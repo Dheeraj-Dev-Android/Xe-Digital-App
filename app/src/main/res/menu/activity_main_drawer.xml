@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item
+        android:id="@+id/nav_dashboard"
+        android:title="@string/menu_dashboard" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:title="@string/menu_profile" />
+
+    <!--    <group android:checkableBehavior="single">-->
+    <!--        <item android:title="@string/menu_attendance">-->
+    <!--            <menu>-->
+    <!--                <item-->
+    <!--                    android:id="@+id/nav_attendance"-->
+    <!--                    android:title="@string/view_attendance" />-->
+    <!--                <item-->
+    <!--                    android:id="@+id/nav_addAttendanceFragment"-->
+    <!--                    android:title="@string/menu_add_attendance" />-->
+    <!--            </menu>-->
+    <!--        </item>-->
+    <!--    </group>-->
+
+    <!--Attendance start-->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_attendance_menu"
+            android:icon="@drawable/lb_ic_nav_arrow"
+            android:title="@string/menu_attendance" />
+    </group>
+    <item
+        android:id="@+id/nav_attendance"
+        android:title="@string/view_attendance"
+        android:visible="false" />
+    <item
+        android:id="@+id/nav_addAttendanceFragment"
+        android:title="@string/menu_add_attendance"
+        android:visible="false" />
+    <item
+        android:id="@+id/nav_regularizeAppliedFragment"
+        android:title="@string/regularize_applied"
+        android:visible="false" />
+    <item
+        android:id="@+id/nav_pendingApprovalFragment"
+        android:title="@string/regularize_pending_approval"
+        android:visible="false" />
+    <!--    Attendance End-->
+
+    <!--    Leaves Start-->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_leaves_menu"
+            android:icon="@drawable/lb_ic_nav_arrow"
+            android:title="@string/menu_leaves" />
+    </group>
+    <item
+        android:id="@+id/nav_leaves"
+        android:title="@string/add_leaves"
+        android:visible="false" />
+    <item
+        android:id="@+id/nav_leaves_data"
+        android:title="@string/total_leaves"
+        android:visible="false" />
+
+    <!--    Leaves End-->
+    <item
+        android:id="@+id/nav_holidays"
+        android:title="@string/menu_holidays" />
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dcr_menu"
+            android:icon="@drawable/lb_ic_nav_arrow"
+            android:title="@string/menu_dcr" />
+
+    </group>
+    <item
+        android:id="@+id/nav_dcr"
+        android:title="@string/view_dcr"
+        android:visible="false" />
+    <item
+        android:id="@+id/nav_dcr_form"
+        android:title="@string/fill_dcr"
+        android:visible="false" />
+
+    <!--    <item-->
+    <!--        android:id="@+id/nav_policy"-->
+    <!--        android:title="@string/menu_policy" />-->
+    <item
+        android:id="@+id/nav_shifts"
+        android:title="@string/menu_shifts" />
+
+    <!--    <item-->
+    <!--        android:id="@+id/nav_claim_management"-->
+    <!--        android:title="@string/menu_claim_management" />-->
+
+    <!--    <item-->
+    <!--        android:id="@+id/nav_documents"-->
+    <!--        android:title="@string/menu_documents_upload" />-->
+
+    <!--    <item-->
+    <!--        android:id="@+id/nav_payroll"-->
+    <!--        android:title="@string/menu_payroll" />-->
+
+    <item
+        android:id="@+id/nav_logout"
+        android:title="@string/logout" />
+
+</menu>

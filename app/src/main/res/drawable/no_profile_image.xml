@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_dropdown_adaptive_back" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>
+
+
+    <!--    <?xml version="1.0" encoding="utf-8"?>-->
+    <!--<shape android:shape="rectangle" xmlns:android="http://schemas.android.com/apk/res/android">-->
+    <!--<corners android:radius="2000dp" />-->
+    <!--<solid android:color="#65ACA7A5" />-->
+    <!--<stroke android:width="5dp" android:color="#03A9F4" />-->
+    <!--</shape>-->
