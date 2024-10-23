@@ -58,17 +58,18 @@
     </group>
     <item
         android:id="@+id/nav_leaves"
-        android:title="@string/add_leaves"
+        android:title="Apply Leaves (Coming Soon*)"
         android:visible="false" />
+    <!--    @string/add_leaves-->
     <item
         android:id="@+id/nav_leaves_data"
         android:title="@string/total_leaves"
         android:visible="false" />
-
-    <!--    Leaves End-->
     <item
-        android:id="@+id/nav_holidays"
-        android:title="@string/menu_holidays" />
+        android:id="@+id/nav_applied_leaves"
+        android:title="@string/leaves_applied"
+        android:visible="false" />
+    <!--    Leaves End-->
 
     <group android:checkableBehavior="single">
         <item
@@ -85,26 +86,32 @@
         android:id="@+id/nav_dcr_form"
         android:title="@string/fill_dcr"
         android:visible="false" />
+    <item
+        android:id="@+id/nav_holidays"
+        android:title="@string/menu_holidays" />
 
-    <!--    <item-->
-    <!--        android:id="@+id/nav_policy"-->
-    <!--        android:title="@string/menu_policy" />-->
+    <item
+        android:id="@+id/nav_policy"
+        android:title="Policy (Coming Soon*)" />
+    <!--    @string/menu_policy-->
     <item
         android:id="@+id/nav_shifts"
-        android:title="@string/menu_shifts" />
+        android:title="Shifts (Coming Soon*)" />
+    <!--    @string/menu_shifts-->
 
-    <!--    <item-->
-    <!--        android:id="@+id/nav_claim_management"-->
-    <!--        android:title="@string/menu_claim_management" />-->
+    <item
+        android:id="@+id/nav_claim_management"
+        android:title="Claim Management (Coming Soon*)" />
+    <!--    @string/menu_claim_management-->
 
-    <!--    <item-->
-    <!--        android:id="@+id/nav_documents"-->
-    <!--        android:title="@string/menu_documents_upload" />-->
-
-    <!--    <item-->
-    <!--        android:id="@+id/nav_payroll"-->
-    <!--        android:title="@string/menu_payroll" />-->
-
+    <item
+        android:id="@+id/nav_documents"
+        android:title="Documents Upload (Coming Soon*)" />
+    <!--"@string/menu_documents_upload-->
+    <item
+        android:id="@+id/nav_payroll"
+        android:title="Payroll (Coming Soon*)" />
+    <!--    @string/menu_payroll-->
     <item
         android:id="@+id/nav_logout"
         android:title="@string/logout" />

@@ -43,7 +43,7 @@ public class RegularizeAppliedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_regularize_applied, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.regularize_applied_recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
         APIInterface apiInterface = APIClient.getInstance().getRegularizeApplied();

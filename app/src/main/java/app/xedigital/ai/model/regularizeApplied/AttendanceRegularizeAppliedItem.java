@@ -2,7 +2,9 @@ package app.xedigital.ai.model.regularizeApplied;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AttendanceRegularizeAppliedItem{
+import java.io.Serializable;
+
+public class AttendanceRegularizeAppliedItem implements Serializable {
 
 	@SerializedName("punchInUpdated")
 	private String punchInUpdated;

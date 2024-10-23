@@ -26,8 +26,8 @@ public class PolicyFragment extends Fragment {
         binding = FragmentPolicyBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textPolicy;
-        policyViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+//        final TextView textView = binding.textPolicy;
+//        policyViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
 
     }

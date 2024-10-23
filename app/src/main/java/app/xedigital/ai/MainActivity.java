@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_viewAttendanceFragment, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment,
-                R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_logout).setOpenableLayout(drawer).build();
+                R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves,R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         // Toggle visibility of submenu items
         menu.findItem(R.id.nav_leaves).setVisible(!isLeavesVisible);
         menu.findItem(R.id.nav_leaves_data).setVisible(!isLeavesVisible);
+        menu.findItem(R.id.nav_applied_leaves).setVisible(!isLeavesVisible);
         // Change icon based on visibility
         if (isLeavesVisible) {
             leavesItem.setIcon(androidx.leanback.R.drawable.lb_ic_nav_arrow);

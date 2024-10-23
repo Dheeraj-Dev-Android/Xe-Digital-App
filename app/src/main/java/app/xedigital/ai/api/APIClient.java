@@ -89,4 +89,6 @@ public class APIClient {
     }
     public APIInterface UpdateRegularizeListApproval() {return  retrofit2.create(APIInterface.class);}
     public APIInterface DcrFormSubmit(){return retrofit2.create(APIInterface.class);}
+
+    public APIInterface AppliedLeave(){return retrofit2.create(APIInterface.class);}
 }

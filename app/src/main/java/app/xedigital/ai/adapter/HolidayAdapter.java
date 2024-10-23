@@ -41,7 +41,6 @@ public class HolidayAdapter extends RecyclerView.Adapter<HolidayAdapter.HolidayV
 
         // Set holiday name
         holder.holidayName.setText(holiday.getHolidayName());
-        Log.d("HolidayAdapter", "Setting holiday name: " + holiday.getHolidayName());
 
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());

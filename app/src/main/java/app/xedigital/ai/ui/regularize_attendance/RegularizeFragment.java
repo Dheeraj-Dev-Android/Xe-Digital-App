@@ -17,13 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
-import app.xedigital.ai.model.profile.UserProfileResponse;
-import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
-import app.xedigital.ai.ui.profile.ProfileViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -45,6 +38,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import app.xedigital.ai.R;
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
+import app.xedigital.ai.model.profile.UserProfileResponse;
+import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
+import app.xedigital.ai.ui.profile.ProfileViewModel;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,17 +65,8 @@ public class RegularizeFragment extends Fragment {
     private TextInputEditText etRemarks;
     private Button btSubmit;
     private Button btnClear;
-    //    private ImageButton btnRegApplied;
     private ProfileViewModel profileViewModel;
     private UserProfileResponse userProfile;
-
-//    public static RegularizeFragment newInstance(EmployeePunchDataItem attendanceItem) {
-//        RegularizeFragment fragment = new RegularizeFragment();
-//        Bundle args = new Bundle();
-//        args.putSerializable(ARG_ATTENDANCE_ITEM, attendanceItem);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,14 +74,14 @@ public class RegularizeFragment extends Fragment {
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         atDate = view.findViewById(R.id.atDate);
-        timePunchIn = view.findViewById(R.id.timepunchin);
-        timePunchOut = view.findViewById(R.id.timepunchout);
-        etPunchInAddress = view.findViewById(R.id.etpunchinaddress);
-        etPunchOutAddress = view.findViewById(R.id.etpunchoutaddress);
-        etRemarks = view.findViewById(R.id.etremarks);
-        btSubmit = view.findViewById(R.id.btsubmit);
-        btnClear = view.findViewById(R.id.btclear);
-//        btnRegApplied = view.findViewById(R.id.appliedRegularize);
+        timePunchIn = view.findViewById(R.id.timePunchIn);
+        timePunchOut = view.findViewById(R.id.timePunchOut);
+        etPunchInAddress = view.findViewById(R.id.etPunchInAddress);
+        etPunchOutAddress = view.findViewById(R.id.etPunchOutAddress);
+        etRemarks = view.findViewById(R.id.etRemarks);
+        btSubmit = view.findViewById(R.id.btSubmit);
+        btnClear = view.findViewById(R.id.btClear);
+
         return view;
     }
 
@@ -175,7 +166,6 @@ public class RegularizeFragment extends Fragment {
                 timePunchIn.setText(selectedTime);
             }, hour, minute, false);
             timePickerDialog.show();
-
         });
         timePunchOut.setOnClickListener(v -> {
             // Get current time
@@ -190,12 +180,6 @@ public class RegularizeFragment extends Fragment {
             }, hour, minute, false);
             timePickerDialog.show();
         });
-
-//        btnRegApplied.setOnClickListener(v -> {
-//            Toast.makeText(requireContext(), "Regularize Applied Data", Toast.LENGTH_SHORT).show();
-//            Navigation.findNavController(v).navigate(R.id.action_regularizeFragment_to_nav_regularizeAppliedFragment);
-//        });
-
     }
 
     @Override
@@ -325,7 +309,6 @@ public class RegularizeFragment extends Fragment {
                         showAlertDialog("Error", "Regularization failed");
                     }
                 } catch (IOException | JSONException e) {
-                    Log.e("API Response", "Error reading response body", e);
                     showAlertDialog("Error", "An error occurred");
                 }
             }
@@ -344,6 +327,4 @@ public class RegularizeFragment extends Fragment {
             }
         });
     }
-
-
 }

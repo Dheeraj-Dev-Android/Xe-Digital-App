@@ -19,7 +19,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="@string/holiday_icon"
-            android:src="@mipmap/ic_launcher"
+            android:src="@mipmap/ic_holiday"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

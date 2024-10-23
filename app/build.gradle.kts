@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.core.i18n)
     implementation(libs.leanback)
     implementation(libs.rendering)
+    implementation(libs.ui.text.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -26,8 +26,8 @@ public class DocumentUploadFragment extends Fragment {
         binding = FragmentDocumentUploadBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textDocumentUpload;
-        documentUploadViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+//        final TextView textView = binding.textDocumentUpload;
+//        documentUploadViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

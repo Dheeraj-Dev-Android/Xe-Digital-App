@@ -2,7 +2,9 @@ package app.xedigital.ai.model.dcrData;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeesDcrDataItem {
+import java.io.Serializable;
+
+public class EmployeesDcrDataItem implements Serializable {
 
     @SerializedName("dcrDate")
     private String dcrDate;

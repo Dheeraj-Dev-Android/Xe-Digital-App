@@ -10,38 +10,9 @@
     android:fontFamily="@font/quicksand_font_family"
     tools:context=".ui.timesheet.DcrFragment">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <!--            <TextView-->
-        <!--                android:id="@+id/textDcr"-->
-        <!--                android:layout_width="0dp"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:fontFamily="@font/quicksand_font_family"-->
-        <!--                android:text="@string/dcr"-->
-        <!--                android:textAlignment="center"-->
-        <!--                android:textSize="20sp"-->
-        <!--                android:textStyle="bold"-->
-        <!--                app:layout_constraintEnd_toEndOf="parent"-->
-        <!--                app:layout_constraintStart_toStartOf="parent"-->
-        <!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-        <!--        <Button-->
-        <!--            android:id="@+id/filterButton"-->
-        <!--            style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:drawableEnd="@drawable/lb_ic_in_app_search"-->
-        <!--            android:text="Filter"-->
-        <!--            android:textAlignment="center"-->
-        <!--            android:textSize="14sp"-->
-        <!--            android:textStyle="bold"-->
-        <!--            app:layout_constraintBottom_toTopOf="@+id/recyclerViewDcr"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintTop_toTopOf="parent"-->
-        <!--            app:layout_constraintVertical_chainStyle="packed" />-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewDcr"

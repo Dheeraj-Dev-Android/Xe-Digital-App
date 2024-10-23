@@ -1,6 +1,7 @@
 package app.xedigital.ai.api;
 
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
+import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
@@ -14,7 +15,6 @@ import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
 import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
 import app.xedigital.ai.model.regularizeUpdateStatus.RegularizeUpdateRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
-
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -68,6 +68,9 @@ public interface APIInterface {
 
     @GET("employees/attendance/regularize/applied?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true")
     retrofit2.Call<RegularizeApprovalResponse> getRegularizeApproval(@Header("Authorization") String authToken);
+
+    @GET("leaves/applied")
+    retrofit2.Call<AppliedLeavesResponse> getAppliedLeaves(@Header("Authorization") String authToken);
 
     //    POST APIs
     @POST("face/recognize")

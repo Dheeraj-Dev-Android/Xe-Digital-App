@@ -3,14 +3,12 @@ package app.xedigital.ai.ui.timesheet;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +17,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.DcrAdapter;
 import app.xedigital.ai.databinding.FragmentDcrBinding;
@@ -26,15 +27,8 @@ import app.xedigital.ai.model.dcrData.Data;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrData.EmployeesDcrDataItem;
 import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DcrFragment extends Fragment implements FilterAppliedListener {
-
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private FragmentDcrBinding binding;
     private TimesheetViewModel dcrViewModel;
     private RecyclerView recyclerViewDcr;
@@ -75,22 +69,11 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
 
         dcrViewModel.getDcrData().observe(getViewLifecycleOwner(), dcrDataList -> {
             if (dcrDataList != null) {
-                String prettyJson = gson.toJson(dcrDataList);
-                Log.d("DcrFragment", "Pretty JSON:\n" + prettyJson);
                 List<EmployeesDcrDataItem> dcr = parseDcrData(dcrDataList);
                 dcrAdapter.updateData(dcr);
-//                DcrAdapter dcrAdapter = new DcrAdapter(dcr, this);
                 recyclerViewDcr.setAdapter(dcrAdapter);
             }
-
         });
-//        Button filterButton = view.findViewById(R.id.filterButton);
-//        filterButton.setOnClickListener(v -> {
-//            FilterBottomSheetDialogFragment filterBottomSheetDialogFragment = new FilterBottomSheetDialogFragment();
-//            filterBottomSheetDialogFragment.setFilterAppliedListener(this);
-//            filterBottomSheetDialogFragment.show(getParentFragmentManager(), filterBottomSheetDialogFragment.getTag());
-//        });
-
     }
 
     private List<EmployeesDcrDataItem> parseDcrData(DcrDataResponse dcrResponse) {
@@ -105,20 +88,17 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
         return new ArrayList<>();
     }
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_dcr_fragment, menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

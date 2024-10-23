@@ -57,6 +57,15 @@
         <action
             android:id="@+id/action_nav_regularizeAppliedFragment_to_nav_attendance"
             app:destination="@id/nav_attendance" />
+        <action
+            android:id="@+id/action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment"
+            app:destination="@id/nav_regularizeViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_regularizeViewFragment"
+        android:name="app.xedigital.ai.ui.regularize_attendance.RegularizeViewFragment"
+        android:label="Regularize View">
+
     </fragment>
 
     <fragment
@@ -114,6 +123,24 @@
             android:id="@+id/action_nav_leaves_to_nav_attendance"
             app:destination="@id/nav_attendance" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_applied_leaves"
+        android:name="app.xedigital.ai.ui.leaves.AppliedLeaveFragment"
+        android:label="Applied Leaves"
+        tools:layout="@layout/fragment_applied_leave">
+        <action
+            android:id="@+id/action_nav_applied_leaves_to_nav_view_applied_leaves"
+            app:destination="@id/nav_view_applied_leaves" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_view_applied_leaves"
+        android:name="app.xedigital.ai.ui.leaves.AppliedViewFragment"
+        android:label="View Applied Leaves"
+        tools:layout="@layout/fragment_applied_view">
+        <action
+            android:id="@+id/action_nav_view_applied_leaves_to_nav_applied_leaves"
+            app:destination="@id/nav_applied_leaves" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_holidays"
@@ -133,15 +160,28 @@
         <action
             android:id="@+id/action_nav_dcr_to_nav_holidays"
             app:destination="@id/nav_holidays" />
+        <action
+            android:id="@+id/action_nav_dcr_to_nav_selected_Timesheet"
+            app:destination="@id/nav_selected_Timesheet" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_dcr_form"
         android:name="app.xedigital.ai.ui.timesheet.TimesheetFormFragment"
-        android:label="Fill DCR"
+        android:label="Add Timesheet"
         tools:layout="@layout/fragment_dcr_form">
         <action
             android:id="@+id/action_nav_dcr_form_to_nav_dcr"
+            app:destination="@id/nav_dcr" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_selected_Timesheet"
+        android:name="app.xedigital.ai.ui.timesheet.SelectedTimesheetFragment"
+        android:label="Selected Timesheet"
+        tools:layout="@layout/fragment_selected_timesheet">
+        <action
+            android:id="@+id/action_nav_selected_Timesheet_to_nav_dcr"
             app:destination="@id/nav_dcr" />
     </fragment>
     <fragment

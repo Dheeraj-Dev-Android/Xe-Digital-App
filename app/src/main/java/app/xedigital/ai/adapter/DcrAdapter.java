@@ -1,20 +1,20 @@
 package app.xedigital.ai.adapter;
 
+import static app.xedigital.ai.ui.timesheet.SelectedTimesheetFragment.ARG_SELECTED_ITEM;
+
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.model.dcrData.EmployeesDcrDataItem;
-import app.xedigital.ai.ui.timesheet.DcrFragment;
-import app.xedigital.ai.utills.DateTimeUtils;
-
-import org.jsoup.Jsoup;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -24,13 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import app.xedigital.ai.R;
+import app.xedigital.ai.model.dcrData.EmployeesDcrDataItem;
+import app.xedigital.ai.ui.timesheet.DcrFragment;
+import app.xedigital.ai.utills.DateTimeUtils;
+
 
 public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
 
     private List<EmployeesDcrDataItem> dcrDataList;
 
     public DcrAdapter(List<EmployeesDcrDataItem> dcrDataList, DcrFragment dcrFragment) {
-//        this.dcrDataList = dcrDataList;
         this.dcrDataList = new ArrayList<>();
     }
 
@@ -42,45 +46,39 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
     @NonNull
     @Override
     public DcrViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.dcr_list, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.timesheet_view_list, parent, false);
         return new DcrViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull DcrViewHolder holder, int position) {
         EmployeesDcrDataItem dcrData = dcrDataList.get(position);
-//        holder.employeeNameTextView.setText("Name : ");
-//        holder.employeeNameTextView.setText("Name : " + dcrData.getEmployee().getFirstname());
-
-//        holder.dateTextView.setText("Date : ");
         holder.dateTextView.setText("Date : " + DateTimeUtils.getDayOfWeekAndDate(dcrData.getDcrDate()));
 
         // Format in and out times using the formatTime method
         String formattedInTime = formatTime(dcrData.getInTime());
         String formattedOutTime = formatTime(dcrData.getOutTime());
 
-        String htmlToday = dcrData.getTodayReport();
-        String htmlOutcome = dcrData.getOutcome();
-        String htmlNextDay = dcrData.getTommarowPlan();
+        holder.inTimeTextView.setText("Punch In Time : " + formattedInTime);
+        holder.outTimeTextView.setText("Punch Out Time : " + formattedOutTime);
 
-        String todayReport = Jsoup.parse(htmlToday).text();
-        String dcrOutcome = Jsoup.parse(htmlOutcome).text();
-        String nextDay = Jsoup.parse(htmlNextDay).text();
 
-//        holder.inTimeTextView.setText("Punch In Time : ");
-        holder.inTimeTextView.setText("In Time : " + formattedInTime);
+        holder.btn_viewTimesheet.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                EmployeesDcrDataItem selectedItem = dcrDataList.get(position);
+                String dcrId = selectedItem.getId();
+                if (dcrId != null && selectedItem != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_SELECTED_ITEM, selectedItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_dcr_to_nav_selected_Timesheet, bundle);
+                } else {
+                    Toast.makeText(v.getContext(), "Selected item or dcrId is null", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(v.getContext(), "Invalid position", Toast.LENGTH_SHORT).show();
+            }
 
-//        holder.outTimeTextView.setText("Punch Out Time : ");
-        holder.outTimeTextView.setText("Out Time : " + formattedOutTime);
-
-        holder.reportTextView.setText("Today's Report : ");
-        holder.reportTextValue.setText(todayReport);
-
-        holder.reportOutcomeTextView.setText("Outcome Of The Day : ");
-        holder.reportOutcomeTextValue.setText(dcrOutcome);
-
-        holder.nexDayTextView.setText("Next Day Plan : ");
-        holder.nexDayTextValue.setText(nextDay);
+        });
     }
 
     @Override
@@ -108,37 +106,17 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
     }
 
     public static class DcrViewHolder extends RecyclerView.ViewHolder {
-        public TextView employeeNameTextView;
-        public TextView employeeNameTextValue;
         public TextView dateTextView;
-        public TextView dateTextValue;
         public TextView inTimeTextView;
-        public TextView inTimeTextValue;
         public TextView outTimeTextView;
-        public TextView outTimeTextValue;
-        public TextView reportTextView;
-        public TextView reportTextValue;
-        public TextView reportOutcomeTextView;
-        public TextView reportOutcomeTextValue;
-        public TextView nexDayTextView;
-        public TextView nexDayTextValue;
+        public ShapeableImageView btn_viewTimesheet;
 
         public DcrViewHolder(@NonNull View itemView) {
             super(itemView);
-//            employeeNameTextView = itemView.findViewById(R.id.employeeNameTextView);
-//            employeeNameTextValue = itemView.findViewById(R.id.employeeNameTextValue);
-            dateTextView = itemView.findViewById(R.id.dateTextView);
-//            dateTextValue = itemView.findViewById(R.id.dateTextValue);
-            inTimeTextView = itemView.findViewById(R.id.inTimeTextView);
-//            inTimeTextValue = itemView.findViewById(R.id.inTimeTextValue);
-            outTimeTextView = itemView.findViewById(R.id.outTimeTextView);
-//            outTimeTextValue = itemView.findViewById(R.id.outTimeTextValue);
-            reportTextView = itemView.findViewById(R.id.reportTextView);
-            reportTextValue = itemView.findViewById(R.id.reportTextValue);
-            reportOutcomeTextView = itemView.findViewById(R.id.reportOutcomeTextView);
-            reportOutcomeTextValue = itemView.findViewById(R.id.reportOutcomeTextValue);
-            nexDayTextView = itemView.findViewById(R.id.nexDayTextView);
-            nexDayTextValue = itemView.findViewById(R.id.nexDayTextValue);
+            dateTextView = itemView.findViewById(R.id.timesheetDate);
+            inTimeTextView = itemView.findViewById(R.id.punchInView);
+            outTimeTextView = itemView.findViewById(R.id.punchOutView);
+            btn_viewTimesheet = itemView.findViewById(R.id.btn_viewTimesheet);
 
         }
     }

@@ -29,8 +29,8 @@ public class ClaimManagementFragment extends Fragment {
         binding = FragmentClaimManagementBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textClaim;
-        claimManagementViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+//        final TextView textView = binding.textClaim;
+//        claimManagementViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
 
     }

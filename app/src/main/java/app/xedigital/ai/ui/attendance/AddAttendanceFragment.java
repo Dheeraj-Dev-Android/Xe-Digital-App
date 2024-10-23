@@ -114,6 +114,7 @@ public class AddAttendanceFragment extends Fragment {
             timePunchOut.setText("");
             etPunchInAddress.setText("");
             etPunchOutAddress.setText("");
+            etRemarks.setText("");
         });
 
         timePunchIn.setOnClickListener(v -> {

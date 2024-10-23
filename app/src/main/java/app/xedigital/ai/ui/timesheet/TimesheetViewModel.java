@@ -44,41 +44,6 @@ public class TimesheetViewModel extends ViewModel {
         this.authToken = authToken;
     }
 
-//    public void fetchEmployeeDcr(String startDate, String endDate) {
-//
-//        if (startDate == null || startDate.isEmpty() || endDate == null || endDate.isEmpty()) {
-//            // If start or end date is not provided, default to the last 30 days
-//            Calendar calendar = Calendar.getInstance();
-//            endDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
-//            calendar.add(Calendar.DAY_OF_MONTH, -30);
-//            startDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
-//        }
-//        if (authToken != null) {
-//            String authHeaderValue = "jwt " + authToken;
-//            apiInterface.getEmployeeDcr(authHeaderValue, startDate, endDate, "", "", "", "", "", "").enqueue(new Callback<DcrDataResponse>() {
-//                @Override
-//                public void onResponse(@NonNull Call<DcrDataResponse> call, @NonNull Response<DcrDataResponse> response) {
-//                    if (response.isSuccessful() && response.body() != null) {
-//                        _dcrData.postValue(response.body());
-//                        String responsejson = gson.toJson(response.body());
-//                        Log.d("DcrDataResponse", "Response:\n " + responsejson);
-//                    } else {
-//                        Log.e("DcrDataResponse", "Error: " + response.code());
-//
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(@NonNull Call<DcrDataResponse> call, @NonNull Throwable t) {
-//                    Log.e("DcrDataResponse", "Error: " + t.getMessage());
-//                }
-//            });
-//        } else {
-//            Log.e("DcrDataResponse", "Error: Auth token is null");
-//        }
-//    }
-
-
     public void fetchEmployeeDcr(String startDate, String endDate) {
         if (startDate == null || startDate.isEmpty() || endDate == null || endDate.isEmpty()) {
             // If start or end date is not provided, default to the last 30 days

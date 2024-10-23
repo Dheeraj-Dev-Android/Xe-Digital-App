@@ -3,6 +3,7 @@ package app.xedigital.ai.utills;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,9 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -54,7 +58,9 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
         applyFilterButton.setOnClickListener(v -> {
             String startDate = Objects.requireNonNull(startDateEditText.getText()).toString();
+            Log.d("FilterBottomSheetDialogFragment", "Start Date: " + startDate);
             String endDate = Objects.requireNonNull(endDateEditText.getText()).toString();
+            Log.d("FilterBottomSheetDialogFragment", "End Date: " + endDate);
 
             if (startDate.isEmpty() || endDate.isEmpty()) {
                 Toast.makeText(requireContext(), "Please select start and end date", Toast.LENGTH_SHORT).show();
@@ -75,14 +81,13 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     private boolean isValidDateRange(String startDate, String endDate) {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-            Date startDateObj = dateFormat.parse(startDate);
-            Date endDateObj = dateFormat.parse(endDate);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault());
+            LocalDate startDateObj = LocalDate.parse(startDate, formatter);
+            LocalDate endDateObj = LocalDate.parse(endDate, formatter);
 
-            assert startDateObj != null;
-            return startDateObj.before(endDateObj) || startDateObj.equals(endDateObj);
+            return !startDateObj.isAfter(endDateObj);
 
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             e.printStackTrace();
             return false;
         }
@@ -93,11 +98,15 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
         materialDateBuilder.setTitleText("SELECT A DATE");
         final MaterialDatePicker<Long> materialDatePicker = materialDateBuilder.build();
         materialDatePicker.show(getParentFragmentManager(), "MATERIAL_DATE_PICKER");
-        materialDatePicker.addOnPositiveButtonClickListener(selection -> editText.setText(materialDatePicker.getHeaderText()));
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            // Format the selected date to "yyyy-MM-dd"
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String formattedDate = sdf.format(new Date(selection));
+            editText.setText(formattedDate);
+        });
         materialDatePicker.addOnNegativeButtonClickListener(v -> materialDatePicker.dismiss());
         materialDatePicker.addOnCancelListener(dialogInterface -> materialDatePicker.dismiss());
     }
-
     public void setFilterAppliedListener(FilterAppliedListener listener) {
         this.filterAppliedListener = listener;
     }

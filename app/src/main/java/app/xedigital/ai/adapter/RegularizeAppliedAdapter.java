@@ -1,18 +1,24 @@
 package app.xedigital.ai.adapter;
 
+import static app.xedigital.ai.ui.regularize_attendance.RegularizeViewFragment.ARG_REGULARIZE_APPLIED_ITEM;
+
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.regularizeApplied.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.utills.DateTimeUtils;
-
-import java.util.List;
 
 public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeAppliedAdapter.ViewHolder> {
 
@@ -34,46 +40,27 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AttendanceRegularizeAppliedItem item = items.get(position);
 
-        holder.empName.setText(item.getEmployee().getFullname());
-        holder.empEmail.setText(item.getEmployee().getEmail());
-
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
-        holder.empPunchDate.setText(formattedPunchDate);
-
-        holder.empShift.setText(item.getShift().getName() + " (" + item.getShift().getStartTime() + " - " + item.getShift().getEndTime() + ")");
-
-        String formattedPunchIn = DateTimeUtils.formatTime(item.getPunchIn());
-        holder.empPunchIn.setText(formattedPunchIn);
-
-        String formattedPunchOut = DateTimeUtils.formatTime(item.getPunchOut());
-        holder.empPunchOut.setText(formattedPunchOut);
-
-        String totalTime = DateTimeUtils.calculateTotalTime(formattedPunchIn, formattedPunchOut);
-        holder.empTotalTime.setText(totalTime);
-
-        String lateTime = DateTimeUtils.calculateLateTime(item.getPunchIn(), item.getShift().getStartTime());
-        holder.empLateTime.setText(lateTime);
-
-        holder.empPunchInAddress.setText(item.getPunchInAddress());
-        holder.empPunchOutAddress.setText(item.getPunchOutAddress());
-
-        String formattedAppliedPunchIn = DateTimeUtils.formatTime(item.getPunchInUpdated());
-        holder.appliedPunchIn.setText(formattedAppliedPunchIn);
-
-        String formattedAppliedPunchOut = DateTimeUtils.formatTime(item.getPunchOutUpdated());
-        holder.appliedPunchOut.setText(formattedAppliedPunchOut);
-
-        holder.appliedPunchInAddress.setText(item.getPunchInAddressUpdated());
-        holder.appliedPunchOutAddress.setText(item.getPunchOutAddressUpdated());
-
+        holder.empPunchDate.setText("Punch Date : " + formattedPunchDate);
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText(formattedAppliedDate);
+        holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
+        holder.appliedStatus.setText("Applied Status : " + item.getStatus());
 
-        holder.appliedStatus.setText(item.getStatus());
-        holder.appliedStatusUpdateBy.setText(item.getApprovedByName());
 
-        String formattedUpdatedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
-        holder.appliedStatusUpdateDate.setText(formattedUpdatedDate);
+        holder.btnViewRegularize.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                AttendanceRegularizeAppliedItem regularizeAppliedItem = items.get(position);
+                if (regularizeAppliedItem != null && regularizeAppliedItem.getId() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_REGULARIZE_APPLIED_ITEM, regularizeAppliedItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment, bundle);
+                } else {
+                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -82,46 +69,19 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView empName;
-        public TextView empEmail;
-        public TextView empShift;
         public TextView empPunchDate;
-        public TextView empPunchIn;
-        public TextView empPunchOut;
-        public TextView empTotalTime;
-        public TextView empLateTime;
-        public TextView empPunchInAddress;
-        public TextView empPunchOutAddress;
-        public TextView appliedPunchIn;
-        public TextView appliedPunchOut;
-        public TextView appliedPunchInAddress;
-        public TextView appliedPunchOutAddress;
         public TextView appliedDate;
         public TextView appliedStatus;
-        public TextView appliedStatusUpdateBy;
-        public TextView appliedStatusUpdateDate;
+
+        public ImageButton btnViewRegularize;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            empName = itemView.findViewById(R.id.empName);
-            empEmail = itemView.findViewById(R.id.empEmail);
             empPunchDate = itemView.findViewById(R.id.empPunchDate);
-            empShift = itemView.findViewById(R.id.empShift);
-            empPunchIn = itemView.findViewById(R.id.empPunchIn);
-            empPunchOut = itemView.findViewById(R.id.empPunchOut);
-            empTotalTime = itemView.findViewById(R.id.empTotalTime);
-            empLateTime = itemView.findViewById(R.id.empLateTime);
-            empPunchInAddress = itemView.findViewById(R.id.empPunchInAddress);
-            empPunchOutAddress = itemView.findViewById(R.id.empPunchOutAddress);
-            appliedPunchIn = itemView.findViewById(R.id.appliedPunchIn);
-            appliedPunchOut = itemView.findViewById(R.id.appliedPunchOut);
-            appliedPunchInAddress = itemView.findViewById(R.id.appliedPunchInAddress);
-            appliedPunchOutAddress = itemView.findViewById(R.id.appliedPunchOutAddress);
             appliedDate = itemView.findViewById(R.id.appliedDate);
             appliedStatus = itemView.findViewById(R.id.appliedStatus);
-            appliedStatusUpdateBy = itemView.findViewById(R.id.appliedStatusUpdateBy);
-            appliedStatusUpdateDate = itemView.findViewById(R.id.appliedStatusUpdateDate);
-
+            btnViewRegularize = itemView.findViewById(R.id.btn_viewRegularize);
         }
+
     }
 }

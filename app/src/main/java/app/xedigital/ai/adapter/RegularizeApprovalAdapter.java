@@ -81,12 +81,10 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         AttendanceRegularizeAppliedItem item = items.get(position);
 
         holder.empName.setText(item.getEmployee().getFullname());
-        holder.appliedDate.setText(item.getAppliedDate());
-        holder.empName.setText(item.getEmployee().getFullname());
         holder.empEmail.setText(item.getEmployee().getEmail() + ",  " + item.getEmployee().getContact());
 
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
-        holder.empPunchDate.setText(formattedPunchDate);
+        holder.empPunchDate.setText("Punch Date : "+formattedPunchDate);
 
         holder.empShift.setText(item.getShift().getName() + " (" + item.getShift().getStartTime() + " - " + item.getShift().getEndTime() + ")");
 
@@ -95,12 +93,6 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
 
         String formattedPunchOut = DateTimeUtils.formatTime(item.getPunchOut());
         holder.empPunchOut.setText(formattedPunchOut);
-
-        String totalTime = DateTimeUtils.calculateTotalTime(formattedPunchIn, formattedPunchOut);
-        holder.empTotalTime.setText(totalTime);
-
-        String lateTime = DateTimeUtils.calculateLateTime(item.getPunchIn(), item.getShift().getStartTime());
-        holder.empLateTime.setText(lateTime);
 
         holder.empPunchInAddress.setText(item.getPunchInAddress());
         holder.empPunchOutAddress.setText(item.getPunchOutAddress());
@@ -115,7 +107,7 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         holder.appliedPunchOutAddress.setText(item.getPunchOutAddressUpdated());
 
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText(formattedAppliedDate);
+        holder.appliedDate.setText("Applied Date : "+formattedAppliedDate);
 
         holder.appliedStatus.setText(item.getStatus());
         holder.appliedStatusUpdateBy.setText(item.getApprovedByName());
@@ -242,8 +234,6 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         public TextView empPunchDate;
         public TextView empPunchIn;
         public TextView empPunchOut;
-        public TextView empTotalTime;
-        public TextView empLateTime;
         public TextView empPunchInAddress;
         public TextView empPunchOutAddress;
         public TextView appliedPunchIn;
@@ -266,8 +256,6 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
             empShift = itemView.findViewById(R.id.empShift);
             empPunchIn = itemView.findViewById(R.id.empPunchIn);
             empPunchOut = itemView.findViewById(R.id.empPunchOut);
-            empTotalTime = itemView.findViewById(R.id.empTotalTime);
-            empLateTime = itemView.findViewById(R.id.empLateTime);
             empPunchInAddress = itemView.findViewById(R.id.empPunchInAddress);
             empPunchOutAddress = itemView.findViewById(R.id.empPunchOutAddress);
             appliedPunchIn = itemView.findViewById(R.id.appliedPunchIn);

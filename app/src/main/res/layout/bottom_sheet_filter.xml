@@ -27,13 +27,13 @@
             android:background="@color/white"
             android:hint="Start Date"
             app:errorTextColor="@color/white">
-<!--            app:startIconDrawable="@drawable/ic_calendar"-->
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/startDateEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
+                android:drawableEnd="@drawable/ic_calendar"
                 android:focusable="false" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -45,13 +45,12 @@
             android:background="@color/white"
             android:hint="End Date">
 
-<!--            app:startIconDrawable="@drawable/ic_calendar"-->
-
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/endDateEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
+                android:drawableEnd="@drawable/ic_calendar"
                 android:focusable="false" />
 
         </com.google.android.material.textfield.TextInputLayout>

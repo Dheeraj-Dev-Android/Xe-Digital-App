@@ -14,13 +14,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.655">
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/appliedRegularize"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:src="@drawable/ic_clock"-->
-<!--            />-->
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,9 +22,10 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center_horizontal"
             android:text="@string/regularize_attendance"
-            android:textColor="@color/black"
-            android:textSize="25sp" />
-
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+            android:textColor="@color/purple_700"
+            android:textSize="24sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
@@ -46,104 +40,71 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".ui.regularize_attendance.RegularizeFragment">
 
-        <!--        <TextView-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_gravity="center_horizontal"-->
-        <!--            android:layout_marginTop="5dp"-->
-        <!--            android:fontFamily="@font/quicksand_font_family"-->
-        <!--            android:gravity="center_horizontal"-->
-        <!--            android:text="@string/regularize_attendance"-->
-        <!--            android:textColor="@color/black"-->
-        <!--            android:textSize="25sp" />-->
-
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/quicksand_font_family">
+            android:layout_marginVertical="@dimen/input_vertical_margin"
+            app:startIconDrawable="@drawable/ic_calendar"
+            app:startIconTint="@color/purple_500">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/atDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:hint="Date" />
+                android:focusable="false"
+                android:hint="Date"
+                android:paddingStart="40dp"
+                android:paddingEnd="5dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!--        <Button-->
-        <!--            android:id="@+id/selectDateButton"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_gravity="end"-->
-        <!--            android:fontFamily="@font/quicksand_font_family"-->
-        <!--            android:text="Select Date" />-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:baselineAligned="false"
+            android:layout_marginVertical="@dimen/input_vertical_margin"
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tpunchin"
+                android:id="@+id/tPunchIn"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:fontFamily="@font/quicksand_font_family"
-                android:hint="Punch In Time"
-                app:endIconDrawable="@drawable/ic_clock"
-                app:endIconMode="custom">
+                app:startIconDrawable="@drawable/ic_clock"
+                app:startIconTint="@color/purple_500">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/timepunchin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!--        <Button-->
-            <!--            android:id="@+id/selectTimeButton1"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:layout_gravity="end"-->
-            <!--            android:fontFamily="@font/quicksand_font_family"-->
-            <!--            android:text="Select Time" />-->
-
-            <View
-                android:layout_width="5dp"
-                android:layout_height="0dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tpunchout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/quicksand_font_family"
-                android:hint="Punch Out Time"
-                app:endIconDrawable="@drawable/ic_clock"
-                app:endIconMode="custom">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/timepunchout"
+                    android:id="@+id/timePunchIn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family" />
+                    android:focusable="false"
+                    android:hint="In Time"
+                    android:paddingStart="40dp"
+                    android:paddingEnd="5dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!--        <Button-->
-            <!--            android:id="@+id/selectTimeButton2"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:layout_gravity="end"-->
-            <!--            android:fontFamily="@font/quicksand_font_family"-->
-            <!--            android:text="Select Time" />-->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tPunchOut"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                app:startIconDrawable="@drawable/ic_clock"
+                app:startIconTint="@color/purple_500">
 
-
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/timePunchOut"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:hint="Out Time"
+                    android:paddingStart="40dp"
+                    android:paddingEnd="5dp" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
-
         <!-- Punch In Address-->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -152,13 +113,16 @@
             android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etpunchinaddress"
+                android:id="@+id/etPunchInAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_font_family"
                 android:hint="Punch In Address"
                 android:inputType="textMultiLine"
-                android:lines="1" />
+                android:maxLines="5"
+                android:scrollbars="vertical"
+                android:gravity="top"
+                android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Punch Out Address-->
@@ -170,13 +134,16 @@
             android:fontFamily="@font/quicksand_font_family">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etpunchoutaddress"
+                android:id="@+id/etPunchOutAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_font_family"
                 android:hint="Punch Out Address"
                 android:inputType="textMultiLine"
-                android:lines="1" />
+                android:maxLines="5"
+                android:scrollbars="vertical"
+                android:gravity="top"
+                android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Remarks-->
@@ -188,37 +155,49 @@
             android:fontFamily="@font/quicksand_font_family">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etremarks"
+                android:id="@+id/etRemarks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_font_family"
                 android:hint="Remarks"
                 android:inputType="textMultiLine"
-                android:lines="2" />
+                android:maxLines="5"
+                android:scrollbars="vertical"
+                android:gravity="top"
+                android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
-            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/buttons_top_margin"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btsubmit"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="185dp"
+                android:id="@+id/btSubmit"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Submit" />
+                android:layout_marginEnd="8dp"
+                android:paddingHorizontal="32dp"
+                android:text="Submit"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/purple_500"
+                app:cornerRadius="8dp" />
 
             <Button
-                android:id="@+id/btclear"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="185dp"
+                android:id="@+id/btClear"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="Clear" />
+                android:layout_marginStart="8dp"
+                android:paddingHorizontal="32dp"
+                android:text="Clear"
+                android:textColor="@color/design_default_color_error"
+                app:cornerRadius="8dp"
+                app:strokeColor="@color/design_default_color_error" />
 
         </LinearLayout>
-
-
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

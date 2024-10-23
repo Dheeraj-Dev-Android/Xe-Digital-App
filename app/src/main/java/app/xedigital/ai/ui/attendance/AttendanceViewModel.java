@@ -39,9 +39,11 @@ public class AttendanceViewModel extends ViewModel {
     public AttendanceViewModel() {
         apiInterface = APIClient.getInstance().getAttendance();
     }
+
     public void showToastMessage(String message) {
         _toastMessage.setValue(message);
     }
+
     public void storeLoginData(String authToken) {
         this.authToken = authToken;
     }
@@ -78,7 +80,7 @@ public class AttendanceViewModel extends ViewModel {
                             EmployeeAttendanceResponse responseBody = response.body();
                             mainHandler.post(() -> _attendance.setValue(responseBody));
                             mainHandler.post(() -> {
-                                String message = "Fetching attendance from " + startDate + " to " + endDate;
+                                String message = "Attendance Showing from " + startDate + " to " + endDate;
                                 showToastMessage(message);
                             });
                             if (responseBody.getData().getEmployeePunchData().isEmpty()) {
@@ -86,9 +88,8 @@ public class AttendanceViewModel extends ViewModel {
                             } else {
                                 mainHandler.post(() -> showNoDataAlert.setValue(false));
                             }
-                            String responseJson = gson.toJson(response.body());
-
-                            Log.d(TAG, "onResponse:\n " + responseJson);
+//                            String responseJson = gson.toJson(response.body());
+//                            Log.d(TAG, "onResponse:\n " + responseJson);
                         } else {
                             Log.e(TAG, "Error:authToken is null");
                             System.err.println("API Error : " + response.code());

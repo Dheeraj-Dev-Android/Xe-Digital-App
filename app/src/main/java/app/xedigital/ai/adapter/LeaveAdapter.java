@@ -4,15 +4,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import app.xedigital.ai.R;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
+import app.xedigital.ai.R;
 import app.xedigital.ai.model.leaves.LeavesItem;
 import app.xedigital.ai.utills.DateTimeUtils;
-
-import java.util.List;
 
 public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHolder> {
     private final List<LeavesItem> leaveList;

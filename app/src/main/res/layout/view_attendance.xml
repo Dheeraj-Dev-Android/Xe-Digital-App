@@ -18,6 +18,14 @@
         android:padding="16dp">
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_calendar"
+            android:textColor="#1C160C"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/dateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -98,6 +106,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="16dp">
 
@@ -201,8 +210,6 @@
                 android:text="Shift"
                 android:textAppearance="?attr/textAppearanceHeadline6"
                 android:textStyle="bold"
-                app:drawableStartCompat="@drawable/ic_clock"
-                app:drawableTint="@color/OccasionalLeave"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -213,6 +220,8 @@
                 android:layout_marginTop="8dp"
                 android:drawablePadding="8dp"
                 android:text="09:00AM - 06:00PM"
+                app:drawableStartCompat="@drawable/ic_clock"
+                app:drawableTint="@color/OccasionalLeave"
                 android:textAppearance="?attr/textAppearanceBody1"
                 app:layout_constraintStart_toStartOf="@id/shiftTitle"
                 app:layout_constraintTop_toBottomOf="@id/shiftTitle" />

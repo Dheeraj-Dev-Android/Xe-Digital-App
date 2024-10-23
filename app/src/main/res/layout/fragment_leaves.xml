@@ -4,206 +4,248 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/color_white"
     android:fontFamily="@font/quicksand_font_family"
     tools:context=".ui.leaves.LeavesFragment">
 
-    <RelativeLayout
-        android:id="@+id/leaveformcard"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:elevation="10dp"
-        android:fontFamily="@font/quicksand_font_family"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="100dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="48dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/quicksand_font_family"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:src="@drawable/coming_soon_illustration"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/quicksand_font_family"
-                android:gravity="center_horizontal"
-                android:text="Apply Leave"
-                android:textColor="@color/purple_700"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Coming Soon"
+            android:textColor="#333333"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-            <!-- From Date -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family">
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="We're working hard to bring you an amazing new app. Stay tuned for updates!"
+            android:textColor="#666666"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etFromDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="From Date" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerLeaveCategoryfrom"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Leave Category"
-                    android:inputType="none"
-                    android:text="Leave Category" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <!-- To Date -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etToDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:hint="To Date" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerLeaveCategoryto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Leave Category"
-                    android:inputType="none"
-                    android:text="Leave Category" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Type of Leave (Spinner) -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerLeaveType"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Type of Leave"
-                    android:inputType="none"
-                    android:text="Type of Leave" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <!-- Reason for Leave -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etReason"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Reason for Leave"
-                    android:inputType="textMultiLine"
-                    android:lines="2" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Leaving Station (Checkbox) -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerLeavingstation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Leaving Station"
-                    android:inputType="none"
-                    android:text="Leaving Station" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilLeaveStationAddress"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etLeaveStationAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Leave Station Address" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Contact Number -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/quicksand_font_family">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etContactNumber"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:hint="Contact Number"
-                    android:inputType="phone" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Submit Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/quicksand_font_family"
-                android:text="Submit" />
-
-        </LinearLayout>
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
+    <!--    <RelativeLayout-->
+    <!--        android:id="@+id/leaveformcard"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:elevation="10dp"-->
+    <!--        android:fontFamily="@font/quicksand_font_family"-->
+    <!--        android:padding="16dp"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent">-->
+
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:fontFamily="@font/quicksand_font_family"-->
+    <!--            android:orientation="vertical"-->
+    <!--            android:padding="16dp">-->
+
+    <!--            <TextView-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="5dp"-->
+    <!--                android:layout_marginBottom="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family"-->
+    <!--                android:gravity="center_horizontal"-->
+    <!--                android:text="Apply Leave"-->
+    <!--                android:textColor="@color/purple_700"-->
+    <!--                android:textSize="25sp"-->
+    <!--                android:textStyle="bold" />-->
+
+    <!--            &lt;!&ndash; From Date &ndash;&gt;-->
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content">-->
+
+    <!--                <com.google.android.material.textfield.TextInputEditText-->
+    <!--                    android:id="@+id/etFromDate"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:drawableEnd="@drawable/ic_calendar"-->
+    <!--                    android:focusable="false"-->
+    <!--                    android:hint="From Date" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <AutoCompleteTextView-->
+    <!--                    android:id="@+id/spinnerLeaveCategoryfrom"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:hint="Leave Category"-->
+    <!--                    android:inputType="none"-->
+    <!--                    android:text="Leave Category" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+
+    <!--            &lt;!&ndash; To Date &ndash;&gt;-->
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp">-->
+
+    <!--                <com.google.android.material.textfield.TextInputEditText-->
+    <!--                    android:id="@+id/etToDate"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:drawableEnd="@drawable/ic_calendar"-->
+    <!--                    android:focusable="false"-->
+    <!--                    android:hint="To Date" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <AutoCompleteTextView-->
+    <!--                    android:id="@+id/spinnerLeaveCategoryto"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:fontFamily="@font/quicksand_font_family"-->
+    <!--                    android:hint="Leave Category"-->
+    <!--                    android:inputType="none"-->
+    <!--                    android:text="Leave Category" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--            &lt;!&ndash; Type of Leave (Spinner) &ndash;&gt;-->
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <AutoCompleteTextView-->
+    <!--                    android:id="@+id/spinnerLeaveType"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:fontFamily="@font/quicksand_font_family"-->
+    <!--                    android:hint="Type of Leave"-->
+    <!--                    android:inputType="none"-->
+    <!--                    android:text="Type of Leave" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+
+    <!--            &lt;!&ndash; Reason for Leave &ndash;&gt;-->
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <com.google.android.material.textfield.TextInputEditText-->
+    <!--                    android:id="@+id/etReason"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:fontFamily="@font/quicksand_font_family"-->
+    <!--                    android:hint="Reason for Leave"-->
+    <!--                    android:inputType="textMultiLine"-->
+    <!--                    android:lines="2" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--            &lt;!&ndash; Leaving Station (Checkbox) &ndash;&gt;-->
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <AutoCompleteTextView-->
+    <!--                    android:id="@+id/spinnerLeavingstation"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:fontFamily="@font/quicksand_font_family"-->
+    <!--                    android:hint="Leaving Station"-->
+    <!--                    android:inputType="none"-->
+    <!--                    android:text="Leaving Station" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                android:id="@+id/tilLeaveStationAddress"-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <com.google.android.material.textfield.TextInputEditText-->
+    <!--                    android:id="@+id/etLeaveStationAddress"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:fontFamily="@font/quicksand_font_family"-->
+    <!--                    android:hint="Leave Station Address" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--            &lt;!&ndash; Contact Number &ndash;&gt;-->
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family">-->
+
+    <!--                <com.google.android.material.textfield.TextInputEditText-->
+    <!--                    android:id="@+id/etContactNumber"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:fontFamily="@font/quicksand_font_family"-->
+    <!--                    android:hint="Contact Number"-->
+    <!--                    android:inputType="phone" />-->
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--            &lt;!&ndash; Submit Button &ndash;&gt;-->
+    <!--            <com.google.android.material.button.MaterialButton-->
+    <!--                android:id="@+id/btnSubmit"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_gravity="center"-->
+    <!--                android:layout_marginTop="16dp"-->
+    <!--                android:fontFamily="@font/quicksand_font_family"-->
+    <!--                android:text="Submit" />-->
+
+    <!--        </LinearLayout>-->
+    <!--    </RelativeLayout>-->
+<!--</ScrollView>-->
