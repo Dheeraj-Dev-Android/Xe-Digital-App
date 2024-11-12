@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Base Layer -->
+    <path
+        android:fillAlpha="0.02"
+        android:fillColor="#5D49CF"
+        android:pathData="M0,0h200v200h-200z" />
+
+    <!-- Flowing Curves -->
+    <path
+        android:pathData="M0,40 C50,20 150,60 200,40"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+    <path
+        android:pathData="M0,80 C50,60 150,100 200,80"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+    <path
+        android:pathData="M0,120 C50,100 150,140 200,120"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+    <path
+        android:pathData="M0,160 C50,140 150,180 200,160"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+
+    <!-- Decorative Circles -->
+    <path
+        android:fillAlpha="0.08"
+        android:fillColor="#5D49CF"
+        android:pathData="M30,30m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <path
+        android:fillAlpha="0.08"
+        android:fillColor="#5D49CF"
+        android:pathData="M170,30m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <path
+        android:fillAlpha="0.08"
+        android:fillColor="#5D49CF"
+        android:pathData="M30,170m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <path
+        android:fillAlpha="0.08"
+        android:fillColor="#5D49CF"
+        android:pathData="M170,170m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+
+    <!-- Small Dots Grid -->
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M50,50m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0M100,50m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0M150,50m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M50,100m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0M100,100m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0M150,100m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M50,150m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0M100,150m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0M150,150m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+</vector>

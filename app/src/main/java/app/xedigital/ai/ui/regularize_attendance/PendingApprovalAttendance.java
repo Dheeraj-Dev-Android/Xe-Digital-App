@@ -12,8 +12,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.RegularizeApprovalAdapter;
@@ -21,21 +27,18 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PendingApprovalAttendance extends Fragment implements RegularizeApprovalAdapter.OnRegularizeApprovalActionListener {
+public class PendingApprovalAttendance extends Fragment implements PendingApprovalViewFragment.OnRegularizeApprovalActionListener {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private String authToken;
     private String userId;
     private RecyclerView approvalRecyclerView;
     private RegularizeApprovalAdapter adapter;
+
+    private PendingApprovalViewFragment pendingApprovalViewFragment;
     private APIInterface apiInterface;
 
 
@@ -49,7 +52,7 @@ public class PendingApprovalAttendance extends Fragment implements RegularizeApp
         View view = inflater.inflate(R.layout.fragment_pending_approval_attendance, container, false);
 
         approvalRecyclerView = view.findViewById(R.id.approval_recycler_view);
-        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         apiInterface = APIClient.getInstance().getRegularizeListApproval();
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -80,6 +83,14 @@ public class PendingApprovalAttendance extends Fragment implements RegularizeApp
                         adapter = new RegularizeApprovalAdapter(items, authToken,userId, PendingApprovalAttendance.this, getContext());
                         approvalRecyclerView.setAdapter(adapter);
 //                        Log.d("Approval pending List", gson.toJson(response.body()));
+//                        adapter.setOnItemClickListener(item -> {
+//                            pendingApprovalViewFragment = PendingApprovalViewFragment.newInstance(item);
+//                            pendingApprovalViewFragment.setListener(PendingApprovalAttendance.this);
+//                            requireActivity().getSupportFragmentManager().beginTransaction()
+//                                    .replace(R.id.action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment, pendingApprovalViewFragment) // Assuming 'fragment_container' is the ID of your fragment container
+//                                    .addToBackStack(null)
+//                                    .commit();
+//                        });
                     }
                 } else {
                     Log.d("Approval pending List", "Failed");
@@ -96,11 +107,20 @@ public class PendingApprovalAttendance extends Fragment implements RegularizeApp
     }
 
     public void onApprove(AttendanceRegularizeAppliedItem item) {
-        adapter.handleApprove(item.getId());
+        if (pendingApprovalViewFragment != null) {
+            pendingApprovalViewFragment.handleApprove(item.getId());
+        }
+
+        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+        ft.detach(pendingApprovalViewFragment).attach(pendingApprovalViewFragment).commit();
         getRegularizeApproval();
     }
     public void onReject(AttendanceRegularizeAppliedItem item) {
-        adapter.handleReject(item.getId());
+        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+        ft.detach(pendingApprovalViewFragment).attach(pendingApprovalViewFragment).commit();
+        if (pendingApprovalViewFragment != null) {
+            pendingApprovalViewFragment.handleReject(item.getId());
+        }
         getRegularizeApproval();
     }
 }

@@ -74,9 +74,20 @@
         android:label="Pending Approval"
         tools:layout="@layout/fragment_pending_approval_attendance">
         <action
-            android:id="@+id/action_nav_pendingApprovalFragment_to_nav_attendance"
+            android:id="@+id/action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment"
+            app:destination="@id/nav_pendingApprovalViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_pendingApprovalViewFragment"
+        android:name="app.xedigital.ai.ui.regularize_attendance.PendingApprovalViewFragment"
+        android:label="Pending Approval View"
+        tools:layout="@layout/fragment_pending_approval_view">
+
+        <action
+            android:id="@+id/action_nav_pendingApprovalViewFragment_to_nav_pendingApprovalFragment"
             app:destination="@id/nav_attendance" />
     </fragment>
+
 
     <fragment
         android:id="@+id/nav_viewAttendanceFragment"

@@ -6,12 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,6 +43,8 @@ public class DashboardFragment extends Fragment {
     public String empDesignation;
     public String punchIn;
     public String punchOut;
+    private Handler handler;
+    private Runnable runnable;
     private FragmentDashboardBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,11 +100,30 @@ public class DashboardFragment extends Fragment {
         attendanceViewModel.storeLoginData(authToken);
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
 
-        Date currentDate = new Date();
-        String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-        String currentTimeString = timeFormat.format(currentDate);
-        binding.todayDate.setText(todayDateString + " - " + currentTimeString);
+//        Date currentDate = new Date();
+//        String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
+//        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//        String currentTimeString = timeFormat.format(currentDate);
+//        binding.todayDate.setText(todayDateString + " - " + currentTimeString);
+
+
+        handler = new Handler(Looper.getMainLooper());
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                Date currentDate = new Date();
+                String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
+                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm ss a", Locale.getDefault());
+                String currentTimeString = timeFormat.format(currentDate);
+                binding.todayDate.setText(todayDateString + " - " + currentTimeString);
+
+                // Schedule the Runnable to run again after 1 second
+                handler.postDelayed(this, 1000);
+            }
+        };
+
+        handler.post(runnable);
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
             employeeName = userprofileResponse.getData().getEmployee().getFirstname();
@@ -116,7 +138,7 @@ public class DashboardFragment extends Fragment {
             if (profileImageUrl != null) {
                 Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
             } else {
-                Toast.makeText(requireContext(), "Profile image not found", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(requireContext(), "Profile image not found", Toast.LENGTH_SHORT).show();
                 profileImage.setImageResource(R.mipmap.ic_default_profile);
             }
 
@@ -150,6 +172,13 @@ public class DashboardFragment extends Fragment {
                 binding.tvPunchOutTime.setText("Punch Out: --:--");
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        handler.removeCallbacks(runnable);
+//        binding = null;
     }
 
     private String formatShiftTime(String shiftTime) {

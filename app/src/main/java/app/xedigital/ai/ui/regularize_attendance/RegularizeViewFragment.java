@@ -64,16 +64,6 @@ public class RegularizeViewFragment extends Fragment {
             String formattedPunchOut = DateTimeUtils.formatTime(punchOut);
             empPunchOut.setText(formattedPunchOut);
 
-//            TextView empTotalTime = view.findViewById(R.id.empTotalTime);
-//            String totalTime = DateTimeUtils.calculateTotalTime(formattedPunchIn, formattedPunchOut);
-//            empTotalTime.setText(totalTime);
-//
-//            String shiftStartTime = item.getShift().getStartTime();
-//            TextView empLateTime = view.findViewById(R.id.empLateTime);
-//            String lateTime = LateTime(formattedPunchIn, shiftStartTime);
-//            empLateTime.setText(lateTime);
-
-
             TextView empPunchInAddress = view.findViewById(R.id.empPunchInAddress);
             empPunchInAddress.setText(item.getPunchInAddress());
 
@@ -132,30 +122,3 @@ public class RegularizeViewFragment extends Fragment {
         return view;
     }
 }
-//    public static String LateTime(String punchInTime, String shiftStartTime) {
-//        if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
-//            return "";
-//        }
-//
-//        SimpleDateFormat shiftFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-//        SimpleDateFormat time12Format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//
-//        try {
-//            Date shiftStart = shiftFormat.parse(shiftStartTime);
-//            Date punchIn = time12Format.parse(punchInTime);
-//
-//            if (punchIn != null && punchIn.after(shiftStart)) {
-//                if (shiftStart != null) {
-//                    long lateInMillis = punchIn.getTime() - shiftStart.getTime();
-//                    long lateHours = lateInMillis / (60 * 60 * 1000);
-//                    long lateMinutes = (lateInMillis % (60 * 60 * 1000)) / (60 * 1000);
-//                    return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, lateMinutes);
-//                }
-//            } else {
-//                return "0";
-//            }
-//        } catch (ParseException e) {
-//            Log.e("DateTimeUtils", "Error calculating late time: " + e.getMessage());
-//        }
-//        return "N/A";
-//    }

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Gradient Background -->
+    <path
+        android:fillAlpha="0.03"
+        android:fillColor="#5D49CF"
+        android:pathData="M0,0h200v200h-200z" />
+
+    <!-- Decorative Elements -->
+    <!-- Circles -->
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M20,20m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M180,20m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M20,180m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M180,180m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+
+    <!-- Wave Pattern -->
+    <path
+        android:fillAlpha="0.05"
+        android:fillColor="#5D49CF"
+        android:pathData="M0,80 Q50,60 100,80 T200,80 L200,100 Q150,120 100,100 T0,100 Z" />
+
+    <!-- Hexagons -->
+    <path
+        android:fillAlpha="0.08"
+        android:fillColor="#5D49CF"
+        android:pathData="M50,40 L58.66,35 L67.32,40 L67.32,50 L58.66,55 L50,50 Z" />
+    <path
+        android:fillAlpha="0.08"
+        android:fillColor="#5D49CF"
+        android:pathData="M150,140 L158.66,135 L167.32,140 L167.32,150 L158.66,155 L150,150 Z" />
+
+    <!-- Dots -->
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M100,50m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M150,100m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    <path
+        android:fillAlpha="0.1"
+        android:fillColor="#5D49CF"
+        android:pathData="M50,150m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+
+    <!-- Lines -->
+    <path
+        android:pathData="M30,30L50,50"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+    <path
+        android:pathData="M150,150L170,170"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+
+    <!-- Curved Lines -->
+    <path
+        android:pathData="M40,100 Q70,120 100,100 T160,100"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.07"
+        android:strokeColor="#5D49CF" />
+
+    <!-- Plus Symbols -->
+    <path
+        android:fillAlpha="0.09"
+        android:fillColor="#5D49CF"
+        android:pathData="M120,40 h4v-4h4v4h4v4h-4v4h-4v-4h-4z" />
+    <path
+        android:fillAlpha="0.09"
+        android:fillColor="#5D49CF"
+        android:pathData="M70,160 h4v-4h4v4h4v4h-4v4h-4v-4h-4z" />
+</vector>

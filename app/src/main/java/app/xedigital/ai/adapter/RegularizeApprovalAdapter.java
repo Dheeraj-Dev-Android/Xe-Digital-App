@@ -1,7 +1,9 @@
 package app.xedigital.ai.adapter;
 
+import static app.xedigital.ai.ui.regularize_attendance.PendingApprovalViewFragment.ARG_ATTENDANCE_ID;
+
 import android.content.Context;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,32 +12,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
-import app.xedigital.ai.model.regularizeUpdateStatus.RegularizeUpdateRequest;
-import app.xedigital.ai.ui.profile.ProfileViewModel;
-import app.xedigital.ai.utills.DateTimeUtils;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.TimeZone;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import app.xedigital.ai.R;
+import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
+import app.xedigital.ai.ui.regularize_attendance.PendingApprovalAttendance;
+import app.xedigital.ai.utills.DateTimeUtils;
 
 
 public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeApprovalAdapter.ViewHolder> {
@@ -44,35 +33,23 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String authToken;
     private final String userId;
-    APIInterface apiInterface = APIClient.getInstance().UpdateRegularizeListApproval();
     private final Context context;
-    private final OnRegularizeApprovalActionListener listener;
-    private ProfileViewModel profileViewModel;
-    private String reportingManager;
 
-    public RegularizeApprovalAdapter(List<AttendanceRegularizeAppliedItem> items, String authToken, String userId, OnRegularizeApprovalActionListener listener, Context context) {
+
+    public RegularizeApprovalAdapter(List<AttendanceRegularizeAppliedItem> items, String authToken, String userId, PendingApprovalAttendance pendingApprovalAttendance, Context context) {
         this.items = items;
         this.userId = userId;
         this.authToken = authToken;
-        this.listener = listener;
         this.context = context;
     }
 
-    public static String getCurrentDateTimeInUTC() {
-        Date currentDateTime = new Date();
-
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String formattedDateTime = dateTimeFormat.format(currentDateTime);
-        Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
-        return formattedDateTime;
-
-    }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.attendance_approval, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.attendance_pending_list, parent, false);
+
+
         return new ViewHolder(view);
     }
 
@@ -81,150 +58,42 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         AttendanceRegularizeAppliedItem item = items.get(position);
 
         holder.empName.setText(item.getEmployee().getFullname());
-        holder.empEmail.setText(item.getEmployee().getEmail() + ",  " + item.getEmployee().getContact());
-
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
-        holder.empPunchDate.setText("Punch Date : "+formattedPunchDate);
-
-        holder.empShift.setText(item.getShift().getName() + " (" + item.getShift().getStartTime() + " - " + item.getShift().getEndTime() + ")");
-
-        String formattedPunchIn = DateTimeUtils.formatTime(item.getPunchIn());
-        holder.empPunchIn.setText(formattedPunchIn);
-
-        String formattedPunchOut = DateTimeUtils.formatTime(item.getPunchOut());
-        holder.empPunchOut.setText(formattedPunchOut);
-
-        holder.empPunchInAddress.setText(item.getPunchInAddress());
-        holder.empPunchOutAddress.setText(item.getPunchOutAddress());
-
-        String formattedAppliedPunchIn = DateTimeUtils.formatTime(item.getPunchInUpdated());
-        holder.appliedPunchIn.setText(formattedAppliedPunchIn);
-
-        String formattedAppliedPunchOut = DateTimeUtils.formatTime(item.getPunchOutUpdated());
-        holder.appliedPunchOut.setText(formattedAppliedPunchOut);
-
-        holder.appliedPunchInAddress.setText(item.getPunchInAddressUpdated());
-        holder.appliedPunchOutAddress.setText(item.getPunchOutAddressUpdated());
+        holder.empPunchDate.setText("Punch Date : " + formattedPunchDate);
 
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText("Applied Date : "+formattedAppliedDate);
-
-        holder.appliedStatus.setText(item.getStatus());
-        holder.appliedStatusUpdateBy.setText(item.getApprovedByName());
-
-        String formattedUpdatedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
-        holder.appliedStatusUpdateDate.setText(formattedUpdatedDate);
+        holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
 
 
-        if (item.getStatus().equals("unapproved")) {
-            holder.approveButton.setVisibility(View.VISIBLE);
-            holder.rejectButton.setVisibility(View.VISIBLE);
+        holder.btn_viewAppliedAttendance.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                AttendanceRegularizeAppliedItem appliedAttendanceItem = items.get(position);
+                String attendanceId = appliedAttendanceItem.getId();
 
-            holder.approveButton.setOnClickListener(v -> {
-                listener.onApprove(item);
-                String attendanceId = item.getId();
-                handleApprove(attendanceId);
-            });
+                if (appliedAttendanceItem != null && attendanceId != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_ATTENDANCE_ID, appliedAttendanceItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment, bundle);
 
-            holder.rejectButton.setOnClickListener(v -> {
-                listener.onReject(item);
-                String attendanceId = item.getId();
-
-                handleReject(attendanceId);
-            });
-        } else {
-            holder.approveButton.setVisibility(View.GONE);
-            holder.rejectButton.setVisibility(View.GONE);
-        }
-
-        if (context instanceof FragmentActivity) {
-            profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
-        }
-
-        profileViewModel.storeLoginData(userId, authToken);
-        profileViewModel.fetchUserProfile();
-        if (ViewTreeLifecycleOwner.get(holder.itemView) != null) {
-            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(holder.itemView)), userProfile -> {
-                if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee().getReportingManager() != null) {
-                    String reportingManagerFirstName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
-                    String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
-                    if (reportingManagerFirstName != null && reportingManagerLastName != null) {
-                        reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                        Log.e("RegularizeApprovalAdapter", "reportingManager: " + reportingManager);
-                    }
-                }
-            });
-        }
-    }
-
-    public void handleApprove(String attendanceId) {
-        Log.d("RegularizeApprovalAdapter", "handleApprove: " + attendanceId);
-        RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
-        requestBody.setStatus("Approved");
-        requestBody.setApprovedByName(reportingManager);
-        Log.d("RegularizeApprovalAdapter", "handleApprove: " + reportingManager);
-        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
-
-        Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-//                    Log.d("RegularizeApprovalAdapter", "onResponse: " + gson.toJson(response.body()));
-                    Toast.makeText(context, "Attendance approved successfully.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "Failed to approve attendance.", Toast.LENGTH_SHORT).show();
-                    Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
+                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                 }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Log.d("RegularizeApprovalAdapter", "onFailure: " + throwable.getMessage());
-                Toast.makeText(context, "Failed to approve attendance.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
-    public void handleReject(String attendanceId) {
-
-        RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
-        requestBody.setStatus("Rejected");
-        requestBody.setApprovedByName(reportingManager);
-        Log.d("RegularizeApprovalAdapter", "handleReject: " + reportingManager);
-        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
-
-        Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-//                    Log.d("RegularizeApprovalAdapter", "onResponse: " + gson.toJson(response.body()));
-                    Toast.makeText(context, "Attendance rejected successfully.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
-                    Toast.makeText(context, "Failed to reject attendance.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Log.d("RegularizeApprovalAdapter", "onFailure: " + throwable.getMessage());
-                Toast.makeText(context, "Failed to reject attendance.", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     @Override
     public int getItemCount() {
         return items.size();
     }
 
-    public interface OnRegularizeApprovalActionListener {
-        void onApprove(AttendanceRegularizeAppliedItem item);
+//    public void setOnItemClickListener(Object o) {
+//    }
 
-        void onReject(AttendanceRegularizeAppliedItem item);
-    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView empName;
@@ -246,6 +115,8 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         public TextView appliedStatusUpdateDate;
         public Button approveButton;
         public Button rejectButton;
+
+        public ShapeableImageView btn_viewAppliedAttendance;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -269,6 +140,7 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
 
             approveButton = itemView.findViewById(R.id.approve_button);
             rejectButton = itemView.findViewById(R.id.reject_button);
+            btn_viewAppliedAttendance = itemView.findViewById(R.id.btn_viewAppliedAttendance);
         }
     }
 }

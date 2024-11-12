@@ -95,21 +95,21 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:background="@drawable/punch_card_background"
-            android:padding="16dp">
+            android:padding="10dp">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.06" />
+                app:layout_constraintGuide_percent="0.01" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_middle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.35" />
+                app:layout_constraintGuide_percent="0.28" />
 
             <ImageView
                 android:id="@+id/ivEmployeeProfile"
