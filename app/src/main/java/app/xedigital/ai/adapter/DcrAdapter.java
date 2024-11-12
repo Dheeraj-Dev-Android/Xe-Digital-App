@@ -59,8 +59,8 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
         String formattedInTime = formatTime(dcrData.getInTime());
         String formattedOutTime = formatTime(dcrData.getOutTime());
 
-        holder.inTimeTextView.setText("Punch In Time : " + formattedInTime);
-        holder.outTimeTextView.setText("Punch Out Time : " + formattedOutTime);
+        holder.inTimeTextView.setText(formattedInTime);
+        holder.outTimeTextView.setText(formattedOutTime);
 
 
         holder.btn_viewTimesheet.setOnClickListener(v -> {

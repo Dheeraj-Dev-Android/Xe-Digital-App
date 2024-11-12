@@ -1,3 +1,5 @@
 <resources>
     <dimen name="fab_margin">48dp</dimen>
+    <dimen name="card_margin_horizontal">24dp</dimen>
+    <dimen name="card_margin_vertical">12dp</dimen>
 </resources>

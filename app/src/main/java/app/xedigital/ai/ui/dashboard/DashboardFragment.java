@@ -114,7 +114,7 @@ public class DashboardFragment extends Fragment {
 
                 Date currentDate = new Date();
                 String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm ss a", Locale.getDefault());
+                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
                 String currentTimeString = timeFormat.format(currentDate);
                 binding.todayDate.setText(todayDateString + " - " + currentTimeString);
 

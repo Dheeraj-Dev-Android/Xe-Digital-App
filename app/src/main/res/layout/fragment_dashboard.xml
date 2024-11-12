@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="20 Feb 2024"
                 android:textColor="#333333"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +66,7 @@
                 android:text="Punch Attendance"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -82,8 +82,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:elevation="4dp"
-        app:cardCornerRadius="12dp"
         app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/punchCardView"
@@ -109,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.28" />
+                app:layout_constraintGuide_percent="0.3" />
 
             <ImageView
                 android:id="@+id/ivEmployeeProfile"
@@ -128,7 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Name : "
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@id/guideline_middle"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
@@ -139,7 +139,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Employee Name"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guideline_middle"
@@ -152,7 +152,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Email : "
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@id/guideline_middle"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@id/tvEmployeeName" />
@@ -161,9 +161,9 @@
                 android:id="@+id/tvEmployeeEmailValue"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="employee@email.com"
+                android:text="employee.t@consultEdge.global"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guideline_middle"
                 app:layout_constraintTop_toTopOf="@id/tvEmployeeEmail" />
@@ -175,7 +175,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Contact : "
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@id/guideline_middle"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@id/tvEmployeeEmail" />
@@ -186,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:text="123-456-7890"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guideline_middle"
                 app:layout_constraintTop_toTopOf="@id/tvEmployeeContact" />
@@ -198,7 +198,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Designation : "
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@id/guideline_middle"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@id/tvEmployeeContact" />
@@ -209,7 +209,7 @@
                 android:layout_height="wrap_content"
                 android:text="Software Engineer"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guideline_middle"
                 app:layout_constraintTop_toTopOf="@id/tvEmployeeDesignation" />
@@ -221,7 +221,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Shift : "
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@id/guideline_middle"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@id/tvEmployeeDesignation" />
@@ -232,7 +232,7 @@
                 android:layout_height="wrap_content"
                 android:text="9:00 AM - 5:00 PM"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guideline_middle"
                 app:layout_constraintTop_toTopOf="@id/tvEmployeeShift" />
@@ -243,6 +243,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Punch In : "
+                android:textSize="13sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.045"
@@ -253,8 +254,9 @@
                 android:id="@+id/tvPunchOutTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
+                android:layout_marginStart="30dp"
                 android:text="Punch Out : "
+                android:textSize="13sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@id/tvPunchInTime"
                 app:layout_constraintTop_toTopOf="@id/tvPunchInTime" />

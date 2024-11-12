@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -106,29 +107,112 @@ public class RegularizeFragment extends Fragment {
         });
 
         profileViewModel.fetchUserProfile();
+//
+//        if (attendanceItem != null) {
+//            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//            timeFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+//            try {
+//                Date punchDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchDate());
+//                Date punchInTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchIn());
+//                Date punchOutTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchOut());
+//
+//                if (punchDate != null && punchInTime != null && punchOutTime != null) {
+//                    atDate.setText(dateFormatter.format(punchDate));
+//                    atDate.setFocusable(false);
+//                    atDate.clearFocus();
+//                    timePunchIn.setText(timeFormatter.format(punchInTime));
+//                    timePunchOut.setText(timeFormatter.format(punchOutTime));
+//                }
+//                etPunchInAddress.setText(attendanceItem.getPunchInAddress());
+//                etPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
+//
+//            } catch (ParseException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+
+//        if (attendanceItem != null) {
+//            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//            // Set timeFormatter to the desired display time zone
+//            timeFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+//
+//            try {
+//                // Parsing with explicit UTC time zone
+//                SimpleDateFormat inputFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+//                inputFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+//
+//                Date punchDate = inputFormatter.parse(attendanceItem.getPunchDate());
+//                Date punchInTime = inputFormatter.parse(attendanceItem.getPunchIn());
+//                Date punchOutTime = inputFormatter.parse(attendanceItem.getPunchOut());
+//
+//                if (punchDate != null && punchInTime != null && punchOutTime != null) {
+//                    atDate.setText(dateFormatter.format(punchDate));
+//                    atDate.setFocusable(false);
+//                    atDate.clearFocus();
+//                    timePunchIn.setText(timeFormatter.format(punchInTime));
+//                    timePunchOut.setText(timeFormatter.format(punchOutTime));
+//                }
+//                etPunchInAddress.setText(attendanceItem.getPunchInAddress());
+//                etPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
+//            } catch (ParseException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
 
         if (attendanceItem != null) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            try {
-                Date punchDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchDate());
-                Date punchInTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchIn());
-                Date punchOutTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchOut());
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm", Locale.getDefault());
+            timeFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
 
-                if (punchDate != null && punchInTime != null && punchOutTime != null) {
+            try {
+                SimpleDateFormat inputFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                inputFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                String punchDateString = attendanceItem.getPunchDate();
+                String punchInString = attendanceItem.getPunchIn();
+                String punchOutString = attendanceItem.getPunchOut();
+
+                Date punchDate = null;
+                Date punchInTime = null;
+                Date punchOutTime = null;
+
+                if (punchDateString != null && !punchDateString.isEmpty()) {
+                    punchDate = inputFormatter.parse(punchDateString);
+                }
+
+                if (punchInString != null && !punchInString.isEmpty()) {
+                    punchInTime = inputFormatter.parse(punchInString);
+                }
+
+                if (punchOutString != null && !punchOutString.isEmpty()) {
+                    punchOutTime = inputFormatter.parse(punchOutString);
+                }
+
+                if (punchDate != null) {
                     atDate.setText(dateFormatter.format(punchDate));
                     atDate.setFocusable(false);
                     atDate.clearFocus();
+                }
+
+                if (punchInTime != null) {
                     timePunchIn.setText(timeFormatter.format(punchInTime));
+                }
+
+                if (punchOutTime != null) {
                     timePunchOut.setText(timeFormatter.format(punchOutTime));
                 }
+
                 etPunchInAddress.setText(attendanceItem.getPunchInAddress());
                 etPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
 
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                // Handle ParseException, e.g., log the error
+                Log.e("RegularizeFragment", "Error parsing date/time: " + e.getMessage());
             }
         }
+
 
         btSubmit.setOnClickListener(v -> {
             if (validateForm()) {
@@ -181,6 +265,30 @@ public class RegularizeFragment extends Fragment {
             timePickerDialog.show();
         });
     }
+
+//    public String formatTime(String timeString) {
+//        if (timeString == null || timeString.isEmpty() || timeString.equals("1900-01-01T00:00:00.000Z")) {
+//            return "N/A";
+//        }
+//
+//        SimpleDateFormat inputFormat;
+//        if (timeString.contains("T")) {
+//            inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+//            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        } else {
+//            inputFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+//        }
+//
+//        SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//        outputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+//
+//        try {
+//            Date date = inputFormat.parse(timeString);
+//            return outputFormat.format(date);
+//        } catch (ParseException e) {
+//            return "N/A";
+//        }
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

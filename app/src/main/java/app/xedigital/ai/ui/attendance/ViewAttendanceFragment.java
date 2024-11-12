@@ -12,15 +12,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import app.xedigital.ai.R;
+import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 
 public class ViewAttendanceFragment extends Fragment {
 
@@ -75,15 +75,19 @@ public class ViewAttendanceFragment extends Fragment {
             lateTime.setText(attendanceItem.getLateTime());
 
             TextView shiftTime = view.findViewById(R.id.shiftDetail);
-            String startTime = attendanceItem.getShift().getStartTime();
-            String endTime = attendanceItem.getShift().getEndTime();
+            if (attendanceItem.getShift() != null) {
+                String startTime = attendanceItem.getShift().getStartTime();
+                String endTime = attendanceItem.getShift().getEndTime();
 
-            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-                String shiftTimeString = startTime + " - " + endTime;
-                shiftTime.setText(formatShiftTime(shiftTimeString));
-                Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
+                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+                    String shiftTimeString = startTime + " - " + endTime;
+                    shiftTime.setText(formatShiftTime(shiftTimeString));
+                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
+                } else {
+                    shiftTime.setText("Shift time not available");
+                }
             } else {
-                shiftTime.setText("Shift time not available");
+                shiftTime.setText("Shift not assigned");
             }
 //            Addresses
             TextView addressDetail = view.findViewById(R.id.addressDetail);

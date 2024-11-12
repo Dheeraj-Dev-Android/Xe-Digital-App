@@ -28,8 +28,8 @@
             android:textColor="@color/white"
             android:textSize="12sp"
             app:chipBackgroundColor="@color/status_approved"
-            app:chipMinHeight="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:chipMinHeight="25dp"
+            app:elevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Approved" />
@@ -66,6 +66,7 @@
                 android:layout_marginBottom="@dimen/text_spacing"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/statusChip"
                 tools:text="Employee Name : " />
 
             <TextView

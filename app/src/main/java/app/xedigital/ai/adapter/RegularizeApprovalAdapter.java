@@ -3,6 +3,7 @@ package app.xedigital.ai.adapter;
 import static app.xedigital.ai.ui.regularize_attendance.PendingApprovalViewFragment.ARG_ATTENDANCE_ID;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,11 +61,24 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         AttendanceRegularizeAppliedItem item = items.get(position);
 
         holder.empName.setText(item.getEmployee().getFullname());
+
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
         holder.empPunchDate.setText("Punch Date : " + formattedPunchDate);
 
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
         holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
+
+        Chip statusChip = holder.itemView.findViewById(R.id.statusChip);
+        statusChip.setText(item.getStatus());
+
+        if (item.getStatus().equals("Approved")) {
+            statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved)));
+        } else if (item.getStatus().equals("Unapproved")) {
+            statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending)));
+        } else if (item.getStatus().equals("Rejected")) {
+            statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected)));
+        }
+
 
 
         holder.btn_viewAppliedAttendance.setOnClickListener(v -> {

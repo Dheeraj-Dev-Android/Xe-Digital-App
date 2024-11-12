@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
@@ -9,6 +10,7 @@
     android:focusable="true"
     app:cardBackgroundColor="@color/color_white"
     app:cardCornerRadius="16dp"
+    android:foreground="?attr/selectableItemBackground"
     app:cardElevation="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,6 +25,7 @@
             android:background="@drawable/circular_background"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_eye"
+            android:contentDescription="View Timesheet Details"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -34,35 +37,79 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Timesheet Date"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_viewTimesheet"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Monday, 12 Nov 2024" />
 
-        <TextView
-            android:id="@+id/punchInView"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:text="Punch In: "
-            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_viewTimesheet"
-            app:layout_constraintTop_toBottomOf="@id/timesheetDate" />
+            app:layout_constraintTop_toBottomOf="@id/timesheetDate">
 
-        <TextView
-            android:id="@+id/punchOutView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:text="Punch Out: "
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_viewTimesheet"
-            app:layout_constraintTop_toBottomOf="@id/punchInView" />
+            <!-- Punch In Section -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Punch In"
+                    android:textAllCaps="true"
+                    android:textColor="#9C9B9B"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/punchInView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="09:00 AM" />
+            </LinearLayout>
+
+            <!-- Punch Out Section -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Punch Out"
+                    android:textAllCaps="true"
+                    android:textColor="#9C9B9B"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/punchOutView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="06:00 PM" />
+            </LinearLayout>
+
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

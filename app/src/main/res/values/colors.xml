@@ -29,7 +29,6 @@
     <color name="LeaveWithoutPay">#FF5722</color>
     <color name="shimmer_placeholder">#BEBDBD</color>
 
-    <color name="card_background">#FFFFFF</color>
     <color name="stroke_color">#E0E0E0</color>
     <color name="text_primary">#1F2937</color>
     <color name="text_secondary">#4B5563</color>
@@ -44,5 +43,30 @@
     <color name="colorSecondary">#1976D2</color>
     <color name="colorSecondaryDark">#1565C0</color>
     <color name="background">#F5F5F5</color>
+
+    <color name="progress_good">#00C853</color>
+    <color name="progress_warning">#FFB300</color>
+    <color name="progress_critical">#FF5252</color>
+    <color name="balance_color">#00796B</color>
+
+    <color name="credited_background">#E3F2FD</color>
+    <color name="debited_background">#FFEBEE</color>
+    <color name="balance_background">#E8F5E9</color>
+    <color name="used_background">#E8F5E9</color>
+    <color name="total_background">#E8F5E9</color>
+
+    <color name="card_background">#F8F9FA</color>
+    <color name="ripple_color">#1F000000</color>
+
+    <color name="card_gradient_start">#FFFFFF</color>
+    <color name="card_gradient_end">#F8F9FF</color>
+
+    <!-- Status Badge Colors -->
+    <color name="status_gradient_start">#4A90E2</color>
+    <color name="status_gradient_end">#357ABD</color>
+
+    <!-- Button Colors -->
+    <color name="button_gradient_start">#6366F1</color>
+    <color name="button_gradient_end">#4F46E5</color>
 
 </resources>

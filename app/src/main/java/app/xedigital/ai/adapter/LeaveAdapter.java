@@ -3,6 +3,7 @@ package app.xedigital.ai.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,6 @@ import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.leaves.LeavesItem;
-import app.xedigital.ai.utills.DateTimeUtils;
 
 public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHolder> {
     private final List<LeavesItem> leaveList;
@@ -31,13 +31,28 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
     @Override
     public void onBindViewHolder(@NonNull LeaveViewHolder holder, int position) {
         LeavesItem leave = leaveList.get(position);
-        holder.typeTextView.setText(leave.getLeavetype());
-        holder.durationTextView.setText("Credit: " + leave.getCreditLeave() + ", Debit: " + leave.getDebitLeave());
-        holder.reasonTextView.setText("Used: " + leave.getUsedLeave());
-        String assignDate = leave.getAssignDate();
-        holder.statusTextView.setText("Assigned: " + DateTimeUtils.getDayOfWeekAndDate(assignDate));
+        holder.leaveTypeText.setText(leave.getLeavetype());
+        String assignedDate = leave.getAssignDate();
+//        holder.assignedDateText.setText("Assigned: " + DateTimeUtils.getDayOfWeekAndDate(assignedDate));
+
+        holder.creditedDaysText.setText(String.valueOf(leave.getCreditLeave()));
+        holder.debitedDaysText.setText(String.valueOf(leave.getDebitLeave()));
+        holder.usedDaysText.setText(String.valueOf(leave.getUsedLeave()));
+        holder.balanceDaysText.setText(String.valueOf(leave.getCreditLeave() - leave.getUsedLeave() - leave.getDebitLeave()));
+        holder.totalDaysText.setText(String.valueOf(leave.getCreditLeave()));
+
+        float creditedDays = leave.getCreditLeave();
+        float usedDays = leave.getUsedLeave();
 
 
+        if (creditedDays > 0) {
+            float progress = Math.min((usedDays * 100 / creditedDays), 100);
+            holder.leaveProgress.setProgress((int) progress);
+            holder.progressText.setText(String.valueOf((int) progress) + "%");
+        } else {
+            holder.leaveProgress.setProgress(0);
+            holder.progressText.setText("0%");
+        }
     }
 
     @Override
@@ -46,17 +61,27 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
     }
 
     static class LeaveViewHolder extends RecyclerView.ViewHolder {
-        TextView typeTextView;
-        TextView durationTextView;
-        TextView reasonTextView;
-        TextView statusTextView;
+        TextView leaveTypeText;
+        TextView creditedDaysText;
+        //        TextView assignedDateText;
+        TextView debitedDaysText;
+        TextView balanceDaysText;
+        TextView usedDaysText;
+        TextView totalDaysText;
+        ProgressBar leaveProgress;
+        TextView progressText;
 
         public LeaveViewHolder(@NonNull View itemView) {
             super(itemView);
-            typeTextView = itemView.findViewById(R.id.typeTextView);
-            durationTextView = itemView.findViewById(R.id.durationTextView);
-            reasonTextView = itemView.findViewById(R.id.reasonTextView);
-            statusTextView = itemView.findViewById(R.id.statusTextView);
+            leaveTypeText = itemView.findViewById(R.id.leaveTypeText);
+//            assignedDateText = itemView.findViewById(R.id.assignedDateText);
+            creditedDaysText = itemView.findViewById(R.id.creditedDaysText);
+            debitedDaysText = itemView.findViewById(R.id.debitedDaysText);
+            balanceDaysText = itemView.findViewById(R.id.balanceDaysText);
+            leaveProgress = itemView.findViewById(R.id.leaveProgress);
+            usedDaysText = itemView.findViewById(R.id.usedDaysText);
+            totalDaysText = itemView.findViewById(R.id.totalDaysText);
+            progressText = itemView.findViewById(R.id.progressText);
         }
     }
 }
