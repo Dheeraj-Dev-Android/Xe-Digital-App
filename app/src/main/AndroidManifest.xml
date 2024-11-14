@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingLeanbackLauncher">
 
+    <!-- Features -->
     <uses-feature
         android:name="android.hardware.camera.any"
         android:required="false" />
@@ -19,11 +20,13 @@
         android:name="android.hardware.location.gps"
         android:required="false" />
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- Application -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -31,34 +34,34 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:permission="android.permission.INTERNET"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.XEDigital"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <!-- Activities -->
         <activity
             android:name=".activity.PunchActivity"
             android:exported="true" />
-        <activity
-            android:name=".activity.RegistrationActivity"
-            android:exported="false" />
 
+        <!-- Launcher Activity -->
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.XEDigital.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:enableOnBackInvokedCallback="true"
             android:exported="true"
-            android:theme="@style/Theme.XEDigital.NoActionBar"
-            tools:targetApi="tiramisu" />
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
     </application>
 
 </manifest>
