@@ -125,40 +125,97 @@ public class DashboardFragment extends Fragment {
 
         handler.post(runnable);
 
+//        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
+//            employeeName = userprofileResponse.getData().getEmployee().getFirstname();
+//            employeeEmail = userprofileResponse.getData().getEmployee().getEmail();
+//            employeeLastName = userprofileResponse.getData().getEmployee().getLastname();
+//            empContact = userprofileResponse.getData().getEmployee().getContact();
+//            empDesignation = userprofileResponse.getData().getEmployee().getDesignation();
+//
+//            Object profileImageUrl = userprofileResponse.getData().getEmployee().getProfileImageUrl();
+//            ImageView profileImage = binding.ivEmployeeProfile;
+//
+//            if (profileImageUrl != null) {
+//                Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
+//            } else {
+//                profileImage.setImageResource(R.mipmap.ic_default_profile);
+//            }
+//
+//            binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
+//            binding.tvEmployeeDesignationValue.setText(empDesignation);
+//
+//            String startTime = userprofileResponse.getData().getEmployee().getShift().getStartTime();
+//            String endTime = userprofileResponse.getData().getEmployee().getShift().getEndTime();
+//
+//            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+//                String shiftTimeString = startTime + " - " + endTime;
+//                binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
+//                Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
+//            } else {
+//                binding.tvEmployeeShift.setText("Shift time not available");
+//            }
+//
+//            binding.tvEmployeeContactValue.setText(empContact);
+//            binding.tvEmployeeEmailValue.setText(employeeEmail);
+//
+//        });
+
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-            employeeName = userprofileResponse.getData().getEmployee().getFirstname();
-            employeeEmail = userprofileResponse.getData().getEmployee().getEmail();
-            employeeLastName = userprofileResponse.getData().getEmployee().getLastname();
-            empContact = userprofileResponse.getData().getEmployee().getContact();
-            empDesignation = userprofileResponse.getData().getEmployee().getDesignation();
+            // Null check before accessing Employee object
+            if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
+                app.xedigital.ai.model.profile.Employee employee = userprofileResponse.getData().getEmployee();
 
-            Object profileImageUrl = userprofileResponse.getData().getEmployee().getProfileImageUrl();
-            ImageView profileImage = binding.ivEmployeeProfile;
+                employeeName = employee.getFirstname();
+                employeeEmail = employee.getEmail();
+                employeeLastName = employee.getLastname();
+                empContact = employee.getContact();
+                empDesignation = employee.getDesignation();
 
-            if (profileImageUrl != null) {
-                Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
+
+                binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
+                binding.tvEmployeeDesignationValue.setText(empDesignation);
+
+                // Handling shift time
+                String startTime = employee.getShift().getStartTime();
+                String endTime = employee.getShift().getEndTime();
+                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+                    String shiftTimeString = startTime + " - " + endTime;
+                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
+                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
+                } else {
+                    binding.tvEmployeeShift.setText("N/A");
+                }
+
+                // Handling contact and email
+                if (empContact != null && employeeEmail != null) {
+                    binding.tvEmployeeContactValue.setText(empContact);
+                    binding.tvEmployeeEmailValue.setText(employeeEmail);
+                } else {
+                    // Handle null values, e.g., set empty text or a placeholder message
+                    binding.tvEmployeeContactValue.setText("");
+                    binding.tvEmployeeEmailValue.setText("");
+                }
+
+                // Load Profile image
+                Object profileImageUrl = employee.getProfileImageUrl();
+                ImageView profileImage = binding.ivEmployeeProfile;
+
+                if (profileImageUrl != null) {
+                    Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
+                } else {
+                    profileImage.setImageResource(R.mipmap.ic_default_profile);
+                }
+
             } else {
-//                Toast.makeText(requireContext(), "Profile image not found", Toast.LENGTH_SHORT).show();
-                profileImage.setImageResource(R.mipmap.ic_default_profile);
+                // Handle the case where employee data is null
+                Log.e("DashboardFragment", "Employee data is null");
+                binding.tvEmployeeNameValue.setText("N/A");
+                binding.tvEmployeeDesignationValue.setText("N/A");
+                binding.tvEmployeeShiftValue.setText("N/A");
+                binding.tvEmployeeContactValue.setText("N/A");
+                binding.tvEmployeeEmailValue.setText("N/A");
+                binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
             }
-
-            binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
-            binding.tvEmployeeDesignationValue.setText(empDesignation);
-
-            String startTime = userprofileResponse.getData().getEmployee().getShift().getStartTime();
-            String endTime = userprofileResponse.getData().getEmployee().getShift().getEndTime();
-
-            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-                String shiftTimeString = startTime + " - " + endTime;
-                binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
-                Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
-            } else {
-                binding.tvEmployeeShift.setText("Shift time not available");
-            }
-
-            binding.tvEmployeeContactValue.setText(empContact);
-            binding.tvEmployeeEmailValue.setText(employeeEmail);
-
         });
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
             if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null && !attendanceResponse.getData().getEmployeePunchData().isEmpty()) {

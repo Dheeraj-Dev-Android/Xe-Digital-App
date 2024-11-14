@@ -13,14 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.login.LoginModelResponse1;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -95,6 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                         storeInSharedPreferences(userId, authToken);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
                         showAlertDialog(loginResponse.getMessage());
                     }

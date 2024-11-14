@@ -32,9 +32,6 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
     public void onBindViewHolder(@NonNull LeaveViewHolder holder, int position) {
         LeavesItem leave = leaveList.get(position);
         holder.leaveTypeText.setText(leave.getLeavetype());
-        String assignedDate = leave.getAssignDate();
-//        holder.assignedDateText.setText("Assigned: " + DateTimeUtils.getDayOfWeekAndDate(assignedDate));
-
         holder.creditedDaysText.setText(String.valueOf(leave.getCreditLeave()));
         holder.debitedDaysText.setText(String.valueOf(leave.getDebitLeave()));
         holder.usedDaysText.setText(String.valueOf(leave.getUsedLeave()));
@@ -48,7 +45,7 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
         if (creditedDays > 0) {
             float progress = Math.min((usedDays * 100 / creditedDays), 100);
             holder.leaveProgress.setProgress((int) progress);
-            holder.progressText.setText(String.valueOf((int) progress) + "%");
+            holder.progressText.setText(progress + "%");
         } else {
             holder.leaveProgress.setProgress(0);
             holder.progressText.setText("0%");
@@ -63,7 +60,6 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
     static class LeaveViewHolder extends RecyclerView.ViewHolder {
         TextView leaveTypeText;
         TextView creditedDaysText;
-        //        TextView assignedDateText;
         TextView debitedDaysText;
         TextView balanceDaysText;
         TextView usedDaysText;
@@ -74,7 +70,6 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
         public LeaveViewHolder(@NonNull View itemView) {
             super(itemView);
             leaveTypeText = itemView.findViewById(R.id.leaveTypeText);
-//            assignedDateText = itemView.findViewById(R.id.assignedDateText);
             creditedDaysText = itemView.findViewById(R.id.creditedDaysText);
             debitedDaysText = itemView.findViewById(R.id.debitedDaysText);
             balanceDaysText = itemView.findViewById(R.id.balanceDaysText);

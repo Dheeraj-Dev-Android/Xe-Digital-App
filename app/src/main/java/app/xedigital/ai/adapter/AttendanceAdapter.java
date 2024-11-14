@@ -19,18 +19,14 @@ import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
-import app.xedigital.ai.ui.attendance.AttendanceViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.AttendanceViewHolder> {
 
     private final List<EmployeePunchDataItem> attendanceList;
 
-    private final AttendanceViewModel attendanceViewModel;
-
-    public AttendanceAdapter(List<EmployeePunchDataItem> attendanceList, AttendanceViewModel attendanceViewModel) {
+    public AttendanceAdapter(List<EmployeePunchDataItem> attendanceList) {
         this.attendanceList = attendanceList;
-        this.attendanceViewModel = attendanceViewModel;
     }
 
     @NonNull
@@ -39,16 +35,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.attendance_list_item, parent, false);
         return new AttendanceViewHolder(itemView);
     }
-
-//    @Override
-//    public void onBindViewHolder(@NonNull AttendanceViewHolder holder, int position) {
-//        EmployeePunchDataItem attendanceItem = attendanceList.get(position);
-//        holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + attendanceItem.getDayOfWeek() + ")");
-//        holder.punchInTextView.setText("Punch In: " + DateTimeUtils.formatTime(attendanceItem.getPunchIn()));
-//        holder.punchOutTextView.setText("Punch Out: " + DateTimeUtils.formatTime(attendanceItem.getPunchOut()));
-//        holder.totalTimeTextView.setText("Total Time: " + attendanceList.get(position).getTotalTime());
-//        holder.lateTimeTextView.setText("Late Time: " + attendanceList.get(position).getLateTime() + " - " + "Over Time: " + attendanceList.get(position).getOvertime());
-//    }
 
     @Override
     public void onBindViewHolder(@NonNull AttendanceViewHolder holder, int position) {
@@ -65,6 +51,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.punchOutTextView.setVisibility(View.GONE);
             holder.totalTimeTextView.setVisibility(View.GONE);
             holder.lateTimeTextView.setVisibility(View.GONE);
+            holder.overTimeTextView.setVisibility(View.GONE);
             holder.btnViewAttendance.setVisibility(View.GONE);
             holder.btnRegularize.setVisibility(View.GONE);
         } else {
@@ -74,13 +61,16 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.punchOutTextView.setVisibility(View.VISIBLE);
             holder.totalTimeTextView.setVisibility(View.VISIBLE);
             holder.lateTimeTextView.setVisibility(View.VISIBLE);
+            holder.overTimeTextView.setVisibility(View.VISIBLE);
             holder.btnViewAttendance.setVisibility(View.VISIBLE);
             holder.btnRegularize.setVisibility(View.VISIBLE);
 
-            holder.punchInTextView.setText("Punch In: " + DateTimeUtils.formatTime(attendanceItem.getPunchIn()));
-            holder.punchOutTextView.setText("Punch Out: " + DateTimeUtils.formatTime(attendanceItem.getPunchOut()));
-            holder.totalTimeTextView.setText("Total Time: " + attendanceList.get(position).getTotalTime());
-            holder.lateTimeTextView.setText("Late Time: " + attendanceList.get(position).getLateTime() + " - " + "Over Time: " + attendanceList.get(position).getOvertime());
+            holder.punchInTextView.setText(DateTimeUtils.formatTime(attendanceItem.getPunchIn()));
+            holder.punchOutTextView.setText(DateTimeUtils.formatTime(attendanceItem.getPunchOut()));
+            holder.totalTimeTextView.setText(attendanceList.get(position).getTotalTime());
+            holder.overTimeTextView.setText(attendanceList.get(position).getOvertime());
+            holder.lateTimeTextView.setText(attendanceList.get(position).getLateTime());
+
         }
     }
 
@@ -95,6 +85,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         public TextView punchOutTextView;
         public TextView totalTimeTextView;
         public TextView lateTimeTextView;
+        public TextView overTimeTextView;
         public ImageButton btnViewAttendance;
         public ImageButton btnRegularize;
 
@@ -105,6 +96,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             punchOutTextView = itemView.findViewById(R.id.punchOutTextView);
             totalTimeTextView = itemView.findViewById(R.id.totalTimeTextView);
             lateTimeTextView = itemView.findViewById(R.id.lateTimeTextView);
+            overTimeTextView = itemView.findViewById(R.id.overTimeTextView);
             btnViewAttendance = itemView.findViewById(R.id.btn_viewAttendance);
             btnRegularize = itemView.findViewById(R.id.btn_regularize);
 
@@ -116,7 +108,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
                     if (attendanceItem != null && attendanceItem.getId() != null) {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(ARG_ATTENDANCE_ITEM, attendanceItem);
-                        Navigation.findNavController(v).navigate(R.id.action_nav_attendance_to_viewAttendanceFragment, bundle);
+                        Navigation.findNavController(v).navigate(R.id.action_nav_attendance_to_nav_viewAttendanceFragment, bundle);
                     } else {
                         new AlertDialog.Builder(v.getContext()).setTitle("Attendance Data").setMessage("Attendance data not available.").setPositiveButton(android.R.string.ok, null).show();
                     }

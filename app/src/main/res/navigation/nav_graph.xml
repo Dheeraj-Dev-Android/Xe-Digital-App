@@ -29,13 +29,35 @@
             android:id="@+id/action_nav_attendance_to_regularizeFragment"
             app:destination="@id/regularizeFragment" />
         <action
-            android:id="@+id/action_nav_attendance_to_viewAttendanceFragment"
+            android:id="@+id/action_nav_attendance_to_nav_viewAttendanceFragment"
             app:destination="@id/nav_viewAttendanceFragment" />
         <action
             android:id="@+id/action_nav_attendance_to_nav_add_attendance_fragment"
             app:destination="@id/nav_addAttendanceFragment" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_viewAttendanceFragment"
+        android:name="app.xedigital.ai.ui.attendance.ViewAttendanceFragment"
+        android:label="View Attendance"
+        tools:layout="@layout/fragment_view_attendance">
+        <action
+            android:id="@+id/action_nav_viewAttendanceFragment_to_nav_attendance"
+            app:destination="@id/nav_attendance" />
+
+        <action
+            android:id="@+id/action_viewAttendanceFragment_to_attendanceFragment"
+            app:destination="@id/nav_attendance"
+            app:popUpTo="@id/nav_attendance"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_addAttendanceFragment"
+        android:name="app.xedigital.ai.ui.attendance.AddAttendanceFragment"
+        android:label="@string/menu_add_attendance"
+        tools:layout="@layout/fragment_add_attendance" />
 
     <fragment
         android:id="@+id/regularizeFragment"
@@ -87,23 +109,6 @@
             android:id="@+id/action_nav_pendingApprovalViewFragment_to_nav_pendingApprovalFragment"
             app:destination="@id/nav_attendance" />
     </fragment>
-
-
-    <fragment
-        android:id="@+id/nav_viewAttendanceFragment"
-        android:name="app.xedigital.ai.ui.attendance.ViewAttendanceFragment"
-        android:label="View Attendance"
-        tools:layout="@layout/fragment_view_attendance">
-        <action
-            android:id="@+id/action_nav_viewAttendanceFragment_to_nav_attendance"
-            app:destination="@id/nav_attendance" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/nav_addAttendanceFragment"
-        android:name="app.xedigital.ai.ui.attendance.AddAttendanceFragment"
-        android:label="@string/menu_add_attendance"
-        tools:layout="@layout/fragment_add_attendance" />
 
     <fragment
         android:id="@+id/nav_profile"

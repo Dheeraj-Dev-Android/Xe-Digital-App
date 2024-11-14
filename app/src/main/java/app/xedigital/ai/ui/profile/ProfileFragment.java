@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,19 +18,18 @@ import com.bumptech.glide.Glide;
 import app.xedigital.ai.R;
 import app.xedigital.ai.databinding.FragmentProfileBinding;
 import app.xedigital.ai.model.profile.Employee;
-import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private FragmentProfileBinding binding;
-    private CircularProgressIndicator progressIndicator;
+//    private CircularProgressIndicator progressIndicator;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
-        progressIndicator = binding.progressIndicator;
+//        progressIndicator = binding.progressIndicator;
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
@@ -40,10 +38,10 @@ public class ProfileFragment extends Fragment {
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
         // Show the ProgressBar initially
-        progressIndicator.setVisibility(View.VISIBLE);
+//        progressIndicator.setVisibility(View.VISIBLE);
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
-            progressIndicator.setVisibility(View.GONE);
+//            progressIndicator.setVisibility(View.GONE);
             if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null) {
 
                 Employee employee = userProfile.getData().getEmployee();

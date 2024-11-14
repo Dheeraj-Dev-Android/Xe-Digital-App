@@ -13,7 +13,7 @@ public class DateTimeUtils {
 
     public static String calculateTotalTime(String punchInTime, String punchOutTime) {
         if (punchInTime == null || punchOutTime == null || punchInTime.equals("N/A") || punchOutTime.equals("N/A")) {
-            return "";
+            return "N/A";
         }
 
         SimpleDateFormat format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
@@ -37,7 +37,7 @@ public class DateTimeUtils {
 
     public static String calculateLateTime(String punchInTime, String shiftStartTime) {
         if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
-            return "";
+            return "N/A";
         }
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -51,15 +51,32 @@ public class DateTimeUtils {
                 Date shiftStart = shiftFormat.parse(shiftStartTime);
                 Date punchIn = time12Format.parse(punchIn12);
 
+//                if (punchIn != null && punchIn.after(shiftStart)) {
+//                    if (shiftStart != null) {
+//                        long lateInMillis = punchIn.getTime() - shiftStart.getTime();
+//                        long lateHours = lateInMillis / (60 * 60 * 1000);
+//                        long lateMinutes = (lateInMillis % (60 * 60 * 1000)) / (60 * 1000);
+//                        return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, lateMinutes);
+//                    }
+//                } else {
+//                    return "0 Min's";
+//                }
+
                 if (punchIn != null && punchIn.after(shiftStart)) {
                     if (shiftStart != null) {
                         long lateInMillis = punchIn.getTime() - shiftStart.getTime();
-                        long lateHours = lateInMillis / (60 * 60 * 1000);
-                        long lateMinutes = (lateInMillis % (60 * 60 * 1000)) / (60 * 1000);
-                        return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, lateMinutes);
+                        long lateMinutes = lateInMillis / (60 * 1000);
+
+                        if (lateMinutes < 60) {
+                            return lateMinutes + " Min's";
+                        } else {
+                            long lateHours = lateMinutes / 60;
+                            long remainingMinutes = lateMinutes % 60;
+                            return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, remainingMinutes);
+                        }
                     }
                 } else {
-                    return "0";
+                    return "0 Min's";
                 }
             }
         } catch (ParseException e) {
@@ -68,9 +85,10 @@ public class DateTimeUtils {
         return "N/A";
     }
 
+
     public static String calculateOvertime(String totalTime) {
         if (totalTime == null || totalTime.equals("N/A") || totalTime.trim().isEmpty() || totalTime.trim().equals(":00")) {
-            return "";
+            return "N/A";
         }
         totalTime = totalTime.replace(" Hrs", "");
         if (!totalTime.contains(":")) {

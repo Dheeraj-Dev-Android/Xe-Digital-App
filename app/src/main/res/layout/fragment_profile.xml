@@ -13,26 +13,21 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/punchCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:strokeColor="#40C4FF"
+            app:strokeWidth="2dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/punch_card_background"
                 android:padding="16dp">
 
                 <ImageView
@@ -55,14 +50,19 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
+            android:padding="16dp"
+            app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:strokeColor="#40C4FF"
+            app:strokeWidth="2dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp">
+                android:layout_margin="10dp"
+                android:background="@drawable/punch_card_background"
+                android:padding="16dp">
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline_start"
@@ -76,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.36" />
+                    app:layout_constraintGuide_percent="0.35" />
 
                 <!-- Employee Code -->
                 <TextView
@@ -91,11 +91,13 @@
 
                 <TextView
                     android:id="@+id/employee_code_value"
-                    :textColor="?android:attr/textColorSecondary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -116,9 +118,11 @@
                     android:id="@+id/name_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/name_title" />
@@ -139,9 +143,11 @@
                     android:id="@+id/email_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/email_title" />
@@ -162,9 +168,11 @@
                     android:id="@+id/contact_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/contact_title" />
@@ -185,9 +193,11 @@
                     android:id="@+id/department_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/department_title" />
@@ -208,9 +218,11 @@
                     android:id="@+id/designation_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/designation_title" />
@@ -231,9 +243,11 @@
                     android:id="@+id/level_grade_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/level_grade_title" />
@@ -254,9 +268,11 @@
                     android:id="@+id/shift_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/shift_title" />
@@ -277,9 +293,11 @@
                     android:id="@+id/shift_timing_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/shift_timing_title" />
@@ -313,9 +331,11 @@
                     android:id="@+id/reporting_manager_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/reporting_manager_title" />
@@ -336,9 +356,11 @@
                     android:id="@+id/reporting_manager_email_value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
                     android:text="-"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/reporting_manager_email" />

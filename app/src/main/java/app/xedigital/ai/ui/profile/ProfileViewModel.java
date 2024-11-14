@@ -9,12 +9,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.profile.UserProfileResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.profile.UserProfileResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,7 +22,7 @@ import retrofit2.Response;
 public class ProfileViewModel extends ViewModel {
     private static final String TAG = "ProfileViewModel";
     private final MutableLiveData<UserProfileResponse> _userProfile = new MutableLiveData<>();
-    private final APIInterface apiInterface, apiInterface1;
+    private final APIInterface apiInterface;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     public LiveData<UserProfileResponse> userProfile = _userProfile;
@@ -34,7 +34,7 @@ public class ProfileViewModel extends ViewModel {
 //    }
     public ProfileViewModel() {
         apiInterface = APIClient.getInstance().getLogin();
-        apiInterface1 = APIClient.getInstance().getUser();
+        APIInterface apiInterface1 = APIClient.getInstance().getUser();
     }
 
     public void storeLoginData(String userId, String authToken) {

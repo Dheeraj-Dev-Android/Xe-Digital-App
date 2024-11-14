@@ -46,10 +46,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import app.xedigital.ai.R;
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.ui.dashboard.DashboardFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -73,6 +69,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
+import app.xedigital.ai.R;
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.ui.dashboard.DashboardFragment;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -281,7 +281,6 @@ public class PunchActivity extends AppCompatActivity {
                             Log.d("token", "token" + token.substring(0, 10) + "...");
                         }
                         String requestBodyFace = dataObject.toString();
-//                        Log.d(TAG, "Face data:\n " + requestBodyFace);
                         RequestBody requestBodyFacee = RequestBody.create(MediaType.parse("application/json"), requestBodyFace);
                         //API CALL
                         callFaceDetailApi(token, requestBodyFacee);

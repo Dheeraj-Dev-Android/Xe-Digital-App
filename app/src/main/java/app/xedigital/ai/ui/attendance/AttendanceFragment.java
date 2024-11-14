@@ -95,7 +95,7 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
                 if (attendance.isEmpty()) {
                     showNoDataAlert();
                 } else {
-                    AttendanceAdapter adapter = new AttendanceAdapter(attendance, attendanceViewModel);
+                    AttendanceAdapter adapter = new AttendanceAdapter(attendance);
                     recyclerViewAttendance.setAdapter(adapter);
                 }
             } else {

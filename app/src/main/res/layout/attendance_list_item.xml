@@ -3,107 +3,208 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FFFFFF"
-    android:backgroundTint="#F4F4F4"
-    android:fontFamily="@font/quicksand_font_family"
-    app:cardCornerRadius="8dp"
-    android:layout_marginTop="12dp"
-    app:cardElevation="4dp">
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/stroke_color">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fontFamily="@font/quicksand_font_family"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:baselineAligned="false"
-        android:padding="10dp">
+        android:padding="12dp">
 
+        <!-- Left side - Action Buttons -->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:fontFamily="@font/quicksand_font_family"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:layout_height="match_parent"
+            android:layout_marginEnd="12dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/btn_viewAttendance"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/view_details"
-                android:background="@drawable/circular_background"
-                android:src="@drawable/ic_eye"
-                app:shapeAppearanceOverlay="@style/CircularImageView"
-                app:tint="@color/icon_tint"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/ripple_circle_background"
+                android:contentDescription="View Details"
+                android:padding="8dp"
+                android:src="@drawable/ic_eye" />
 
             <ImageButton
                 android:id="@+id/btn_regularize"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/circular_background"
-                android:contentDescription="@string/regularize"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ripple_circle_background"
+                android:contentDescription="Regularize"
+                android:padding="8dp"
                 android:src="@drawable/ic_clock"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_viewAttendance"
-                app:shapeAppearanceOverlay="@style/CircularImageView"
-                app:tint="@color/icon_tint" />
+                app:tint="@color/OccasionalLeave" />
 
         </LinearLayout>
 
+        <!-- Right side - Content -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/quicksand_font_family"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:orientation="vertical">
 
+            <!-- Date -->
             <TextView
                 android:id="@+id/dateTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family"
-                android:text="@string/date"
+                android:layout_marginBottom="8dp"
+                android:text="September 15, 2023"
+                android:textColor="#1E1E1E"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/punchInTextView"
-                android:layout_width="wrap_content"
+            <!-- Punch In/Out Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family"
-                android:text="Punch In: "
-                android:textSize="15sp" />
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/punchOutTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family"
-                android:text="Punch Out: "
-                android:textSize="15sp" />
+                <!-- Punch In -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/totalTimeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family"
-                android:text="Total Time: "
-                android:textColor="@color/LossOfPay"
-                android:textSize="15sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Punch In"
+                        android:textColor="#757575"
+                        android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/lateTimeTextView"
-                android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/punchInTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="09:00 AM"
+                        android:textColor="#1E1E1E"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Punch Out -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Punch Out"
+                        android:textColor="#757575"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/punchOutTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="06:00 PM"
+                        android:textColor="#1E1E1E"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="8dp"
+                android:background="#F0F0F0" />
+
+            <!-- Time Info Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family"
-                android:text="Late Time: "
-                android:textColor="#BF0E0E"
-                android:textSize="15sp" />
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <!-- Total Time -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Time"
+                        android:textColor="#757575"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/totalTimeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="09:00 Hrs"
+                        android:textColor="#4CAF50"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Over Time -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Over Time"
+                        android:textColor="#757575"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/overTimeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="10 Min"
+                        android:textColor="#FF9800"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Late Time -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Late Time"
+                        android:textColor="#757575"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/lateTimeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="10 Min"
+                        android:textColor="#F44336"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
 
         </LinearLayout>
 

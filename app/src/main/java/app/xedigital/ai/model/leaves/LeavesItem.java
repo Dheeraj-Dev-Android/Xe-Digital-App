@@ -11,7 +11,7 @@ public class LeavesItem{
 	private String assignDate;
 
 	@SerializedName("creditLeave")
-	private int creditLeave;
+    private float creditLeave;
 
 	@SerializedName("debitLeave")
 	private float debitLeave;
@@ -33,7 +33,7 @@ public class LeavesItem{
 		return assignDate;
 	}
 
-	public int getCreditLeave(){
+    public float getCreditLeave() {
 		return creditLeave;
 	}
 

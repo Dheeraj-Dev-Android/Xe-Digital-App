@@ -18,8 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import app.xedigital.ai.R;
@@ -54,7 +53,6 @@ import retrofit2.Response;
 public class RegularizeFragment extends Fragment {
 
     public static final String ARG_ATTENDANCE_ITEM = "attendanceItem";
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private EmployeePunchDataItem attendanceItem;
     private APIInterface apiInterface;
     private String token;
@@ -216,12 +214,12 @@ public class RegularizeFragment extends Fragment {
 
         btSubmit.setOnClickListener(v -> {
             if (validateForm()) {
-                String date = atDate.getText().toString();
-                String punchIn = timePunchIn.getText().toString();
-                String punchOut = timePunchOut.getText().toString();
-                String punchInAddress = etPunchInAddress.getText().toString();
-                String punchOutAddress = etPunchOutAddress.getText().toString();
-                String remarks = etRemarks.getText().toString();
+                String date = Objects.requireNonNull(atDate.getText()).toString();
+                String punchIn = Objects.requireNonNull(timePunchIn.getText()).toString();
+                String punchOut = Objects.requireNonNull(timePunchOut.getText()).toString();
+                String punchInAddress = Objects.requireNonNull(etPunchInAddress.getText()).toString();
+                String punchOutAddress = Objects.requireNonNull(etPunchOutAddress.getText()).toString();
+                String remarks = Objects.requireNonNull(etRemarks.getText()).toString();
                 if (attendanceItem != null) {
                     regularize(token, attendanceItem.getId(), date, punchIn, punchOut, punchInAddress, punchOutAddress, remarks);
                 } else {
@@ -266,30 +264,6 @@ public class RegularizeFragment extends Fragment {
         });
     }
 
-//    public String formatTime(String timeString) {
-//        if (timeString == null || timeString.isEmpty() || timeString.equals("1900-01-01T00:00:00.000Z")) {
-//            return "N/A";
-//        }
-//
-//        SimpleDateFormat inputFormat;
-//        if (timeString.contains("T")) {
-//            inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-//            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//        } else {
-//            inputFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-//        }
-//
-//        SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//        outputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
-//
-//        try {
-//            Date date = inputFormat.parse(timeString);
-//            return outputFormat.format(date);
-//        } catch (ParseException e) {
-//            return "N/A";
-//        }
-//    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -316,23 +290,23 @@ public class RegularizeFragment extends Fragment {
 
     private boolean validateForm() {
         boolean isValid = true;
-        if (timePunchIn.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(timePunchIn.getText()).toString().isEmpty()) {
             timePunchIn.setError("Punch-in time is required");
             isValid = false;
         }
-        if (timePunchOut.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(timePunchOut.getText()).toString().isEmpty()) {
             timePunchOut.setError("Punch-out time is required");
             isValid = false;
         }
-        if (etPunchInAddress.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(etPunchInAddress.getText()).toString().isEmpty()) {
             etPunchInAddress.setError("Punch-in address is required");
             isValid = false;
         }
-        if (etPunchOutAddress.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(etPunchOutAddress.getText()).toString().isEmpty()) {
             etPunchOutAddress.setError("Punch-out address is required");
             isValid = false;
         }
-        if (etRemarks.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(etRemarks.getText()).toString().isEmpty()) {
             etRemarks.setError("Remarks is required");
             isValid = false;
         }
