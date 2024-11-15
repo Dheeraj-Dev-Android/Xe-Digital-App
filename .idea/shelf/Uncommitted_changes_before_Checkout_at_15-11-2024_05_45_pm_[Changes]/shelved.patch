@@ -1,0 +1,436 @@
+Index: app/release/output-metadata.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\r\n  \"version\": 3,\r\n  \"artifactType\": {\r\n    \"type\": \"APK\",\r\n    \"kind\": \"Directory\"\r\n  },\r\n  \"applicationId\": \"app.xedigital.ai\",\r\n  \"variantName\": \"release\",\r\n  \"elements\": [\r\n    {\r\n      \"type\": \"SINGLE\",\r\n      \"filters\": [],\r\n      \"attributes\": [],\r\n      \"versionCode\": 1,\r\n      \"versionName\": \"1.1\",\r\n      \"outputFile\": \"app-release.apk\"\r\n    }\r\n  ],\r\n  \"elementType\": \"File\",\r\n  \"baselineProfiles\": [\r\n    {\r\n      \"minApi\": 28,\r\n      \"maxApi\": 30,\r\n      \"baselineProfiles\": [\r\n        \"baselineProfiles/1/app-release.dm\"\r\n      ]\r\n    },\r\n    {\r\n      \"minApi\": 31,\r\n      \"maxApi\": 2147483647,\r\n      \"baselineProfiles\": [\r\n        \"baselineProfiles/0/app-release.dm\"\r\n      ]\r\n    }\r\n  ],\r\n  \"minSdkVersionForDexing\": 26\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/release/output-metadata.json b/app/release/output-metadata.json
+--- a/app/release/output-metadata.json	
++++ b/app/release/output-metadata.json	
+@@ -12,7 +12,7 @@
+       "filters": [],
+       "attributes": [],
+       "versionCode": 1,
+-      "versionName": "1.1",
++      "versionName": "1.0",
+       "outputFile": "app-release.apk"
+     }
+   ],
+@@ -33,5 +33,5 @@
+       ]
+     }
+   ],
+-  "minSdkVersionForDexing": 26
++  "minSdkVersionForDexing": 28
+ }
+\ No newline at end of file
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n}\r\n\r\nandroid {\r\n    namespace = \"app.xedigital.ai\"\r\n    compileSdk = 34\r\n\r\n    defaultConfig {\r\n        applicationId = \"app.xedigital.ai\"\r\n        minSdk = 28\r\n        targetSdk = 35\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n        ndk {\r\n            abiFilters += listOf(\"armeabi-v7a\", \"arm64-v8a\", \"x86\", \"x86_64\")\r\n        }\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"), \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_1_8\r\n        targetCompatibility = JavaVersion.VERSION_1_8\r\n        isCoreLibraryDesugaringEnabled = true\r\n\r\n    }\r\n    buildFeatures {\r\n        viewBinding = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n\r\n    implementation(libs.appcompat)\r\n    implementation(libs.material)\r\n    implementation(libs.constraintlayout)\r\n    implementation(libs.lifecycle.livedata.ktx)\r\n    implementation(libs.lifecycle.viewmodel.ktx)\r\n    implementation(libs.navigation.fragment)\r\n    implementation(libs.navigation.ui)\r\n    implementation(libs.legacy.support.v4)\r\n    implementation(libs.activity)\r\n    implementation(libs.filament.android)\r\n    implementation(libs.tracing.perfetto.handshake)\r\n    implementation(libs.firebase.crashlytics.buildtools)\r\n    implementation(libs.protolite.well.known.types)\r\n    implementation(libs.media3.common)\r\n    implementation(libs.play.services.location)\r\n    implementation(libs.compilercommon)\r\n    implementation(libs.cronet.embedded)\r\n    implementation(libs.compiler)\r\n    implementation(libs.transport.api)\r\n    implementation(libs.core.i18n)\r\n    implementation(libs.leanback)\r\n    implementation(libs.rendering)\r\n    implementation(libs.ui.text.android)\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.ext.junit)\r\n    androidTestImplementation(libs.espresso.core)\r\n    implementation(libs.retrofit)\r\n    implementation(libs.converterGson)\r\n    implementation(libs.cardView)\r\n    implementation(libs.mpandroidchart)\r\n    implementation(libs.recyclerView)\r\n    implementation(libs.camera.core)\r\n    implementation(libs.camera.camera2)\r\n    implementation(libs.camera.lifecycle)\r\n    implementation(libs.camera.video)\r\n    implementation(libs.camera.view)\r\n    implementation(libs.camera.extensions)\r\n    implementation(libs.navigation.fragment)\r\n    implementation(libs.navigation.ui)\r\n    implementation(libs.play.services.location)\r\n    coreLibraryDesugaring(\"com.android.tools:desugar_jdk_libs:2.1.3\")\r\n    implementation(\"com.google.code.gson:gson:2.11.0\")\r\n    implementation(\"com.github.bumptech.glide:glide:4.16.0\")\r\n    annotationProcessor(\"com.github.bumptech.glide:compiler:4.16.0\")\r\n    implementation(\"com.facebook.shimmer:shimmer:0.5.0\")\r\n    implementation(\"com.squareup.okhttp3:logging-interceptor:4.12.0\")\r\n    implementation(\"org.jsoup:jsoup:1.18.1\")\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	
++++ b/app/build.gradle.kts	
+@@ -63,6 +63,7 @@
+     implementation(libs.leanback)
+     implementation(libs.rendering)
+     implementation(libs.ui.text.android)
++    implementation(libs.firebase.inappmessaging)
+     testImplementation(libs.junit)
+     androidTestImplementation(libs.ext.junit)
+     androidTestImplementation(libs.espresso.core)
+@@ -87,4 +88,5 @@
+     implementation("com.facebook.shimmer:shimmer:0.5.0")
+     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+     implementation("org.jsoup:jsoup:1.18.1")
++    implementation("com.google.mlkit:face-detection:16.1.5")
+ }
+\ No newline at end of file
+Index: app/src/main/java/app/xedigital/ai/activity/PunchActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package app.xedigital.ai.activity;\r\n\r\nimport android.Manifest;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.content.SharedPreferences;\r\nimport android.content.pm.PackageManager;\r\nimport android.graphics.Bitmap;\r\nimport android.graphics.BitmapFactory;\r\nimport android.hardware.camera2.CameraManager;\r\nimport android.location.Address;\r\nimport android.location.Geocoder;\r\nimport android.location.Location;\r\nimport android.net.Uri;\r\nimport android.os.Bundle;\r\nimport android.os.CountDownTimer;\r\nimport android.os.Environment;\r\nimport android.os.Handler;\r\nimport android.text.Html;\r\nimport android.util.Base64;\r\nimport android.util.Log;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.widget.ImageView;\r\nimport android.widget.ProgressBar;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.activity.EdgeToEdge;\r\nimport androidx.activity.result.ActivityResultLauncher;\r\nimport androidx.activity.result.contract.ActivityResultContracts;\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AlertDialog;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.camera.core.Camera;\r\nimport androidx.camera.core.CameraInfo;\r\nimport androidx.camera.core.CameraSelector;\r\nimport androidx.camera.core.ImageCapture;\r\nimport androidx.camera.core.ImageCaptureException;\r\nimport androidx.camera.core.Preview;\r\nimport androidx.camera.lifecycle.ProcessCameraProvider;\r\nimport androidx.camera.view.PreviewView;\r\nimport androidx.core.app.ActivityCompat;\r\nimport androidx.core.content.ContextCompat;\r\nimport androidx.fragment.app.FragmentManager;\r\nimport androidx.navigation.Navigation;\r\n\r\nimport com.bumptech.glide.Glide;\r\nimport com.google.android.gms.location.FusedLocationProviderClient;\r\nimport com.google.android.gms.location.LocationCallback;\r\nimport com.google.android.gms.location.LocationRequest;\r\nimport com.google.android.gms.location.LocationResult;\r\nimport com.google.android.gms.location.LocationServices;\r\nimport com.google.android.material.dialog.MaterialAlertDialogBuilder;\r\nimport com.google.common.util.concurrent.ListenableFuture;\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.GsonBuilder;\r\n\r\nimport org.json.JSONException;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.ByteArrayOutputStream;\r\nimport java.io.File;\r\nimport java.io.IOException;\r\nimport java.text.SimpleDateFormat;\r\nimport java.util.Date;\r\nimport java.util.List;\r\nimport java.util.Locale;\r\nimport java.util.TimeZone;\r\nimport java.util.concurrent.ExecutionException;\r\n\r\nimport app.xedigital.ai.R;\r\nimport app.xedigital.ai.api.APIClient;\r\nimport app.xedigital.ai.api.APIInterface;\r\nimport app.xedigital.ai.ui.dashboard.DashboardFragment;\r\nimport okhttp3.MediaType;\r\nimport okhttp3.RequestBody;\r\nimport okhttp3.ResponseBody;\r\nimport retrofit2.Call;\r\nimport retrofit2.Callback;\r\nimport retrofit2.Response;\r\n\r\npublic class PunchActivity extends AppCompatActivity {\r\n    private static final String TAG = \"PunchActivity\";\r\n    private final String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION};\r\n    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();\r\n    private Preview preview;\r\n    private ImageCapture imageCapture;\r\n    private CameraSelector cameraSelector;\r\n    private String authToken, userId;\r\n    private FusedLocationProviderClient fusedLocationClient;\r\n    private String currentAddress = \"\";\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        EdgeToEdge.enable(this);\r\n        setContentView(R.layout.activity_punch);\r\n\r\n        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);\r\n\r\n        ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {\r\n            boolean allGranted = true;\r\n            for (boolean granted : result.values()) {\r\n                if (!granted) {\r\n                    allGranted = true;\r\n                    break;\r\n                }\r\n            }\r\n            startCamera();\r\n        });\r\n\r\n        if (allPermissionsGranted()) {\r\n            startCamera();\r\n        } else {\r\n            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);\r\n        }\r\n\r\n        imageCapture = new ImageCapture.Builder().build();\r\n        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);\r\n        preview = new Preview.Builder().build();\r\n        cameraSelector = new CameraSelector.Builder().build();\r\n\r\n//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {\r\n//            new AlertDialog.Builder(this).setTitle(\"Camera Permission Required\").setMessage(\"This app needs access to the camera to capture your punch.\").setPositiveButton(\"OK\", (dialog, which) -> requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS)).setNegativeButton(\"Cancel\", null).show();\r\n//        } else {\r\n//            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);\r\n//        }\r\n    }\r\n\r\n    private boolean allPermissionsGranted() {\r\n        for (String permission : REQUIRED_PERMISSIONS) {\r\n            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {\r\n                return false;\r\n            }\r\n        }\r\n        return true;\r\n    }\r\n\r\n    private void startCamera() {\r\n        Log.d(TAG, \"Camera Started\");\r\n        PreviewView viewFinder = findViewById(R.id.viewFinder);\r\n        CameraManager cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);\r\n        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);\r\n\r\n        cameraProviderFuture.addListener(() -> {\r\n            try {\r\n                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();\r\n                cameraProvider.unbindAll();\r\n                preview.setSurfaceProvider(viewFinder.getSurfaceProvider());\r\n\r\n                cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();\r\n                try {\r\n                    Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);\r\n                    if (camera == null) {\r\n                        Log.e(TAG, \"Camera is null\");\r\n                        showRetryAlert();\r\n                        return;\r\n                    }\r\n\r\n                    CameraInfo cameraInfo = camera.getCameraInfo();\r\n                    Log.d(TAG, \"Camera Info: \" + cameraInfo);\r\n                    Log.d(TAG, \"Camera State: \" + cameraInfo.getCameraState());\r\n                    TextView captureText = findViewById(R.id.CaptureText);\r\n\r\n                    new CountDownTimer(3000, 1000) {\r\n                        @Override\r\n                        public void onTick(long millisUntilFinished) {\r\n                            captureText.setVisibility(View.VISIBLE);\r\n                            captureText.setText(\"Capturing in: \" + millisUntilFinished / 1000 + \"seconds\");\r\n                        }\r\n\r\n                        @Override\r\n                        public void onFinish() {\r\n                            Toast.makeText(PunchActivity.this, \"Captured\", Toast.LENGTH_SHORT).show();\r\n                            Log.i(TAG, \"Captured\");\r\n                            captureImage();\r\n                            captureText.setEnabled(true);\r\n                            captureText.setText(\"Capture\");\r\n                            captureText.setVisibility(View.GONE);\r\n                        }\r\n                    }.start();\r\n                } catch (IllegalArgumentException e) {\r\n                    Log.e(TAG, \"Error binding camera: \" + e.getMessage(), e);\r\n                    showRetryAlert();\r\n                }\r\n\r\n            } catch (ExecutionException | InterruptedException e) {\r\n                Log.e(TAG, \"Error starting camera: \" + e.getMessage(), e);\r\n            }\r\n        }, ContextCompat.getMainExecutor(this));\r\n    }\r\n\r\n\r\n    private void showRetryAlert() {\r\n        new MaterialAlertDialogBuilder(this).setTitle(\"Camera Not Found\").setMessage(\"No camera found or selected. Please check your device and try again.\").setPositiveButton(\"Retry\", (dialog, which) -> {\r\n            startCamera();\r\n        }).setNegativeButton(\"Cancel\", (dialog, which) -> {\r\n            dialog.dismiss();\r\n            Navigation.findNavController(this, R.id.nav_host_fragment_content_main).navigate(R.id.nav_dashboard);\r\n        }).show();\r\n    }\r\n\r\n    private void captureImage() {\r\n        File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + \"_photo.jpg\");\r\n        ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();\r\n\r\n        imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {\r\n            @Override\r\n            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {\r\n                String savedUri = Uri.fromFile(photoFile).toString();\r\n                LayoutInflater inflater = getLayoutInflater();\r\n                View dialogView = inflater.inflate(R.layout.image_alert_dialog, null);\r\n                ImageView imageView = dialogView.findViewById(R.id.capturedImage);\r\n\r\n                Glide.with(PunchActivity.this).load(savedUri).into(imageView);\r\n                ProgressBar progressBar = findViewById(R.id.progressBar);\r\n                progressBar.setVisibility(View.VISIBLE);\r\n\r\n                String savedImagePath = photoFile.getAbsolutePath();\r\n                try {\r\n                    ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(PunchActivity.this).get();\r\n                    cameraProvider.unbind(preview);\r\n                } catch (ExecutionException | InterruptedException e) {\r\n                    Log.e(TAG, \"Error unbinding camera preview: \" + e.getMessage(), e);\r\n                }\r\n\r\n                try {\r\n                    Bitmap bitmap = BitmapFactory.decodeFile(savedImagePath);\r\n                    int newWidth = 500;\r\n                    int newHeight = (int) (bitmap.getHeight() * (newWidth / (float) bitmap.getWidth()));\r\n                    bitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);\r\n\r\n                    String base64Image = convertImageToBase64(bitmap);\r\n                    if (base64Image.length() >= 10) {\r\n                        Log.d(TAG, \"Base64 Image: \" + base64Image.substring(0, 10) + \"...\");\r\n                    }\r\n                    JSONObject jsonObject = new JSONObject();\r\n                    jsonObject.put(\"collection_name\", \"consultedgeglobalpvtltd_5e970n\");\r\n                    jsonObject.put(\"image\", base64Image);\r\n\r\n                    String requestBodyJson = jsonObject.toString();\r\n                    RequestBody requestBody = RequestBody.create(MediaType.parse(\"application/json\"), requestBodyJson);\r\n//                   API CALL\r\n                    sendImageToApi(requestBody);\r\n                } catch (Exception e) {\r\n                    Log.e(TAG, \"Error processing image: \" + e.getMessage(), e);\r\n                }\r\n            }\r\n\r\n            @Override\r\n            public void onError(@NonNull ImageCaptureException exception) {\r\n                Log.e(TAG, \"Photo capture failed: \" + exception.getMessage(), exception);\r\n            }\r\n        });\r\n    }\r\n\r\n    //    API TO SEND IMAGE TO DB\r\n    private void sendImageToApi(RequestBody requestBody) {\r\n        Log.d(TAG, \"Recognize API Called\");\r\n        APIInterface imageApiService = APIClient.getInstance().getImage();\r\n        retrofit2.Call<ResponseBody> recognize = imageApiService.FaceRecognitionApi(requestBody);\r\n\r\n        recognize.enqueue(new Callback<ResponseBody>() {\r\n            @Override\r\n            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {\r\n                if (response.isSuccessful() && response.body() != null) {\r\n                    try {\r\n                        String responseBody = response.body().string();\r\n                        String responseJson = gson.toJson(responseBody);\r\n                        Log.d(TAG, \"Recognize Response Body:\\n \" + responseJson);\r\n                        JSONObject jsonResponse = new JSONObject(responseBody);\r\n                        JSONObject dataObject = jsonResponse.getJSONObject(\"data\");\r\n\r\n                        Intent intent = getIntent();\r\n                        if (intent != null) {\r\n                            authToken = intent.getStringExtra(\"authToken\");\r\n                        }\r\n                        String token = \"jwt \" + authToken;\r\n                        if (token.length() >= 10) {\r\n                            Log.d(\"token\", \"token\" + token.substring(0, 10) + \"...\");\r\n                        }\r\n                        String requestBodyFace = dataObject.toString();\r\n                        RequestBody requestBodyFacee = RequestBody.create(MediaType.parse(\"application/json\"), requestBodyFace);\r\n                        //API CALL\r\n                        callFaceDetailApi(token, requestBodyFacee);\r\n\r\n                    } catch (IOException | JSONException e) {\r\n                        Log.e(TAG, \"Error reading response body: \" + e.getMessage(), e);\r\n                        throw new RuntimeException(e);\r\n                    }\r\n                } else {\r\n                    Log.e(TAG, \"Recognize Response Error: \" + response.code() + \" - \" + response.message());\r\n                }\r\n            }\r\n\r\n            @Override\r\n            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {\r\n                Log.e(TAG, \"Recognize Error: \" + throwable.getMessage(), throwable);\r\n            }\r\n        });\r\n    }\r\n\r\n//    private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {\r\n//        Log.d(TAG, \"Face Detail API Called\");\r\n//        Log.d(TAG, \"Token: \" + token);\r\n//        APIInterface faceApiService = APIClient.getInstance().getFace();\r\n//        retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetailApi(token, requestBodyFacee);\r\n//\r\n//        faceDetails.enqueue(new Callback<ResponseBody>() {\r\n//            @Override\r\n//            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {\r\n//                if (response.isSuccessful() && response.body() != null) {\r\n//                    String responseBody = null;\r\n//                    try {\r\n//                        responseBody = response.body().string();\r\n////                        String responseJson = gson.toJson(responseBody);\r\n////                        Log.d(TAG, \"Face Detail Response Body:\\n\" + responseJson);\r\n//                        JSONObject jsonResponse = new JSONObject(responseBody);\r\n//                        JSONObject dataObject = jsonResponse.getJSONObject(\"data\");\r\n//                        Log.d(TAG, \"Face data: \" + dataObject);\r\n//                        String id = dataObject.getString(\"_id\");\r\n//                        String firstName = dataObject.getString(\"firstname\");\r\n//                        Log.d(TAG, \"ID: \" + id + \", First Name: \" + firstName);\r\n//\r\n//                        callAttendanceApi(id, firstName);\r\n//                    } catch (IOException | JSONException e) {\r\n//                        throw new RuntimeException(e);\r\n//                    }\r\n////                    callAttendanceApi();\r\n//                } else {\r\n//                    Log.e(TAG, \"Face Detail Response Error: \" + response.code() + \" - \" + response.message());\r\n//                }\r\n//            }\r\n//\r\n//            @Override\r\n//            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {\r\n//                Log.e(TAG, \"Face DetailError: \" + throwable.getMessage(), throwable);\r\n//\r\n//            }\r\n//        });\r\n//    }\r\n\r\n    private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {\r\n        Log.d(TAG, \"Face Detail API Called\");\r\n        APIInterface faceApiService = APIClient.getInstance().getFace();\r\n        retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetailApi(token, requestBodyFacee);\r\n\r\n        faceDetails.enqueue(new Callback<ResponseBody>() {\r\n            @Override\r\n            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {\r\n                if (response.isSuccessful() && response.body() != null) {\r\n                    try {\r\n                        String responseBody = response.body().string();\r\n                        JSONObject jsonResponse = new JSONObject(responseBody);\r\n\r\n                        // Check if \"data\" key exists and is not null before proceeding\r\n                        if (jsonResponse.has(\"data\") && !jsonResponse.isNull(\"data\")) {\r\n                            JSONObject dataObject = jsonResponse.getJSONObject(\"data\");\r\n                            JSONObject employeeObject = dataObject.getJSONObject(\"employee\");\r\n                            String id = employeeObject.getString(\"_id\");\r\n                            String firstName = employeeObject.getString(\"firstname\");\r\n\r\n                            Log.d(TAG, \"ID: \" + id + \", First Name: \" + firstName);\r\n\r\n                            String responseJson = gson.toJson(responseBody);\r\n                            Log.d(TAG, \"Face Detail Response Body:\\n\" + responseJson);\r\n\r\n                            SharedPreferences sharedPreferences = getSharedPreferences(\"MyPrefs\", Context.MODE_PRIVATE);\r\n                            String userId = sharedPreferences.getString(\"userId\", null);\r\n                            Log.e(TAG, \"User ID: \" + userId + \", ID: \" + id);\r\n                            if (userId != null && userId.equals(id)) {\r\n                                callAttendanceApi(id, firstName);\r\n                            } else {\r\n                                showAttendanceFailedAlert(\"Attendance failed: User Id Mismatch.\");\r\n                            }\r\n                        } else {\r\n                            Log.e(TAG, \"Face data not found in response.\");\r\n                            showAttendanceFailedAlert(\"Attendance failed: Face not found or matched.\");\r\n                        }\r\n                    } catch (IOException | JSONException e) {\r\n                        Log.e(TAG, \"Error processing face detail response: \" + e.getMessage(), e);\r\n                        showAttendanceFailedAlert(\"Attendance failed: An error occurred.\");\r\n                    }\r\n                } else {\r\n                    Log.e(TAG, \"Face Detail Response Error: \" + response.code() + \" - \" + response.message());\r\n                    showAttendanceFailedAlert(\"Attendance failed: Server error.\");\r\n                }\r\n            }\r\n\r\n            @Override\r\n            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {\r\n                Log.e(TAG, \"Face Detail Error: \" + throwable.getMessage(), throwable);\r\n                showAttendanceFailedAlert(\"Attendance failed: Network or API error.\");\r\n            }\r\n        });\r\n    }\r\n\r\n\r\n//    private void callAttendanceApi() {\r\n//        Log.d(TAG, \"Attendance API Called\");\r\n//        Intent intent = getIntent();\r\n//        if (intent != null) {\r\n//            authToken = intent.getStringExtra(\"authToken\");\r\n//            userId = intent.getStringExtra(\"userId\");\r\n//            name = intent.getStringExtra(\"name\");\r\n//        }\r\n//        String token = \"jwt \" + authToken;\r\n//        if (token.length() >= 10) {\r\n//            Log.d(\"token\", \"token\" + token.substring(0, 10) + \"...\");\r\n//        }\r\n////        String currentAddress = \"GoBolt\";\r\n//        getCurrentLocation();\r\n//        Log.d(TAG, \"Current Address: \" + currentAddress);\r\n//        String currentTime = getCurrentTime();\r\n//        Log.d(TAG, \"Current Time: \" + currentTime);\r\n//        try {\r\n//            JSONObject requestBody = new JSONObject();\r\n//            requestBody.put(\"employee\", userId);\r\n//            requestBody.put(\"employeename\", name);\r\n//            requestBody.put(\"address\", currentAddress);\r\n//            requestBody.put(\"punchTime\", currentTime);\r\n//\r\n//            String requestBodyString = requestBody.toString();\r\n//            Log.d(TAG, \"Request Body: \" + requestBodyString);\r\n//            RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse(\"application/json\"), requestBodyString);\r\n//\r\n//            APIInterface attendanceApiService = APIClient.getInstance().getAttendance();\r\n//            retrofit2.Call<ResponseBody> attendance = attendanceApiService.AttendanceApi(token, requestBodyAttendance);\r\n////API FOR ATTENDANCE PUNCH\r\n//            attendance.enqueue(new Callback<ResponseBody>() {\r\n//                @Override\r\n//                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {\r\n//                    if (response.isSuccessful() && response.body() != null) {\r\n//                        try {\r\n//                            String responseBody = response.body().string();\r\n//                            String responseJson = gson.toJson(responseBody);\r\n//                            Log.d(TAG, \"Attendance Response Body:\\n\" + responseJson);\r\n//                        } catch (IOException e) {\r\n//                            Log.e(TAG, \"Error reading response body: \" + e.getMessage(), e);\r\n//                            throw new RuntimeException(e);\r\n//                        }\r\n//                    }\r\n//\r\n//                }\r\n//\r\n//                @Override\r\n//                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {\r\n//                    Log.e(TAG, \"Attendance Error: \" + throwable.getMessage(), throwable);\r\n//                    throw new RuntimeException(throwable);\r\n//\r\n//                }\r\n//            });\r\n//\r\n//        } catch (JSONException e) {\r\n//            Log.e(TAG, \"Error creating request body: \" + e.getMessage(), e);\r\n//            throw new RuntimeException(e);\r\n//        }\r\n//\r\n//    }\r\n\r\n    private void callAttendanceApi(String employeeId, String employeeName) {\r\n        Log.d(TAG, \"Attendance API Called\");\r\n        Intent intent = getIntent();\r\n        if (intent != null) {\r\n            authToken = intent.getStringExtra(\"authToken\");\r\n        }\r\n        String token = \"jwt \" + authToken;\r\n        if (token.length() >= 10) {\r\n            Log.d(\"token\", \"token\" + token.substring(0, 10) + \"...\");\r\n        }\r\n\r\n        getCurrentLocation(address -> {\r\n            currentAddress = address;\r\n            Log.d(TAG, \"Current Address (Received): \" + currentAddress);\r\n\r\n            String currentTime = getCurrentTime();\r\n            try {\r\n                JSONObject requestBody = new JSONObject();\r\n                requestBody.put(\"employee\", employeeId);\r\n                requestBody.put(\"employeeName\", employeeName);\r\n                requestBody.put(\"address\", currentAddress);\r\n                requestBody.put(\"punchTime\", currentTime);\r\n\r\n                String requestBodyString = requestBody.toString();\r\n                Log.d(TAG, \"Request Body: \" + requestBodyString);\r\n                RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse(\"application/json\"), requestBodyString);\r\n\r\n                APIInterface attendanceApiService = APIClient.getInstance().getAttendance();\r\n                Call<ResponseBody> attendance = attendanceApiService.AttendanceApi(token, requestBodyAttendance);\r\n\r\n                attendance.enqueue(new Callback<ResponseBody>() {\r\n                    @Override\r\n                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {\r\n                        ProgressBar progressBar = findViewById(R.id.progressBar);\r\n                        progressBar.setVisibility(View.GONE);\r\n                        if (response.isSuccessful() && response.body() != null) {\r\n                            try {\r\n                                String responseBody = response.body().string();\r\n                                JSONObject responseJson = new JSONObject(responseBody);\r\n                                String message = responseJson.getString(\"message\");\r\n                                Log.d(TAG, \"Attendance Response Message: \" + message);\r\n                                showAttendanceSuccessAlert(responseBody);\r\n\r\n                                String responseJsonn = gson.toJson(responseBody);\r\n                                Log.d(TAG, \"Attendance Response Body:\\n\" + responseJsonn);\r\n                            } catch (IOException | JSONException e) {\r\n                                Log.e(TAG, \"Error reading response body: \" + e.getMessage(), e);\r\n                                throw new RuntimeException(e);\r\n                            }\r\n                        }\r\n                    }\r\n\r\n                    @Override\r\n                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {\r\n                        Log.e(TAG, \"Attendance Error: \" + throwable.getMessage(), throwable);\r\n                        throw new RuntimeException(throwable);\r\n                    }\r\n                });\r\n            } catch (JSONException e) {\r\n                Log.e(TAG, \"Error creating request body: \" + e.getMessage(), e);\r\n                throw new RuntimeException(e);\r\n            }\r\n        });\r\n    }\r\n\r\n    private void showAttendanceSuccessAlert(String responseBody) {\r\n        try {\r\n            JSONObject responseJson = new JSONObject(responseBody);\r\n            boolean success = responseJson.getBoolean(\"success\");\r\n            String message = responseJson.getString(\"message\");\r\n            if (success) {\r\n                JSONObject data = responseJson.getJSONObject(\"data\");\r\n                Log.d(TAG, \"Attendance Data: \" + data);\r\n//                String punchDate = data.getString(\"punchDate\");\r\n//                String punchIn = data.getString(\"punchIn\");\r\n//                String punchOut = data.getString(\"punchOut\");\r\n                String punchInAddress = data.getString(\"punchInAddress\");\r\n                String punchOutAddress = data.getString(\"punchOutAddress\");\r\n\r\n                String address;\r\n                if (punchOutAddress.isEmpty()) {\r\n                    address = punchInAddress;\r\n                } else {\r\n                    address = punchOutAddress;\r\n                }\r\n\r\n                StringBuilder formattedMessage = new StringBuilder();\r\n                // Check if AlertDialog.Builder supports HTML formatting\r\n                formattedMessage.append(\"<b>\").append(message).append(\"</b>\").append(\"<br><br>\");\r\n//                    formattedMessage.append(\"Punch Date: <i>\").append(punchDate).append(\"</i>\").append(\"<br><br>\");\r\n//                    formattedMessage.append(\"Punch In: \").append(punchIn).append(\"<br>\");\r\n//                    formattedMessage.append(\"Punch Out: \").append(punchOut).append(\"<br><br>\");\r\n                formattedMessage.append(\"Address: \").append(address).append(\"<br>\");\r\n                FragmentManager fragmentManager = getSupportFragmentManager();\r\n//                runOnUiThread(() -> {\r\n//                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);\r\n//                    builder.setTitle(\"Attendance Success\").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton(\"OK\", (dialog, which) -> {\r\n//                        dialog.dismiss();\r\n//                        DashboardFragment dashboardFragment = new DashboardFragment();\r\n//                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();\r\n//                    }).show();\r\n//                });\r\n\r\n                runOnUiThread(() -> {\r\n                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);\r\n                    AlertDialog dialog = builder.setTitle(\"Attendance Success\").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton(\"OK\", (dialog1, which) -> {\r\n                        dialog1.dismiss();\r\n                        DashboardFragment dashboardFragment = new DashboardFragment();\r\n                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();\r\n                    }).show();\r\n                    new Handler().postDelayed(() -> {\r\n                        if (dialog.isShowing()) {\r\n                            dialog.dismiss();\r\n                            DashboardFragment dashboardFragment = new DashboardFragment();\r\n                            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();\r\n                        }\r\n                    }, 5000);\r\n                });\r\n            }\r\n        } catch (JSONException e) {\r\n            Log.e(\"PunchActivity\", \"Error parsing JSON response\", e);\r\n            throw new RuntimeException(e);\r\n        }\r\n    }\r\n\r\n    private void showAttendanceFailedAlert(String message) {\r\n        runOnUiThread(() -> new AlertDialog.Builder(PunchActivity.this).setTitle(\"Attendance Failed\").setMessage(message).setPositiveButton(\"Retry\", (dialog, id) -> {\r\n            dialog.dismiss();\r\n            startCamera();\r\n        }).setNegativeButton(\"Cancel\", (dialog, id) -> {\r\n            dialog.dismiss();\r\n            FragmentManager fragmentManager = getSupportFragmentManager();\r\n            DashboardFragment dashboardFragment = new DashboardFragment();\r\n            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();\r\n\r\n        }).show());\r\n    }\r\n\r\n    private String getCurrentTime() {\r\n        SimpleDateFormat dateFormat = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\", Locale.getDefault());\r\n        dateFormat.setTimeZone(TimeZone.getTimeZone(\"UTC\"));\r\n        return dateFormat.format(new Date());\r\n    }\r\n\r\n    private void getCurrentLocation(AddressCallback callback) {\r\n        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {\r\n            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);\r\n\r\n            LocationCallback locationCallback = new LocationCallback() {\r\n                @Override\r\n                public void onLocationResult(@NonNull LocationResult locationResult) {\r\n                    Location location = locationResult.getLastLocation();\r\n                    if (location != null) {\r\n                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);\r\n                    } else {\r\n                        Log.e(TAG, \"Location is null in onLocationResult\");\r\n                        callback.onAddressReceived(\"Location not found\");\r\n                    }\r\n                }\r\n            };\r\n            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);\r\n        } else {\r\n            Log.e(TAG, \"Location permission not granted\");\r\n            callback.onAddressReceived(\"Location not found\");\r\n        }\r\n    }\r\n\r\n    private void getAddressFromLocation(double latitude, double longitude, AddressCallback callback) {\r\n        Geocoder geocoder = new Geocoder(this, Locale.getDefault());\r\n        try {\r\n            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);\r\n            if (addresses != null && !addresses.isEmpty()) {\r\n                Address address = addresses.get(0);\r\n                StringBuilder completeAddress = new StringBuilder();\r\n                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {\r\n                    completeAddress.append(address.getAddressLine(i)).append(\"\\n\");\r\n                }\r\n                currentAddress = completeAddress.toString();\r\n                callback.onAddressReceived(currentAddress);\r\n            } else {\r\n                Log.e(TAG, \"No address found for location\");\r\n                currentAddress = \"Location not found\";\r\n                callback.onAddressReceived(currentAddress);\r\n            }\r\n        } catch (IOException e) {\r\n            Log.e(TAG, \"Error getting address: \" + e.getMessage());\r\n            currentAddress = \"Location not found\";\r\n            callback.onAddressReceived(currentAddress);\r\n        }\r\n    }\r\n\r\n    private String convertImageToBase64(Bitmap bitmap) {\r\n        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();\r\n        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);\r\n        byte[] imageBytes = byteArrayOutputStream.toByteArray();\r\n        return Base64.encodeToString(imageBytes, Base64.DEFAULT);\r\n    }\r\n\r\n    private File getOutputDirectory() {\r\n        File mediaDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), \"Punch\");\r\n        if (!mediaDir.exists()) {\r\n            if (!mediaDir.mkdirs()) {\r\n                Log.e(TAG, \"Failed to create directory\");\r\n            }\r\n        }\r\n        return mediaDir;\r\n    }\r\n\r\n    @Override\r\n    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {\r\n        super.onRequestPermissionsResult(requestCode, permissions, grantResults);\r\n        int REQUEST_CODE_PERMISSIONS = 10;\r\n        if (requestCode == REQUEST_CODE_PERMISSIONS) {\r\n            if (allPermissionsGranted()) {\r\n                startCamera();\r\n            }\r\n        }\r\n    }\r\n\r\n    interface AddressCallback {\r\n        void onAddressReceived(String address);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/app/xedigital/ai/activity/PunchActivity.java b/app/src/main/java/app/xedigital/ai/activity/PunchActivity.java
+--- a/app/src/main/java/app/xedigital/ai/activity/PunchActivity.java	
++++ b/app/src/main/java/app/xedigital/ai/activity/PunchActivity.java	
+@@ -21,6 +21,7 @@
+ import android.util.Log;
+ import android.view.LayoutInflater;
+ import android.view.View;
++import android.widget.Button;
+ import android.widget.ImageView;
+ import android.widget.ProgressBar;
+ import android.widget.TextView;
+@@ -43,6 +44,7 @@
+ import androidx.core.app.ActivityCompat;
+ import androidx.core.content.ContextCompat;
+ import androidx.fragment.app.FragmentManager;
++import androidx.navigation.NavController;
+ import androidx.navigation.Navigation;
+ 
+ import com.bumptech.glide.Glide;
+@@ -51,10 +53,16 @@
+ import com.google.android.gms.location.LocationRequest;
+ import com.google.android.gms.location.LocationResult;
+ import com.google.android.gms.location.LocationServices;
++import com.google.android.gms.tasks.Task;
+ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+ import com.google.common.util.concurrent.ListenableFuture;
+ import com.google.gson.Gson;
+ import com.google.gson.GsonBuilder;
++import com.google.mlkit.vision.common.InputImage;
++import com.google.mlkit.vision.face.Face;
++import com.google.mlkit.vision.face.FaceDetection;
++import com.google.mlkit.vision.face.FaceDetector;
++import com.google.mlkit.vision.face.FaceDetectorOptions;
+ 
+ import org.json.JSONException;
+ import org.json.JSONObject;
+@@ -68,11 +76,11 @@
+ import java.util.Locale;
+ import java.util.TimeZone;
+ import java.util.concurrent.ExecutionException;
++import java.util.concurrent.atomic.AtomicReference;
+ 
+ import app.xedigital.ai.R;
+ import app.xedigital.ai.api.APIClient;
+ import app.xedigital.ai.api.APIInterface;
+-import app.xedigital.ai.ui.dashboard.DashboardFragment;
+ import okhttp3.MediaType;
+ import okhttp3.RequestBody;
+ import okhttp3.ResponseBody;
+@@ -90,6 +98,7 @@
+     private String authToken, userId;
+     private FusedLocationProviderClient fusedLocationClient;
+     private String currentAddress = "";
++    private ProgressBar progressBar;
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+@@ -194,10 +203,18 @@
+ 
+     private void showRetryAlert() {
+         new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
++            dialog.dismiss(); // Dismiss the dialog before restarting the camera
+             startCamera();
+         }).setNegativeButton("Cancel", (dialog, which) -> {
+             dialog.dismiss();
+-            Navigation.findNavController(this, R.id.nav_host_fragment_content_main).navigate(R.id.nav_dashboard);
++
++            // Find the NavController correctly
++            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
++
++            // Check if the current destination is the same as the one you want to navigate to
++            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
++                navController.navigate(R.id.nav_dashboard);
++            }
+         }).show();
+     }
+ 
+@@ -214,7 +231,7 @@
+                 ImageView imageView = dialogView.findViewById(R.id.capturedImage);
+ 
+                 Glide.with(PunchActivity.this).load(savedUri).into(imageView);
+-                ProgressBar progressBar = findViewById(R.id.progressBar);
++                progressBar = findViewById(R.id.progressBar);
+                 progressBar.setVisibility(View.VISIBLE);
+ 
+                 String savedImagePath = photoFile.getAbsolutePath();
+@@ -226,31 +243,68 @@
+                 }
+ 
+                 try {
+-                    Bitmap bitmap = BitmapFactory.decodeFile(savedImagePath);
+-                    int newWidth = 500;
+-                    int newHeight = (int) (bitmap.getHeight() * (newWidth / (float) bitmap.getWidth()));
+-                    bitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
++                    AtomicReference<Bitmap> bitmap;
++                    bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
++
++                    InputImage image = InputImage.fromBitmap(bitmap.get(), 0);
++                    FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).build();
++                    FaceDetector detector = FaceDetection.getClient(options);
++
++                    Task<List<Face>> result = detector.process(image);
++                    result.addOnSuccessListener(faces -> {
++                        ProgressBar progressBar = findViewById(R.id.progressBar);
++                        progressBar.setVisibility(View.GONE);
++                        if (faces.isEmpty()) {
++                            handleError("No faces detected in the image. Please try again with a clear image showing your face.");
++                        } else {
++                            try {
++                                int newWidth = 500;
++                                int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
++                                bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
+ 
+-                    String base64Image = convertImageToBase64(bitmap);
+-                    if (base64Image.length() >= 10) {
+-                        Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
+-                    }
+-                    JSONObject jsonObject = new JSONObject();
+-                    jsonObject.put("collection_name", "consultedgeglobalpvtltd_5e970n");
+-                    jsonObject.put("image", base64Image);
++                                String base64Image = convertImageToBase64(bitmap.get());
++                                if (base64Image.length() >= 10) {
++                                    Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
++                                }
++                                JSONObject jsonObject = new JSONObject();
++                                jsonObject.put("collection_name", "consultedgeglobalpvtltd_5e970n");
++                                jsonObject.put("image", base64Image);
+ 
+-                    String requestBodyJson = jsonObject.toString();
+-                    RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
++                                String requestBodyJson = jsonObject.toString();
++                                RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
+ //                   API CALL
+-                    sendImageToApi(requestBody);
++                                sendImageToApi(requestBody);
++                            } catch (Exception e) {
++                                Log.e(TAG, "Error processing image: " + e.getMessage(), e);
++                                handleError("Error processing image: " + e.getMessage());
++                            }
++                        }
++                        progressBar = findViewById(R.id.progressBar);
++                        progressBar.setVisibility(View.GONE);
++                    });
++                    Log.d(TAG, "Face Detection Result: " + result);
++                    result.addOnFailureListener(e -> {
++                        Log.e(TAG, "Face detection failed: " + e.getMessage(), e);
++                        handleError("Error detecting faces. Please try again.");
++                        // Hide progress bar (if you're using one)
++                        progressBar = findViewById(R.id.progressBar);
++                        progressBar.setVisibility(View.GONE);
++                    });
++
++
+                 } catch (Exception e) {
+                     Log.e(TAG, "Error processing image: " + e.getMessage(), e);
++                    Log.e(TAG, "Error during face detection: " + e.getMessage(), e);
++                    handleError("Error detecting faces. Please try again.");
++                    progressBar = findViewById(R.id.progressBar);
++                    progressBar.setVisibility(View.GONE);
+                 }
+             }
+ 
+             @Override
+             public void onError(@NonNull ImageCaptureException exception) {
+                 Log.e(TAG, "Photo capture failed: " + exception.getMessage(), exception);
++                handleError("Photo capture failed: " + exception.getMessage());
+             }
+         });
+     }
+@@ -258,6 +312,7 @@
+     //    API TO SEND IMAGE TO DB
+     private void sendImageToApi(RequestBody requestBody) {
+         Log.d(TAG, "Recognize API Called");
++
+         APIInterface imageApiService = APIClient.getInstance().getImage();
+         retrofit2.Call<ResponseBody> recognize = imageApiService.FaceRecognitionApi(requestBody);
+ 
+@@ -290,17 +345,63 @@
+                         throw new RuntimeException(e);
+                     }
+                 } else {
+-                    Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message());
++                    // Get more detailed error information from the response
++                    String errorBody = "";
++                    try {
++                        if (response.errorBody() != null) {
++                            errorBody = response.errorBody().string();
++                        }
++                    } catch (IOException e) {
++                        Log.e(TAG, "Error reading error body: " + e.getMessage(), e);
++                    }
++
++                    Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
++
++                    // Handle the error based on the response code and error body
++                    handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
+                 }
+             }
+ 
+             @Override
+             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                 Log.e(TAG, "Recognize Error: " + throwable.getMessage(), throwable);
++
++                // Handle network or other errors
++                handleError("Network Error: " + throwable.getMessage());
+             }
+         });
+     }
++
++    private void handleError(String errorMessage) {
++        runOnUiThread(() -> {
++            AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(errorMessage.contains("There are no faces in the image") ? "No faces detected in the image. Please try again with a clear image showing your face." : errorMessage).setPositiveButton("Retry", null) // Set the click listener to null initially
++                    .setNegativeButton("Cancel", (dialog, which) -> {
++                        dialog.dismiss();
++                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
++                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
++                            navController.navigate(R.id.nav_dashboard);
++                        }
++                    }).create();
++
++            alertDialog.setOnShowListener(dialog -> {
++                Button retryButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
++                retryButton.setOnClickListener(view -> {
++                    alertDialog.dismiss(); // Dismiss the dialog explicitly
++                    startCamera(); // Restart the camera
++                });
++            });
++
++            // Unbind camera preview (if bound)
++            try {
++                ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(PunchActivity.this).get();
++                cameraProvider.unbindAll();
++            } catch (ExecutionException | InterruptedException e) {
++                Log.e(TAG, "Error unbinding camera preview: " + e.getMessage(), e);
++            }
+ 
++            alertDialog.show();
++        });
++    }
+ //    private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {
+ //        Log.d(TAG, "Face Detail API Called");
+ //        Log.d(TAG, "Token: " + token);
+@@ -566,14 +667,28 @@
+                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);
+                     AlertDialog dialog = builder.setTitle("Attendance Success").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (dialog1, which) -> {
+                         dialog1.dismiss();
+-                        DashboardFragment dashboardFragment = new DashboardFragment();
+-                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
++//                        DashboardFragment dashboardFragment = new DashboardFragment();
++//                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
++
++                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
++
++                        // Check if the current destination is the same as the one you want to navigate to
++                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
++                            navController.navigate(R.id.nav_dashboard);
++                        }
+                     }).show();
+                     new Handler().postDelayed(() -> {
+                         if (dialog.isShowing()) {
+                             dialog.dismiss();
+-                            DashboardFragment dashboardFragment = new DashboardFragment();
+-                            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
++//                            DashboardFragment dashboardFragment = new DashboardFragment();
++//                            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
++
++                            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
++
++                            // Check if the current destination is the same as the one you want to navigate to
++                            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
++                                navController.navigate(R.id.nav_dashboard);
++                            }
+                         }
+                     }, 5000);
+                 });
+@@ -584,17 +699,52 @@
+         }
+     }
+ 
++//    private void showAttendanceFailedAlert(String message) {
++//        runOnUiThread(() -> new AlertDialog.Builder(PunchActivity.this).setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
++//            dialog.dismiss();
++//            startCamera();
++//        }).setNegativeButton("Cancel", (dialog, id) -> {
++//            dialog.dismiss();
++////            FragmentManager fragmentManager = getSupportFragmentManager();
++////            DashboardFragment dashboardFragment = new DashboardFragment();
++////            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
++//
++//            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
++//
++//            // Check if the current destination is the same as the one you want to navigate to
++//            if (navController.getCurrentDestination() != null &&
++//                    navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
++//                navController.navigate(R.id.nav_dashboard);
++//            }
++//
++//        }).show());
++//    }
++
+     private void showAttendanceFailedAlert(String message) {
+-        runOnUiThread(() -> new AlertDialog.Builder(PunchActivity.this).setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
+-            dialog.dismiss();
+-            startCamera();
+-        }).setNegativeButton("Cancel", (dialog, id) -> {
+-            dialog.dismiss();
+-            FragmentManager fragmentManager = getSupportFragmentManager();
+-            DashboardFragment dashboardFragment = new DashboardFragment();
+-            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
++        runOnUiThread(() -> {
++            AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
++            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
++                dialog.dismiss();
++                startCamera();
++            }).setNegativeButton("Cancel", (dialog, id) -> {
++                dialog.dismiss();
++                // Find NavController
++                NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+ 
+-        }).show());
++                // Check if navigation is safe
++                if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
++                    navController.navigate(R.id.nav_dashboard);
++                } else {
++                    // Handle case where navigation is not safe
++                    // (e.g., log a warning or display a toast)
++                    Log.w(TAG, "Navigation to dashboard is not safe from current destination.");
++                    Toast.makeText(PunchActivity.this, "Navigation failed. Please try again later.", Toast.LENGTH_SHORT).show();
++                }
++            });
++
++            AlertDialog alertDialog = builder.create();
++            alertDialog.show();
++        });
+     }
+ 
+     private String getCurrentTime() {
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"app\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n        <DropdownSelection timestamp=\"2024-11-14T11:24:16.963901400Z\">\r\n          <Target type=\"DEFAULT_BOOT\">\r\n            <handle>\r\n              <DeviceId pluginId=\"LocalEmulator\" identifier=\"path=C:\\Users\\Dheeraj.t\\.android\\avd\\XeDigital_API_35.avd\" />\r\n            </handle>\r\n          </Target>\r\n        </DropdownSelection>\r\n        <DialogSelection />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	
++++ b/.idea/deploymentTargetSelector.xml	
+@@ -4,14 +4,27 @@
+     <selectionStates>
+       <SelectionState runConfigName="app">
+         <option name="selectionMode" value="DROPDOWN" />
+-        <DropdownSelection timestamp="2024-11-14T11:24:16.963901400Z">
++        <DropdownSelection timestamp="2024-11-15T11:46:46.184205600Z">
+           <Target type="DEFAULT_BOOT">
+             <handle>
+               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Dheeraj.t\.android\avd\XeDigital_API_35.avd" />
+             </handle>
+           </Target>
+         </DropdownSelection>
+-        <DialogSelection />
++        <DialogSelection>
++          <targets>
++            <Target type="DEFAULT_BOOT">
++              <handle>
++                <DeviceId pluginId="PhysicalDevice" identifier="serial=70a9f3d8" />
++              </handle>
++            </Target>
++            <Target type="DEFAULT_BOOT">
++              <handle>
++                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Dheeraj.t\.android\avd\XeDigital_API_35.avd" />
++              </handle>
++            </Target>
++          </targets>
++        </DialogSelection>
+       </SelectionState>
+     </selectionStates>
+   </component>

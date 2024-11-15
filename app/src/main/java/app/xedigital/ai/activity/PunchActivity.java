@@ -21,6 +21,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,6 +44,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
@@ -51,10 +53,16 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceDetection;
+import com.google.mlkit.vision.face.FaceDetector;
+import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,11 +76,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.ui.dashboard.DashboardFragment;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -90,6 +98,7 @@ public class PunchActivity extends AppCompatActivity {
     private String authToken, userId;
     private FusedLocationProviderClient fusedLocationClient;
     private String currentAddress = "";
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,10 +203,18 @@ public class PunchActivity extends AppCompatActivity {
 
     private void showRetryAlert() {
         new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
+            dialog.dismiss(); // Dismiss the dialog before restarting the camera
             startCamera();
         }).setNegativeButton("Cancel", (dialog, which) -> {
             dialog.dismiss();
-            Navigation.findNavController(this, R.id.nav_host_fragment_content_main).navigate(R.id.nav_dashboard);
+
+            // Find the NavController correctly
+            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+
+            // Check if the current destination is the same as the one you want to navigate to
+            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                navController.navigate(R.id.nav_dashboard);
+            }
         }).show();
     }
 
@@ -214,7 +231,7 @@ public class PunchActivity extends AppCompatActivity {
                 ImageView imageView = dialogView.findViewById(R.id.capturedImage);
 
                 Glide.with(PunchActivity.this).load(savedUri).into(imageView);
-                ProgressBar progressBar = findViewById(R.id.progressBar);
+                progressBar = findViewById(R.id.progressBar);
                 progressBar.setVisibility(View.VISIBLE);
 
                 String savedImagePath = photoFile.getAbsolutePath();
@@ -226,31 +243,68 @@ public class PunchActivity extends AppCompatActivity {
                 }
 
                 try {
-                    Bitmap bitmap = BitmapFactory.decodeFile(savedImagePath);
-                    int newWidth = 500;
-                    int newHeight = (int) (bitmap.getHeight() * (newWidth / (float) bitmap.getWidth()));
-                    bitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+                    AtomicReference<Bitmap> bitmap;
+                    bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
 
-                    String base64Image = convertImageToBase64(bitmap);
-                    if (base64Image.length() >= 10) {
-                        Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
-                    }
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("collection_name", "consultedgeglobalpvtltd_5e970n");
-                    jsonObject.put("image", base64Image);
+                    InputImage image = InputImage.fromBitmap(bitmap.get(), 0);
+                    FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).build();
+                    FaceDetector detector = FaceDetection.getClient(options);
 
-                    String requestBodyJson = jsonObject.toString();
-                    RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
+                    Task<List<Face>> result = detector.process(image);
+                    result.addOnSuccessListener(faces -> {
+                        ProgressBar progressBar = findViewById(R.id.progressBar);
+                        progressBar.setVisibility(View.GONE);
+                        if (faces.isEmpty()) {
+                            handleError("No faces detected in the image. Please try again with a clear image showing your face.");
+                        } else {
+                            try {
+                                int newWidth = 500;
+                                int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
+                                bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
+
+                                String base64Image = convertImageToBase64(bitmap.get());
+                                if (base64Image.length() >= 10) {
+                                    Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
+                                }
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("collection_name", "consultedgeglobalpvtltd_5e970n");
+                                jsonObject.put("image", base64Image);
+
+                                String requestBodyJson = jsonObject.toString();
+                                RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
 //                   API CALL
-                    sendImageToApi(requestBody);
+                                sendImageToApi(requestBody);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error processing image: " + e.getMessage(), e);
+                                handleError("Error processing image: " + e.getMessage());
+                            }
+                        }
+                        progressBar = findViewById(R.id.progressBar);
+                        progressBar.setVisibility(View.GONE);
+                    });
+                    Log.d(TAG, "Face Detection Result: " + result);
+                    result.addOnFailureListener(e -> {
+                        Log.e(TAG, "Face detection failed: " + e.getMessage(), e);
+                        handleError("Error detecting faces. Please try again.");
+                        // Hide progress bar (if you're using one)
+                        progressBar = findViewById(R.id.progressBar);
+                        progressBar.setVisibility(View.GONE);
+                    });
+
+
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing image: " + e.getMessage(), e);
+                    Log.e(TAG, "Error during face detection: " + e.getMessage(), e);
+                    handleError("Error detecting faces. Please try again.");
+                    progressBar = findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
                 Log.e(TAG, "Photo capture failed: " + exception.getMessage(), exception);
+                handleError("Photo capture failed: " + exception.getMessage());
             }
         });
     }
@@ -258,6 +312,7 @@ public class PunchActivity extends AppCompatActivity {
     //    API TO SEND IMAGE TO DB
     private void sendImageToApi(RequestBody requestBody) {
         Log.d(TAG, "Recognize API Called");
+
         APIInterface imageApiService = APIClient.getInstance().getImage();
         retrofit2.Call<ResponseBody> recognize = imageApiService.FaceRecognitionApi(requestBody);
 
@@ -290,17 +345,63 @@ public class PunchActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message());
+                    // Get more detailed error information from the response
+                    String errorBody = "";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorBody = response.errorBody().string();
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error reading error body: " + e.getMessage(), e);
+                    }
+
+                    Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+
+                    // Handle the error based on the response code and error body
+                    handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "Recognize Error: " + throwable.getMessage(), throwable);
+
+                // Handle network or other errors
+                handleError("Network Error: " + throwable.getMessage());
             }
         });
     }
 
+    private void handleError(String errorMessage) {
+        runOnUiThread(() -> {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(errorMessage.contains("There are no faces in the image") ? "No faces detected in the image. Please try again with a clear image showing your face." : errorMessage).setPositiveButton("Retry", null) // Set the click listener to null initially
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                            navController.navigate(R.id.nav_dashboard);
+                        }
+                    }).create();
+
+            alertDialog.setOnShowListener(dialog -> {
+                Button retryButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                retryButton.setOnClickListener(view -> {
+                    alertDialog.dismiss(); // Dismiss the dialog explicitly
+                    startCamera(); // Restart the camera
+                });
+            });
+
+            // Unbind camera preview (if bound)
+            try {
+                ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(PunchActivity.this).get();
+                cameraProvider.unbindAll();
+            } catch (ExecutionException | InterruptedException e) {
+                Log.e(TAG, "Error unbinding camera preview: " + e.getMessage(), e);
+            }
+
+            alertDialog.show();
+        });
+    }
 //    private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {
 //        Log.d(TAG, "Face Detail API Called");
 //        Log.d(TAG, "Token: " + token);
@@ -566,14 +667,28 @@ public class PunchActivity extends AppCompatActivity {
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);
                     AlertDialog dialog = builder.setTitle("Attendance Success").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (dialog1, which) -> {
                         dialog1.dismiss();
-                        DashboardFragment dashboardFragment = new DashboardFragment();
-                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
+//                        DashboardFragment dashboardFragment = new DashboardFragment();
+//                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
+
+                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+
+                        // Check if the current destination is the same as the one you want to navigate to
+                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                            navController.navigate(R.id.nav_dashboard);
+                        }
                     }).show();
                     new Handler().postDelayed(() -> {
                         if (dialog.isShowing()) {
                             dialog.dismiss();
-                            DashboardFragment dashboardFragment = new DashboardFragment();
-                            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
+//                            DashboardFragment dashboardFragment = new DashboardFragment();
+//                            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
+
+                            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+
+                            // Check if the current destination is the same as the one you want to navigate to
+                            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                                navController.navigate(R.id.nav_dashboard);
+                            }
                         }
                     }, 5000);
                 });
@@ -584,17 +699,52 @@ public class PunchActivity extends AppCompatActivity {
         }
     }
 
-    private void showAttendanceFailedAlert(String message) {
-        runOnUiThread(() -> new AlertDialog.Builder(PunchActivity.this).setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
-            dialog.dismiss();
-            startCamera();
-        }).setNegativeButton("Cancel", (dialog, id) -> {
-            dialog.dismiss();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            DashboardFragment dashboardFragment = new DashboardFragment();
-            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
+//    private void showAttendanceFailedAlert(String message) {
+//        runOnUiThread(() -> new AlertDialog.Builder(PunchActivity.this).setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
+//            dialog.dismiss();
+//            startCamera();
+//        }).setNegativeButton("Cancel", (dialog, id) -> {
+//            dialog.dismiss();
+////            FragmentManager fragmentManager = getSupportFragmentManager();
+////            DashboardFragment dashboardFragment = new DashboardFragment();
+////            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
+//
+//            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+//
+//            // Check if the current destination is the same as the one you want to navigate to
+//            if (navController.getCurrentDestination() != null &&
+//                    navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+//                navController.navigate(R.id.nav_dashboard);
+//            }
+//
+//        }).show());
+//    }
 
-        }).show());
+    private void showAttendanceFailedAlert(String message) {
+        runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
+            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
+                dialog.dismiss();
+                startCamera();
+            }).setNegativeButton("Cancel", (dialog, id) -> {
+                dialog.dismiss();
+                // Find NavController
+                NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+
+                // Check if navigation is safe
+                if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                    navController.navigate(R.id.nav_dashboard);
+                } else {
+                    // Handle case where navigation is not safe
+                    // (e.g., log a warning or display a toast)
+                    Log.w(TAG, "Navigation to dashboard is not safe from current destination.");
+                    Toast.makeText(PunchActivity.this, "Navigation failed. Please try again later.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        });
     }
 
     private String getCurrentTime() {
