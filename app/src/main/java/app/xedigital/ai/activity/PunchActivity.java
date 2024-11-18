@@ -1,6 +1,7 @@
 package app.xedigital.ai.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,8 +45,6 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -203,18 +202,18 @@ public class PunchActivity extends AppCompatActivity {
 
     private void showRetryAlert() {
         new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
-            dialog.dismiss(); // Dismiss the dialog before restarting the camera
+            dialog.dismiss();
             startCamera();
         }).setNegativeButton("Cancel", (dialog, which) -> {
             dialog.dismiss();
-
+            setResult(Activity.RESULT_CANCELED);
+            finish();
             // Find the NavController correctly
-            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-
+//            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
             // Check if the current destination is the same as the one you want to navigate to
-            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-                navController.navigate(R.id.nav_dashboard);
-            }
+//            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+//                navController.navigate(R.id.nav_dashboard);
+//            }
         }).show();
     }
 
@@ -290,8 +289,6 @@ public class PunchActivity extends AppCompatActivity {
                         progressBar = findViewById(R.id.progressBar);
                         progressBar.setVisibility(View.GONE);
                     });
-
-
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing image: " + e.getMessage(), e);
                     Log.e(TAG, "Error during face detection: " + e.getMessage(), e);
@@ -312,7 +309,6 @@ public class PunchActivity extends AppCompatActivity {
     //    API TO SEND IMAGE TO DB
     private void sendImageToApi(RequestBody requestBody) {
         Log.d(TAG, "Recognize API Called");
-
         APIInterface imageApiService = APIClient.getInstance().getImage();
         retrofit2.Call<ResponseBody> recognize = imageApiService.FaceRecognitionApi(requestBody);
 
@@ -354,9 +350,7 @@ public class PunchActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading error body: " + e.getMessage(), e);
                     }
-
                     Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
-
                     // Handle the error based on the response code and error body
                     handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
@@ -365,7 +359,6 @@ public class PunchActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "Recognize Error: " + throwable.getMessage(), throwable);
-
                 // Handle network or other errors
                 handleError("Network Error: " + throwable.getMessage());
             }
@@ -374,20 +367,27 @@ public class PunchActivity extends AppCompatActivity {
 
     private void handleError(String errorMessage) {
         runOnUiThread(() -> {
-            AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(errorMessage.contains("There are no faces in the image") ? "No faces detected in the image. Please try again with a clear image showing your face." : errorMessage).setPositiveButton("Retry", null) // Set the click listener to null initially
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                        dialog.dismiss();
-                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-                            navController.navigate(R.id.nav_dashboard);
-                        }
-                    }).create();
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+
+            AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(errorMessage.contains("There are no faces in the image") ? "No faces detected in the image. Please try again with a clear image showing your face." : errorMessage).setPositiveButton("Retry", null).setNegativeButton("Cancel", (dialog, which) -> {
+                dialog.dismiss();
+                setResult(Activity.RESULT_CANCELED);
+                if (!isFinishing()) {
+                    finish(); // Finish PunchActivity
+                }
+//                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+//                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+//                            navController.navigate(R.id.nav_dashboard);
+//                        }
+            }).create();
 
             alertDialog.setOnShowListener(dialog -> {
                 Button retryButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
                 retryButton.setOnClickListener(view -> {
-                    alertDialog.dismiss(); // Dismiss the dialog explicitly
-                    startCamera(); // Restart the camera
+                    alertDialog.dismiss();
+                    startCamera();
                 });
             });
 
@@ -402,45 +402,6 @@ public class PunchActivity extends AppCompatActivity {
             alertDialog.show();
         });
     }
-//    private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {
-//        Log.d(TAG, "Face Detail API Called");
-//        Log.d(TAG, "Token: " + token);
-//        APIInterface faceApiService = APIClient.getInstance().getFace();
-//        retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetailApi(token, requestBodyFacee);
-//
-//        faceDetails.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-//                if (response.isSuccessful() && response.body() != null) {
-//                    String responseBody = null;
-//                    try {
-//                        responseBody = response.body().string();
-////                        String responseJson = gson.toJson(responseBody);
-////                        Log.d(TAG, "Face Detail Response Body:\n" + responseJson);
-//                        JSONObject jsonResponse = new JSONObject(responseBody);
-//                        JSONObject dataObject = jsonResponse.getJSONObject("data");
-//                        Log.d(TAG, "Face data: " + dataObject);
-//                        String id = dataObject.getString("_id");
-//                        String firstName = dataObject.getString("firstname");
-//                        Log.d(TAG, "ID: " + id + ", First Name: " + firstName);
-//
-//                        callAttendanceApi(id, firstName);
-//                    } catch (IOException | JSONException e) {
-//                        throw new RuntimeException(e);
-//                    }
-////                    callAttendanceApi();
-//                } else {
-//                    Log.e(TAG, "Face Detail Response Error: " + response.code() + " - " + response.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-//                Log.e(TAG, "Face DetailError: " + throwable.getMessage(), throwable);
-//
-//            }
-//        });
-//    }
 
     private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {
         Log.d(TAG, "Face Detail API Called");
@@ -496,69 +457,6 @@ public class PunchActivity extends AppCompatActivity {
             }
         });
     }
-
-
-//    private void callAttendanceApi() {
-//        Log.d(TAG, "Attendance API Called");
-//        Intent intent = getIntent();
-//        if (intent != null) {
-//            authToken = intent.getStringExtra("authToken");
-//            userId = intent.getStringExtra("userId");
-//            name = intent.getStringExtra("name");
-//        }
-//        String token = "jwt " + authToken;
-//        if (token.length() >= 10) {
-//            Log.d("token", "token" + token.substring(0, 10) + "...");
-//        }
-////        String currentAddress = "GoBolt";
-//        getCurrentLocation();
-//        Log.d(TAG, "Current Address: " + currentAddress);
-//        String currentTime = getCurrentTime();
-//        Log.d(TAG, "Current Time: " + currentTime);
-//        try {
-//            JSONObject requestBody = new JSONObject();
-//            requestBody.put("employee", userId);
-//            requestBody.put("employeename", name);
-//            requestBody.put("address", currentAddress);
-//            requestBody.put("punchTime", currentTime);
-//
-//            String requestBodyString = requestBody.toString();
-//            Log.d(TAG, "Request Body: " + requestBodyString);
-//            RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
-//
-//            APIInterface attendanceApiService = APIClient.getInstance().getAttendance();
-//            retrofit2.Call<ResponseBody> attendance = attendanceApiService.AttendanceApi(token, requestBodyAttendance);
-////API FOR ATTENDANCE PUNCH
-//            attendance.enqueue(new Callback<ResponseBody>() {
-//                @Override
-//                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-//                    if (response.isSuccessful() && response.body() != null) {
-//                        try {
-//                            String responseBody = response.body().string();
-//                            String responseJson = gson.toJson(responseBody);
-//                            Log.d(TAG, "Attendance Response Body:\n" + responseJson);
-//                        } catch (IOException e) {
-//                            Log.e(TAG, "Error reading response body: " + e.getMessage(), e);
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//
-//                }
-//
-//                @Override
-//                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-//                    Log.e(TAG, "Attendance Error: " + throwable.getMessage(), throwable);
-//                    throw new RuntimeException(throwable);
-//
-//                }
-//            });
-//
-//        } catch (JSONException e) {
-//            Log.e(TAG, "Error creating request body: " + e.getMessage(), e);
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
 
     private void callAttendanceApi(String employeeId, String employeeName) {
         Log.d(TAG, "Attendance API Called");
@@ -633,9 +531,6 @@ public class PunchActivity extends AppCompatActivity {
             if (success) {
                 JSONObject data = responseJson.getJSONObject("data");
                 Log.d(TAG, "Attendance Data: " + data);
-//                String punchDate = data.getString("punchDate");
-//                String punchIn = data.getString("punchIn");
-//                String punchOut = data.getString("punchOut");
                 String punchInAddress = data.getString("punchInAddress");
                 String punchOutAddress = data.getString("punchOutAddress");
 
@@ -649,47 +544,38 @@ public class PunchActivity extends AppCompatActivity {
                 StringBuilder formattedMessage = new StringBuilder();
                 // Check if AlertDialog.Builder supports HTML formatting
                 formattedMessage.append("<b>").append(message).append("</b>").append("<br><br>");
-//                    formattedMessage.append("Punch Date: <i>").append(punchDate).append("</i>").append("<br><br>");
-//                    formattedMessage.append("Punch In: ").append(punchIn).append("<br>");
-//                    formattedMessage.append("Punch Out: ").append(punchOut).append("<br><br>");
                 formattedMessage.append("Address: ").append(address).append("<br>");
                 FragmentManager fragmentManager = getSupportFragmentManager();
-//                runOnUiThread(() -> {
-//                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);
-//                    builder.setTitle("Attendance Success").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (dialog, which) -> {
-//                        dialog.dismiss();
-//                        DashboardFragment dashboardFragment = new DashboardFragment();
-//                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
-//                    }).show();
-//                });
 
                 runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) {
+                        return; // Do not show dialog if activity is finished or destroyed
+                    }
+
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);
                     AlertDialog dialog = builder.setTitle("Attendance Success").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (dialog1, which) -> {
                         dialog1.dismiss();
-//                        DashboardFragment dashboardFragment = new DashboardFragment();
-//                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
-
-                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-
-                        // Check if the current destination is the same as the one you want to navigate to
-                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-                            navController.navigate(R.id.nav_dashboard);
-                        }
+                        setResult(Activity.RESULT_OK);
+                        finish();
+//                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+//                        // Check if the current destination is the same as the one you want to navigate to
+//                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+//                            navController.navigate(R.id.nav_dashboard);
+//                        }
                     }).show();
                     new Handler().postDelayed(() -> {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-//                            DashboardFragment dashboardFragment = new DashboardFragment();
-//                            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
-
-                            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-
-                            // Check if the current destination is the same as the one you want to navigate to
-                            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-                                navController.navigate(R.id.nav_dashboard);
-                            }
+//                        if (dialog.isShowing()) {
+//                            dialog.dismiss();
+//                            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+//                            // Check if the current destination is the same as the one you want to navigate to
+//                            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+//                                navController.navigate(R.id.nav_dashboard);
+//                            }
+//                        }
+                        if (isFinishing()) {
+                            return;
                         }
+                        finish();
                     }, 5000);
                 });
             }
@@ -699,51 +585,30 @@ public class PunchActivity extends AppCompatActivity {
         }
     }
 
-//    private void showAttendanceFailedAlert(String message) {
-//        runOnUiThread(() -> new AlertDialog.Builder(PunchActivity.this).setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
-//            dialog.dismiss();
-//            startCamera();
-//        }).setNegativeButton("Cancel", (dialog, id) -> {
-//            dialog.dismiss();
-////            FragmentManager fragmentManager = getSupportFragmentManager();
-////            DashboardFragment dashboardFragment = new DashboardFragment();
-////            fragmentManager.beginTransaction().replace(R.id.nav_host_fragment_content_main, dashboardFragment).commit();
-//
-//            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-//
-//            // Check if the current destination is the same as the one you want to navigate to
-//            if (navController.getCurrentDestination() != null &&
-//                    navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-//                navController.navigate(R.id.nav_dashboard);
-//            }
-//
-//        }).show());
-//    }
-
     private void showAttendanceFailedAlert(String message) {
         runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) {
+                return; // Do not show dialog if activity is finished or destroyed
+            }
+
             AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
             builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
                 dialog.dismiss();
                 startCamera();
             }).setNegativeButton("Cancel", (dialog, id) -> {
                 dialog.dismiss();
-                // Find NavController
-                NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-
-                // Check if navigation is safe
-                if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-                    navController.navigate(R.id.nav_dashboard);
-                } else {
-                    // Handle case where navigation is not safe
-                    // (e.g., log a warning or display a toast)
-                    Log.w(TAG, "Navigation to dashboard is not safe from current destination.");
-                    Toast.makeText(PunchActivity.this, "Navigation failed. Please try again later.", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
+                setResult(Activity.RESULT_CANCELED);
+                finish();
+//                NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
+//                if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+//                    navController.navigate(R.id.nav_dashboard);
+//                } else {
+//                    Log.w(TAG, "Navigation to dashboard is not safe from current destination.");
+//                    Toast.makeText(PunchActivity.this, "Navigation failed. Please try again later.", Toast.LENGTH_SHORT).show();
+//                }
+            }).create().show();
+//            AlertDialog alertDialog = builder.create();
+//            alertDialog.show();
         });
     }
 

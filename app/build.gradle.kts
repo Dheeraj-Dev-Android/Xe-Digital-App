@@ -63,7 +63,6 @@ dependencies {
     implementation(libs.leanback)
     implementation(libs.rendering)
     implementation(libs.ui.text.android)
-    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
