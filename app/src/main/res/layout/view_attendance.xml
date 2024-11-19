@@ -20,7 +20,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_calendar"
             android:textColor="#1C160C"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -32,6 +31,9 @@
             android:layout_centerHorizontal="true"
             android:text="April 16, 2023"
             android:textColor="#1C160C"
+            android:drawableStart="@drawable/ic_calendar"
+            android:drawablePadding="10dp"
+            app:drawableTint="@color/OccasionalLeave"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -220,9 +222,9 @@
                 android:layout_marginTop="8dp"
                 android:drawablePadding="8dp"
                 android:text="09:00AM - 06:00PM"
+                android:textAppearance="?attr/textAppearanceBody1"
                 app:drawableStartCompat="@drawable/ic_clock"
                 app:drawableTint="@color/OccasionalLeave"
-                android:textAppearance="?attr/textAppearanceBody1"
                 app:layout_constraintStart_toStartOf="@id/shiftTitle"
                 app:layout_constraintTop_toBottomOf="@id/shiftTitle" />
 
@@ -231,33 +233,214 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Address Information -->
-    <TextView
-        android:id="@+id/addressTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="Punch Address"
-        android:textColor="#1C160C"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/addressTitle"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:padding="16dp"-->
+    <!--        android:text="Punch Address"-->
+    <!--        android:textColor="#1C160C"-->
+    <!--        android:textSize="18sp"-->
+    <!--        android:textStyle="bold"-->
+    <!--        app:drawableLeftCompat="@android:drawable/ic_dialog_map"-->
+    <!--        app:drawableTint="@color/PrivilegeLeave" />-->
 
-    <LinearLayout
-        android:id="@+id/addressInfo"
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/addressInfo"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        android:padding="16dp">-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/addressDetailIn"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:drawablePadding="8dp"-->
+    <!--            android:text="San Francisco, CA"-->
+    <!--            android:textColor="#1C160C"-->
+    <!--            android:textSize="16sp" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/addressDetailOut"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:drawablePadding="8dp"-->
+    <!--            android:text="San Francisco, CA"-->
+    <!--            android:textColor="#1C160C"-->
+    <!--            android:textSize="16sp" />-->
+    <!--    </LinearLayout>-->
+
+    <!-- Address Information -->
+    <!--    <com.google.android.material.card.MaterialCardView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        app:cardCornerRadius="8dp"-->
+    <!--        app:cardElevation="4dp">-->
+
+    <!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:padding="16dp">-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/addressTitle"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:text="Punch Address"-->
+    <!--                android:textAppearance="?attr/textAppearanceHeadline6"-->
+    <!--                android:textStyle="bold"-->
+    <!--                app:drawableStartCompat="@android:drawable/ic_dialog_map"-->
+    <!--                app:drawableTint="@color/PrivilegeLeave"-->
+    <!--                app:layout_constraintStart_toStartOf="parent"-->
+    <!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--            <LinearLayout-->
+    <!--                android:id="@+id/addressInfo"-->
+    <!--                android:layout_width="0dp"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:orientation="vertical"-->
+    <!--                android:layout_marginTop="8dp"-->
+    <!--                app:layout_constraintStart_toStartOf="parent"-->
+    <!--                app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                app:layout_constraintTop_toBottomOf="@id/addressTitle">-->
+
+    <!--                <LinearLayout-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:orientation="horizontal">-->
+
+    <!--                    <TextView-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="Punch In: "-->
+    <!--                        android:textStyle="bold" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:id="@+id/addressDetailIn"-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="San Francisco, CA"-->
+    <!--                        android:textColor="#1C160C"-->
+    <!--                        android:textSize="16sp" />-->
+    <!--                </LinearLayout>-->
+
+    <!--                <View-->
+    <!--                    android:layout_width="wrap_content"-->
+    <!--                    android:background="@color/black"-->
+    <!--                    android:layout_height="2dp"/>-->
+
+    <!--                <LinearLayout-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:orientation="horizontal">-->
+
+    <!--                    <TextView-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="Punch Out: "-->
+    <!--                        android:textStyle="bold" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:id="@+id/addressDetailOut"-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="San Francisco, CA"-->
+    <!--                        android:textColor="#1C160C"-->
+    <!--                        android:textSize="16sp" />-->
+    <!--                </LinearLayout>-->
+    <!--            </LinearLayout>-->
+
+    <!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <!--    </com.google.android.material.card.MaterialCardView>-->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:layout_margin="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
 
-        <TextView
-            android:id="@+id/addressDetail"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="8dp"
-            android:text="San Francisco, CA"
-            android:textColor="#1C160C"
-            android:textSize="16sp"
-            app:drawableLeftCompat="@android:drawable/ic_dialog_map"
-            app:drawableTint="@color/PrivilegeLeave" />
-    </LinearLayout>
+            android:padding="16dp">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/addressTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="Punch Address"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textStyle="bold"
+                app:drawableStartCompat="@android:drawable/ic_dialog_map"
+                app:drawableTint="@color/PrivilegeLeave"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Punch-In Address -->
+            <TextView
+                android:id="@+id/punchInAddressLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Punch-In"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/addressTitle" />
+
+            <TextView
+                android:id="@+id/addressDetailIn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="San Francisco, CA"
+                android:textAppearance="?attr/textAppearanceBody2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/punchInAddressLabel"
+                app:layout_constraintTop_toBottomOf="@id/punchInAddressLabel" />
+
+            <!-- Punch-Out Address -->
+            <View
+                android:id="@+id/view_line"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="10dp"
+                android:background="#9A9A9A"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/addressDetailIn" />
+
+            <TextView
+                android:id="@+id/punchOutAddressLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Punch-Out"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_line" />
+
+            <TextView
+                android:id="@+id/addressDetailOut"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="San Francisco, CA"
+                android:textAppearance="?attr/textAppearanceBody2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/punchOutAddressLabel"
+                app:layout_constraintTop_toBottomOf="@id/punchOutAddressLabel" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

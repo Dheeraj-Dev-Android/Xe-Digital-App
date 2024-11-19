@@ -32,6 +32,8 @@
     <dimen name="input_vertical_margin">8dp</dimen>
     <dimen name="buttons_top_margin">32dp</dimen>
 
+    <dimen name="screen_margin">16dp</dimen>
+
     <array name="autoSize_text_sizes">
         <item>12sp</item>
         <item>14sp</item>

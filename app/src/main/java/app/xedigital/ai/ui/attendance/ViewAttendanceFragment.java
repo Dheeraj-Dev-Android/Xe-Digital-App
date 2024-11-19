@@ -90,8 +90,10 @@ public class ViewAttendanceFragment extends Fragment {
                 shiftTime.setText("Shift not assigned");
             }
 //            Addresses
-            TextView addressDetail = view.findViewById(R.id.addressDetail);
-            addressDetail.setText(attendanceItem.getPunchInAddress());
+            TextView addressDetailIn = view.findViewById(R.id.addressDetailIn);
+            addressDetailIn.setText(attendanceItem.getPunchInAddress());
+            TextView addressDetailOut = view.findViewById(R.id.addressDetailOut);
+            addressDetailOut.setText(attendanceItem.getPunchOutAddress());
 
         }
         return view;

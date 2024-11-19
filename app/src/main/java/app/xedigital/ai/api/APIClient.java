@@ -19,7 +19,7 @@ public class APIClient {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(loggingInterceptor) //logging interceptor
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(loggingInterceptor)
                 .retryOnConnectionFailure(true).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).build();
 
         retrofit1 = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
@@ -37,33 +37,26 @@ public class APIClient {
     public APIInterface getApi() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getLogin() {
         return retrofit2.create(APIInterface.class);
     }
     public APIInterface getUser(){return retrofit2.create(APIInterface.class);}
     public APIInterface getBranch(){return retrofit2.create(APIInterface.class);}
-
     public APIInterface getAttendance() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getHolidays() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getImage() {
         return retrofit1.create(APIInterface.class);
     }
-
     public APIInterface getFace() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getPunch() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getDcrData() {
         return retrofit2.create(APIInterface.class);
     }
@@ -71,7 +64,6 @@ public class APIClient {
     public APIInterface RegularizeAttendance() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface AddAttendance() {
         return retrofit2.create(APIInterface.class);
     }
@@ -79,16 +71,34 @@ public class APIClient {
     public APIInterface getRegularizeApplied() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getLeaves() {
         return retrofit2.create(APIInterface.class);
     }
-
     public APIInterface getRegularizeListApproval() {
         return retrofit2.create(APIInterface.class);
     }
+
     public APIInterface UpdateRegularizeListApproval() {return  retrofit2.create(APIInterface.class);}
     public APIInterface DcrFormSubmit(){return retrofit2.create(APIInterface.class);}
-
     public APIInterface AppliedLeave(){return retrofit2.create(APIInterface.class);}
+
+    public APIInterface ApplyLeave() {
+        return retrofit2.create(APIInterface.class);
+    }
+
+    public APIInterface getLeaveTypes() {
+        return retrofit2.create(APIInterface.class);
+    }
+
+    public APIInterface getUnapprovedLeaves() {
+        return retrofit2.create(APIInterface.class);
+    }
+
+    public APIInterface getLeaveTypeDetails() {
+        return retrofit2.create(APIInterface.class);
+    }
+
+    public APIInterface getEmployeeLeave() {
+        return retrofit2.create(APIInterface.class);
+    }
 }

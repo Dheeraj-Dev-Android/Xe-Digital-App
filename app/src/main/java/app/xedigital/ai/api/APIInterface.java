@@ -6,7 +6,9 @@ import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
+import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
 import app.xedigital.ai.model.holiday.HolidayModelResponse;
+import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import app.xedigital.ai.model.login.LoginModelResponse1;
 import app.xedigital.ai.model.profile.UserProfileResponse;
@@ -72,6 +74,19 @@ public interface APIInterface {
     @GET("leaves/applied")
     retrofit2.Call<AppliedLeavesResponse> getAppliedLeaves(@Header("Authorization") String authToken);
 
+    @GET("leavetypes?active=true")
+    retrofit2.Call<LeaveTypeResponse> getLeaveTypes(@Header("Authorization") String authToken);
+
+    @GET("leaves/type/{leaveID}/employees/{employeeID}")
+    retrofit2.Call<EmployeeLeaveTypeResponse> getEmployeeLeave(@Header("Authorization") String authToken, @Path("leaveID") String leaveID, @Path("employeeID") String employeeID);
+
+    @GET("leavetypes/profile/{leaveID}")
+    retrofit2.Call<ResponseBody> getLeaveTypeDetails(@Header("Authorization") String authToken, @Path("leaveID") String leaveID);
+
+    @GET("leaves/unapproved/{leaveId}/employees/{employeeId}")
+    retrofit2.Call<ResponseBody> getUnapprovedLeaves(@Header("Authorization") String authToken, @Path("leaveId") String leaveId, @Path("employeeId") String employeeId);
+
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
@@ -90,6 +105,9 @@ public interface APIInterface {
 
     @POST("employees/dcr")
     retrofit2.Call<ResponseBody> DcrSubmit(@Header("Authorization") String token, @Body DcrFormRequest requestBody);
+
+    @POST("leaves/apply")
+    retrofit2.Call<ResponseBody> LeavesApply(@Header("Authorization") String token, @Body RequestBody requestBody);
 
 //    PUT API
 

@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Shift"
-                android:textColor="#616161"
+                android:textColor="#494949"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider1" />
@@ -112,7 +112,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Punch In"
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -135,7 +135,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Punch Out"
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -237,7 +237,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Punch In Location"
-                        android:textColor="#616161"
+                        android:textColor="#323131"
                         android:textSize="12sp" />
 
                     <TextView
@@ -253,7 +253,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Punch Out Location"
-                        android:textColor="#616161"
+                        android:textColor="#494949"
                         android:textSize="12sp" />
 
                     <TextView
@@ -312,7 +312,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Updated Date"
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -334,7 +334,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Updated Punch In"
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -356,7 +356,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Updated Punch Out"
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -374,7 +374,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Updated Punch In Location"
-                        android:textColor="#616161"
+                        android:textColor="#494949"
                         android:textSize="12sp" />
 
                     <TextView
@@ -390,7 +390,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Updated Punch Out Location"
-                        android:textColor="#616161"
+                        android:textColor="#494949"
                         android:textSize="12sp" />
 
                     <TextView
@@ -447,7 +447,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Applied Date  "
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -469,7 +469,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Updated By "
-                                android:textColor="#616161"
+                                android:textColor="#494949"
                                 android:textSize="12sp" />
 
                             <TextView
