@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_white"
+    android:fontFamily="@font/quicksand_font_family">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header Section with Status -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/claimIdHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Claim ID: CL001"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dateSubmitted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Submitted on: 22 Nov 2024"
+                    android:textColor="@color/text_secondary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Status: "
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/statusText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/status_background"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="Pending"
+                        android:textColor="@color/color_white" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Meeting Details Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/DetailsSectionTitle"
+                    android:text="Meeting Details" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Project Name" />
+
+                        <TextView
+                            android:id="@+id/projectNameValue"
+                            style="@style/DetailsValue"
+                            android:text="Project XYZ" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Meeting Type" />
+
+                        <TextView
+                            android:id="@+id/meetingTypeValue"
+                            style="@style/DetailsValue"
+                            android:text="Client Meeting" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Purpose" />
+
+                        <TextView
+                            android:id="@+id/purposeValue"
+                            style="@style/DetailsValue"
+                            android:text="Project Discussion" />
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Travel Details Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/DetailsSectionTitle"
+                    android:text="Travel Details" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Category" />
+
+                        <TextView
+                            android:id="@+id/travelCategoryValue"
+                            style="@style/DetailsValue"
+                            android:text="Business" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Mode" />
+
+                        <TextView
+                            android:id="@+id/transportModeValue"
+                            style="@style/DetailsValue"
+                            android:text="Car" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="From" />
+
+                        <TextView
+                            android:id="@+id/fromLocationValue"
+                            style="@style/DetailsValue"
+                            android:text="Mumbai" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="To" />
+
+                        <TextView
+                            android:id="@+id/toLocationValue"
+                            style="@style/DetailsValue"
+                            android:text="Pune" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Distance" />
+
+                        <TextView
+                            android:id="@+id/distanceValue"
+                            style="@style/DetailsValue"
+                            android:text="150 Km" />
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Amount Details Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/DetailsSectionTitle"
+                    android:text="Amount Details" />
+
+                <TextView
+                    android:id="@+id/totalAmountValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="₹ 1,500"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Comments Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/DetailsSectionTitle"
+                    android:text="Comments &amp; Remarks" />
+
+                <TextView
+                    android:id="@+id/commentsValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Regular business travel for client meeting."
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/remarksValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Approved by Manager"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Approval Status Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/DetailsSectionTitle"
+                    android:text="Approval Status" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="RM Status" />
+
+                        <TextView
+                            android:id="@+id/rmStatusValue"
+                            style="@style/DetailsValue"
+                            android:text="Approved" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="HR Status" />
+
+                        <TextView
+                            android:id="@+id/hrStatusValue"
+                            style="@style/DetailsValue"
+                            android:text="Pending" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Last Updated" />
+
+                        <TextView
+                            android:id="@+id/lastUpdatedValue"
+                            style="@style/DetailsValue"
+                            android:text="22 Nov 2024, 10:30 AM" />
+                    </TableRow>
+
+                    <TableRow style="@style/DetailsTableRow">
+
+                        <TextView
+                            style="@style/DetailsLabel"
+                            android:text="Updated By" />
+
+                        <TextView
+                            android:id="@+id/updatedByValue"
+                            style="@style/DetailsValue"
+                            android:text="John Doe" />
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

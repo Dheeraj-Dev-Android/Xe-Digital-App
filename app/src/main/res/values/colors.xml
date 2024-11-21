@@ -92,7 +92,6 @@
     <color name="textPrimary">#212121</color>           <!-- Grey 900 -->
     <color name="textSecondary">#757575</color>         <!-- Grey 600 -->
 
-
     <!-- Status Colors -->
     <color name="success">#4CAF50</color>               <!-- Green 500 -->
     <color name="warning">#FFC107</color>               <!-- Amber 500 -->
