@@ -52,16 +52,10 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.face.Face;
-import com.google.mlkit.vision.face.FaceDetection;
-import com.google.mlkit.vision.face.FaceDetector;
-import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -245,17 +239,17 @@ public class PunchActivity extends AppCompatActivity {
                     AtomicReference<Bitmap> bitmap;
                     bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
 
-                    InputImage image = InputImage.fromBitmap(bitmap.get(), 0);
-                    FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).build();
-                    FaceDetector detector = FaceDetection.getClient(options);
+//                    InputImage image = InputImage.fromBitmap(bitmap.get(), 0);
+//                    FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).build();
+//                    FaceDetector detector = FaceDetection.getClient(options);
 
-                    Task<List<Face>> result = detector.process(image);
-                    result.addOnSuccessListener(faces -> {
-                        ProgressBar progressBar = findViewById(R.id.progressBar);
-                        progressBar.setVisibility(View.GONE);
-                        if (faces.isEmpty()) {
-                            handleError("No faces detected in the image. Please try again with a clear image showing your face.");
-                        } else {
+//                    Task<List<Face>> result = detector.process(image);
+//                    result.addOnSuccessListener(faces -> {
+//                        ProgressBar progressBar = findViewById(R.id.progressBar);
+//                        progressBar.setVisibility(View.GONE);
+//                        if (faces.isEmpty()) {
+//                            handleError("No faces detected in the image. Please try again with a clear image showing your face.");
+//                        } else {
                             try {
                                 int newWidth = 500;
                                 int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
@@ -277,18 +271,18 @@ public class PunchActivity extends AppCompatActivity {
                                 Log.e(TAG, "Error processing image: " + e.getMessage(), e);
                                 handleError("Error processing image: " + e.getMessage());
                             }
-                        }
-                        progressBar = findViewById(R.id.progressBar);
-                        progressBar.setVisibility(View.GONE);
-                    });
-                    Log.d(TAG, "Face Detection Result: " + result);
-                    result.addOnFailureListener(e -> {
-                        Log.e(TAG, "Face detection failed: " + e.getMessage(), e);
-                        handleError("Error detecting faces. Please try again.");
-                        // Hide progress bar (if you're using one)
-                        progressBar = findViewById(R.id.progressBar);
-                        progressBar.setVisibility(View.GONE);
-                    });
+//                        }
+//                        progressBar = findViewById(R.id.progressBar);
+//                        progressBar.setVisibility(View.GONE);
+//                    });
+//                    Log.d(TAG, "Face Detection Result: " + result);
+//                    result.addOnFailureListener(e -> {
+//                        Log.e(TAG, "Face detection failed: " + e.getMessage(), e);
+//                        handleError("Error detecting faces. Please try again.");
+//                        // Hide progress bar (if you're using one)
+//                        progressBar = findViewById(R.id.progressBar);
+//                        progressBar.setVisibility(View.GONE);
+//                    });
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing image: " + e.getMessage(), e);
                     Log.e(TAG, "Error during face detection: " + e.getMessage(), e);

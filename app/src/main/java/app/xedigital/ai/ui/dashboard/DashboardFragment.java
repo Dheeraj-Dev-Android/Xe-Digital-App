@@ -26,11 +26,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.activity.PunchActivity;
 import app.xedigital.ai.databinding.FragmentDashboardBinding;
+import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
+import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.ui.attendance.AttendanceViewModel;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
@@ -45,6 +49,7 @@ public class DashboardFragment extends Fragment {
     public String punchOut;
     private Handler handler;
     private Runnable runnable;
+    public AttendanceViewModel attendanceViewModel;
     private FragmentDashboardBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +83,7 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        AttendanceViewModel attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
+        attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         getContext();
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -100,13 +105,6 @@ public class DashboardFragment extends Fragment {
         attendanceViewModel.storeLoginData(authToken);
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
 
-//        Date currentDate = new Date();
-//        String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-//        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//        String currentTimeString = timeFormat.format(currentDate);
-//        binding.todayDate.setText(todayDateString + " - " + currentTimeString);
-
-
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
             @Override
@@ -125,45 +123,11 @@ public class DashboardFragment extends Fragment {
 
         handler.post(runnable);
 
-//        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-//            employeeName = userprofileResponse.getData().getEmployee().getFirstname();
-//            employeeEmail = userprofileResponse.getData().getEmployee().getEmail();
-//            employeeLastName = userprofileResponse.getData().getEmployee().getLastname();
-//            empContact = userprofileResponse.getData().getEmployee().getContact();
-//            empDesignation = userprofileResponse.getData().getEmployee().getDesignation();
-//
-//            Object profileImageUrl = userprofileResponse.getData().getEmployee().getProfileImageUrl();
-//            ImageView profileImage = binding.ivEmployeeProfile;
-//
-//            if (profileImageUrl != null) {
-//                Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
-//            } else {
-//                profileImage.setImageResource(R.mipmap.ic_default_profile);
-//            }
-//
-//            binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
-//            binding.tvEmployeeDesignationValue.setText(empDesignation);
-//
-//            String startTime = userprofileResponse.getData().getEmployee().getShift().getStartTime();
-//            String endTime = userprofileResponse.getData().getEmployee().getShift().getEndTime();
-//
-//            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-//                String shiftTimeString = startTime + " - " + endTime;
-//                binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
-//                Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
-//            } else {
-//                binding.tvEmployeeShift.setText("Shift time not available");
-//            }
-//
-//            binding.tvEmployeeContactValue.setText(empContact);
-//            binding.tvEmployeeEmailValue.setText(employeeEmail);
-//
-//        });
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
             // Null check before accessing Employee object
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
-                app.xedigital.ai.model.profile.Employee employee = userprofileResponse.getData().getEmployee();
+                Employee employee = userprofileResponse.getData().getEmployee();
 
                 employeeName = employee.getFirstname();
                 employeeEmail = employee.getEmail();
@@ -217,25 +181,101 @@ public class DashboardFragment extends Fragment {
                 binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
             }
         });
-        attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
-            if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null && !attendanceResponse.getData().getEmployeePunchData().isEmpty()) {
+//        attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
+//            if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null && !attendanceResponse.getData().getEmployeePunchData().isEmpty()) {
+//                Log.d("PunchIn", "Punch In: " + attendanceResponse.getData().toString());
+//
+//                punchIn = DateTimeUtils.formatTime(attendanceResponse.getData().getEmployeePunchData().get(0).getPunchIn());
+//                punchOut = DateTimeUtils.formatTime(attendanceResponse.getData().getEmployeePunchData().get(0).getPunchOut());
+//                binding.tvPunchInTime.setText("Punch In: " + punchIn);
+//                binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+//            } else {
+//                binding.tvPunchInTime.setText("Punch In: --:--");
+//                binding.tvPunchOutTime.setText("Punch Out: --:--");
+//            }
+//        });
 
-                punchIn = DateTimeUtils.formatTime(attendanceResponse.getData().getEmployeePunchData().get(0).getPunchIn());
-                punchOut = DateTimeUtils.formatTime(attendanceResponse.getData().getEmployeePunchData().get(0).getPunchOut());
-                binding.tvPunchInTime.setText("Punch In: " + punchIn);
-                binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+//        attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
+//            if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
+//                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//                String currentDate = dateFormat.format(new Date());
+//
+//                List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream()
+//                        .filter(punchData -> {
+//                            try {
+//                                // Get the punch date from punchDateFormat and format it
+//                                SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//                                Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
+//                                String formattedPunchDate = dateFormat.format(punchDate);
+//                                return formattedPunchDate.equals(currentDate);
+//                            } catch (ParseException e) {
+//                                e.printStackTrace();
+//                                return false;
+//                            }
+//                        })
+//                        .collect(Collectors.toList());
+//
+//                if (!currentPunchData.isEmpty()) {
+//                    punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
+//                    punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
+//                    binding.tvPunchInTime.setText("Punch In: " + punchIn);
+//                    binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+//                } else {
+//                    binding.tvPunchInTime.setText("Punch In: --:--");
+//                    binding.tvPunchOutTime.setText("Punch Out: --:--");
+//                }
+//            } else {
+//                binding.tvPunchInTime.setText("Punch In: --:--");
+//                binding.tvPunchOutTime.setText("Punch Out: --:--");
+//            }
+//        });
+        attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
+            if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
+                // Run data processing on a background thread
+                new Thread(() -> {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    String currentDate = dateFormat.format(new Date());
+
+                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream()
+                            .filter(punchData -> {
+                                try {
+                                    SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                    Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
+                                    String formattedPunchDate = dateFormat.format(punchDate);
+                                    return formattedPunchDate.equals(currentDate);
+                                } catch (androidx.core.net.ParseException | ParseException e) {
+                                    e.printStackTrace();
+                                    return false;
+                                }
+                            })
+                            .collect(Collectors.toList());
+
+                    // Update UI on the main thread
+                    requireActivity().runOnUiThread(() -> {
+                        if (!currentPunchData.isEmpty()) {
+                            punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
+                            punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
+                            binding.tvPunchInTime.setText("Punch In: " + punchIn);
+                            binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+                        } else {
+                            binding.tvPunchInTime.setText("Punch In: --:--");
+                            binding.tvPunchOutTime.setText("Punch Out: --:--");
+                        }
+                    });
+                }).start(); // Start the background thread
             } else {
                 binding.tvPunchInTime.setText("Punch In: --:--");
                 binding.tvPunchOutTime.setText("Punch Out: --:--");
             }
         });
+
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         handler.removeCallbacks(runnable);
-//        binding = null;
+        binding = null;
     }
 
     private String formatShiftTime(String shiftTime) {

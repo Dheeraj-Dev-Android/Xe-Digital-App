@@ -40,6 +40,13 @@ public class LeavesItem{
 	public float getDebitLeave(){
 		return debitLeave;
 	}
+//	public Object getDebitLeaveAsObject() {
+//		if (debitLeave % 1 == 0) {
+//			return (int) debitLeave; // If it's a whole number, return as int
+//		} else {
+//			return debitLeave; // Otherwise, return as float
+//		}
+//	}
 
 	public String getId(){
 		return id;

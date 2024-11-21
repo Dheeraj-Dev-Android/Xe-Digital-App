@@ -55,4 +55,8 @@
         <item name="android:textColor">@color/purple_700</item>
     </style>
 
+    <style name="NavigationViewTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/quicksand_font_family</item>
+    </style>
+
 </resources>

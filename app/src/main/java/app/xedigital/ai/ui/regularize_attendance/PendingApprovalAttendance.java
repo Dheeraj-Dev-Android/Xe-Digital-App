@@ -55,7 +55,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         apiInterface = APIClient.getInstance().getRegularizeListApproval();
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
         getRegularizeApproval();

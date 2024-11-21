@@ -21,7 +21,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -49,7 +49,6 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.legacy.support.v4)
     implementation(libs.activity)
-    implementation(libs.filament.android)
     implementation(libs.tracing.perfetto.handshake)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.protolite.well.known.types)
@@ -60,7 +59,6 @@ dependencies {
     implementation(libs.compiler)
     implementation(libs.transport.api)
     implementation(libs.core.i18n)
-    implementation(libs.leanback)
     implementation(libs.rendering)
     implementation(libs.ui.text.android)
     testImplementation(libs.junit)
@@ -88,4 +86,5 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
     implementation("com.google.mlkit:face-detection:16.1.5")
+    implementation("androidx.vectordrawable:vectordrawable-animated:1.1.0")
 }

@@ -79,9 +79,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginModelResponse1 loginResponse = response.body();
 
-                    String responseJson = gson.toJson(loginResponse);
-
-                    Log.d(TAG, "Login Response:\n " + responseJson);
+//                    String responseJson = gson.toJson(loginResponse);
+//                    Log.d(TAG, "Login Response:\n " + responseJson);
 
                     if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
                         getIntent().putExtra("userId", loginResponse.getData().getUser().getId());

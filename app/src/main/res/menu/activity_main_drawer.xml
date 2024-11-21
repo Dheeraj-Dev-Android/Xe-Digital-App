@@ -28,7 +28,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_attendance_menu"
-            android:icon="@drawable/lb_ic_nav_arrow"
+            android:icon="@drawable/ic_dropdown_adaptive_fore"
             android:title="@string/menu_attendance" />
     </group>
     <item
@@ -53,7 +53,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_leaves_menu"
-            android:icon="@drawable/lb_ic_nav_arrow"
+            android:icon="@drawable/ic_dropdown_adaptive_fore"
             android:title="@string/menu_leaves" />
     </group>
     <item
@@ -74,7 +74,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dcr_menu"
-            android:icon="@drawable/lb_ic_nav_arrow"
+            android:icon="@drawable/ic_dropdown_adaptive_fore"
             android:title="@string/menu_dcr" />
 
     </group>

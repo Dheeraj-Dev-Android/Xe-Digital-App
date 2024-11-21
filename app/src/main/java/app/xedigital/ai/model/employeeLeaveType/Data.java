@@ -14,7 +14,7 @@ public class Data {
     private int creditLeave;
 
     @SerializedName("debitLeave")
-    private int debitLeave;
+    private float debitLeave;
 
     @SerializedName("_id")
     private String id;
@@ -49,7 +49,7 @@ public class Data {
         this.creditLeave = creditLeave;
     }
 
-    public int getDebitLeave() {
+    public float getDebitLeave() {
         return debitLeave;
     }
 

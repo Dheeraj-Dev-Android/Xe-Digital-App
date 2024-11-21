@@ -80,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_dcr_form).setVisible(!isDcrVisible);
         // Change icon based on visibility
         if (isDcrVisible) {
-            dcrItem.setIcon(androidx.leanback.R.drawable.lb_ic_nav_arrow);
-        } else {
             dcrItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);
+        } else {
+            dcrItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);
         }
 
     }
@@ -96,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_applied_leaves).setVisible(!isLeavesVisible);
         // Change icon based on visibility
         if (isLeavesVisible) {
-            leavesItem.setIcon(androidx.leanback.R.drawable.lb_ic_nav_arrow);
-        } else {
             leavesItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);
+        } else {
+            leavesItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);
         }
     }
 
@@ -112,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(!isAddAttendanceVisible);
         // Change icon based on visibility
         if (isAddAttendanceVisible) {
-            attendanceItem.setIcon(androidx.leanback.R.drawable.lb_ic_nav_arrow);
-        } else {
             attendanceItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);
+        } else {
+            attendanceItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);
         }
     }
 
