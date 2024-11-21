@@ -26,8 +26,8 @@
 
             <ImageButton
                 android:id="@+id/btn_viewAttendance"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_marginBottom="8dp"
                 android:background="@drawable/ripple_circle_background"
                 android:contentDescription="View Details"
@@ -36,8 +36,8 @@
 
             <ImageButton
                 android:id="@+id/btn_regularize"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="@drawable/ripple_circle_background"
                 android:contentDescription="Regularize"
                 android:padding="8dp"
