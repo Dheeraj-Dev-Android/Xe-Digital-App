@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_leaves).setVisible(!isLeavesVisible);
         menu.findItem(R.id.nav_leaves_data).setVisible(!isLeavesVisible);
         menu.findItem(R.id.nav_applied_leaves).setVisible(!isLeavesVisible);
+        menu.findItem(R.id.nav_approve_leaves).setVisible(!isLeavesVisible);
         // Change icon based on visibility
         if (isLeavesVisible) {
             leavesItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);

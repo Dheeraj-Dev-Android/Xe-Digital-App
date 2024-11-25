@@ -59,21 +59,6 @@
                 android:maxLines="3" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Meeting Type -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Meeting Type">
-
-            <AutoCompleteTextView
-                android:id="@+id/meetingTypeDropdown"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-        </com.google.android.material.textfield.TextInputLayout>
-
         <!-- Purpose Of Meeting -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -88,6 +73,28 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:maxLines="3" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <!-- Meeting Type -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/meetingTypeDropdownLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Meeting Type">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Meeting Type"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
+                android:id="@+id/meetingTypeDropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Expense Types -->
@@ -132,9 +139,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Miscellaneous" />
-
         </com.google.android.material.chip.ChipGroup>
 
+        <!-- Under Process Text -->
         <TextView
             android:id="@+id/underProcessText"
             android:layout_width="wrap_content"
@@ -145,114 +152,137 @@
             android:textColor="#BC372E"
             android:textStyle="bold|italic"
             android:visibility="gone" />
+
         <!-- Claim Category -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/claimCategoryDropdownLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Claim Category">
+            android:hint="Select Claim Category">
 
-            <AutoCompleteTextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Claim Category"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
                 android:id="@+id/claimCategoryDropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Travel Category -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/travelCategoryDropdownLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Travel Category">
 
-            <AutoCompleteTextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="Travel Category"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
                 android:id="@+id/travelCategoryDropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!--        &lt;!&ndash; Mode of Transport &ndash;&gt;-->
-        <!--        <com.google.android.material.textfield.TextInputLayout-->
-        <!--            android:id="@+id/transportModeDropdownLayout"-->
-        <!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginBottom="16dp"-->
-        <!--            android:hint="Mode of Transport">-->
-
-        <!--            <AutoCompleteTextView-->
-        <!--                android:id="@+id/transportModeDropdown"-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="wrap_content" />-->
-        <!--        </com.google.android.material.textfield.TextInputLayout>-->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Mode of Transport -->
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/transportModeDropdownLayout"
-            style="?attr/materialCardViewOutlinedStyle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:strokeWidth="1dp">
+            android:hint="Mode of Transport">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="Mode of Transport"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
                 android:id="@+id/transportModeDropdown"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:spinnerMode="dropdown"
-                android:text="Mode of Transport" />
-        </com.google.android.material.card.MaterialCardView>
+                android:layout_height="wrap_content"
+                android:minHeight="48dp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Transport Mode Shared -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/transportModeSharedLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Shared">
 
-            <AutoCompleteTextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="Shared Mode of Transport"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
                 android:id="@+id/transportModeShared"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Transport Mode Dedicated -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/transportModeDedicatedLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Dedicated">
 
-            <AutoCompleteTextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="Dedicated Mode of Transport"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
                 android:id="@+id/transportModeDedicated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.card.MaterialCardView
+        <!-- Enter Transport -->
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/EnterTransportInputLayout"
-            style="?attr/materialCardViewOutlinedStyle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="16dp"
             android:hint="Enter Transport">
 
-            <Spinner
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/EnterTransportInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:maxLines="3"
-                android:text="Enter Transport" />
-        </com.google.android.material.card.MaterialCardView>
+                android:minHeight="48dp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Location Details -->
         <LinearLayout
@@ -306,7 +336,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
                 android:layout_weight="1"
                 android:hint="Currency">
 

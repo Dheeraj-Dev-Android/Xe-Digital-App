@@ -51,8 +51,6 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.attendance_pending_list, parent, false);
-
-
         return new ViewHolder(view);
     }
 

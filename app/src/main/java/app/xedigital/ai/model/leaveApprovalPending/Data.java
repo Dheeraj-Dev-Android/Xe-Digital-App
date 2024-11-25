@@ -7,9 +7,9 @@ import java.util.List;
 public class Data {
 
     @SerializedName("appliedLeaves")
-    private List<AppliedLeavesItem> appliedLeaves;
+    private List<AppliedLeavesApproveItem> appliedLeaves;
 
-    public List<AppliedLeavesItem> getAppliedLeaves() {
+    public List<AppliedLeavesApproveItem> getAppliedLeaves() {
         return appliedLeaves;
     }
 }

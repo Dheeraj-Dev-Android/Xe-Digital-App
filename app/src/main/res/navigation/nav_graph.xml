@@ -157,6 +157,24 @@
             android:id="@+id/action_nav_view_applied_leaves_to_nav_applied_leaves"
             app:destination="@id/nav_applied_leaves" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_approve_leaves"
+        android:name="app.xedigital.ai.ui.leaves.ApproveLeaveFragment"
+        android:label="Approve Leave"
+        tools:layout="@layout/fragment_approve_leave">
+        <action
+            android:id="@+id/action_nav_approve_leaves_to_nav_approve_leave_data"
+            app:destination="@id/nav_approve_leave_data" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_approve_leave_data"
+        android:name="app.xedigital.ai.ui.leaves.PendingLeaveApproveFragment"
+        android:label="Approve Leave Data"
+        tools:layout="@layout/fragment_pending_approval_attendance">
+        <action
+            android:id="@+id/action_nav_approve_leave_data_to_nav_approve_leaves"
+            app:destination="@id/nav_approve_leaves" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_holidays"

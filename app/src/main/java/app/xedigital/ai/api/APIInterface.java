@@ -89,7 +89,7 @@ public interface APIInterface {
     @GET("leaves/unapproved/{leaveId}/employees/{employeeId}")
     retrofit2.Call<ResponseBody> getUnapprovedLeaves(@Header("Authorization") String authToken, @Path("leaveId") String leaveId, @Path("employeeId") String employeeId);
 
-    @GET("/leaves/applied/report/manager/{employeeId}")
+    @GET("leaves/applied/report/manager/{employeeId}")
     retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
     //    POST APIs

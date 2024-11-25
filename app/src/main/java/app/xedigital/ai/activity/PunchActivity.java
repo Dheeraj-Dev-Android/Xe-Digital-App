@@ -272,8 +272,8 @@ public class PunchActivity extends AppCompatActivity {
                                 handleError("Error processing image: " + e.getMessage());
                             }
 //                        }
-//                        progressBar = findViewById(R.id.progressBar);
-//                        progressBar.setVisibility(View.GONE);
+                    progressBar = findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.GONE);
 //                    });
 //                    Log.d(TAG, "Face Detection Result: " + result);
 //                    result.addOnFailureListener(e -> {
@@ -476,7 +476,7 @@ public class PunchActivity extends AppCompatActivity {
                 requestBody.put("punchTime", currentTime);
 
                 String requestBodyString = requestBody.toString();
-                Log.d(TAG, "Request Body: " + requestBodyString);
+//                Log.d(TAG, "Request Body: " + requestBodyString);
                 RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
 
                 APIInterface attendanceApiService = APIClient.getInstance().getAttendance();

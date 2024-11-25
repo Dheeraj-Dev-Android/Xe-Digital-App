@@ -43,7 +43,6 @@ public class PendingApprovalViewFragment extends Fragment {
     private AttendanceRegularizeAppliedItem item;
     private APIInterface apiInterface;
     private ProfileViewModel profileViewModel;
-
     private String reportingManager;
     private AttendanceApprovalBinding binding;
     private OnRegularizeApprovalActionListener listener;
@@ -91,7 +90,7 @@ public class PendingApprovalViewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         binding = AttendanceApprovalBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
