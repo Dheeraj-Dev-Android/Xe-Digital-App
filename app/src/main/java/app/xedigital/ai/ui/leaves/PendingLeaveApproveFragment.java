@@ -2,6 +2,7 @@ package app.xedigital.ai.ui.leaves;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -108,19 +110,50 @@ public class PendingLeaveApproveFragment extends Fragment {
         binding = LeaveApprovalBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        binding.empCode.setText(item.getEmployeeCode());
-        binding.empDesignation.setText(item.getDesignation());
         binding.empName.setText(item.getFirstname() + " " + item.getLastname());
+        binding.empEmail.setText(item.getEmail());
+        binding.empDesignation.setText(item.getDesignation());
         binding.empLeaveType.setText(item.getLeavetype().getLeavetypeName());
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());
-        binding.empFromDate.setText(formattedFromDate + " " + item.getSelectTypeFrom());
+        binding.empFromDate.setText(formattedFromDate);
+        binding.empSelectTypeFrom.setText(item.getSelectTypeFrom());
         String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(item.getToDate());
-        binding.empToDate.setText(formattedToDate + " " + item.getSelectTypeTo());
+        binding.empToDate.setText(formattedToDate);
+        binding.empSelectTypeTo.setText(item.getSelectTypeTo());
+        String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
+        binding.empAppliedDate.setText(formattedAppliedDate);
         binding.empReason.setText(item.getReason());
         binding.empContactNumber.setText(item.getContactNumber());
         binding.empAddress.setText(item.getVacationAddress());
-        String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        binding.empAppliedDate.setText(formattedAppliedDate);
+        binding.empVacationAddress.setText(item.getVacationAddress());
+        binding.empLeavingStation.setText(item.getLeavingStation());
+        binding.empStatusUpdatedBy.setText(item.getApprovedByName());
+        String formattedApprovedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
+        binding.empStatusUpdatedDate.setText(formattedApprovedDate);
+        binding.empComments.setText(item.getComment());
+//        binding.empTotalDays.setText();
+
+
+        String status = item.getStatus().toLowerCase();
+        Context context = binding.empStatusChip.getContext();
+
+        binding.empStatusChip.setText(status);
+
+        int chipBackgroundColor;
+
+        if (status.equals("approved")) {
+            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_approved);
+        } else if (status.equals("cancelled")) {
+            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_rejected);
+        } else if (status.equals("rejected")) {
+            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_rejected);
+        } else if (status.equals("unapproved")) {
+            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_pending);
+        } else {
+            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_pending);
+        }
+
+        binding.empStatusChip.setChipBackgroundColor(ColorStateList.valueOf(chipBackgroundColor));
 
         if (item.getStatus().equals("unapproved")) {
             binding.leaveBtnApprove.setVisibility(View.VISIBLE);

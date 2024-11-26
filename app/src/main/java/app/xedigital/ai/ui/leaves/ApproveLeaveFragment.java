@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -30,11 +33,12 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesApproveItem;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
 import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
+import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ApproveLeaveFragment extends Fragment {
+public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprovalListener {
 
     private String authTokenHeader;
     private String userId;
@@ -54,9 +58,14 @@ public class ApproveLeaveFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    public void onFilterApplied(String startDate, String endDate) {
+        filterLeavesByDate(startDate, endDate);
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
+        setHasOptionsMenu(true);
 
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -155,10 +164,47 @@ public class ApproveLeaveFragment extends Fragment {
 
     }
 
+    private void filterLeavesByDate(String fromDate, String toDate) {
+        if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
+            List<AppliedLeavesApproveItem> originalList = leavePendingApprovalResponse.getData().getAppliedLeaves();
+            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
+
+            for (AppliedLeavesApproveItem item : originalList) {
+                String leaveDate = item.getAppliedDate();
+
+                // Check if leaveDate is within the specified range
+                if (leaveDate.compareTo(fromDate) >= 0 && leaveDate.compareTo(toDate) <= 0) {
+                    filteredList.add(item);
+                }
+            }
+            approvalAdapter.updateList(filteredList);
+        }
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         view = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_approve_leave_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (super.onOptionsItemSelected(item)) {
+            return true;
+        }
+        if (item.getItemId() == R.id.action_filter) {
+            FilterBottomSheetDialogFragment filterBottomSheetDialogFragment = new FilterBottomSheetDialogFragment();
+            filterBottomSheetDialogFragment.setFilterLeaveApprovalListener(this);
+            filterBottomSheetDialogFragment.show(getParentFragmentManager(), filterBottomSheetDialogFragment.getTag());
+            return true;
+        }
+        return false;
     }
 
     public void onApprove(AttendanceRegularizeAppliedItem item) {

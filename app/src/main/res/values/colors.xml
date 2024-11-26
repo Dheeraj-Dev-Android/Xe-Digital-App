@@ -103,4 +103,23 @@
 
     <color name="primary_color">#2196F3</color>
 
+    <!-- Text Colors -->
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+
+    <!-- Background Colors -->
+    <color name="background_light">#F5F5F5</color>
+    <color name="surface_color">#FFFFFF</color>
+
+    <!-- Accent and State Colors -->
+    <color name="success_color">#4CAF50</color>
+    <color name="error_color">#FF5252</color>
+    <color name="warning_color">#FFC107</color>
+
+    <!-- Neutral Colors -->
+    <color name="divider_color">#BDBDBD</color>
+    <color name="icon_color">#757575</color>
+    <color name="_000000">#448AFF</color>
+    <color name="_0000">#3F996D</color>
+
 </resources>

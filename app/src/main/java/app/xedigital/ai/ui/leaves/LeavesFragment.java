@@ -628,7 +628,7 @@ public class LeavesFragment extends Fragment {
         }
     }
 
-    public double finalUsedDays(double totalDays) {
+    public void finalUsedDays(double totalDays) {
         String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
         String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
         finalUsedDays = totalDays;
@@ -642,7 +642,6 @@ public class LeavesFragment extends Fragment {
         }
         Log.e(TAG, "finalUsedDays: " + finalUsedDays);
 
-        return finalUsedDays;
     }
 
     private void showLeaveLimitExceededAlert() {

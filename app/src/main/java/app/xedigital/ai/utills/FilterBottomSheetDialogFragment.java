@@ -30,6 +30,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.ui.leaves.ApproveLeaveFragment;
+import app.xedigital.ai.ui.leaves.FilterLeaveApprovalListener;
 import app.xedigital.ai.ui.timesheet.FilterAppliedListener;
 import app.xedigital.ai.ui.timesheet.TimesheetViewModel;
 
@@ -46,6 +48,7 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private MaterialButton applyFilterButton;
     private MaterialButton resetButton;
     private FilterAppliedListener filterAppliedListener;
+    private FilterLeaveApprovalListener filterLeaveApprovalListener;
     private TimesheetViewModel timesheetViewModel;
 
     @Override
@@ -123,6 +126,10 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
             filterAppliedListener.onFilterApplied(startDate, endDate);
             dismiss();
         }
+        if (filterLeaveApprovalListener != null) {
+            filterLeaveApprovalListener.onFilterApplied(startDate, endDate);
+            dismiss();
+        }
     }
 
     private boolean validateDates(String startDate, String endDate) {
@@ -164,6 +171,10 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     public void setFilterAppliedListener(FilterAppliedListener listener) {
         this.filterAppliedListener = listener;
+    }
+
+    public void setFilterLeaveApprovalListener(ApproveLeaveFragment listener) {
+        this.filterLeaveApprovalListener = listener;
     }
 }
 
