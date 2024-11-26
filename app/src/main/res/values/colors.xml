@@ -101,4 +101,6 @@
     <color name="gradient_start">#357ABD</color>
     <color name="gradient_end">#4F46E5</color>
 
+    <color name="primary_color">#2196F3</color>
+
 </resources>

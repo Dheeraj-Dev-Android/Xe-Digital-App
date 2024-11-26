@@ -17,13 +17,16 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.LeaveApprovalAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.databinding.FragmentApproveLeaveBinding;
 import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesApproveItem;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
 import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
@@ -33,14 +36,14 @@ import retrofit2.Response;
 
 public class ApproveLeaveFragment extends Fragment {
 
-    private String authToken;
     private String authTokenHeader;
     private String userId;
     private LeaveApprovalAdapter approvalAdapter;
     private RecyclerView approvalRecyclerView;
     private PendingLeaveApproveFragment pendingLeaveApproveFragment;
+    private LeavePendingApprovalResponse leavePendingApprovalResponse;
     private APIInterface apiInterface;
-    private FragmentApproveLeaveBinding binding;
+    private View view;
 
     public static ApproveLeaveFragment newInstance() {
         return new ApproveLeaveFragment();
@@ -53,38 +56,72 @@ public class ApproveLeaveFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
+        view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
 
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
-//        RecyclerView leaveApprovalRecyclerView = binding.leaveApprovalRecyclerView;
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         apiInterface = APIClient.getInstance().getPendingApprovalLeaves();
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
+        String authToken = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
         authTokenHeader = "jwt " + authToken;
         getLeaveApproval();
 
-//        viewModel.getLeaveApprovalList().observe(getViewLifecycleOwner(), items -> {
-//            if (approvalAdapter == null) {
-//                approvalAdapter = new LeaveApprovalAdapter(items, authTokenHeader, userId, ApproveLeaveFragment.this, getContext());
-//                binding.leaveApprovalRecyclerView.setAdapter(approvalAdapter);
-//            } else {
-////                approvalAdapter.updateItems(items);
-//                approvalAdapter.notifyDataSetChanged();
-//            }
-//        });
-//
-//        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), errorMessage -> {
-//            if (errorMessage != null) {
-//                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        viewModel.getPendingApprovalLeaves(authTokenHeader, userId);
+        ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
+        chipGroup.setSingleSelection(true);
 
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            // Handle chip selection
+            if (checkedIds.contains(R.id.chipAll)) {
+                filterLeaves("All");
+            } else if (checkedIds.contains(R.id.chipApproved)) {
+                filterLeaves("Approved");
+            } else if (checkedIds.contains(R.id.chipUnapproved)) {
+                filterLeaves("Unapproved");
+            } else if (checkedIds.contains(R.id.chipRejected)) {
+                filterLeaves("Rejected");
+            } else if (checkedIds.contains(R.id.chipCancelled)) {
+                filterLeaves("Cancelled");
+            } else {
+                filterLeaves("All");
+            }
+        });
+        // Attach click listeners to chips
+        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+            View child = chipGroup.getChildAt(i);
+            if (child instanceof Chip) {
+                child.setOnClickListener(this::onChipClicked);
+            }
+        }
         return view;
+    }
+
+    public void onChipClicked(View view) {
+        // Get the ChipGroup and the clicked chip
+        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
+        Chip clickedChip = (Chip) view;
+
+        // Check the clicked chip
+        chipGroup.check(clickedChip.getId());
+    }
+
+    private void filterLeaves(String status) {
+        if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
+            List<AppliedLeavesApproveItem> originalList = leavePendingApprovalResponse.getData().getAppliedLeaves();
+            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
+
+            if (status.equals("All")) {
+                filteredList.addAll(originalList);
+            } else {
+                for (AppliedLeavesApproveItem item : originalList) {
+                    if (item.getStatus().equalsIgnoreCase(status)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            approvalAdapter.updateList(filteredList);
+        }
     }
 
     private void getLeaveApproval() {
@@ -93,19 +130,14 @@ public class ApproveLeaveFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<LeavePendingApprovalResponse> call, @NonNull Response<LeavePendingApprovalResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    LeavePendingApprovalResponse leavePendingApprovalResponse = response.body();
+                    leavePendingApprovalResponse = response.body();
                     List<AppliedLeavesApproveItem> items = leavePendingApprovalResponse.getData().getAppliedLeaves();
                     if (items.isEmpty()) {
                         Toast.makeText(getContext(), "No Data Found", Toast.LENGTH_SHORT).show();
-                        new AlertDialog.Builder(getContext())
-                                .setTitle("No Data Found")
-                                .setMessage("No Data Found")
-                                .setPositiveButton("OK", null)
-                                .show();
+                        new AlertDialog.Builder(getContext()).setTitle("No Data Found").setMessage("No Data Found").setPositiveButton("OK", null).show();
                     } else {
                         approvalAdapter = new LeaveApprovalAdapter(items, authTokenHeader, userId, ApproveLeaveFragment.this, getContext());
                         approvalRecyclerView.setAdapter(approvalAdapter);
-
                     }
                 } else {
                     Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
@@ -122,30 +154,12 @@ public class ApproveLeaveFragment extends Fragment {
 
 
     }
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        updateLeaveApprovalList();
-//    }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        view = null;
     }
-
-//    public void updateLeaveApprovalList() {
-//        viewModel.getPendingApprovalLeaves(authTokenHeader, userId);
-//    }
-//
-//    public void onApprove(AttendanceRegularizeAppliedItem item) {
-//        viewModel.getPendingApprovalLeaves(authTokenHeader, userId);
-//    }
-
-//    public void onReject(AttendanceRegularizeAppliedItem item) {
-//
-//        viewModel.getPendingApprovalLeaves(authTokenHeader, userId);
-//    }
 
     public void onApprove(AttendanceRegularizeAppliedItem item) {
         if (pendingLeaveApproveFragment != null) {
@@ -156,11 +170,12 @@ public class ApproveLeaveFragment extends Fragment {
         ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
         getLeaveApproval();
     }
+
     public void onReject(AttendanceRegularizeAppliedItem item) {
         FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
         ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
         if (pendingLeaveApproveFragment != null) {
-            pendingLeaveApproveFragment.handleReject(item.getId());
+            pendingLeaveApproveFragment.handleReject(item.getId(), "");
         }
         getLeaveApproval();
     }
@@ -169,7 +184,7 @@ public class ApproveLeaveFragment extends Fragment {
         FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
         ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
         if (pendingLeaveApproveFragment != null) {
-            pendingLeaveApproveFragment.handleCancel(item.getId());
+            pendingLeaveApproveFragment.handleCancel(item.getId(), "");
         }
     }
 

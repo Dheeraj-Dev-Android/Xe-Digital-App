@@ -27,7 +27,7 @@ import app.xedigital.ai.ui.leaves.ApproveLeaveFragment;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdapter.ViewHolder> {
-    private final List<AppliedLeavesApproveItem> items;
+    private List<AppliedLeavesApproveItem> items;
     private final String authToken;
     private final String userId;
     private final Context context;
@@ -51,7 +51,6 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         AppliedLeavesApproveItem item = items.get(position);
 
         holder.empName.setText(item.getFirstname() + " " + item.getLastname());
-//        holder.leaveName.setText(item.getLeavetype().getLeavetypeName());
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());
         holder.fromDate.setText("From Date : " + formattedFromDate);
         String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(item.getToDate());
@@ -64,13 +63,14 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         statusChip.setText(item.getStatus());
 
         int statusColor;
-        if (item.getStatus().equals("approved")) {
+        String status = item.getStatus().toLowerCase();
+        if (status.equals("approved")) {
             statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved);
-        } else if (item.getStatus().equals("unapproved")) {
+        } else if (status.equals("unapproved")) {
             statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
-        } else if (item.getStatus().equals("rejected")) {
+        } else if (status.equals("rejected")) {
             statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
-        } else if (item.getStatus().equals("cancelled")) {
+        } else if (status.equals("cancelled")) {
             statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
         } else {
             statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
@@ -90,14 +90,10 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
                 } else {
                     Toast.makeText(context, "Leave ID is null", Toast.LENGTH_SHORT).show();
                 }
-
             } else {
                 Toast.makeText(context, "Invalid position", Toast.LENGTH_SHORT).show();
             }
-
         });
-
-
     }
 
     @Override
@@ -105,10 +101,11 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         return items.size();
     }
 
-//    public void updateItems(List<AppliedLeavesApproveItem> items) {
-//        this.items = items;
-//        notifyDataSetChanged();
-//    }
+    // Inside LeaveApprovalAdapter Class
+    public void updateList(List<AppliedLeavesApproveItem> newLeaves) {
+        this.items = newLeaves;
+        notifyDataSetChanged();
+    }
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

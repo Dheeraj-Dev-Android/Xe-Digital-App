@@ -97,6 +97,10 @@ public class APIClient {
         return retrofit2.create(APIInterface.class);
     }
 
+    public APIInterface UpdateLeavesStatus() {
+        return retrofit2.create(APIInterface.class);
+    }
+
     public APIInterface DcrFormSubmit() {
         return retrofit2.create(APIInterface.class);
     }

@@ -12,6 +12,7 @@ import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
 import app.xedigital.ai.model.holiday.HolidayModelResponse;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
 import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
+import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import app.xedigital.ai.model.login.LoginModelResponse1;
 import app.xedigital.ai.model.profile.UserProfileResponse;
@@ -121,4 +122,7 @@ public interface APIInterface {
 
     @PUT("leaves/used/debit")
     retrofit2.Call<ResponseBody> LeavesUsedDebit(@Header("Authorization") String token, @Body DebitLeaveRequest requestBody);
+
+    @PUT("leaves/status/{managerId}")
+    retrofit2.Call<ResponseBody> LeavesStatus(@Header("Authorization") String token, @Path("managerId") String managerId, @Body LeaveUpdateRequest requestBody);
 }
