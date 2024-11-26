@@ -3,7 +3,9 @@ package app.xedigital.ai.ui.claim_management;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -58,6 +60,16 @@ public class ClaimManagementFragment extends Fragment {
 
     public static ClaimManagementFragment newInstance() {
         return new ClaimManagementFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", "");
+
+        claimManagementViewModel = new ViewModelProvider(this).get(ClaimManagementViewModel.class);
+        claimManagementViewModel.getClaimLength(authToken);
     }
 
     @Override
@@ -147,7 +159,7 @@ public class ClaimManagementFragment extends Fragment {
                                 Toast.makeText(requireContext(), "File size exceeds 1MB", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    } else if (data.getData() != null) { // Handle single file
+                    } else if (data.getData() != null) {
                         Uri uri = data.getData();
                         if (isValidFileSize(uri)) {
                             selectedFiles.add(uri);
@@ -205,46 +217,39 @@ public class ClaimManagementFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Handle case when nothing is selected if needed
                 binding.transportModeSharedLayout.setVisibility(View.GONE);
                 binding.transportModeDedicatedLayout.setVisibility(View.GONE);
                 binding.EnterTransportInputLayout.setVisibility(View.GONE);
             }
         }));
-
-        binding.transportModeDropdown.post(new Runnable() {
-            @Override
-            public void run() {
-                binding.transportModeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String selectedMode = parent.getItemAtPosition(position).toString();
-
-                        // Show/Hide Views with Delay
-                        if (selectedMode.equals("Shared")) {
-                            binding.transportModeSharedLayout.setVisibility(View.VISIBLE);
-                            binding.transportModeDedicatedLayout.setVisibility(View.GONE);
-                            binding.EnterTransportInputLayout.setVisibility(View.GONE);
-                        } else if (selectedMode.equals("Dedicated")) {
-                            binding.transportModeSharedLayout.setVisibility(View.GONE);
-                            binding.transportModeDedicatedLayout.setVisibility(View.VISIBLE);
-                            binding.EnterTransportInputLayout.setVisibility(View.GONE);
-                        } else {
-                            binding.transportModeSharedLayout.setVisibility(View.GONE);
-                            binding.transportModeDedicatedLayout.setVisibility(View.GONE);
-                            binding.EnterTransportInputLayout.setVisibility(View.GONE);
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        binding.transportModeSharedLayout.setVisibility(View.GONE);
-                        binding.transportModeDedicatedLayout.setVisibility(View.GONE);
-                        binding.EnterTransportInputLayout.setVisibility(View.GONE);
-                    }
-                });
-            }
-        });
+//        binding.transportModeDropdown.post(() -> binding.transportModeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                String selectedMode = parent.getItemAtPosition(position).toString();
+//
+//                // Show/Hide Views with Delay
+//                if (selectedMode.equals("Shared")) {
+//                    binding.transportModeSharedLayout.setVisibility(View.VISIBLE);
+//                    binding.transportModeDedicatedLayout.setVisibility(View.GONE);
+//                    binding.EnterTransportInputLayout.setVisibility(View.GONE);
+//                } else if (selectedMode.equals("Dedicated")) {
+//                    binding.transportModeSharedLayout.setVisibility(View.GONE);
+//                    binding.transportModeDedicatedLayout.setVisibility(View.VISIBLE);
+//                    binding.EnterTransportInputLayout.setVisibility(View.GONE);
+//                } else {
+//                    binding.transportModeSharedLayout.setVisibility(View.GONE);
+//                    binding.transportModeDedicatedLayout.setVisibility(View.GONE);
+//                    binding.EnterTransportInputLayout.setVisibility(View.GONE);
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//                binding.transportModeSharedLayout.setVisibility(View.GONE);
+//                binding.transportModeDedicatedLayout.setVisibility(View.GONE);
+//                binding.EnterTransportInputLayout.setVisibility(View.GONE);
+//            }
+//        }));
         binding.transportModeShared.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -261,7 +266,6 @@ public class ClaimManagementFragment extends Fragment {
                 binding.EnterTransportInputLayout.setVisibility(View.GONE);
             }
         });
-
         binding.transportModeDedicated.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -453,14 +457,9 @@ public class ClaimManagementFragment extends Fragment {
         binding.transportModeDedicated.setPrompt(getString(R.string.select_prompt));
 
         // Currency Dropdown
-//        String[] currencies = {"INR", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SEK", "NZD"};
-//        ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, currencies);
-//        binding.currencyDropdown.setAdapter(currencyAdapter);
-        // Currency Dropdown
         String[] currencies = {"Select an option", "INR", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SEK", "NZD"};
         CurrencyArrayAdapter currencyAdapter = new CurrencyArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, currencies);
         binding.currencyDropdown.setAdapter(currencyAdapter);
-//        binding.currencyDropdown.setPrompt(getString(R.string.select_prompt));
     }
 
     private void setupDatePicker() {
@@ -478,7 +477,7 @@ public class ClaimManagementFragment extends Fragment {
     private void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/jpeg", "image/png"}); // Filter to JPG and PNG
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/jpeg", "image/png"});
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         filePickerLauncher.launch(intent);
@@ -538,18 +537,16 @@ public class ClaimManagementFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false; // Assume invalid if size cannot be determined
+        return false;
     }
 
     private void setupButtons() {
         binding.uploadButton.setOnClickListener(v -> {
             openFilePicker();
-            // Implement file upload logic
             Toast.makeText(requireContext(), "Select Files to Upload", Toast.LENGTH_SHORT).show();
         });
 
         binding.saveButton.setOnClickListener(v -> {
-            // Implement save logic
             if (validateForm()) {
                 saveClaimData();
                 Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
@@ -557,7 +554,6 @@ public class ClaimManagementFragment extends Fragment {
         });
 
         binding.submitButton.setOnClickListener(v -> {
-            // Implement submit logic
             if (validateForm()) {
                 submitClaimData();
                 Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
@@ -568,32 +564,24 @@ public class ClaimManagementFragment extends Fragment {
 
     private boolean validateForm() {
         boolean isValid = true;
-
-        // Validate Claim Date
         if (binding.claimDateInput.getText().toString().trim().isEmpty()) {
             binding.claimDateInput.setError("Please enter claim date");
             isValid = false;
         } else {
             binding.claimDateInput.setError(null);
         }
-
-        // Validate Project Name
         if (binding.projectName.getText().toString().trim().isEmpty()) {
             binding.projectName.setError("Please enter project name");
             isValid = false;
         } else {
             binding.projectName.setError(null);
         }
-
-        // Validate Purpose
         if (binding.purposeInput.getText().toString().trim().isEmpty()) {
             binding.purposeInput.setError("Please enter purpose of meeting");
             isValid = false;
         } else {
             binding.purposeInput.setError(null);
         }
-
-        // Validate Meeting Type
         if (binding.meetingTypeDropdown.getSelectedItemPosition() == 0) {
             binding.meetingTypeDropdownLayout.setError("Please select meeting type");
             isValid = false;
@@ -601,7 +589,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.meetingTypeDropdownLayout.setError(null);
         }
 
-        // Validate Claim Category
         if (binding.claimCategoryDropdown.getSelectedItemPosition() == 0) {
             binding.claimCategoryDropdownLayout.setError("Please select claim category");
             isValid = false;
@@ -609,7 +596,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.claimCategoryDropdownLayout.setError(null);
         }
 
-        // Validate Travel Category (only if Claim Category is Travel)
         if (binding.claimCategoryDropdown.getSelectedItem().toString().equals("Travel") && binding.travelCategoryDropdown.getSelectedItemPosition() == 0) {
             binding.travelCategoryDropdownLayout.setError("Please select travel category");
             isValid = false;
@@ -617,7 +603,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.travelCategoryDropdownLayout.setError(null);
         }
 
-        // Validate Transport mode (only if Travel Category is Local)
         if (binding.travelCategoryDropdown.getSelectedItem().toString().equals("Local") && (binding.transportModeDropdown.getSelectedItemPosition() == 0)) {
             binding.transportModeDropdownLayout.setError("Please select transport mode");
             isValid = false;
@@ -625,7 +610,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.transportModeDropdownLayout.setError(null);
         }
 
-        // Validate Shared Transport mode (only if Transport Mode is Shared)
         if (binding.transportModeDropdown.getSelectedItem().toString().equals("Shared") && (binding.transportModeShared.getSelectedItemPosition() == 0)) {
             binding.transportModeSharedLayout.setError("Please select transport mode Shared");
             isValid = false;
@@ -633,7 +617,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.transportModeSharedLayout.setError(null);
         }
 
-        // Validate Dedicated Transport mode (only if Transport Mode is Dedicated)
         if (binding.transportModeDropdown.getSelectedItem().toString().equals("Dedicated") && (binding.transportModeDedicated.getSelectedItemPosition() == 0)) {
             binding.transportModeDedicatedLayout.setError("Please select transport mode dedicated");
             isValid = false;
@@ -648,7 +631,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.EnterTransportInputLayout.setError(null);
         }
 
-        // Validate Start and End Locations
         if (Objects.requireNonNull(binding.startLocationInput.getText()).toString().trim().isEmpty()) {
             binding.startLocationInputLayout.setError("Please enter start location");
             isValid = false;
@@ -662,22 +644,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.endLocationInputLayout.setError(null);
         }
         // Validate Amount
-//        String amountString = binding.amountInput.getText().toString().trim();
-//        if (amountString.isEmpty()) {
-//            binding.amountInput.setError("Please enter the amount");
-//            isValid = false;
-//        } else {
-//            try {
-//                double amount = Double.parseDouble(amountString);
-//                if (amount <= 0) {
-//                    binding.amountInput.setError("Amount must be positive");
-//                    isValid = false;
-//                }
-//            } catch (NumberFormatException e) {
-//                binding.amountInput.setError("Invalid amount format");
-//                isValid = false;
-//            }
-//        }
         String amountString = Objects.requireNonNull(binding.amountInput.getText()).toString().trim();
         if (amountString.isEmpty()) {
             binding.amountInput.setError("Please enter the amount");

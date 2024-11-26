@@ -140,4 +140,15 @@ public class APIClient {
     public APIInterface getPendingApprovalLeaves() {
         return retrofit2.create(APIInterface.class);
     }
+
+    public APIInterface getClaimLength() {
+        return retrofit2.create(APIInterface.class);
+    }
+
+    public APIInterface getPolicies() {
+        return retrofit2.create(APIInterface.class);
+    }
 }
+
+
+

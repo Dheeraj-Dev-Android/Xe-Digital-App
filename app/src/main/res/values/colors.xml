@@ -122,4 +122,11 @@
     <color name="_000000">#448AFF</color>
     <color name="_0000">#3F996D</color>
 
+    <color name="card_stroke">#E0E0E0</color>
+
+    <!-- Status Colors -->
+    <color name="status_active_background">#E6F2E6</color>
+    <color name="status_active_text">#2E7D32</color>
+
+
 </resources>

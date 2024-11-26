@@ -5,6 +5,7 @@ import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
+import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
@@ -15,6 +16,7 @@ import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import app.xedigital.ai.model.login.LoginModelResponse1;
+import app.xedigital.ai.model.policy.PolicyResponse;
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
 import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
@@ -92,6 +94,12 @@ public interface APIInterface {
 
     @GET("leaves/applied/report/manager/{employeeId}")
     retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+
+    @GET("claims/employee/claimLength")
+    retrofit2.Call<ClaimLengthResponse> getClaimLength(@Header("Authorization") String authToken);
+
+    @GET("policies")
+    retrofit2.Call<PolicyResponse> getPolicies(@Header("Authorization") String authToken);
 
     //    POST APIs
     @POST("face/recognize")

@@ -95,8 +95,8 @@
 
     <item
         android:id="@+id/nav_policy"
-        android:title="Policy (Coming Soon*)" />
-    <!--    @string/menu_policy-->
+        android:title="@string/menu_policy" />
+
     <item
         android:id="@+id/nav_shifts"
         android:title="Shifts (Coming Soon*)" />
