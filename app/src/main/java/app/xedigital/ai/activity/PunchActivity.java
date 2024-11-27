@@ -369,7 +369,13 @@ public class PunchActivity extends AppCompatActivity {
                 dialog.dismiss();
                 setResult(Activity.RESULT_CANCELED);
                 if (!isFinishing()) {
-                    finish(); // Finish PunchActivity
+                    try {
+                        ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(PunchActivity.this).get();
+                        cameraProvider.unbindAll();
+                    } catch (ExecutionException | InterruptedException e) {
+                        Log.e(TAG, "Error unbinding camera preview: " + e.getMessage(), e);
+                    }
+                    finish();
                 }
 //                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
 //                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
@@ -690,4 +696,16 @@ public class PunchActivity extends AppCompatActivity {
     interface AddressCallback {
         void onAddressReceived(String address);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(this).get();
+            cameraProvider.unbindAll();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "Error unbinding camera preview: " + e.getMessage(), e);
+        }
+    }
+
 }
