@@ -1,5 +1,7 @@
 package app.xedigital.ai.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +16,18 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.List;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.activity.PDFViewActivity;
 import app.xedigital.ai.model.policy.PoliciesItem;
+import app.xedigital.ai.utills.DateTimeUtils;
 
 public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyViewHolder> {
 
-    private List<PoliciesItem> policies;
+    private final List<PoliciesItem> policies;
+    private final Context context;
 
-    public PolicyAdapter(List<PoliciesItem> policies) {
+    public PolicyAdapter(List<PoliciesItem> policies, Context context) {
         this.policies = policies;
+        this.context = context;
     }
 
     @NonNull
@@ -36,7 +42,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
     public void onBindViewHolder(@NonNull PolicyViewHolder holder, int position) {
         PoliciesItem policy = policies.get(position);
         holder.policyName.setText(policy.getName());
-        holder.policyDate.setText(policy.getUpdatedAt());
+        holder.policyDate.setText("Policy Date : " + DateTimeUtils.getDayOfWeekAndDate(policy.getUpdatedAt()));
 
         // Convert boolean to String
 //        String status = policy.isActive() ? "Active" : "Inactive";
@@ -50,7 +56,12 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
         }
 
         holder.policyViewIcon.setOnClickListener(v -> {
+            PoliciesItem policy1 = policies.get(holder.getBindingAdapterPosition());
+            String pdfUrl = policy1.getPolicyFileURL();
 
+            Intent intent = new Intent(context, PDFViewActivity.class);
+            intent.putExtra("pdfUrl", pdfUrl);
+            context.startActivity(intent);
         });
     }
 

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -19,7 +18,6 @@ import java.util.List;
 import app.xedigital.ai.adapter.PolicyAdapter;
 import app.xedigital.ai.databinding.FragmentPolicyBinding;
 import app.xedigital.ai.model.policy.PoliciesItem;
-import app.xedigital.ai.model.policy.PolicyResponse;
 
 public class PolicyFragment extends Fragment {
 
@@ -34,20 +32,16 @@ public class PolicyFragment extends Fragment {
         String authTokenHeader = "jwt " + authToken;
         policyViewModel.fetchPolicies(authTokenHeader);
 
-        policyViewModel.getPolicyData().observe(getViewLifecycleOwner(), new Observer<PolicyResponse>() {
-            @Override
-            public void onChanged(PolicyResponse policyResponse) {
-                List<PoliciesItem> policies = policyResponse.getData().getPolicies();
-                PolicyAdapter adapter = new PolicyAdapter(policies);
-                binding.policyRecyclerView.setAdapter(adapter);
-                binding.policyRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            }
+        policyViewModel.getPolicyData().observe(getViewLifecycleOwner(), policyResponse -> {
+            List<PoliciesItem> policies = policyResponse.getData().getPolicies();
+            PolicyAdapter adapter = new PolicyAdapter(policies, requireContext());
+            binding.policyRecyclerView.setAdapter(adapter);
+            binding.policyRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         });
 
         binding = FragmentPolicyBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
 
-        return view;
+        return binding.getRoot();
 
     }
 
