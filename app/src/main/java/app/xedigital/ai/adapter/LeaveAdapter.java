@@ -96,10 +96,10 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
         }
 
         // Create dataset
-        PieDataSet dataSet = new PieDataSet(entries, "Leave Distribution");
+        PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(colors);
         dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueTextSize(10f);
+        dataSet.setValueTextSize(8f);
 
 
         // Create pie data object
@@ -109,7 +109,7 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
         pieChart.setData(pieData);
         pieChart.getDescription().setEnabled(false);
         pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleRadius(40f);
+        pieChart.setHoleRadius(35f);
         pieChart.setTransparentCircleRadius(45f);
         pieChart.animateXY(1000, 1000);
         pieChart.invalidate();

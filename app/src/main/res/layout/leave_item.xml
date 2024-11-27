@@ -6,60 +6,44 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
     app:cardBackgroundColor="@color/card_background"
-    app:strokeColor="@color/stroke_color"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:strokeColor="@color/stroke_color">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <!-- Header Section -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/leaveTypeText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/leaveTypeText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@android:color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="Annual Leave" />
-
-        </LinearLayout>
-
-
-    <!-- Pie Chart and Stats Container -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal">
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Annual Leave" />
 
         <!-- Pie Chart -->
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_weight="1"/>
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="12dp" />
 
         <!-- Stats Grid -->
         <GridLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:columnCount="2"
-            android:rowCount="3"
+            android:layout_marginTop="5dp"
             android:alignmentMode="alignBounds"
+            android:columnCount="3"
+            android:rowCount="3"
             android:useDefaultMargins="true">
 
-            <!-- Credited -->
+            <!-- Credited Card (Blue) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -103,7 +87,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Debited -->
+            <!-- Debited Card (Orange) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -147,7 +131,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Used -->
+            <!-- Used Card (Red) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -191,7 +175,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Balance -->
+            <!-- Balance Card (Green) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -235,7 +219,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Total -->
+            <!-- Total Card (Purple) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -279,7 +263,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </GridLayout>
-    </LinearLayout>
 
         <!-- Progress Bar -->
         <LinearLayout
