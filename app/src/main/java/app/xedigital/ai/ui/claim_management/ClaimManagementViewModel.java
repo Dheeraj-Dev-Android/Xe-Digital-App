@@ -3,12 +3,16 @@ package app.xedigital.ai.ui.claim_management;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
@@ -19,20 +23,58 @@ import retrofit2.Callback;
 public class ClaimManagementViewModel extends ViewModel {
     public final APIInterface apiInterface;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    String authToken;
-    int claimLength;
-
+    private final MutableLiveData<List<String>> meetingTypes = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> claimCategories = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> travelCategories = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> transportModes = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> sharedTransportModes = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> dedicatedTransportModes = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> currencyDropdown = new MutableLiveData<>();
+    public int claimLength;
 
     public ClaimManagementViewModel() {
         apiInterface = APIClient.getInstance().getClaimLength();
+        meetingTypes.setValue(Arrays.asList("Select an option", "Business", "Project", "Pre Sales"));
+        claimCategories.setValue(Arrays.asList("Select an option", "General", "Standard"));
+        travelCategories.setValue(Arrays.asList("Select an option", "Local", "Domestic", "International"));
+        transportModes.setValue(Arrays.asList("Select an option", "Shared", "Dedicated"));
+        sharedTransportModes.setValue(Arrays.asList("Select an option", "Auto", "Car", "E-Rickshaw", "Metro", "Others"));
+        dedicatedTransportModes.setValue(Arrays.asList("Select an option", "Two-Wheeler", "Three-Wheeler", "Others"));
+        currencyDropdown.setValue(Arrays.asList("Select an option", "INR", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SEK", "NZD"));
     }
 
+    // Getters for dropdown data (exposed as LiveData)
+    public LiveData<List<String>> getMeetingTypes() {
+        return meetingTypes;
+    }
+
+    public LiveData<List<String>> getClaimCategories() {
+        return claimCategories;
+    }
+
+    public LiveData<List<String>> getTravelCategories() {
+        return travelCategories;
+    }
+
+    public LiveData<List<String>> getTransportModes() {
+        return transportModes;
+    }
+
+    public LiveData<List<String>> getSharedTransportModes() {
+        return sharedTransportModes;
+    }
+
+    public LiveData<List<String>> getDedicatedTransportModes() {
+        return dedicatedTransportModes;
+    }
+
+    public LiveData<List<String>> getCurrencyDropdown() {
+        return currencyDropdown;
+    }
 
     public void getClaimLength(String authToken) {
         if (authToken != null) {
-            Log.d("ClaimManagementViewModel", "Auth Token: " + authToken.substring(0, 10) + "...");
             String authHeaderValue = "jwt " + authToken;
-
             apiInterface.getClaimLength(authHeaderValue).enqueue(new Callback<ClaimLengthResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<ClaimLengthResponse> call, @NonNull retrofit2.Response<ClaimLengthResponse> response) {
@@ -45,7 +87,6 @@ public class ClaimManagementViewModel extends ViewModel {
                             Log.e("ClaimLength", "Response body is null");
                         }
                     } else {
-                        // Handle error responses
                         try {
                             if (response.errorBody() != null) {
                                 String errorBody = response.errorBody().string();

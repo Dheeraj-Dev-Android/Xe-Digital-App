@@ -93,6 +93,11 @@ public class APIClient {
         return retrofit2.create(APIInterface.class);
     }
 
+    public APIInterface getEmployeeClaim() {
+        return retrofit2.create(APIInterface.class);
+    }
+
+
     public APIInterface UpdateRegularizeListApproval() {
         return retrofit2.create(APIInterface.class);
     }

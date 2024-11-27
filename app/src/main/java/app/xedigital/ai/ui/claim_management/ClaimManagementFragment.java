@@ -78,7 +78,6 @@ public class ClaimManagementFragment extends Fragment {
         binding = FragmentClaimManagementBinding.inflate(inflater, container, false);
 
         initializeCalendar();
-        setupDropdowns();
         setupDatePicker();
         setupButtons();
 
@@ -97,6 +96,41 @@ public class ClaimManagementFragment extends Fragment {
         binding.transportModeDedicatedLayout.setVisibility(View.GONE);
         binding.EnterTransportInputLayout.setVisibility(View.GONE);
 
+        // Observe dropdown data from ViewModel
+        claimManagementViewModel.getMeetingTypes().observe(getViewLifecycleOwner(), meetingTypes -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, meetingTypes);
+            binding.meetingTypeDropdown.setAdapter(adapter);
+        });
+
+        claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories);
+            binding.claimCategoryDropdown.setAdapter(adapter);
+        });
+
+        claimManagementViewModel.getTravelCategories().observe(getViewLifecycleOwner(), travelCategories -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, travelCategories);
+            binding.travelCategoryDropdown.setAdapter(adapter);
+        });
+
+        claimManagementViewModel.getTransportModes().observe(getViewLifecycleOwner(), transportModes -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, transportModes);
+            binding.transportModeDropdown.setAdapter(adapter);
+        });
+
+        claimManagementViewModel.getSharedTransportModes().observe(getViewLifecycleOwner(), sharedTransportModes -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, sharedTransportModes);
+            binding.transportModeShared.setAdapter(adapter);
+        });
+
+        claimManagementViewModel.getDedicatedTransportModes().observe(getViewLifecycleOwner(), dedicatedTransportModes -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, dedicatedTransportModes);
+            binding.transportModeDedicated.setAdapter(adapter);
+        });
+
+        claimManagementViewModel.getCurrencyDropdown().observe(getViewLifecycleOwner(), currencies -> {
+            CurrencyArrayAdapter currencyAdapter = new CurrencyArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, currencies);
+            binding.currencyDropdown.setAdapter(currencyAdapter);
+        });
 
         // Set ChipGroup listener with deprecation suppression
         expenseTypeChipGroup.setOnCheckedStateChangeListener(((chipGroup, checkedIds) -> {
@@ -222,34 +256,7 @@ public class ClaimManagementFragment extends Fragment {
                 binding.EnterTransportInputLayout.setVisibility(View.GONE);
             }
         }));
-//        binding.transportModeDropdown.post(() -> binding.transportModeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String selectedMode = parent.getItemAtPosition(position).toString();
-//
-//                // Show/Hide Views with Delay
-//                if (selectedMode.equals("Shared")) {
-//                    binding.transportModeSharedLayout.setVisibility(View.VISIBLE);
-//                    binding.transportModeDedicatedLayout.setVisibility(View.GONE);
-//                    binding.EnterTransportInputLayout.setVisibility(View.GONE);
-//                } else if (selectedMode.equals("Dedicated")) {
-//                    binding.transportModeSharedLayout.setVisibility(View.GONE);
-//                    binding.transportModeDedicatedLayout.setVisibility(View.VISIBLE);
-//                    binding.EnterTransportInputLayout.setVisibility(View.GONE);
-//                } else {
-//                    binding.transportModeSharedLayout.setVisibility(View.GONE);
-//                    binding.transportModeDedicatedLayout.setVisibility(View.GONE);
-//                    binding.EnterTransportInputLayout.setVisibility(View.GONE);
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//                binding.transportModeSharedLayout.setVisibility(View.GONE);
-//                binding.transportModeDedicatedLayout.setVisibility(View.GONE);
-//                binding.EnterTransportInputLayout.setVisibility(View.GONE);
-//            }
-//        }));
+
         binding.transportModeShared.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -303,163 +310,6 @@ public class ClaimManagementFragment extends Fragment {
     private void initializeCalendar() {
         calendar = Calendar.getInstance();
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-    }
-
-    private void setupDropdowns() {
-        // Meeting Type Dropdown
-        String[] meetingTypes = {"Select an option", "Business", "Project", "Pre Sales"};
-        //        ArrayAdapter<String> meetingAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, meetingTypes);
-        ArrayAdapter<String> meetingAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, meetingTypes) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Disable the first item ("Select an option")
-                return position != 0;
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position == 0) {
-                    // Set the text color to gray to indicate it's disabled
-                    TextView textView = (TextView) view;
-                    textView.setTextColor(getResources().getColor(R.color.shimmer_placeholder));
-                }
-                return view;
-            }
-        };
-        binding.meetingTypeDropdown.setAdapter(meetingAdapter);
-        binding.meetingTypeDropdown.setPrompt(getString(R.string.select_prompt));
-
-        //Claim Category Dropdown
-        String[] claimCategories = {"Select an option", "General", "Standard"};
-//        ArrayAdapter<String> claimCategoryAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories);
-        ArrayAdapter<String> claimCategoryAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Disable the first item ("Select an option")
-                return position != 0;
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position == 0) {
-                    // Set the text color to gray to indicate it's disabled
-                    TextView textView = (TextView) view;
-                    textView.setTextColor(getResources().getColor(R.color.shimmer_placeholder));
-                }
-                return view;
-            }
-        };
-        binding.claimCategoryDropdown.setAdapter(claimCategoryAdapter);
-        binding.claimCategoryDropdown.setPrompt(getString(R.string.select_prompt));
-
-        // Travel Category Dropdown
-        String[] travelCategories = {"Select an option", "Local", "Domestic", "International"};
-//        ArrayAdapter<String> travelCategoryAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, travelCategories);
-        ArrayAdapter<String> travelCategoryAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, travelCategories) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Disable the first item ("Select an option")
-                return position != 0;
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position == 0) {
-                    // Set the text color to gray to indicate it's disabled
-                    TextView textView = (TextView) view;
-                    textView.setTextColor(getResources().getColor(R.color.shimmer_placeholder));
-                }
-                return view;
-            }
-        };
-        binding.travelCategoryDropdown.setAdapter(travelCategoryAdapter);
-        binding.travelCategoryDropdown.setPrompt(getString(R.string.select_prompt));
-
-        // Transport Mode Dropdown
-        String[] transportModes = {"Select an option", "Shared", "Dedicated"};
-//        ArrayAdapter<String> transportAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, transportModes);
-        ArrayAdapter<String> transportAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, transportModes) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Disable the first item ("Select an option")
-                return position != 0;
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position == 0) {
-                    // Set the text color to gray to indicate it's disabled
-                    TextView textView = (TextView) view;
-                    textView.setTextColor(getResources().getColor(R.color.shimmer_placeholder));
-                }
-                return view;
-            }
-        };
-        binding.transportModeDropdown.setAdapter(transportAdapter);
-        binding.transportModeDropdown.setPrompt(getString(R.string.select_prompt));
-
-        // Shared Transport Mode Dropdown
-        String[] shared = {"Select an option", "Auto", "Car", "E-Rickshaw", "Metro", "Others"};
-//        ArrayAdapter<String> sharedAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, shared);
-        ArrayAdapter<String> sharedAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, shared) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Disable the first item ("Select an option")
-                return position != 0;
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position == 0) {
-                    // Set the text color to gray to indicate it's disabled
-                    TextView textView = (TextView) view;
-                    textView.setTextColor(getResources().getColor(R.color.shimmer_placeholder));
-                }
-                return view;
-            }
-        };
-        binding.transportModeShared.setAdapter(sharedAdapter);
-        binding.transportModeShared.setPrompt(getString(R.string.select_prompt));
-
-        // Dedicated Transport Mode Dropdown
-        String[] dedicated = {"Select an option", "Two-Wheeler", "Three-Wheeler", "Others"};
-//        ArrayAdapter<String> dedicatedAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, dedicated);
-        ArrayAdapter<String> dedicatedAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, dedicated) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Disable the first item ("Select an option")
-                return position != 0;
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position == 0) {
-                    // Set the text color to gray to indicate it's disabled
-                    TextView textView = (TextView) view;
-                    textView.setTextColor(getResources().getColor(R.color.shimmer_placeholder));
-                }
-                return view;
-            }
-        };
-        binding.transportModeDedicated.setAdapter(dedicatedAdapter);
-        binding.transportModeDedicated.setPrompt(getString(R.string.select_prompt));
-
-        // Currency Dropdown
-        String[] currencies = {"Select an option", "INR", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SEK", "NZD"};
-        CurrencyArrayAdapter currencyAdapter = new CurrencyArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, currencies);
-        binding.currencyDropdown.setAdapter(currencyAdapter);
     }
 
     private void setupDatePicker() {
