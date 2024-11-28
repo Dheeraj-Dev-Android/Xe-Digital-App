@@ -161,6 +161,7 @@ public class APIClient {
     public APIInterface ClaimSubmit() {
         return retrofit2.create(APIInterface.class);
     }
+    public APIInterface ClaimSave() {return  retrofit2.create(APIInterface.class);}
 }
 
 

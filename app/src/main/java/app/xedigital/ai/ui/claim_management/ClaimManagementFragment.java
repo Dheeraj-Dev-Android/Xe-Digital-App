@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,9 +26,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
@@ -50,7 +53,11 @@ import app.xedigital.ai.adapter.CurrencyArrayAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentClaimManagementBinding;
+import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
+import app.xedigital.ai.model.claimSubmit.ReportingManager;
+import app.xedigital.ai.model.profile.Employee;
+import app.xedigital.ai.ui.profile.ProfileViewModel;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -61,23 +68,6 @@ import retrofit2.Response;
 public class ClaimManagementFragment extends Fragment {
 
     private static final long MAX_FILE_SIZE_BYTES = 1024 * 1024;
-    //    private void updateSelectedFileText() {
-//        selectedFilesContainer.removeAllViews();
-//
-//        for (Uri uri : selectedFiles) {
-//            String fileName = getFileNameFromUri(uri);
-//            TextView textView = new TextView(requireContext());
-//            textView.setText(fileName);
-//            selectedFilesContainer.addView(textView);
-//        }
-//
-//        if (selectedFiles.isEmpty()) {
-//            binding.selectedFileText.setVisibility(View.GONE);
-//        } else {
-//            binding.selectedFileText.setVisibility(View.VISIBLE);
-//            binding.selectedFileText.setText("Selected " + selectedFiles.size() + " files:");
-//        }
-//    }
     private final List<Uri> processedFiles = new ArrayList<>();
     private FragmentClaimManagementBinding binding;
     private ClaimManagementViewModel claimManagementViewModel;
@@ -93,7 +83,8 @@ public class ClaimManagementFragment extends Fragment {
     private LinearLayout locationDetailsContainer;
     private String imageUrl, imageUrlOne, imageUrlTwo, imageUrlThree, imageUrlFour, imageUrlFive, imageUrlSix, imageUrlSeven, imageUrlEight, imageUrlNine;
     private String imageKey, imageKeyOne, imageKeyTwo, imageKeyThree, imageKeyFour, imageKeyFive, imageKeySix, imageKeySeven, imageKeyEight, imageKeyNine;
-    private String authToken;
+    private String authToken , userId;
+    private String employeeName,employeeId,employeeEmail,employeeLastName,empContact,empDesignation,empCode,empGrade,reportingManagerName,reportingManagerEmail,reportingManagerLastName,reportingManagerId;
     private String authTokenHeader;
 
     public static ClaimManagementFragment newInstance() {
@@ -106,6 +97,7 @@ public class ClaimManagementFragment extends Fragment {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         authTokenHeader = "jwt " + authToken;
+        userId = sharedPreferences.getString("userId","");
 
         claimManagementViewModel = new ViewModelProvider(this).get(ClaimManagementViewModel.class);
         claimManagementViewModel.getClaimLength(authToken);
@@ -156,9 +148,34 @@ public class ClaimManagementFragment extends Fragment {
         claimManagementViewModel = new ViewModelProvider(this).get(ClaimManagementViewModel.class);
         binding = FragmentClaimManagementBinding.inflate(inflater, container, false);
 
+        ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.storeLoginData(authToken, userId);
+        profileViewModel.fetchUserProfile();
+        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
+            // Null check before accessing Employee object
+            if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
+                Employee employee = userprofileResponse.getData().getEmployee();
+
+                employeeName = employee.getFirstname();
+                employeeEmail = employee.getEmail();
+                employeeLastName = employee.getLastname();
+                empContact = employee.getContact();
+                empDesignation = employee.getDesignation();
+                employeeId = employee.getId();
+                empCode = employee.getEmployeeCode();
+                empGrade = employee.getGrade();
+                reportingManagerId = employee.getReportingManager().getId();
+                reportingManagerEmail = employee.getReportingManager().getEmail();
+                reportingManagerName = employee.getReportingManager().getFirstname();
+                reportingManagerLastName = employee.getReportingManager().getLastname();
+
+
+            }
+        });
+
         initializeCalendar();
         setupDatePicker();
-        setupButtons();
+
 
         underProcessText = binding.underProcessText;
         expenseTypeChipGroup = binding.expenseTypeChipGroup;
@@ -166,6 +183,32 @@ public class ClaimManagementFragment extends Fragment {
         transportModeDropdownLayout = binding.transportModeDropdownLayout;
         locationDetailsContainer = binding.locationDetailsContainer;
         selectedFilesContainer = binding.selectedFilesContainer;
+
+        binding.uploadButton.setOnClickListener(v -> {
+            openFilePicker();
+            Toast.makeText(requireContext(), "Select Files to Upload", Toast.LENGTH_SHORT).show();
+        });
+
+        binding.saveButton.setOnClickListener(v -> {
+            Log.e("ClaimManagementFragment", "Save button clicked");
+            if (validateForm()) {
+                Log.d("ClaimManagementFragment", "Form validated, saving claim data");
+                saveClaimData();
+                Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.d("ClaimManagementFragment", "Form validation failed");
+            }
+        });
+
+        binding.submitButton.setOnClickListener(v -> {
+            Log.e("ClaimManagementFragment", "Submit button clicked");
+            if (validateForm()) {
+                submitClaimData();
+                Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
+            }else {
+                Log.d("ClaimManagementFragment", "Form validation failed");
+            }
+        });
 
         travelCategoryDropdownLayout.setVisibility(View.GONE);
         transportModeDropdownLayout.setVisibility(View.GONE);
@@ -256,34 +299,6 @@ public class ClaimManagementFragment extends Fragment {
         }));
 
         selectedFilesContainer = binding.selectedFilesContainer;
-//        filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-//            if (result.getResultCode() == Activity.RESULT_OK) {
-//                Intent data = result.getData();
-//                if (data != null) {
-//                    // Handle multiple files
-//                    if (data.getClipData() != null) {
-//                        ClipData clipData = data.getClipData();
-//                        for (int i = 0; i < clipData.getItemCount(); i++) {
-//                            ClipData.Item item = clipData.getItemAt(i);
-//                            Uri uri = item.getUri();
-//                            if (isValidFileSize(uri)) {
-//                                selectedFiles.add(uri);
-//                            } else {
-//                                Toast.makeText(requireContext(), "File size exceeds 1MB", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    } else if (data.getData() != null) {
-//                        Uri uri = data.getData();
-//                        if (isValidFileSize(uri)) {
-//                            selectedFiles.add(uri);
-//                        } else {
-//                            Toast.makeText(requireContext(), "File size exceeds 1MB", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                    updateSelectedFileText();
-//                }
-//            }
-//        });
         filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent data = result.getData();
@@ -1045,28 +1060,6 @@ public class ClaimManagementFragment extends Fragment {
         return false;
     }
 
-    private void setupButtons() {
-        binding.uploadButton.setOnClickListener(v -> {
-            openFilePicker();
-            Toast.makeText(requireContext(), "Select Files to Upload", Toast.LENGTH_SHORT).show();
-        });
-
-        binding.saveButton.setOnClickListener(v -> {
-            if (validateForm()) {
-                saveClaimData();
-                Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        binding.submitButton.setOnClickListener(v -> {
-            if (validateForm()) {
-                submitClaimData();
-                Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-
     private boolean validateForm() {
         boolean isValid = true;
         if (binding.claimDateInput.getText().toString().trim().isEmpty()) {
@@ -1128,13 +1121,7 @@ public class ClaimManagementFragment extends Fragment {
         } else {
             binding.transportModeDedicatedLayout.setError(null);
         }
-        // Validate Enter Transport Input
-        if (Objects.requireNonNull(binding.EnterTransportInput.getText()).toString().trim().isEmpty()) {
-            binding.EnterTransportInputLayout.setError("Please enter transport details");
-            isValid = false;
-        } else {
-            binding.EnterTransportInputLayout.setError(null);
-        }
+
 
         if (Objects.requireNonNull(binding.startLocationInput.getText()).toString().trim().isEmpty()) {
             binding.startLocationInputLayout.setError("Please enter start location");
@@ -1172,17 +1159,175 @@ public class ClaimManagementFragment extends Fragment {
     }
 
     private void saveClaimData() {
-        Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
+
+        ClaimSaveRequest claimSaveRequest = new ClaimSaveRequest();
+        app.xedigital.ai.model.claimSave.ReportingManager reportingManager = new app.xedigital.ai.model.claimSave.ReportingManager();
+        reportingManager.setId(reportingManagerId);
+        reportingManager.setFirstname(reportingManagerName);
+        reportingManager.setLastname(reportingManagerLastName);
+        reportingManager.setEmail(reportingManagerEmail);
+
+        claimSaveRequest.setEmployee(employeeId);
+        claimSaveRequest.setEmployeeCode(empCode);
+        claimSaveRequest.setEmail(employeeEmail);
+        claimSaveRequest.setFirstname(employeeName);
+        claimSaveRequest.setLastname(employeeLastName);
+        claimSaveRequest.setDesignation(empDesignation);
+        claimSaveRequest.setGrade(empGrade);
+        claimSaveRequest.setReportingManager(reportingManager);
+        claimSaveRequest.setReportingManagerName(reportingManagerName);
+        claimSaveRequest.setReportingManagerEmail(reportingManagerEmail);
+        claimSaveRequest.setClaimDate(binding.claimDateInput.getText().toString());
+        claimSaveRequest.setProject(binding.projectName.getText().toString());
+        claimSaveRequest.setFromaddress("");
+        claimSaveRequest.setToaddress("");
+        claimSaveRequest.setMeeting("");
+        claimSaveRequest.setPerposeofmeet(binding.purposeInput.getText().toString());
+        claimSaveRequest.setDistance("");
+        claimSaveRequest.setTotalClaim(claimManagementViewModel.claimLength);
+        claimSaveRequest.setCurrency("");
+        claimSaveRequest.setConfbutton(false);
+        claimSaveRequest.setModeofcal("");
+        claimSaveRequest.setTotalamount(binding.amountInput.getText().toString());
+        claimSaveRequest.setVarients("");
+        claimSaveRequest.setIsTravel(true);
+        claimSaveRequest.setTravelCategory("");
+        claimSaveRequest.setIsFood(false);
+        claimSaveRequest.setIsAccommodation(false);
+        claimSaveRequest.setIsMiscellaneous(false);
+        claimSaveRequest.setModeoftransport(binding.transportModeDropdown.getSelectedItem().toString());
+        claimSaveRequest.setShared("");
+        claimSaveRequest.setDedicated("");
+        claimSaveRequest.setIndividually("");
+        claimSaveRequest.setEmpTransport("");
+        claimSaveRequest.setRemark("");
+        claimSaveRequest.setImage("");
+        claimSaveRequest.setDocFileURL(imageUrl);
+        claimSaveRequest.setDocFileURLKey(imageKey);
+        claimSaveRequest.setImageOne("");
+        claimSaveRequest.setDocFileURLOne(imageUrlOne);
+        claimSaveRequest.setDocFileURLKeyOne(imageKeyOne);
+        claimSaveRequest.setImageTwo("");
+        claimSaveRequest.setDocFileURLTwo(imageUrlTwo);
+        claimSaveRequest.setDocFileURLKeyTwo(imageKeyTwo);
+        claimSaveRequest.setImageThree("");
+        claimSaveRequest.setDocFileURLThree(imageUrlThree);
+        claimSaveRequest.setDocFileURLKeyThree(imageKeyThree);
+        claimSaveRequest.setImageFour("");
+        claimSaveRequest.setDocFileURLFour(imageUrlFour);
+        claimSaveRequest.setDocFileURLKeyFour(imageKeyFour);
+        claimSaveRequest.setImageFive("");
+        claimSaveRequest.setDocFileURLFive(imageUrlFive);
+        claimSaveRequest.setDocFileURLKeyFive(imageKeyFive);
+        claimSaveRequest.setImageSix("");
+        claimSaveRequest.setDocFileURLSix(imageUrlSix);
+        claimSaveRequest.setDocFileURLKeySix(imageKeySix);
+        claimSaveRequest.setImageSeven("");
+        claimSaveRequest.setDocFileURLSeven(imageUrlSeven);
+        claimSaveRequest.setDocFileURLKeySeven(imageKeySeven);
+        claimSaveRequest.setImageEight("");
+        claimSaveRequest.setDocFileURLEight(imageUrlEight);
+        claimSaveRequest.setDocFileURLKeyEight(imageKeyEight);
+        claimSaveRequest.setImageNine("");
+        claimSaveRequest.setDocFileURLNine(imageUrlNine);
+        claimSaveRequest.setDocFileURLKeyNine(imageKeyNine);
+
+
+
+        Call<ResponseBody> call = APIClient.getInstance().ClaimSave().claimSave(authTokenHeader, claimSaveRequest);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Claim Saved successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("Claim Saved", "API request failed: " + response.code() + " " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                Log.e("Claim Saved", "API call failed: " + throwable.getMessage(), throwable);
+            }
+        });
+
     }
 
     private void submitClaimData() {
         // 1. Create ClaimUpdateRequest object
         ClaimUpdateRequest claimUpdateRequest = new ClaimUpdateRequest();
-        claimUpdateRequest.setEmployee("6627b3a47d05c52dad0d00d4");
-        claimUpdateRequest.setEmployeeCode("CTPL-097");
+        ReportingManager reportingManager = new ReportingManager();
+        reportingManager.setId(reportingManagerId);
+        reportingManager.setFirstname(reportingManagerName);
+        reportingManager.setLastname(reportingManagerLastName);
+        reportingManager.setEmail(reportingManagerEmail);
 
+
+        claimUpdateRequest.setEmployee(employeeId);
+        claimUpdateRequest.setEmployeeCode(empCode);
+        claimUpdateRequest.setEmail(employeeEmail);
+        claimUpdateRequest.setFirstname(employeeName);
+        claimUpdateRequest.setLastname(employeeLastName);
+        claimUpdateRequest.setDesignation(empDesignation);
+        claimUpdateRequest.setGrade(empGrade);
+        claimUpdateRequest.setReportingManager(reportingManager);
+        claimUpdateRequest.setReportingManagerName(reportingManagerName);
+        claimUpdateRequest.setReportingManagerEmail(reportingManagerEmail);
+        claimUpdateRequest.setClaimDate(binding.claimDateInput.getText().toString());
+        claimUpdateRequest.setProject(binding.projectName.getText().toString());
+        claimUpdateRequest.setFromaddress("");
+        claimUpdateRequest.setToaddress("");
+        claimUpdateRequest.setMeeting("");
+        claimUpdateRequest.setPerposeofmeet(binding.purposeInput.getText().toString());
+        claimUpdateRequest.setDistance("");
+        claimUpdateRequest.setTotalClaim(claimManagementViewModel.claimLength);
+        claimUpdateRequest.setCurrency("");
+        claimUpdateRequest.setConfbutton(false);
+        claimUpdateRequest.setModeofcal("");
+        claimUpdateRequest.setTotalamount(binding.amountInput.getText().toString());
+        claimUpdateRequest.setVarients("");
+        claimUpdateRequest.setIsTravel(true);
+        claimUpdateRequest.setTravelCategory("");
+        claimUpdateRequest.setIsFood(false);
+        claimUpdateRequest.setIsAccommodation(false);
+        claimUpdateRequest.setIsMiscellaneous(false);
+        claimUpdateRequest.setModeoftransport(binding.transportModeDropdown.getSelectedItem().toString());
+        claimUpdateRequest.setShared("");
+        claimUpdateRequest.setDedicated("");
+        claimUpdateRequest.setIndividually("");
+        claimUpdateRequest.setEmpTransport("");
+        claimUpdateRequest.setRemark("");
+        claimUpdateRequest.setImage("");
         claimUpdateRequest.setDocFileURL(imageUrl);
         claimUpdateRequest.setDocFileURLKey(imageKey);
+        claimUpdateRequest.setImageOne("");
+        claimUpdateRequest.setDocFileURLOne(imageUrlOne);
+        claimUpdateRequest.setDocFileURLKeyOne(imageKeyOne);
+        claimUpdateRequest.setImageTwo("");
+        claimUpdateRequest.setDocFileURLTwo(imageUrlTwo);
+        claimUpdateRequest.setDocFileURLKeyTwo(imageKeyTwo);
+        claimUpdateRequest.setImageThree("");
+        claimUpdateRequest.setDocFileURLThree(imageUrlThree);
+        claimUpdateRequest.setDocFileURLKeyThree(imageKeyThree);
+        claimUpdateRequest.setImageFour("");
+        claimUpdateRequest.setDocFileURLFour(imageUrlFour);
+        claimUpdateRequest.setDocFileURLKeyFour(imageKeyFour);
+        claimUpdateRequest.setImageFive("");
+        claimUpdateRequest.setDocFileURLFive(imageUrlFive);
+        claimUpdateRequest.setDocFileURLKeyFive(imageKeyFive);
+        claimUpdateRequest.setImageSix("");
+        claimUpdateRequest.setDocFileURLSix(imageUrlSix);
+        claimUpdateRequest.setDocFileURLKeySix(imageKeySix);
+        claimUpdateRequest.setImageSeven("");
+        claimUpdateRequest.setDocFileURLSeven(imageUrlSeven);
+        claimUpdateRequest.setDocFileURLKeySeven(imageKeySeven);
+        claimUpdateRequest.setImageEight("");
+        claimUpdateRequest.setDocFileURLEight(imageUrlEight);
+        claimUpdateRequest.setDocFileURLKeyEight(imageKeyEight);
+        claimUpdateRequest.setImageNine("");
+        claimUpdateRequest.setDocFileURLNine(imageUrlNine);
+        claimUpdateRequest.setDocFileURLKeyNine(imageKeyNine);
+
 
 
         Call<ResponseBody> call = APIClient.getInstance().ClaimSubmit().claimSubmit(authTokenHeader, claimUpdateRequest);
