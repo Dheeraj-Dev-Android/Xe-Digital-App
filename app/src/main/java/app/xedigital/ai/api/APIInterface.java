@@ -168,4 +168,7 @@ public interface APIInterface {
     @POST("images/add/bucket/claimNine")
     retrofit2.Call<ResponseBody> uploadImage9(@Header("Authorization") String token, @Body RequestBody requestBody);
 
+    @POST("claims")
+    retrofit2.Call<ResponseBody> claimSubmit(@Header("Authorization") String token, @Body RequestBody requestBody);
+
 }

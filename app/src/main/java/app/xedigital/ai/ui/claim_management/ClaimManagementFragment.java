@@ -60,18 +60,6 @@ import retrofit2.Response;
 public class ClaimManagementFragment extends Fragment {
 
     private static final long MAX_FILE_SIZE_BYTES = 1024 * 1024;
-    private FragmentClaimManagementBinding binding;
-    private ClaimManagementViewModel claimManagementViewModel;
-    private Calendar calendar;
-    private SimpleDateFormat dateFormatter;
-    private List<Uri> selectedFiles = new ArrayList<>();
-    private ActivityResultLauncher<Intent> filePickerLauncher;
-    private LinearLayout selectedFilesContainer;
-    private TextView underProcessText;
-    private ChipGroup expenseTypeChipGroup;
-    private TextInputLayout travelCategoryDropdownLayout;
-    private TextInputLayout transportModeDropdownLayout;
-    private LinearLayout locationDetailsContainer;
     //    private void updateSelectedFileText() {
 //        selectedFilesContainer.removeAllViews();
 //
@@ -90,12 +78,26 @@ public class ClaimManagementFragment extends Fragment {
 //        }
 //    }
     private final List<Uri> processedFiles = new ArrayList<>();
+    private FragmentClaimManagementBinding binding;
+    private ClaimManagementViewModel claimManagementViewModel;
+    private Calendar calendar;
+    private SimpleDateFormat dateFormatter;
+    private List<Uri> selectedFiles = new ArrayList<>();
+    private ActivityResultLauncher<Intent> filePickerLauncher;
+    private LinearLayout selectedFilesContainer;
+    private TextView underProcessText;
+    private ChipGroup expenseTypeChipGroup;
+    private TextInputLayout travelCategoryDropdownLayout;
+    private TextInputLayout transportModeDropdownLayout;
+    private LinearLayout locationDetailsContainer;
+    private String imageUrl, imageUrlOne, imageUrlTwo, imageUrlThree, imageUrlFour, imageUrlFive, imageUrlSix, imageUrlSeven, imageUrlEight, imageUrlNine;
+    private String imageKey, imageKeyOne, imageKeyTwo, imageKeyThree, imageKeyFour, imageKeyFive, imageKeySix, imageKeySeven, imageKeyEight, imageKeyNine;
     private String authToken;
+    private String authTokenHeader;
 
     public static ClaimManagementFragment newInstance() {
         return new ClaimManagementFragment();
     }
-    private String authTokenHeader;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -503,6 +505,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrl = dataObject.getString("imageUrl");
+                                imageKey = dataObject.getString("imageKey");
                                 Log.d("handleFile1 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -510,6 +516,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile1 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -545,6 +553,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlOne = dataObject.getString("imageUrlOne");
+                                imageKeyOne = dataObject.getString("imageKeyOne");
                                 Log.d("handleFile2 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -552,6 +564,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile2 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -588,6 +602,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) { // Use try-with-resources
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlTwo = dataObject.getString("imageUrlTwo");
+                                imageKeyTwo = dataObject.getString("imageKeyTwo");
                                 Log.d("handleFile3 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -595,6 +613,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile3 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -627,9 +647,13 @@ public class ClaimManagementFragment extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                     if (response.isSuccessful()) {
-                        try (ResponseBody responseBody = response.body()) { // Use try-with-resources
+                        try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlThree = dataObject.getString("imageUrlThree");
+                                imageKeyThree = dataObject.getString("imageKeyThree");
                                 Log.d("handleFile4 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -637,6 +661,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile4 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -673,6 +699,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlFour = dataObject.getString("imageUrlFour");
+                                imageKeyFour = dataObject.getString("imageKeyFour");
                                 Log.d("handleFile5 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -680,6 +710,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile5 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -716,6 +748,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlFive = dataObject.getString("imageUrlFive");
+                                imageKeyFive = dataObject.getString("imageKeyFive");
                                 Log.d("handleFile6 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -723,6 +759,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile6 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -758,6 +796,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlSix = dataObject.getString("imageUrlSix");
+                                imageKeySix = dataObject.getString("imageKeySix");
                                 Log.d("handleFile7 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -765,6 +807,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile7 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -801,6 +845,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlSeven = dataObject.getString("imageUrlSeven");
+                                imageKeySeven = dataObject.getString("imageKeySeven");
                                 Log.d("handleFile8 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -808,6 +856,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile8 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -844,6 +894,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlEight = dataObject.getString("imageUrlEight");
+                                imageKeyEight = dataObject.getString("imageKeyEight");
                                 Log.d("handleFile9 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -851,6 +905,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile9 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -887,6 +943,10 @@ public class ClaimManagementFragment extends Fragment {
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody != null) {
                                 String responseBodyString = responseBody.string();
+                                JSONObject jsonResponse = new JSONObject(responseBodyString);
+                                JSONObject dataObject = jsonResponse.getJSONObject("data");
+                                imageUrlNine = dataObject.getString("imageUrlNine");
+                                imageKeyNine = dataObject.getString("imageKeyNine");
                                 Log.d("handleFile10 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
@@ -894,6 +954,8 @@ public class ClaimManagementFragment extends Fragment {
                             }
                         } catch (IOException e) {
                             Log.e("handleFile10 Response", "Error reading response body: " + e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
