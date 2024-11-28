@@ -6,6 +6,7 @@ import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
+import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
@@ -169,6 +170,6 @@ public interface APIInterface {
     retrofit2.Call<ResponseBody> uploadImage9(@Header("Authorization") String token, @Body RequestBody requestBody);
 
     @POST("claims")
-    retrofit2.Call<ResponseBody> claimSubmit(@Header("Authorization") String token, @Body RequestBody requestBody);
+    retrofit2.Call<ResponseBody> claimSubmit(@Header("Authorization") String token, @Body ClaimUpdateRequest requestBody);
 
 }

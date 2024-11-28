@@ -157,6 +157,10 @@ public class APIClient {
     public APIInterface getUploadImage() {
         return retrofit2.create(APIInterface.class);
     }
+
+    public APIInterface ClaimSubmit() {
+        return retrofit2.create(APIInterface.class);
+    }
 }
 
 

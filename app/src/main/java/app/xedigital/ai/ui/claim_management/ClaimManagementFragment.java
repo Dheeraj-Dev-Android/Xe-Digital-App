@@ -50,6 +50,7 @@ import app.xedigital.ai.adapter.CurrencyArrayAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentClaimManagementBinding;
+import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -1029,23 +1030,6 @@ public class ClaimManagementFragment extends Fragment {
         return fileName;
     }
 
-    // Method to validate file size
-//    private boolean isValidFileSize(Uri fileUri) {
-//        try (Cursor cursor = requireContext().getContentResolver().query(fileUri, null, null, null, null)) {
-//            if (cursor != null && cursor.moveToFirst()) {
-//                // Use getColumnIndexOrThrow() to avoid potential errors
-//                int sizeIndex = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE);
-//                if (!cursor.isNull(sizeIndex)) {
-//                    long fileSize = cursor.getLong(sizeIndex);
-//                    return fileSize <= MAX_FILE_SIZE_BYTES;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-    // Helper function to check file size
     private boolean isValidFileSize(Uri uri) {
         try {
             Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null);
@@ -1192,7 +1176,31 @@ public class ClaimManagementFragment extends Fragment {
     }
 
     private void submitClaimData() {
-        Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
+        // 1. Create ClaimUpdateRequest object
+        ClaimUpdateRequest claimUpdateRequest = new ClaimUpdateRequest();
+        claimUpdateRequest.setEmployee("6627b3a47d05c52dad0d00d4");
+        claimUpdateRequest.setEmployeeCode("CTPL-097");
+
+        claimUpdateRequest.setDocFileURL(imageUrl);
+        claimUpdateRequest.setDocFileURLKey(imageKey);
+
+
+        Call<ResponseBody> call = APIClient.getInstance().ClaimSubmit().claimSubmit(authTokenHeader, claimUpdateRequest);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("Claim Submit", "API request failed: " + response.code() + " " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                Log.e("Claim Submit", "API call failed: " + throwable.getMessage(), throwable);
+            }
+        });
     }
 
     @Override
