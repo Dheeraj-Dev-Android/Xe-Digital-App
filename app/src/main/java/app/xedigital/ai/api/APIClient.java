@@ -153,6 +153,10 @@ public class APIClient {
     public APIInterface getPolicies() {
         return retrofit2.create(APIInterface.class);
     }
+
+    public APIInterface getUploadImage() {
+        return retrofit2.create(APIInterface.class);
+    }
 }
 
 

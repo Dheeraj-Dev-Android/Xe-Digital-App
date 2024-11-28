@@ -137,4 +137,35 @@ public interface APIInterface {
 
     @PUT("leaves/status/{managerId}")
     retrofit2.Call<ResponseBody> LeavesStatus(@Header("Authorization") String token, @Path("managerId") String managerId, @Body LeaveUpdateRequest requestBody);
+
+    @POST("images/add/bucket/claim")
+    retrofit2.Call<ResponseBody> uploadImage(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimOne")
+    retrofit2.Call<ResponseBody> uploadImage1(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimTwo")
+    retrofit2.Call<ResponseBody> uploadImage2(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimThree")
+    retrofit2.Call<ResponseBody> uploadImage3(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimFour")
+    retrofit2.Call<ResponseBody> uploadImage4(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimFive")
+    retrofit2.Call<ResponseBody> uploadImage5(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimSix")
+    retrofit2.Call<ResponseBody> uploadImage6(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimSeven")
+    retrofit2.Call<ResponseBody> uploadImage7(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimEight")
+    retrofit2.Call<ResponseBody> uploadImage8(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket/claimNine")
+    retrofit2.Call<ResponseBody> uploadImage9(@Header("Authorization") String token, @Body RequestBody requestBody);
+
 }
