@@ -1282,10 +1282,6 @@ public class ClaimManagementFragment extends Fragment {
         claimSaveRequest.setHrEmail(hrMail != null ? hrMail : "");
 
 
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .create();
-
         Call<ResponseBody> call = APIClient.getInstance().ClaimSave().claimSave(authTokenHeader, claimSaveRequest);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
