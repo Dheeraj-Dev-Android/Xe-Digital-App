@@ -21,6 +21,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 public class ClaimManagementViewModel extends ViewModel {
+
     public final APIInterface apiInterface;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final MutableLiveData<List<String>> meetingTypes = new MutableLiveData<>();
@@ -31,6 +32,7 @@ public class ClaimManagementViewModel extends ViewModel {
     private final MutableLiveData<List<String>> dedicatedTransportModes = new MutableLiveData<>();
     private final MutableLiveData<List<String>> currencyDropdown = new MutableLiveData<>();
     public int claimLength;
+    public String hrMail;
 
     public ClaimManagementViewModel() {
         apiInterface = APIClient.getInstance().getClaimLength();
@@ -55,6 +57,7 @@ public class ClaimManagementViewModel extends ViewModel {
     public LiveData<List<String>> getTravelCategories() {
         return travelCategories;
     }
+
 
     public LiveData<List<String>> getTransportModes() {
         return transportModes;
@@ -109,4 +112,5 @@ public class ClaimManagementViewModel extends ViewModel {
             Log.e("LeavesViewModel", "Auth Token is null");
         }
     }
+
 }

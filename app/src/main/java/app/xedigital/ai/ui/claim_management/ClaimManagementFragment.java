@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,14 +25,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,10 +52,12 @@ import app.xedigital.ai.adapter.CurrencyArrayAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentClaimManagementBinding;
+import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
 import app.xedigital.ai.model.claimSubmit.ReportingManager;
 import app.xedigital.ai.model.profile.Employee;
+import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -69,6 +70,8 @@ public class ClaimManagementFragment extends Fragment {
 
     private static final long MAX_FILE_SIZE_BYTES = 1024 * 1024;
     private final List<Uri> processedFiles = new ArrayList<>();
+    private static final String TAG = "LeavesFragment";
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private FragmentClaimManagementBinding binding;
     private ClaimManagementViewModel claimManagementViewModel;
     private Calendar calendar;
@@ -76,7 +79,7 @@ public class ClaimManagementFragment extends Fragment {
     private List<Uri> selectedFiles = new ArrayList<>();
     private ActivityResultLauncher<Intent> filePickerLauncher;
     private LinearLayout selectedFilesContainer;
-    private TextView underProcessText;
+    private TextView underProcessText, selectedEmpTransport;
     private ChipGroup expenseTypeChipGroup;
     private TextInputLayout travelCategoryDropdownLayout;
     private TextInputLayout transportModeDropdownLayout;
@@ -84,8 +87,12 @@ public class ClaimManagementFragment extends Fragment {
     private String imageUrl, imageUrlOne, imageUrlTwo, imageUrlThree, imageUrlFour, imageUrlFive, imageUrlSix, imageUrlSeven, imageUrlEight, imageUrlNine;
     private String imageKey, imageKeyOne, imageKeyTwo, imageKeyThree, imageKeyFour, imageKeyFive, imageKeySix, imageKeySeven, imageKeyEight, imageKeyNine;
     private String authToken , userId;
-    private String employeeName,employeeId,employeeEmail,employeeLastName,empContact,empDesignation,empCode,empGrade,reportingManagerName,reportingManagerEmail,reportingManagerLastName,reportingManagerId;
+    private String employeeName, employeeId, employeeEmail, employeeLastName, empDesignation, empCode, empGrade, reportingManagerName, reportingManagerEmail, reportingManagerLastName, reportingManagerId;
     private String authTokenHeader;
+    private String hrMail;
+    private ClaimSaveRequest claimSaveRequest;
+    private ClaimUpdateRequest claimUpdateRequest;
+    private String selectedTravelCategory, selectedSharedMode, selectedDedicatedMode, selectedMeetingType, TransportModeSelected, selectedClaimCategory, selectedCurrency;
 
     public static ClaimManagementFragment newInstance() {
         return new ClaimManagementFragment();
@@ -119,7 +126,7 @@ public class ClaimManagementFragment extends Fragment {
 
     private void initializeCalendar() {
         calendar = Calendar.getInstance();
-        dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
     private void setupDatePicker() {
@@ -149,17 +156,16 @@ public class ClaimManagementFragment extends Fragment {
         binding = FragmentClaimManagementBinding.inflate(inflater, container, false);
 
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        profileViewModel.storeLoginData(authToken, userId);
+        profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
+        callUserApi(userId, authToken);
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-            // Null check before accessing Employee object
+
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
-
                 employeeName = employee.getFirstname();
                 employeeEmail = employee.getEmail();
                 employeeLastName = employee.getLastname();
-                empContact = employee.getContact();
                 empDesignation = employee.getDesignation();
                 employeeId = employee.getId();
                 empCode = employee.getEmployeeCode();
@@ -169,9 +175,9 @@ public class ClaimManagementFragment extends Fragment {
                 reportingManagerName = employee.getReportingManager().getFirstname();
                 reportingManagerLastName = employee.getReportingManager().getLastname();
 
-
             }
         });
+        claimManagementViewModel.getClaimLength(authToken);
 
         initializeCalendar();
         setupDatePicker();
@@ -183,6 +189,8 @@ public class ClaimManagementFragment extends Fragment {
         transportModeDropdownLayout = binding.transportModeDropdownLayout;
         locationDetailsContainer = binding.locationDetailsContainer;
         selectedFilesContainer = binding.selectedFilesContainer;
+        selectedEmpTransport = binding.EnterTransportInput;
+
 
         binding.uploadButton.setOnClickListener(v -> {
             openFilePicker();
@@ -257,6 +265,7 @@ public class ClaimManagementFragment extends Fragment {
         // Set ChipGroup listener with deprecation suppression
         expenseTypeChipGroup.setOnCheckedStateChangeListener(((chipGroup, checkedIds) -> {
 //                Chip selectedChip = chipGroup.findViewById(checkedId.get(0));
+
             Chip selectedChip = null;
             for (Integer checkedId : checkedIds) {
                 selectedChip = chipGroup.findViewById(checkedId);
@@ -315,9 +324,6 @@ public class ClaimManagementFragment extends Fragment {
                                 // Throw an error or display an error message
                                 Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
                                 throw new IllegalStateException("File size exceeds 1MB: " + uri.toString());
-                                // or
-                                // Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
-                                // return; // Stop further processing
                             }
                         }
                     } else if (data.getData() != null) {
@@ -328,9 +334,6 @@ public class ClaimManagementFragment extends Fragment {
                             // Throw an error or display an error message
                             Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
                             throw new IllegalStateException("File size exceeds 1MB: " + uri.toString());
-                            // or
-
-                            // return; // Stop further processing
                         }
                     }
                     updateSelectedFileText();
@@ -341,13 +344,13 @@ public class ClaimManagementFragment extends Fragment {
         binding.transportModeDropdown.post(() -> binding.transportModeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedMode = parent.getItemAtPosition(position).toString();
-                Log.e("Selected Mode", selectedMode);
-                if (selectedMode.equals("Select Mode")) {
+                TransportModeSelected = parent.getItemAtPosition(position).toString();
+                Log.e("Selected Mode", TransportModeSelected);
+                if (TransportModeSelected.equals("Select Mode")) {
                     return;
                 }
 
-                if (selectedMode.equals("Shared")) {
+                if (TransportModeSelected.equals("Shared")) {
                     Log.d("Shared", "Shared");
                     Toast.makeText(requireContext(), "Shared", Toast.LENGTH_SHORT).show();
                     binding.transportModeSharedLayout.setVisibility(View.VISIBLE);
@@ -358,7 +361,7 @@ public class ClaimManagementFragment extends Fragment {
                         binding.transportModeSharedLayout.requestLayout();
                         binding.transportModeSharedLayout.invalidate();
                     });
-                } else if (selectedMode.equals("Dedicated")) {
+                } else if (TransportModeSelected.equals("Dedicated")) {
                     Log.d("Dedicated", "Dedicated");
                     Toast.makeText(requireContext(), "Dedicated", Toast.LENGTH_SHORT).show();
                     binding.transportModeSharedLayout.setVisibility(View.GONE);
@@ -392,8 +395,8 @@ public class ClaimManagementFragment extends Fragment {
         binding.transportModeShared.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedMode = parent.getItemAtPosition(position).toString();
-                if (selectedMode.equals("Others")) {
+                selectedSharedMode = parent.getItemAtPosition(position).toString();
+                if (selectedSharedMode.equals("Others")) {
                     binding.EnterTransportInputLayout.setVisibility(View.VISIBLE);
                 } else {
                     binding.EnterTransportInputLayout.setVisibility(View.GONE);
@@ -408,8 +411,8 @@ public class ClaimManagementFragment extends Fragment {
         binding.transportModeDedicated.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedMode = parent.getItemAtPosition(position).toString();
-                if (selectedMode.equals("Others")) {
+                selectedDedicatedMode = parent.getItemAtPosition(position).toString();
+                if (selectedDedicatedMode.equals("Others")) {
                     binding.EnterTransportInputLayout.setVisibility(View.VISIBLE);
                 } else {
                     binding.EnterTransportInputLayout.setVisibility(View.GONE);
@@ -421,6 +424,53 @@ public class ClaimManagementFragment extends Fragment {
                 binding.EnterTransportInputLayout.setVisibility(View.GONE);
             }
         });
+        binding.meetingTypeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedMeetingType = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle case where nothing is selected
+            }
+        });
+        binding.claimCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedClaimCategory = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle if nothing selected
+            }
+        });
+        binding.currencyDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCurrency = ((CurrencyArrayAdapter) parent.getAdapter()).getItem(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle if nothing selected
+            }
+        });
+
+        binding.travelCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedTravelCategory = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle if nothing selected
+            }
+        });
+
 
         return binding.getRoot();
     }
@@ -1122,7 +1172,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.transportModeDedicatedLayout.setError(null);
         }
 
-
         if (Objects.requireNonNull(binding.startLocationInput.getText()).toString().trim().isEmpty()) {
             binding.startLocationInputLayout.setError("Please enter start location");
             isValid = false;
@@ -1159,80 +1208,83 @@ public class ClaimManagementFragment extends Fragment {
     }
 
     private void saveClaimData() {
-
-        ClaimSaveRequest claimSaveRequest = new ClaimSaveRequest();
+        claimSaveRequest = new ClaimSaveRequest();
         app.xedigital.ai.model.claimSave.ReportingManager reportingManager = new app.xedigital.ai.model.claimSave.ReportingManager();
-        reportingManager.setId(reportingManagerId);
-        reportingManager.setFirstname(reportingManagerName);
-        reportingManager.setLastname(reportingManagerLastName);
-        reportingManager.setEmail(reportingManagerEmail);
+        reportingManager.setId(reportingManagerId != null ? reportingManagerId : "");
+        reportingManager.setFirstname(reportingManagerName != null ? reportingManagerName : "");
+        reportingManager.setLastname(reportingManagerLastName != null ? reportingManagerLastName : "");
+        reportingManager.setEmail(reportingManagerEmail != null ? reportingManagerEmail : "");
 
-        claimSaveRequest.setEmployee(employeeId);
-        claimSaveRequest.setEmployeeCode(empCode);
-        claimSaveRequest.setEmail(employeeEmail);
-        claimSaveRequest.setFirstname(employeeName);
-        claimSaveRequest.setLastname(employeeLastName);
-        claimSaveRequest.setDesignation(empDesignation);
-        claimSaveRequest.setGrade(empGrade);
+        claimSaveRequest.setEmployee(employeeId != null ? employeeId : "");
+        claimSaveRequest.setEmployeeCode(empCode != null ? empCode : "");
+        claimSaveRequest.setEmail(employeeEmail != null ? employeeEmail : "");
+        claimSaveRequest.setFirstname(employeeName != null ? employeeName : "");
+        claimSaveRequest.setLastname(employeeLastName != null ? employeeLastName : "");
+        claimSaveRequest.setDesignation(empDesignation != null ? empDesignation : "");
+        claimSaveRequest.setGrade(empGrade != null ? empGrade : "");
         claimSaveRequest.setReportingManager(reportingManager);
-        claimSaveRequest.setReportingManagerName(reportingManagerName);
-        claimSaveRequest.setReportingManagerEmail(reportingManagerEmail);
-        claimSaveRequest.setClaimDate(binding.claimDateInput.getText().toString());
-        claimSaveRequest.setProject(binding.projectName.getText().toString());
-        claimSaveRequest.setFromaddress("");
-        claimSaveRequest.setToaddress("");
-        claimSaveRequest.setMeeting("");
-        claimSaveRequest.setPerposeofmeet(binding.purposeInput.getText().toString());
+        claimSaveRequest.setReportingManagerName(reportingManagerName != null ? reportingManagerName : "");
+        claimSaveRequest.setReportingManagerEmail(reportingManagerEmail != null ? reportingManagerEmail : "");
+        claimSaveRequest.setClaimDate(binding.claimDateInput.getText().toString().isEmpty() ? "" : binding.claimDateInput.getText().toString());
+        claimSaveRequest.setProject(binding.projectName.getText().toString().isEmpty() ? "" : binding.projectName.getText().toString());
+        claimSaveRequest.setFromaddress(binding.startLocationInput.getText().toString().isEmpty() ? "" : binding.startLocationInput.getText().toString());
+        claimSaveRequest.setToaddress(binding.endLocationInput.getText().toString().isEmpty() ? "" : binding.endLocationInput.getText().toString());
+        claimSaveRequest.setMeeting(selectedMeetingType != null ? selectedMeetingType : "");
+        claimSaveRequest.setPerposeofmeet(binding.purposeInput.getText().toString().isEmpty() ? "" : binding.purposeInput.getText().toString());
         claimSaveRequest.setDistance("");
         claimSaveRequest.setTotalClaim(claimManagementViewModel.claimLength);
-        claimSaveRequest.setCurrency("");
+        claimSaveRequest.setCurrency(selectedCurrency != null ? selectedCurrency : "INR");
         claimSaveRequest.setConfbutton(false);
-        claimSaveRequest.setModeofcal("");
-        claimSaveRequest.setTotalamount(binding.amountInput.getText().toString());
+        claimSaveRequest.setModeofcal(selectedClaimCategory != null ? selectedClaimCategory : "");
+        claimSaveRequest.setTotalamount(binding.amountInput.getText().toString().isEmpty() ? "" : binding.amountInput.getText().toString());
         claimSaveRequest.setVarients("");
-        claimSaveRequest.setIsTravel(true);
-        claimSaveRequest.setTravelCategory("");
+        claimSaveRequest.setIsTravel(binding.claimCategoryDropdown.getSelectedItem().equals("Travel"));
+        claimSaveRequest.setTravelCategory(selectedTravelCategory != null ? selectedTravelCategory : "");
         claimSaveRequest.setIsFood(false);
         claimSaveRequest.setIsAccommodation(false);
         claimSaveRequest.setIsMiscellaneous(false);
-        claimSaveRequest.setModeoftransport(binding.transportModeDropdown.getSelectedItem().toString());
-        claimSaveRequest.setShared("");
-        claimSaveRequest.setDedicated("");
+        claimSaveRequest.setModeoftransport(binding.transportModeDropdown.getSelectedItem().toString().isEmpty() ? "" : binding.transportModeDropdown.getSelectedItem().toString());
+        claimSaveRequest.setShared(selectedSharedMode != null ? selectedSharedMode : "");
+        claimSaveRequest.setDedicated(selectedDedicatedMode != null ? selectedDedicatedMode : "");
         claimSaveRequest.setIndividually("");
-        claimSaveRequest.setEmpTransport("");
-        claimSaveRequest.setRemark("");
+        claimSaveRequest.setEmpTransport(selectedEmpTransport.getText().toString().isEmpty() ? "" : selectedEmpTransport.getText().toString());
+        claimSaveRequest.setRemark(binding.remarksInput.getText().toString().isEmpty() ? "" : binding.remarksInput.getText().toString());
         claimSaveRequest.setImage("");
-        claimSaveRequest.setDocFileURL(imageUrl);
-        claimSaveRequest.setDocFileURLKey(imageKey);
+        claimSaveRequest.setDocFileURL(imageUrl != null ? imageUrl : "");
+        claimSaveRequest.setDocFileURLKey(imageKey != null ? imageKey : "");
         claimSaveRequest.setImageOne("");
-        claimSaveRequest.setDocFileURLOne(imageUrlOne);
-        claimSaveRequest.setDocFileURLKeyOne(imageKeyOne);
+        claimSaveRequest.setDocFileURLOne(imageUrlOne != null ? imageUrlOne : "");
+        claimSaveRequest.setDocFileURLKeyOne(imageKeyOne != null ? imageKeyOne : "");
         claimSaveRequest.setImageTwo("");
-        claimSaveRequest.setDocFileURLTwo(imageUrlTwo);
-        claimSaveRequest.setDocFileURLKeyTwo(imageKeyTwo);
+        claimSaveRequest.setDocFileURLTwo(imageUrlTwo != null ? imageUrlTwo : "");
+        claimSaveRequest.setDocFileURLKeyTwo(imageKeyTwo != null ? imageKeyTwo : "");
         claimSaveRequest.setImageThree("");
-        claimSaveRequest.setDocFileURLThree(imageUrlThree);
-        claimSaveRequest.setDocFileURLKeyThree(imageKeyThree);
+        claimSaveRequest.setDocFileURLThree(imageUrlThree != null ? imageUrlThree : "");
+        claimSaveRequest.setDocFileURLKeyThree(imageKeyThree != null ? imageKeyThree : "");
         claimSaveRequest.setImageFour("");
-        claimSaveRequest.setDocFileURLFour(imageUrlFour);
-        claimSaveRequest.setDocFileURLKeyFour(imageKeyFour);
+        claimSaveRequest.setDocFileURLFour(imageUrlFour != null ? imageUrlFour : "");
+        claimSaveRequest.setDocFileURLKeyFour(imageKeyFour != null ? imageKeyFour : "");
         claimSaveRequest.setImageFive("");
-        claimSaveRequest.setDocFileURLFive(imageUrlFive);
-        claimSaveRequest.setDocFileURLKeyFive(imageKeyFive);
+        claimSaveRequest.setDocFileURLFive(imageUrlFive != null ? imageUrlFive : "");
+        claimSaveRequest.setDocFileURLKeyFive(imageKeyFive != null ? imageKeyFive : "");
         claimSaveRequest.setImageSix("");
-        claimSaveRequest.setDocFileURLSix(imageUrlSix);
-        claimSaveRequest.setDocFileURLKeySix(imageKeySix);
+        claimSaveRequest.setDocFileURLSix(imageUrlSix != null ? imageUrlSix : "");
+        claimSaveRequest.setDocFileURLKeySix(imageKeySix != null ? imageKeySix : "");
         claimSaveRequest.setImageSeven("");
-        claimSaveRequest.setDocFileURLSeven(imageUrlSeven);
-        claimSaveRequest.setDocFileURLKeySeven(imageKeySeven);
+        claimSaveRequest.setDocFileURLSeven(imageUrlSeven != null ? imageUrlSeven : "");
+        claimSaveRequest.setDocFileURLKeySeven(imageKeySeven != null ? imageKeySeven : "");
         claimSaveRequest.setImageEight("");
-        claimSaveRequest.setDocFileURLEight(imageUrlEight);
-        claimSaveRequest.setDocFileURLKeyEight(imageKeyEight);
+        claimSaveRequest.setDocFileURLEight(imageUrlEight != null ? imageUrlEight : "");
+        claimSaveRequest.setDocFileURLKeyEight(imageKeyEight != null ? imageKeyEight : "");
         claimSaveRequest.setImageNine("");
-        claimSaveRequest.setDocFileURLNine(imageUrlNine);
-        claimSaveRequest.setDocFileURLKeyNine(imageKeyNine);
+        claimSaveRequest.setDocFileURLNine(imageUrlNine != null ? imageUrlNine : "");
+        claimSaveRequest.setDocFileURLKeyNine(imageKeyNine != null ? imageKeyNine : "");
+        claimSaveRequest.setHrEmail(hrMail != null ? hrMail : "");
 
 
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .create();
 
         Call<ResponseBody> call = APIClient.getInstance().ClaimSave().claimSave(authTokenHeader, claimSaveRequest);
         call.enqueue(new Callback<ResponseBody>() {
@@ -1255,79 +1307,78 @@ public class ClaimManagementFragment extends Fragment {
 
     private void submitClaimData() {
         // 1. Create ClaimUpdateRequest object
-        ClaimUpdateRequest claimUpdateRequest = new ClaimUpdateRequest();
+        claimUpdateRequest = new ClaimUpdateRequest();
         ReportingManager reportingManager = new ReportingManager();
-        reportingManager.setId(reportingManagerId);
-        reportingManager.setFirstname(reportingManagerName);
-        reportingManager.setLastname(reportingManagerLastName);
-        reportingManager.setEmail(reportingManagerEmail);
+        reportingManager.setId(reportingManagerId != null ? reportingManagerId : "");
+        reportingManager.setFirstname(reportingManagerName != null ? reportingManagerName : "");
+        reportingManager.setLastname(reportingManagerLastName != null ? reportingManagerLastName : "");
+        reportingManager.setEmail(reportingManagerEmail != null ? reportingManagerEmail : "");
 
-
-        claimUpdateRequest.setEmployee(employeeId);
-        claimUpdateRequest.setEmployeeCode(empCode);
-        claimUpdateRequest.setEmail(employeeEmail);
-        claimUpdateRequest.setFirstname(employeeName);
-        claimUpdateRequest.setLastname(employeeLastName);
-        claimUpdateRequest.setDesignation(empDesignation);
-        claimUpdateRequest.setGrade(empGrade);
+        claimUpdateRequest.setEmployee(employeeId != null ? employeeId : "");
+        claimUpdateRequest.setEmployeeCode(empCode != null ? empCode : "");
+        claimUpdateRequest.setEmail(employeeEmail != null ? employeeEmail : "");
+        claimUpdateRequest.setFirstname(employeeName != null ? employeeName : "");
+        claimUpdateRequest.setLastname(employeeLastName != null ? employeeLastName : "");
+        claimUpdateRequest.setDesignation(empDesignation != null ? empDesignation : "");
+        claimUpdateRequest.setGrade(empGrade != null ? empGrade : "");
         claimUpdateRequest.setReportingManager(reportingManager);
-        claimUpdateRequest.setReportingManagerName(reportingManagerName);
-        claimUpdateRequest.setReportingManagerEmail(reportingManagerEmail);
-        claimUpdateRequest.setClaimDate(binding.claimDateInput.getText().toString());
-        claimUpdateRequest.setProject(binding.projectName.getText().toString());
-        claimUpdateRequest.setFromaddress("");
-        claimUpdateRequest.setToaddress("");
-        claimUpdateRequest.setMeeting("");
-        claimUpdateRequest.setPerposeofmeet(binding.purposeInput.getText().toString());
+        claimUpdateRequest.setReportingManagerName(reportingManagerName != null ? reportingManagerName : "");
+        claimUpdateRequest.setReportingManagerEmail(reportingManagerEmail != null ? reportingManagerEmail : "");
+        claimUpdateRequest.setClaimDate(binding.claimDateInput.getText().toString().isEmpty() ? "" : binding.claimDateInput.getText().toString());
+        claimUpdateRequest.setProject(binding.projectName.getText().toString().isEmpty() ? "" : binding.projectName.getText().toString());
+        claimUpdateRequest.setFromaddress(binding.startLocationInput.getText().toString().isEmpty() ? "" : binding.startLocationInput.getText().toString());
+        claimUpdateRequest.setToaddress(binding.endLocationInput.getText().toString().isEmpty() ? "" : binding.endLocationInput.getText().toString());
+        claimUpdateRequest.setMeeting(selectedMeetingType != null ? selectedMeetingType : "");
+        claimUpdateRequest.setPerposeofmeet(binding.purposeInput.getText().toString().isEmpty() ? "" : binding.purposeInput.getText().toString());
         claimUpdateRequest.setDistance("");
         claimUpdateRequest.setTotalClaim(claimManagementViewModel.claimLength);
-        claimUpdateRequest.setCurrency("");
+        claimUpdateRequest.setCurrency(selectedCurrency != null ? selectedCurrency : "INR");
         claimUpdateRequest.setConfbutton(false);
-        claimUpdateRequest.setModeofcal("");
-        claimUpdateRequest.setTotalamount(binding.amountInput.getText().toString());
+        claimUpdateRequest.setModeofcal(selectedClaimCategory != null ? selectedClaimCategory : "");
+        claimUpdateRequest.setTotalamount(binding.amountInput.getText().toString().isEmpty() ? "" : binding.amountInput.getText().toString());
         claimUpdateRequest.setVarients("");
-        claimUpdateRequest.setIsTravel(true);
-        claimUpdateRequest.setTravelCategory("");
+        claimUpdateRequest.setIsTravel(binding.claimCategoryDropdown.getSelectedItem().equals("Travel"));
+        claimUpdateRequest.setTravelCategory(selectedTravelCategory != null ? selectedTravelCategory : "");
         claimUpdateRequest.setIsFood(false);
         claimUpdateRequest.setIsAccommodation(false);
         claimUpdateRequest.setIsMiscellaneous(false);
-        claimUpdateRequest.setModeoftransport(binding.transportModeDropdown.getSelectedItem().toString());
-        claimUpdateRequest.setShared("");
-        claimUpdateRequest.setDedicated("");
+        claimUpdateRequest.setModeoftransport(binding.transportModeDropdown.getSelectedItem().toString().isEmpty() ? "" : binding.transportModeDropdown.getSelectedItem().toString());
+        claimUpdateRequest.setShared(selectedSharedMode != null ? selectedSharedMode : "");
+        claimUpdateRequest.setDedicated(selectedDedicatedMode != null ? selectedDedicatedMode : "");
         claimUpdateRequest.setIndividually("");
-        claimUpdateRequest.setEmpTransport("");
-        claimUpdateRequest.setRemark("");
+        claimUpdateRequest.setEmpTransport(selectedEmpTransport.getText().toString().isEmpty() ? "" : selectedEmpTransport.getText().toString());
+        claimUpdateRequest.setRemark(binding.remarksInput.getText().toString().isEmpty() ? "" : binding.remarksInput.getText().toString());
         claimUpdateRequest.setImage("");
-        claimUpdateRequest.setDocFileURL(imageUrl);
-        claimUpdateRequest.setDocFileURLKey(imageKey);
+        claimUpdateRequest.setDocFileURL(imageUrl != null ? imageUrl : "");
+        claimUpdateRequest.setDocFileURLKey(imageKey != null ? imageKey : "");
         claimUpdateRequest.setImageOne("");
-        claimUpdateRequest.setDocFileURLOne(imageUrlOne);
-        claimUpdateRequest.setDocFileURLKeyOne(imageKeyOne);
+        claimUpdateRequest.setDocFileURLOne(imageUrlOne != null ? imageUrlOne : "");
+        claimUpdateRequest.setDocFileURLKeyOne(imageKeyOne != null ? imageKeyOne : "");
         claimUpdateRequest.setImageTwo("");
-        claimUpdateRequest.setDocFileURLTwo(imageUrlTwo);
-        claimUpdateRequest.setDocFileURLKeyTwo(imageKeyTwo);
+        claimUpdateRequest.setDocFileURLTwo(imageUrlTwo != null ? imageUrlTwo : "");
+        claimUpdateRequest.setDocFileURLKeyTwo(imageKeyTwo != null ? imageKeyTwo : "");
         claimUpdateRequest.setImageThree("");
-        claimUpdateRequest.setDocFileURLThree(imageUrlThree);
-        claimUpdateRequest.setDocFileURLKeyThree(imageKeyThree);
+        claimUpdateRequest.setDocFileURLThree(imageUrlThree != null ? imageUrlThree : "");
+        claimUpdateRequest.setDocFileURLKeyThree(imageKeyThree != null ? imageKeyThree : "");
         claimUpdateRequest.setImageFour("");
-        claimUpdateRequest.setDocFileURLFour(imageUrlFour);
-        claimUpdateRequest.setDocFileURLKeyFour(imageKeyFour);
+        claimUpdateRequest.setDocFileURLFour(imageUrlFour != null ? imageUrlFour : "");
+        claimUpdateRequest.setDocFileURLKeyFour(imageKeyFour != null ? imageKeyFour : "");
         claimUpdateRequest.setImageFive("");
-        claimUpdateRequest.setDocFileURLFive(imageUrlFive);
-        claimUpdateRequest.setDocFileURLKeyFive(imageKeyFive);
+        claimUpdateRequest.setDocFileURLFive(imageUrlFive != null ? imageUrlFive : "");
+        claimUpdateRequest.setDocFileURLKeyFive(imageKeyFive != null ? imageKeyFive : "");
         claimUpdateRequest.setImageSix("");
-        claimUpdateRequest.setDocFileURLSix(imageUrlSix);
-        claimUpdateRequest.setDocFileURLKeySix(imageKeySix);
+        claimUpdateRequest.setDocFileURLSix(imageUrlSix != null ? imageUrlSix : "");
+        claimUpdateRequest.setDocFileURLKeySix(imageKeySix != null ? imageKeySix : "");
         claimUpdateRequest.setImageSeven("");
-        claimUpdateRequest.setDocFileURLSeven(imageUrlSeven);
-        claimUpdateRequest.setDocFileURLKeySeven(imageKeySeven);
+        claimUpdateRequest.setDocFileURLSeven(imageUrlSeven != null ? imageUrlSeven : "");
+        claimUpdateRequest.setDocFileURLKeySeven(imageKeySeven != null ? imageKeySeven : "");
         claimUpdateRequest.setImageEight("");
-        claimUpdateRequest.setDocFileURLEight(imageUrlEight);
-        claimUpdateRequest.setDocFileURLKeyEight(imageKeyEight);
+        claimUpdateRequest.setDocFileURLEight(imageUrlEight != null ? imageUrlEight : "");
+        claimUpdateRequest.setDocFileURLKeyEight(imageKeyEight != null ? imageKeyEight : "");
         claimUpdateRequest.setImageNine("");
-        claimUpdateRequest.setDocFileURLNine(imageUrlNine);
-        claimUpdateRequest.setDocFileURLKeyNine(imageKeyNine);
-
+        claimUpdateRequest.setDocFileURLNine(imageUrlNine != null ? imageUrlNine : "");
+        claimUpdateRequest.setDocFileURLKeyNine(imageKeyNine != null ? imageKeyNine : "");
+        claimUpdateRequest.setHrEmail(hrMail != null ? hrMail : "");
 
 
         Call<ResponseBody> call = APIClient.getInstance().ClaimSubmit().claimSubmit(authTokenHeader, claimUpdateRequest);
@@ -1344,6 +1395,57 @@ public class ClaimManagementFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Log.e("Claim Submit", "API call failed: " + throwable.getMessage(), throwable);
+            }
+        });
+    }
+
+
+    public void callUserApi(String userId, String authToken) {
+        String authHeaderValue = "jwt " + authToken;
+
+        Call<UserModelResponse> call = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
+        call.enqueue(new Callback<UserModelResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserModelResponse userResponse = response.body();
+                    String responseJson = gson.toJson(userResponse.getData());
+//                    Log.d(TAG, "Response: " + responseJson);
+                    String branchId = userResponse.getData().getBranch().getId();
+                    callBranchApi(branchId, authToken);
+                    Log.d(TAG, "Branch ID: " + branchId);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable throwable) {
+                Log.d(TAG, "onFailure: " + throwable.getMessage());
+            }
+        });
+    }
+
+    public void callBranchApi(String branchId, String authToken) {
+        String authHeaderValue = "jwt " + authToken;
+        Call<UserBranchResponse> branchCall = APIClient.getInstance().getBranch().getBranchData(branchId, authHeaderValue);
+        branchCall.enqueue(new Callback<UserBranchResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserBranchResponse> call, @NonNull Response<UserBranchResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        UserBranchResponse responseBranch = response.body();
+                        String responseString = gson.toJson(responseBranch);
+//                        Log.d("BranchData", "Response: " + responseString);
+                        hrMail = responseBranch.getData().getBranch().getNotificationEmail();
+                        Log.d("BranchData", "Notification Email: " + hrMail);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserBranchResponse> call, @NonNull Throwable throwable) {
+                Log.d("BranchData", "onFailure: " + throwable.getMessage());
             }
         });
     }
