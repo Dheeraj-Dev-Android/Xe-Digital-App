@@ -162,7 +162,6 @@ public class ClaimManagementFragment extends Fragment {
         profileViewModel.fetchUserProfile();
         callUserApi(userId, authToken);
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
                 employeeName = employee.getFirstname();
@@ -183,7 +182,6 @@ public class ClaimManagementFragment extends Fragment {
 
         initializeCalendar();
         setupDatePicker();
-
 
         underProcessText = binding.underProcessText;
         expenseTypeChipGroup = binding.expenseTypeChipGroup;
@@ -468,7 +466,6 @@ public class ClaimManagementFragment extends Fragment {
                 // Handle if nothing selected
             }
         });
-
         binding.travelCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -480,8 +477,6 @@ public class ClaimManagementFragment extends Fragment {
                 // Handle if nothing selected
             }
         });
-
-
         return binding.getRoot();
     }
 
@@ -1052,6 +1047,7 @@ public class ClaimManagementFragment extends Fragment {
 
     private String getBase64StringFromFile(Uri fileUri) throws IOException {
         InputStream inputStream = requireContext().getContentResolver().openInputStream(fileUri);
+        assert inputStream != null;
         byte[] bytes = getBytes(inputStream);
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
@@ -1097,6 +1093,7 @@ public class ClaimManagementFragment extends Fragment {
         }
         if (fileName == null) {
             fileName = uri.getPath();
+            assert fileName != null;
             int cut = fileName.lastIndexOf('/');
             if (cut != -1) {
                 fileName = fileName.substring(cut + 1);
@@ -1122,19 +1119,19 @@ public class ClaimManagementFragment extends Fragment {
 
     private boolean validateForm() {
         boolean isValid = true;
-        if (binding.claimDateInput.getText().toString().trim().isEmpty()) {
+        if (Objects.requireNonNull(binding.claimDateInput.getText()).toString().trim().isEmpty()) {
             binding.claimDateInput.setError("Please enter claim date");
             isValid = false;
         } else {
             binding.claimDateInput.setError(null);
         }
-        if (binding.projectName.getText().toString().trim().isEmpty()) {
+        if (Objects.requireNonNull(binding.projectName.getText()).toString().trim().isEmpty()) {
             binding.projectName.setError("Please enter project name");
             isValid = false;
         } else {
             binding.projectName.setError(null);
         }
-        if (binding.purposeInput.getText().toString().trim().isEmpty()) {
+        if (Objects.requireNonNull(binding.purposeInput.getText()).toString().trim().isEmpty()) {
             binding.purposeInput.setError("Please enter purpose of meeting");
             isValid = false;
         } else {
@@ -1217,6 +1214,27 @@ public class ClaimManagementFragment extends Fragment {
         return isValid;
     }
 
+    private void clearForm() {
+        binding.claimDateInput.setText("");
+        binding.projectName.setText("");
+        binding.purposeInput.setText("");
+        binding.meetingTypeDropdown.setSelection(0);
+        binding.claimCategoryDropdown.setSelection(0);
+        binding.travelCategoryDropdown.setSelection(0);
+        binding.transportModeDropdown.setSelection(0);
+        binding.transportModeShared.setSelection(0);
+        binding.transportModeDedicated.setSelection(0);
+        binding.startLocationInput.setText("");
+        binding.endLocationInput.setText("");
+        binding.amountInput.setText("");
+        binding.remarksInput.setText("");
+
+        // Assuming selectedEmpTransport is a TextView or EditText
+        if (selectedEmpTransport != null) {
+            selectedEmpTransport.setText("");
+        }
+    }
+
     private void saveClaimData() {
         claimSaveRequest = new ClaimSaveRequest();
         app.xedigital.ai.model.claimSave.ReportingManager reportingManager = new app.xedigital.ai.model.claimSave.ReportingManager();
@@ -1235,18 +1253,18 @@ public class ClaimManagementFragment extends Fragment {
         claimSaveRequest.setReportingManager(reportingManager);
         claimSaveRequest.setReportingManagerName(reportingManagerName != null ? reportingManagerName : "");
         claimSaveRequest.setReportingManagerEmail(reportingManagerEmail != null ? reportingManagerEmail : "");
-        claimSaveRequest.setClaimDate(binding.claimDateInput.getText().toString().isEmpty() ? "" : binding.claimDateInput.getText().toString());
-        claimSaveRequest.setProject(binding.projectName.getText().toString().isEmpty() ? "" : binding.projectName.getText().toString());
-        claimSaveRequest.setFromaddress(binding.startLocationInput.getText().toString().isEmpty() ? "" : binding.startLocationInput.getText().toString());
-        claimSaveRequest.setToaddress(binding.endLocationInput.getText().toString().isEmpty() ? "" : binding.endLocationInput.getText().toString());
+        claimSaveRequest.setClaimDate(Objects.requireNonNull(binding.claimDateInput.getText()).toString().isEmpty() ? "" : binding.claimDateInput.getText().toString());
+        claimSaveRequest.setProject(Objects.requireNonNull(binding.projectName.getText()).toString().isEmpty() ? "" : binding.projectName.getText().toString());
+        claimSaveRequest.setFromaddress(Objects.requireNonNull(binding.startLocationInput.getText()).toString().isEmpty() ? "" : binding.startLocationInput.getText().toString());
+        claimSaveRequest.setToaddress(Objects.requireNonNull(binding.endLocationInput.getText()).toString().isEmpty() ? "" : binding.endLocationInput.getText().toString());
         claimSaveRequest.setMeeting(selectedMeetingType != null ? selectedMeetingType : "");
-        claimSaveRequest.setPerposeofmeet(binding.purposeInput.getText().toString().isEmpty() ? "" : binding.purposeInput.getText().toString());
+        claimSaveRequest.setPerposeofmeet(Objects.requireNonNull(binding.purposeInput.getText()).toString().isEmpty() ? "" : binding.purposeInput.getText().toString());
         claimSaveRequest.setDistance("");
         claimSaveRequest.setTotalClaim(claimManagementViewModel.claimLength);
         claimSaveRequest.setCurrency(selectedCurrency != null ? selectedCurrency : "INR");
         claimSaveRequest.setConfbutton(false);
         claimSaveRequest.setModeofcal(selectedClaimCategory != null ? selectedClaimCategory : "");
-        claimSaveRequest.setTotalamount(binding.amountInput.getText().toString().isEmpty() ? "" : binding.amountInput.getText().toString());
+        claimSaveRequest.setTotalamount(Objects.requireNonNull(binding.amountInput.getText()).toString().isEmpty() ? "" : binding.amountInput.getText().toString());
         claimSaveRequest.setVarients("");
         claimSaveRequest.setIsTravel(binding.claimCategoryDropdown.getSelectedItem().equals("Travel"));
         claimSaveRequest.setTravelCategory(selectedTravelCategory != null ? selectedTravelCategory : "");
@@ -1258,7 +1276,7 @@ public class ClaimManagementFragment extends Fragment {
         claimSaveRequest.setDedicated(selectedDedicatedMode != null ? selectedDedicatedMode : "");
         claimSaveRequest.setIndividually("");
         claimSaveRequest.setEmpTransport(selectedEmpTransport.getText().toString().isEmpty() ? "" : selectedEmpTransport.getText().toString());
-        claimSaveRequest.setRemark(binding.remarksInput.getText().toString().isEmpty() ? "" : binding.remarksInput.getText().toString());
+        claimSaveRequest.setRemark(Objects.requireNonNull(binding.remarksInput.getText()).toString().isEmpty() ? "" : binding.remarksInput.getText().toString());
         claimSaveRequest.setImage("");
         claimSaveRequest.setDocFileURL(imageUrl != null ? imageUrl : "");
         claimSaveRequest.setDocFileURLKey(imageKey != null ? imageKey : "");
@@ -1297,6 +1315,7 @@ public class ClaimManagementFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    clearForm();
                     Toast.makeText(requireContext(), "Claim Saved successfully", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.e("Claim Saved", "API request failed: " + response.code() + " " + response.message());
@@ -1330,18 +1349,18 @@ public class ClaimManagementFragment extends Fragment {
         claimUpdateRequest.setReportingManager(reportingManager);
         claimUpdateRequest.setReportingManagerName(reportingManagerName != null ? reportingManagerName : "");
         claimUpdateRequest.setReportingManagerEmail(reportingManagerEmail != null ? reportingManagerEmail : "");
-        claimUpdateRequest.setClaimDate(binding.claimDateInput.getText().toString().isEmpty() ? "" : binding.claimDateInput.getText().toString());
-        claimUpdateRequest.setProject(binding.projectName.getText().toString().isEmpty() ? "" : binding.projectName.getText().toString());
-        claimUpdateRequest.setFromaddress(binding.startLocationInput.getText().toString().isEmpty() ? "" : binding.startLocationInput.getText().toString());
-        claimUpdateRequest.setToaddress(binding.endLocationInput.getText().toString().isEmpty() ? "" : binding.endLocationInput.getText().toString());
+        claimUpdateRequest.setClaimDate(Objects.requireNonNull(binding.claimDateInput.getText()).toString().isEmpty() ? "" : binding.claimDateInput.getText().toString());
+        claimUpdateRequest.setProject(Objects.requireNonNull(binding.projectName.getText()).toString().isEmpty() ? "" : binding.projectName.getText().toString());
+        claimUpdateRequest.setFromaddress(Objects.requireNonNull(binding.startLocationInput.getText()).toString().isEmpty() ? "" : binding.startLocationInput.getText().toString());
+        claimUpdateRequest.setToaddress(Objects.requireNonNull(binding.endLocationInput.getText()).toString().isEmpty() ? "" : binding.endLocationInput.getText().toString());
         claimUpdateRequest.setMeeting(selectedMeetingType != null ? selectedMeetingType : "");
-        claimUpdateRequest.setPerposeofmeet(binding.purposeInput.getText().toString().isEmpty() ? "" : binding.purposeInput.getText().toString());
+        claimUpdateRequest.setPerposeofmeet(Objects.requireNonNull(binding.purposeInput.getText()).toString().isEmpty() ? "" : binding.purposeInput.getText().toString());
         claimUpdateRequest.setDistance("");
         claimUpdateRequest.setTotalClaim(claimManagementViewModel.claimLength);
         claimUpdateRequest.setCurrency(selectedCurrency != null ? selectedCurrency : "INR");
         claimUpdateRequest.setConfbutton(false);
         claimUpdateRequest.setModeofcal(selectedClaimCategory != null ? selectedClaimCategory : "");
-        claimUpdateRequest.setTotalamount(binding.amountInput.getText().toString().isEmpty() ? "" : binding.amountInput.getText().toString());
+        claimUpdateRequest.setTotalamount(Objects.requireNonNull(binding.amountInput.getText()).toString().isEmpty() ? "" : binding.amountInput.getText().toString());
         claimUpdateRequest.setVarients("");
         claimUpdateRequest.setIsTravel(binding.claimCategoryDropdown.getSelectedItem().equals("Travel"));
         claimUpdateRequest.setTravelCategory(selectedTravelCategory != null ? selectedTravelCategory : "");
@@ -1353,7 +1372,7 @@ public class ClaimManagementFragment extends Fragment {
         claimUpdateRequest.setDedicated(selectedDedicatedMode != null ? selectedDedicatedMode : "");
         claimUpdateRequest.setIndividually("");
         claimUpdateRequest.setEmpTransport(selectedEmpTransport.getText().toString().isEmpty() ? "" : selectedEmpTransport.getText().toString());
-        claimUpdateRequest.setRemark(binding.remarksInput.getText().toString().isEmpty() ? "" : binding.remarksInput.getText().toString());
+        claimUpdateRequest.setRemark(Objects.requireNonNull(binding.remarksInput.getText()).toString().isEmpty() ? "" : binding.remarksInput.getText().toString());
         claimUpdateRequest.setImage("");
         claimUpdateRequest.setDocFileURL(imageUrl != null ? imageUrl : "");
         claimUpdateRequest.setDocFileURLKey(imageKey != null ? imageKey : "");
@@ -1392,6 +1411,7 @@ public class ClaimManagementFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    clearForm();
                     Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.e("Claim Submit", "API request failed: " + response.code() + " " + response.message());
