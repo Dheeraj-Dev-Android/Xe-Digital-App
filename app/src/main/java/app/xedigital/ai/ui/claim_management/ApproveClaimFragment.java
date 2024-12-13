@@ -81,6 +81,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         recyclerView = view.findViewById(R.id.claimsApproveRecyclerView);
         filterButton = view.findViewById(R.id.filterButton);
         loadingProgress = view.findViewById(R.id.loadingProgress);
@@ -92,7 +93,6 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         approveClaimAdapter = new ApproveClaimAdapter(claimList);
         approveClaimAdapter.setOnClaimClickListener(this);
         recyclerView.setAdapter(approveClaimAdapter);
-
 
         fromDateEditText.setOnClickListener(v -> showDatePickerDialog(fromDateEditText));
 
