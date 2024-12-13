@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    tools:context=".ui.claim_management.ApproveClaimDetailsFragment">
+
+
+    <!-- Main Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@color/background_light"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp">
+
+            <!-- Claim Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/claimDetailsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Claim Information"
+                        android:textColor="@color/primary_color"
+                        android:textSize="@dimen/header_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtClaimId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="Claim identification number"
+                        android:importantForAccessibility="yes"
+                        android:text="Claim ID: CL-2024-001"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtProjectName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Project Name: Marketing Campaign"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtMeetingType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Meeting Type: Client Meeting"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtPurposeOfMeeting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Purpose: Quarterly Review"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtComment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Comment: Travel for client meeting"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Travel Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/travelDetailsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Travel Details"
+                        android:textColor="@color/primary_color"
+                        android:textSize="@dimen/header_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTravelCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Travel Category: Business"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtModeOfTransport"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Mode of Transport: Flight"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtFromTo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Route: Mumbai to Delhi"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtDistance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Distance: 1200 Km"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Financial Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/financialDetailsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Financial Details"
+                        android:textColor="@color/primary_color"
+                        android:textSize="@dimen/header_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTotalAmount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total Amount: ₹15,000"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Status Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/statusDetailsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Status Details"
+                        android:textColor="@color/primary_color"
+                        android:textSize="@dimen/header_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtAppliedDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Applied Date: 15 Jan 2024"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Status: "
+                        android:textColor="@color/approved_color"
+                        android:textSize="@dimen/body_text_size" />
+
+                    <TextView
+                        android:id="@+id/txtStatusDetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Status RM: Approved | Status HR: Processed"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/body_text_size" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnDocumentView"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="View Documents"
+                    android:src="@drawable/ic_document" />
+
+                <!--                <ImageButton-->
+                <!--                    android:id="@+id/btnPrintClaim"-->
+                <!--                    android:layout_width="56dp"-->
+                <!--                    android:layout_height="56dp"-->
+                <!--                    android:background="?attr/selectableItemBackgroundBorderless"-->
+                <!--                    android:contentDescription="Print Claim"-->
+                <!--                    android:src="@drawable/ic_print" />-->
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

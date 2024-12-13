@@ -2,18 +2,33 @@ package app.xedigital.ai.model.employeeClaim;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class EmployeeClaimResponse {
 
-    @SerializedName("employeeClaimdata")
-    private List<EmployeeClaimdataItem> employeeClaimdata;
+    @SerializedName("data")
+    private Data data;
 
-    public List<EmployeeClaimdataItem> getEmployeeClaimdata() {
-        return employeeClaimdata;
+    @SerializedName("success")
+    private boolean success;
+
+    @SerializedName("message")
+    private String message;
+
+    @SerializedName("statusCode")
+    private int statusCode;
+
+    public Data getData() {
+        return data;
     }
 
-    public void setEmployeeClaimdata(List<EmployeeClaimdataItem> employeeClaimdata) {
-        this.employeeClaimdata = employeeClaimdata;
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
     }
 }

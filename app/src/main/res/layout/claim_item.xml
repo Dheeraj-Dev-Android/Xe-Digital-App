@@ -3,9 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:strokeColor="@color/stroke_color"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,80 +16,116 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header Section -->
-        <LinearLayout
+        <!-- Header Section with Improved Layout -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:id="@+id/claimIdText"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:text="Claim ID: CL001"
                 android:textSize="16sp"
+                android:textColor="@color/primary_text_color"
                 android:textStyle="bold" />
+
 
             <TextView
                 android:id="@+id/statusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:background="@drawable/status_background"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
                 android:text="Pending"
-                android:textColor="@color/color_white" />
-        </LinearLayout>
+                android:textColor="@color/color_white"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
-        <!-- Project Details -->
-        <TextView
-            android:id="@+id/projectNameText"
-            style="@style/ClaimDetailText"
-            android:text="Project: Project Name" />
-
-        <!-- Meeting Details -->
-        <TextView
-            android:id="@+id/meetingTypeText"
-            style="@style/ClaimDetailText"
-            android:text="Meeting Type: Regular" />
-
-        <TextView
-            android:id="@+id/purposeText"
-            style="@style/ClaimDetailText"
-            android:text="Purpose: Team Discussion" />
-
-        <!-- Travel Details -->
-        <TextView
-            android:id="@+id/travelDetailsText"
-            style="@style/ClaimDetailText"
-            android:text="Travel: Car - Mumbai to Pune (150 Km)" />
-
-        <!-- Amount -->
-        <TextView
-            android:id="@+id/amountText"
+        <!-- Details Section with Icons -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="₹ 1,500"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginBottom="8dp"
+            android:gravity="start"
+            android:orientation="vertical">
 
-        <!-- Action Buttons -->
+            <TextView
+                android:id="@+id/claimDateText"
+                style="@style/ClaimDetailTextWithIcon"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/statusText"
+                android:drawableStart="@drawable/ic_calendar"
+                android:text="Claim Date : 12 Dec 2024" />
+
+            <TextView
+                android:id="@+id/projectNameText"
+                style="@style/ClaimDetailTextWithIcon"
+                android:drawableStart="@drawable/ic_project"
+                android:text="Project: Project Name" />
+
+            <TextView
+                android:id="@+id/meetingTypeText"
+                style="@style/ClaimDetailTextWithIcon"
+                android:drawableStart="@drawable/ic_meeting"
+                android:text="Meeting Type: Regular" />
+
+            <TextView
+                android:id="@+id/purposeText"
+                style="@style/ClaimDetailTextWithIcon"
+                android:drawableStart="@drawable/ic_purpose"
+                android:text="Purpose: Team Discussion" />
+
+        </LinearLayout>
+
+        <!-- Amount Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/amountText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="₹ 1,500"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Action Buttons with Improved Styling -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/viewDetailsButton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="8dp"
                 android:text="View Details" />
 
             <com.google.android.material.button.MaterialButton
@@ -97,5 +136,6 @@
                 android:layout_weight="1"
                 android:text="Take Action" />
         </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

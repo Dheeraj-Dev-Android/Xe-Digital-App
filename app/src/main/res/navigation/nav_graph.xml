@@ -247,7 +247,42 @@
         <action
             android:id="@+id/action_nav_claim_management_to_nav_shifts"
             app:destination="@id/nav_shifts" />
+        <action
+            android:id="@+id/action_nav_claim_management_to_nav_view_claim"
+            app:destination="@id/nav_view_claim" />
+        <action
+            android:id="@+id/action_nav_claim_management_to_nav_approve_claim"
+            app:destination="@id/nav_approve_claim" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_view_claim"
+        android:name="app.xedigital.ai.ui.claim_management.ViewClaimFragment"
+        android:label="View Claim"
+        tools:layout="@layout/fragment_view_claim">
+        <action
+            android:id="@+id/action_nav_view_claim_to_nav_claim_details"
+            app:destination="@id/nav_claim_details" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/nav_claim_details"
+        android:name="app.xedigital.ai.ui.claim_management.ClaimDetailsFragment"
+        android:label="Claim Details"
+        tools:layout="@layout/fragment_claim_details" />
+    <fragment
+        android:id="@+id/nav_approve_claim"
+        android:name="app.xedigital.ai.ui.claim_management.ApproveClaimFragment"
+        android:label="Approve Claim"
+        tools:layout="@layout/fragment_approve_claim">
+        <action
+            android:id="@+id/action_nav_approve_claim_to_nav_approve_claim_details"
+            app:destination="@id/nav_approve_claim_details" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_approve_claim_details"
+        android:name="app.xedigital.ai.ui.claim_management.ApproveClaimDetailsFragment"
+        android:label="Approve Claim Details"
+        tools:layout="@layout/fragment_approve_claim_details" />
 
     <fragment
         android:id="@+id/nav_payroll"

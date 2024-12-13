@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.leanback)
     implementation(libs.rendering)
     implementation(libs.ui.text.android)
+    implementation(libs.firebase.vertexai)
 //    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -90,4 +91,5 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
     implementation("com.google.mlkit:face-detection:16.1.5")
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
 }

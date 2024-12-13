@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -69,8 +70,8 @@ import retrofit2.Response;
 public class ClaimManagementFragment extends Fragment {
 
     private static final long MAX_FILE_SIZE_BYTES = 1024 * 1024;
-    private final List<Uri> processedFiles = new ArrayList<>();
     private static final String TAG = "LeavesFragment";
+    private final List<Uri> processedFiles = new ArrayList<>();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private FragmentClaimManagementBinding binding;
     private ClaimManagementViewModel claimManagementViewModel;
@@ -86,10 +87,11 @@ public class ClaimManagementFragment extends Fragment {
     private LinearLayout locationDetailsContainer;
     private String imageUrl, imageUrlOne, imageUrlTwo, imageUrlThree, imageUrlFour, imageUrlFive, imageUrlSix, imageUrlSeven, imageUrlEight, imageUrlNine;
     private String imageKey, imageKeyOne, imageKeyTwo, imageKeyThree, imageKeyFour, imageKeyFive, imageKeySix, imageKeySeven, imageKeyEight, imageKeyNine;
-    private String authToken , userId;
+    private String authToken, userId;
     private String employeeName, employeeId, employeeEmail, employeeLastName, empDesignation, empCode, empGrade, reportingManagerName, reportingManagerEmail, reportingManagerLastName, reportingManagerId;
     private String authTokenHeader;
     private String hrMail;
+    private Chip viewClaimChip;
     private ClaimSaveRequest claimSaveRequest;
     private ClaimUpdateRequest claimUpdateRequest;
     private String selectedTravelCategory, selectedSharedMode, selectedDedicatedMode, selectedMeetingType, TransportModeSelected, selectedClaimCategory, selectedCurrency;
@@ -104,7 +106,7 @@ public class ClaimManagementFragment extends Fragment {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         authTokenHeader = "jwt " + authToken;
-        userId = sharedPreferences.getString("userId","");
+        userId = sharedPreferences.getString("userId", "");
 
         claimManagementViewModel = new ViewModelProvider(this).get(ClaimManagementViewModel.class);
         claimManagementViewModel.getClaimLength(authToken);
@@ -213,9 +215,17 @@ public class ClaimManagementFragment extends Fragment {
             if (validateForm()) {
                 submitClaimData();
                 Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 Log.d("ClaimManagementFragment", "Form validation failed");
             }
+        });
+
+        binding.viewClaimChip.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_nav_claim_management_to_nav_view_claim);
+        });
+        binding.approveClaimChip.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_nav_claim_management_to_nav_approve_claim);
+            Toast.makeText(requireContext(), "Approve Claim", Toast.LENGTH_SHORT).show();
         });
 
         travelCategoryDropdownLayout.setVisibility(View.GONE);
@@ -1058,12 +1068,12 @@ public class ClaimManagementFragment extends Fragment {
         return byteBuffer.toByteArray();
     }
 
-    private void logFileInfo(Uri uri) {
-        String fileName = getFileNameFromUri(uri);
-        String fileType = requireContext().getContentResolver().getType(uri);
-
-        Log.d("FileInfo", "File Name: " + fileName + ", File Type: " + fileType + ", File URI: " + uri.toString());
-    }
+//    private void logFileInfo(Uri uri) {
+//        String fileName = getFileNameFromUri(uri);
+//        String fileType = requireContext().getContentResolver().getType(uri);
+//
+//        Log.d("FileInfo", "File Name: " + fileName + ", File Type: " + fileType + ", File URI: " + uri);
+//    }
 
     // Helper method to display the file name
     private void displayFileName(Uri uri) {

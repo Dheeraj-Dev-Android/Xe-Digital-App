@@ -3,6 +3,7 @@ package app.xedigital.ai.api;
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
+import app.xedigital.ai.model.approveClaim.ApproveClaimResponse;
 import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
@@ -107,6 +108,9 @@ public interface APIInterface {
     @GET("claims/employee/claim")
     retrofit2.Call<EmployeeClaimResponse> getClaims(@Header("Authorization") String authToken);
 
+    @GET("claims/employee/claim?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true")
+    retrofit2.Call<ApproveClaimResponse> getClaimsForApproval(@Header("Authorization") String authToken);
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
@@ -139,6 +143,9 @@ public interface APIInterface {
 
     @PUT("leaves/status/{managerId}")
     retrofit2.Call<ResponseBody> LeavesStatus(@Header("Authorization") String token, @Path("managerId") String managerId, @Body LeaveUpdateRequest requestBody);
+
+    @PUT("claims/status")
+    retrofit2.Call<ResponseBody> claimStatus(@Header("Authorization") String token, @Body RequestBody requestBody);
 
     @POST("images/add/bucket/claim")
     retrofit2.Call<ResponseBody> uploadImage(@Header("Authorization") String token, @Body RequestBody requestBody);

@@ -5,19 +5,6 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Claim Details" />
-    </com.google.android.material.appbar.AppBarLayout>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -81,6 +68,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Purpose: Quarterly Review"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/txtComment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Comment: Travel for client meeting"
                         android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -172,12 +166,6 @@
                         android:text="Total Amount: ₹15,000"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/txtComment"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Comment: Travel for client meeting"
-                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

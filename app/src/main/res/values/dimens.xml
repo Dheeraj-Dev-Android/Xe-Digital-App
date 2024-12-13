@@ -44,5 +44,14 @@
     </array>
     <dimen name="text_margin">16dp</dimen>
 
+    <dimen name="header_text_size">18sp</dimen>
+    <dimen name="body_text_size">16sp</dimen>
+    <dimen name="small_text_size">14sp</dimen>
+
+    <!-- Spacing -->
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+
 
 </resources>

@@ -128,5 +128,20 @@
     <color name="status_active_background">#E6F2E6</color>
     <color name="status_active_text">#2E7D32</color>
 
+    <color name="primary_text_color">#333333</color>
+    <color name="secondary_text_color">#666666</color>
+
+    <color name="pending_status_color">#FFC107</color> <!-- Amber -->
+    <color name="approved_status_color">#4CAF50</color> <!-- Green -->
+    <color name="rejected_status_color">#F44336</color> <!-- Red -->
+    <color name="default_status_color">#808080</color> <!-- Gray -->
+
+    <color name="primary_dark_color">#1976D2</color>
+    <color name="primary_light_color">#BBDEFB</color>
+
+    <!-- Status Colors -->
+    <color name="approved_color">#4CAF50</color>
+    <color name="pending_color">#FFC107</color>
+    <color name="rejected_color">#F44336</color>
 
 </resources>

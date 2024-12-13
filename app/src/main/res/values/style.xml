@@ -102,4 +102,32 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="ClaimDetailTextWithIcon">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog" parent="@style/ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <!--            <item name="colorAccent">@color/</item>-->
+        <item name="android:buttonBarPositiveButtonStyle">@style/MyPositiveButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/MyNegativeButton</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/MyNeutralButton</item>
+    </style>
+
+    <style name="MyPositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/approved_status_color</item>
+    </style>
+
+    <style name="MyNegativeButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/rejected_status_color</item>
+    </style>
+
+    <style name="MyNeutralButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/rejected_status_color</item>
+    </style>
 </resources>

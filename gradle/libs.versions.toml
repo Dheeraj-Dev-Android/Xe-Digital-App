@@ -28,6 +28,7 @@ coreI18n = "1.0.0-alpha01"
 leanback = "1.0.0"
 rendering = "1.17.1"
 uiTextAndroid = "1.7.5"
+firebaseVertexai = "16.0.2"
 
 [libraries]
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
@@ -67,6 +68,7 @@ core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI1
 leanback = { group = "androidx.leanback", name = "leanback", version.ref = "leanback" }
 rendering = { group = "com.google.ar.sceneform", name = "rendering", version.ref = "rendering" }
 ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
+firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai", version.ref = "firebaseVertexai" }
 
 
 [plugins]
