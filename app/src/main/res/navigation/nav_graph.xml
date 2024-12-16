@@ -234,11 +234,37 @@
         android:label="@string/menu_shifts"
         tools:layout="@layout/fragment_shifts">
 
+        <!--        <action-->
+        <!--            android:id="@+id/action_nav_shifts_to_nav_policy"-->
+        <!--            app:destination="@id/nav_policy" />-->
         <action
-            android:id="@+id/action_nav_shifts_to_nav_policy"
-            app:destination="@id/nav_policy" />
+            android:id="@+id/action_nav_shifts_to_nav_shift_applied"
+            app:destination="@id/nav_shift_applied" />
+        <action
+            android:id="@+id/action_nav_shifts_to_nav_shift_approve"
+            app:destination="@id/nav_shift_approve" />
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_shift_applied"
+        android:name="app.xedigital.ai.ui.shifts.ShiftAppliedFragment"
+        android:label="Shift Applied"
+        tools:layout="@layout/fragment_shift_applied">
+        <action
+            android:id="@+id/action_nav_shift_applied_to_nav_shifts"
+            app:destination="@id/nav_shifts" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/nav_shift_approve"
+        android:name="app.xedigital.ai.ui.shifts.ShiftApproveFragment"
+        android:label="Shift Approve"
+        tools:layout="@layout/fragment_shift_approve">
+        <action
+            android:id="@+id/action_nav_shift_approve_to_nav_shifts"
+            app:destination="@id/nav_shifts" />
+
+    </fragment>
     <fragment
         android:id="@+id/nav_claim_management"
         android:name="app.xedigital.ai.ui.claim_management.ClaimManagementFragment"

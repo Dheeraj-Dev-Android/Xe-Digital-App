@@ -170,6 +170,10 @@ public class APIClient {
     public APIInterface ApproveClaim() {
         return retrofit2.create(APIInterface.class);
     }
+
+    public APIInterface getShiftTypes() {
+        return retrofit2.create(APIInterface.class);
+    }
 }
 
 

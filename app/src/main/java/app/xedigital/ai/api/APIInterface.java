@@ -26,6 +26,11 @@ import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
 import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
 import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
 import app.xedigital.ai.model.regularizeUpdateStatus.RegularizeUpdateRequest;
+import app.xedigital.ai.model.shiftApplied.ShiftAppliedResponse;
+import app.xedigital.ai.model.shiftApprovalList.ShiftApproveListResponse;
+import app.xedigital.ai.model.shiftTime.ShiftTimeResponse;
+import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
+import app.xedigital.ai.model.shifts.ShiftTypeResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -111,6 +116,18 @@ public interface APIInterface {
     @GET("claims/employee/claim?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true")
     retrofit2.Call<ApproveClaimResponse> getClaimsForApproval(@Header("Authorization") String authToken);
 
+    @GET("shifts/shift/shiftTypes")
+    retrofit2.Call<ShiftTypeResponse> getShiftTypes(@Header("Authorization") String authToken);
+
+    @GET("shifts/shiftType/{shiftId}")
+    retrofit2.Call<ShiftTimeResponse> getShiftTime(@Header("Authorization") String authToken, @Path("shiftId") String shiftId);
+
+    @GET("shifts/shiftChange/shiftApprovalRequest")
+    retrofit2.Call<ShiftAppliedResponse> getShiftApplied(@Header("Authorization") String authToken);
+
+    @GET("shifts/shiftChange/shiftApprovalRequest?startTime=&endTime=&employee=&page=&limit=&branch=&prefix=&rm=true")
+    retrofit2.Call<ShiftApproveListResponse> getShiftApprovalList(@Header("Authorization") String authToken);
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
@@ -132,6 +149,9 @@ public interface APIInterface {
 
     @POST("leaves/apply")
     retrofit2.Call<ResponseBody> LeavesApply(@Header("Authorization") String token, @Body ApplyLeaveRequest requestBody);
+
+    @POST("shifts/shiftChange")
+    retrofit2.Call<ResponseBody> ShiftChange(@Header("Authorization") String token, @Body ShiftUpdateRequest requestBody);
 
 //    PUT API
 
@@ -179,6 +199,7 @@ public interface APIInterface {
 
     @POST("claims")
     retrofit2.Call<ResponseBody> claimSubmit(@Header("Authorization") String token, @Body ClaimUpdateRequest requestBody);
+
     @POST("claims/save")
     retrofit2.Call<ResponseBody> claimSave(@Header("Authorization") String token, @Body ClaimSaveRequest requestBody);
 
