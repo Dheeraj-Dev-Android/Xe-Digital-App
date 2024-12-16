@@ -144,4 +144,6 @@
     <color name="pending_color">#FFC107</color>
     <color name="rejected_color">#F44336</color>
 
+    <color name="chip_background">#FFFFFF</color>
+
 </resources>

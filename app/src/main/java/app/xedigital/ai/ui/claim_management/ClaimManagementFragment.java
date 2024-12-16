@@ -240,9 +240,48 @@ public class ClaimManagementFragment extends Fragment {
             binding.meetingTypeDropdown.setAdapter(adapter);
         });
 
+//        claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
+//            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories);
+//            binding.claimCategoryDropdown.setAdapter(adapter);
+//        });
+
+//        claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
+//            // Filter the list to include only "General"
+//            List<String> filteredCategories = new ArrayList<>();
+//            for (String category : claimCategories) {
+//                if (category.equals("Select an option") || category.equals("General")) {
+//                    filteredCategories.add(category);
+//                }
+//            }
+//
+//            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, filteredCategories);
+//            binding.claimCategoryDropdown.setAdapter(adapter);
+//        });
         claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories);
             binding.claimCategoryDropdown.setAdapter(adapter);
+
+            binding.claimCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                private int previousSelection = 0;
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedCategory = parent.getItemAtPosition(position).toString();
+                    if (selectedCategory.equals("Standard")) {
+                        // Display error and reset to previous selection
+                        Toast.makeText(requireContext(), "Standard category is not available.", Toast.LENGTH_SHORT).show();
+                        binding.claimCategoryDropdown.setSelection(previousSelection);
+                    } else {
+                        // Update previous selection if it's a valid choice
+                        previousSelection = position;
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    Log.d("ClaimManagementFragment", "Nothing selected in claim category dropdown");
+                }
+            });
         });
 
         claimManagementViewModel.getTravelCategories().observe(getViewLifecycleOwner(), travelCategories -> {

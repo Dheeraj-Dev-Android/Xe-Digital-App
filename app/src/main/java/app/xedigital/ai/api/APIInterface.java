@@ -144,8 +144,8 @@ public interface APIInterface {
     @PUT("leaves/status/{managerId}")
     retrofit2.Call<ResponseBody> LeavesStatus(@Header("Authorization") String token, @Path("managerId") String managerId, @Body LeaveUpdateRequest requestBody);
 
-    @PUT("claims/status")
-    retrofit2.Call<ResponseBody> claimStatus(@Header("Authorization") String token, @Body RequestBody requestBody);
+    @PUT("claims/status/{id}")
+    retrofit2.Call<ResponseBody> claimStatus(@Header("Authorization") String token, @Path("id") String id, @Body RequestBody requestBody);
 
     @POST("images/add/bucket/claim")
     retrofit2.Call<ResponseBody> uploadImage(@Header("Authorization") String token, @Body RequestBody requestBody);

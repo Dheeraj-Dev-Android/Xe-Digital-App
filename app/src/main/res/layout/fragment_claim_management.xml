@@ -21,24 +21,37 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
+            android:paddingHorizontal="12dp"
             android:paddingVertical="8dp">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/viewClaimChip"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="View Claim" />
+                android:text="View Claim"
+                app:chipBackgroundColor="@color/chip_background"
+                app:chipIconTint="@color/purple_700"
+                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeWidth="1dp" />
+
+            <View
+                android:layout_width="20dp"
+                android:layout_height="wrap_content" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/approveClaimChip"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Approve Claim" />
+                android:text="Approve Claim"
+                app:chipBackgroundColor="@color/chip_background"
+                app:chipIconTint="@color/purple_700"
+                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeWidth="1dp" />
+
         </LinearLayout>
+
 
         <!-- Header -->
         <TextView

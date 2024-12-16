@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.rendering)
     implementation(libs.ui.text.android)
     implementation(libs.firebase.vertexai)
+    implementation(libs.impress)
 //    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

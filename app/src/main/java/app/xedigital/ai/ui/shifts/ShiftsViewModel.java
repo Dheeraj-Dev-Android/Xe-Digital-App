@@ -7,11 +7,7 @@ import androidx.lifecycle.ViewModel;
 public class ShiftsViewModel extends ViewModel {
 
     private MutableLiveData<String> someLiveData;
-//
-//    public ShiftsViewModel() {
-//        mText = new MutableLiveData<>();
-//        mText.setValue("This is Shift fragment");
-//    }
+
 
     public LiveData<String> getSomeLiveData() {
         if (someLiveData == null) {

@@ -167,12 +167,12 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                     String message = "Choose an action for this claim:\nClaim ID: " + claim.getClaimId();
                     builder.setMessage(message);
 
-                    builder.setPositiveButton("Approve", (dialog, which) -> {
-                        updateClaimStatus(claim, "Approved", "");
+                    builder.setPositiveButton("approve", (dialog, which) -> {
+                        updateClaimStatus(claim, "approved", "");
                     });
 
-                    builder.setNeutralButton("Cancel", null);
-                    builder.setNegativeButton("Reject", null);
+                    builder.setNeutralButton("cancel", null);
+                    builder.setNegativeButton("reject", null);
 
                     final EditText commentInput = new EditText(context);
                     commentInput.setHint("Enter comment");
@@ -200,7 +200,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                                 errorTextView.setVisibility(View.VISIBLE);
                             } else {
                                 errorTextView.setVisibility(View.GONE);
-                                updateClaimStatus(claim, "Rejected", comment);
+                                updateClaimStatus(claim, "rejected", comment);
                                 dialog.dismiss();
                             }
                         });
@@ -215,7 +215,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                                 errorTextView.setVisibility(View.VISIBLE);
                             } else {
                                 errorTextView.setVisibility(View.GONE);
-                                updateClaimStatus(claim, "Cancelled", comment);
+                                updateClaimStatus(claim, "cancelled", comment);
                                 dialog.dismiss();
                             }
                         });
@@ -301,6 +301,8 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String authToken = sharedPreferences.getString("authToken", "");
             String userId = sharedPreferences.getString("userId", "");
+            String claimId = claim.getId();
+            Log.d("ClaimViewHolder", "Claim ID: " + claimId);
 
             ProfileViewModel profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
             profileViewModel.storeLoginData(userId, authToken);
@@ -318,7 +320,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
                         try {
                             JSONObject requestBody = new JSONObject(new Gson().toJson(claim));
-                            requestBody.put("statusRm", status);
+                            requestBody.put("status", status);
                             requestBody.put("comment", comment);
                             requestBody.put("approvedBy", reportingManagerId);
                             requestBody.put("email", reportingManagerEmail);
@@ -331,7 +333,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
                             // Get API instance and make the call
                             APIInterface apiInterface = APIClient.getInstance().ClaimUpdateStatus();
-                            retrofit2.Call<ResponseBody> call = apiInterface.claimStatus("jwt " + authToken, body);
+                            retrofit2.Call<ResponseBody> call = apiInterface.claimStatus("jwt " + authToken, claimId, body);
 
                             call.enqueue(new Callback<ResponseBody>() {
                                 @Override
