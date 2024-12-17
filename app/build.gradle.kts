@@ -91,6 +91,6 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
-    implementation("com.google.mlkit:face-detection:16.1.5")
+//    implementation("com.google.mlkit:face-detection:16.1.5")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
 }
