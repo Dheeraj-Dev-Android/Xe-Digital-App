@@ -45,6 +45,12 @@ public class ShiftUpdateRequest {
 
     @SerializedName("status")
     private String status;
+    @SerializedName("comment")
+    private String comment;
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
     public void setFirstname(String firstname) {
         this.firstname = firstname;

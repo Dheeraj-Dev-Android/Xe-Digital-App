@@ -174,6 +174,10 @@ public class APIClient {
     public APIInterface getShiftTypes() {
         return retrofit2.create(APIInterface.class);
     }
+
+    public APIInterface getDocumentList() {
+        return retrofit2.create(APIInterface.class);
+    }
 }
 
 

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,6 +25,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.shiftApprovalList.EmployeeShiftdataItem;
 import app.xedigital.ai.model.shiftApprovalList.ShiftApproveListResponse;
+import app.xedigital.ai.ui.profile.ProfileViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,14 +35,10 @@ public class ShiftApproveFragment extends Fragment {
     private RecyclerView ShiftApproveRecyclerView;
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
+    private ProfileViewModel profileViewModel;
 
     public ShiftApproveFragment() {
         // Required empty public constructor
-    }
-
-    public static ShiftApproveFragment newInstance(String param1, String param2) {
-        ShiftApproveFragment fragment = new ShiftApproveFragment();
-        return fragment;
     }
 
     @Override
@@ -49,8 +47,7 @@ public class ShiftApproveFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_shift_approve, container, false);
     }
@@ -58,6 +55,7 @@ public class ShiftApproveFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
         ShiftApproveRecyclerView = view.findViewById(R.id.ShiftApproveRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
@@ -82,7 +80,7 @@ public class ShiftApproveFragment extends Fragment {
                     // Access data using the correct structure:
                     if (shiftList != null && shiftList.getData() != null && shiftList.getData().getEmployeeShiftdata() != null && !shiftList.getData().getEmployeeShiftdata().isEmpty()) {
                         List<EmployeeShiftdataItem> shiftApprovalDataList = shiftList.getData().getEmployeeShiftdata();
-                        ShiftApprovalListAdapter adapter = new ShiftApprovalListAdapter(getContext(), shiftApprovalDataList);
+                        ShiftApprovalListAdapter adapter = new ShiftApprovalListAdapter(getContext(), shiftApprovalDataList, getViewLifecycleOwner(), profileViewModel);
                         ShiftApproveRecyclerView.setAdapter(adapter);
                     } else {
                         emptyStateText.setVisibility(View.VISIBLE);

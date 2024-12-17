@@ -14,6 +14,7 @@ import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimResponse;
 import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
+import app.xedigital.ai.model.getDocuments.DocumentListResponse;
 import app.xedigital.ai.model.holiday.HolidayModelResponse;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
 import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
@@ -28,9 +29,11 @@ import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
 import app.xedigital.ai.model.regularizeUpdateStatus.RegularizeUpdateRequest;
 import app.xedigital.ai.model.shiftApplied.ShiftAppliedResponse;
 import app.xedigital.ai.model.shiftApprovalList.ShiftApproveListResponse;
+import app.xedigital.ai.model.shiftApprove.ShiftApproveRequest;
 import app.xedigital.ai.model.shiftTime.ShiftTimeResponse;
 import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
 import app.xedigital.ai.model.shifts.ShiftTypeResponse;
+import app.xedigital.ai.model.uploadDocument.UploadDocumentRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -128,6 +131,9 @@ public interface APIInterface {
     @GET("shifts/shiftChange/shiftApprovalRequest?startTime=&endTime=&employee=&page=&limit=&branch=&prefix=&rm=true")
     retrofit2.Call<ShiftApproveListResponse> getShiftApprovalList(@Header("Authorization") String authToken);
 
+    @GET("employees/uploadDoc/list/{empId}")
+    retrofit2.Call<DocumentListResponse> getDocList(@Header("Authorization") String authToken, @Path("empId") String empId);
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
@@ -167,6 +173,9 @@ public interface APIInterface {
     @PUT("claims/status/{id}")
     retrofit2.Call<ResponseBody> claimStatus(@Header("Authorization") String token, @Path("id") String id, @Body RequestBody requestBody);
 
+    @PUT("shifts/shift/applied/status/{shiftId}")
+    retrofit2.Call<ResponseBody> UpdateShiftStatus(@Header("Authorization") String token, @Path("shiftId") String shiftId, @Body ShiftApproveRequest requestBody);
+
     @POST("images/add/bucket/claim")
     retrofit2.Call<ResponseBody> uploadImage(@Header("Authorization") String token, @Body RequestBody requestBody);
 
@@ -202,5 +211,11 @@ public interface APIInterface {
 
     @POST("claims/save")
     retrofit2.Call<ResponseBody> claimSave(@Header("Authorization") String token, @Body ClaimSaveRequest requestBody);
+
+    @POST("images/add/bucket/employeesdoc")
+    retrofit2.Call<ResponseBody> uploadDoc(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("employees/uploadDoc")
+    retrofit2.Call<ResponseBody> uploadDocument(@Header("Authorization") String token, @Body UploadDocumentRequest requestBody);
 
 }

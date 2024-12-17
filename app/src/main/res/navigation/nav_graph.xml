@@ -323,12 +323,21 @@
 
     <fragment
         android:id="@+id/nav_documents"
-        android:name="app.xedigital.ai.ui.document_upload.DocumentUploadFragment"
+        android:name="app.xedigital.ai.ui.document_upload.ViewDocumentFragment"
         android:label="@string/menu_documents_upload"
-        tools:layout="@layout/fragment_document_upload">
-
+        tools:layout="@layout/fragment_view_document">
         <action
-            android:id="@+id/action_nav_documents_to_nav_payroll"
-            app:destination="@id/nav_payroll" />
+            android:id="@+id/action_nav_documents_to_nav_document_upload"
+            app:destination="@id/nav_document_upload" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_document_upload"
+        android:name="app.xedigital.ai.ui.document_upload.DocumentUploadFragment"
+        android:label="Document Upload"
+        tools:layout="@layout/fragment_document_upload">
+        <action
+            android:id="@+id/action_nav_document_upload_to_nav_documents"
+            app:destination="@id/nav_documents" />
+
     </fragment>
 </navigation>

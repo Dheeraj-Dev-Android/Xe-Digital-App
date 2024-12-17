@@ -2,23 +2,30 @@ package app.xedigital.ai.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,23 +33,52 @@ import java.util.List;
 import java.util.Locale;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.shiftApprovalList.EmployeeShiftdataItem;
+import app.xedigital.ai.model.shiftApprove.ShiftApproveRequest;
+import app.xedigital.ai.ui.profile.ProfileViewModel;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApprovalListAdapter.ViewHolder> {
 
     private final Context context;
     private final List<EmployeeShiftdataItem> shiftApprovalDataList;
+    private final ProfileViewModel profileViewModel;
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private String fName;
+    private String lName;
+    private String empId;
+    private LifecycleOwner lifecycleOwner;
 
-    public ShiftApprovalListAdapter(Context context, List<EmployeeShiftdataItem> shiftApprovalDataList) {
+    public ShiftApprovalListAdapter(Context context, List<EmployeeShiftdataItem> shiftApprovalDataList, LifecycleOwner lifecycleOwner, ProfileViewModel profileViewModel) {
         this.context = context;
         this.shiftApprovalDataList = shiftApprovalDataList;
+        this.lifecycleOwner = lifecycleOwner;
+        this.profileViewModel = profileViewModel;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_shift_approval, parent, false);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", "");
+        String userId = sharedPreferences.getString("userId", "");
+        profileViewModel.fetchUserProfile();
+        profileViewModel.storeLoginData(userId, authToken);
+        profileViewModel.userProfile.observe(lifecycleOwner, userProfile -> {
+            if (userProfile != null) {
+                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
+                fName = userProfile.getData().getEmployee().getFirstname();
+                lName = userProfile.getData().getEmployee().getLastname();
+                empId = userProfile.getData().getEmployee().getId();
+            }
+        });
         return new ViewHolder(view);
     }
 
@@ -86,53 +122,109 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         }
 
         holder.btnApprove.setOnClickListener(v -> {
-            showActionDialog(holder, shiftApprovalDataList.get(position).getId(), "approve");
+            String shiftID = shiftApprovalData.getId();
+//            profileViewModel.fetchUserProfile();
+            updateShiftStatus(shiftID, "approved", "", shiftApprovalData);
+
         });
 
         holder.btnCancel.setOnClickListener(v -> {
-            showActionDialog(holder, shiftApprovalDataList.get(position).getId(), "reject");
+//            profileViewModel.fetchUserProfile();
+            showRejectDialog(holder, shiftApprovalData.getId(), shiftApprovalData);
         });
     }
 
-
-    private void showActionDialog(ViewHolder holder, String shiftId, String action) {
+    private void showRejectDialog(ViewHolder holder, final String shiftID, EmployeeShiftdataItem shiftApprovalData) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_shift_action, null);
         builder.setView(dialogView);
 
-        TextView tvShiftId = dialogView.findViewById(R.id.tvShiftId);
         EditText etComment = dialogView.findViewById(R.id.etComment);
-        MaterialButton btnApproveDialog = dialogView.findViewById(R.id.btnApproveDialog);
         MaterialButton btnRejectDialog = dialogView.findViewById(R.id.btnRejectDialog);
-
-        tvShiftId.setText(shiftId);
 
         AlertDialog dialog = builder.create();
         dialog.show();
 
-        btnApproveDialog.setOnClickListener(v -> {
-            String comment = etComment.getText().toString();
-            // Handle approve action with comment and shiftId
-            dialog.dismiss();
-        });
-
         btnRejectDialog.setOnClickListener(v -> {
             String comment = etComment.getText().toString();
-            // Handle reject action with comment and shiftId
+            updateShiftStatus(shiftID, "cancel", comment, shiftApprovalData);
             dialog.dismiss();
         });
     }
 
-    private String formatDate(String inputDate) {
+    private void updateShiftStatus(String shiftId, String status, String comment, EmployeeShiftdataItem originalPayload) {
+        Log.d("ShiftStatus", "Shift ID: " + shiftId + ", Status: " + status + ", Comment: " + comment);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", "");
+        String token = "jwt " + authToken;
+        ShiftApproveRequest requestBody = new ShiftApproveRequest();
+
+        requestBody.setStatus(status);
+        requestBody.setComment(comment);
+        requestBody.setReportingManager(empId);
+
+        // Get current date and time
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        String formattedDate = dateFormat.format(currentDate);
+
+        requestBody.setApprovedDate(formattedDate);
+        requestBody.setApprovedByName(fName + " " + lName);
+
+//        requestBody.setId(originalPayload.getId());
+        requestBody.setAppliedDate(originalPayload.getAppliedDate());
+//        requestBody.setShiftType(originalPayload.getShiftType());
+//        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
+//        requestBody.setReportingManager(originalPayload.getReportingManager());
+//        requestBody.setShift(originalPayload.getShift());
+//        requestBody.setEmployee(originalPayload.getEmployee());
+
+
+        APIInterface apiInterface = APIClient.getInstance().getShiftTypes();
+        Call<ResponseBody> call = apiInterface.UpdateShiftStatus(token, shiftId, requestBody);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                try {
+                    ResponseBody responseBody = response.body();
+                    if (response.isSuccessful() && responseBody != null) {
+                        String responseJson = gson.toJson(response.body());
+                        Log.d("ShiftStatus", "Response JSON: " + responseJson);
+                    } else {
+                        // Log error response
+                        assert response.errorBody() != null;
+                        String errorBody = response.errorBody().string();
+                        Log.d("ShiftStatus", "Error Response: " + errorBody);
+                    }
+                } catch (IOException e) {
+                    Log.e("ShiftStatus", "Error reading response body", e);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.d("ShiftStatus", "Failed to update shift status: " + t.getMessage());
+                Toast.makeText(context, "Failed to update shift status: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private String formatDate(String dateString) {
+        if (dateString == null || dateString.isEmpty()) {
+            return "";
+        }
+
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
         try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-            Date date = inputFormat.parse(inputDate);
+            Date date = inputFormat.parse(dateString);
             return outputFormat.format(date);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return inputDate;
+            Log.e("ShiftApprovalListAdapter", "Error parsing date", e);
+            return "";
         }
     }
 

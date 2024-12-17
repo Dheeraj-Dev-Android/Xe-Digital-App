@@ -107,8 +107,8 @@
 
     <item
         android:id="@+id/nav_documents"
-        android:title="Documents Upload (Coming Soon*)" />
-    <!--"@string/menu_documents_upload-->
+        android:title="@string/menu_documents_upload" />
+
     <item
         android:id="@+id/nav_payroll"
         android:title="Payroll (Coming Soon*)" />

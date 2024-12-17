@@ -6,6 +6,15 @@
     android:padding="16dp">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_horizontal"
+        android:text="Action"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -16,33 +25,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
-        android:lines="3" />
+        android:lines="2" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="Shift ID" />
-
-    <TextView
-        android:id="@+id/tvShiftId"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:gravity="end">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnApproveDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Approve" />
-
-        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="@color/rejected_color"
             android:id="@+id/btnRejectDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

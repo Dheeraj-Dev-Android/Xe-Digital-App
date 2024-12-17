@@ -282,6 +282,8 @@ public class ShiftsFragment extends Fragment {
                             @Override
                             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull retrofit2.Response<ResponseBody> response) {
                                 if (response.isSuccessful()) {
+                                    shiftTypeSpinner.setText("");
+                                    shiftTimeSpinner.setText("");
                                     // Handle success
                                     Toast.makeText(requireContext(), "Shift change request submitted successfully", Toast.LENGTH_SHORT).show();
                                 } else {
