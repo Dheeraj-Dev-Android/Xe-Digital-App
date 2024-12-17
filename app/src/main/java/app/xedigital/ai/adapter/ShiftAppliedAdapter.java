@@ -66,7 +66,7 @@ public class ShiftAppliedAdapter extends RecyclerView.Adapter<ShiftAppliedAdapte
             holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.pending_status_color)));
         } else if (shift.getStatus().equals("approved")) {
             holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved)));
-        } else if (shift.getStatus().equals("cancelled")) {
+        } else if (shift.getStatus().equals("cancel")) {
             holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected)));
         }
         holder.chipStatus.setText(shift.getStatus());
