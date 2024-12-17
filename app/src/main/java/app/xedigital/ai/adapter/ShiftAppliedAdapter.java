@@ -74,6 +74,10 @@ public class ShiftAppliedAdapter extends RecyclerView.Adapter<ShiftAppliedAdapte
     }
 
     private String formatDate(String inputDate) {
+        if (inputDate == null) {
+            return "";
+        }
+
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
