@@ -17,11 +17,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
-import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONException;
@@ -31,6 +26,11 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
 
+import app.xedigital.ai.R;
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
+import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,13 +50,6 @@ public class AddAttendanceFragment extends Fragment {
     private Button btnClear;
     private String token;
 
-//    public static AddAttendanceFragment newInstance(EmployeePunchDataItem attendanceItem) {
-//        AddAttendanceFragment fragment = new AddAttendanceFragment();
-//        Bundle args = new Bundle();
-//        args.putSerializable(ARG_ATTENDANCE_ITEM, attendanceItem);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

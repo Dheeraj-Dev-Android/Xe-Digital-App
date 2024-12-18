@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -24,6 +25,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.AttendanceApprovalBinding;
@@ -127,12 +129,25 @@ public class PendingApprovalViewFragment extends Fragment {
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
         binding.appliedDate.setText("Applied Date : " + formattedAppliedDate);
 
-        binding.appliedStatus.setText(item.getStatus());
         binding.appliedStatusUpdateBy.setText(item.getApprovedByName());
 
         String formattedUpdatedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
         binding.appliedStatusUpdateDate.setText(formattedUpdatedDate);
 
+        binding.appliedStatus.setText(item.getStatus());
+        String status = item.getStatus();
+        binding.appliedStatus.setText(status);
+
+
+        if (status.equalsIgnoreCase("unapproved")) {
+            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.pending_status_color));
+        } else if (status.equalsIgnoreCase("Approved")) {
+            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.status_approved));
+        } else if (status.equalsIgnoreCase("Rejected")) {
+            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.status_rejected));
+        } else {
+            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), android.R.color.black));
+        }
 
         if (item.getStatus().equals("unapproved")) {
             binding.approveButton.setVisibility(View.VISIBLE);

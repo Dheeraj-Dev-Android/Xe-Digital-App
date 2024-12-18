@@ -69,15 +69,13 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         Chip statusChip = holder.itemView.findViewById(R.id.statusChip);
         statusChip.setText(item.getStatus());
 
-        if (item.getStatus().equals("Approved")) {
+        if (item.getStatus().equalsIgnoreCase("Approved")) {
             statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved)));
-        } else if (item.getStatus().equals("Unapproved")) {
+        } else if (item.getStatus().equalsIgnoreCase("Unapproved")) {
             statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending)));
-        } else if (item.getStatus().equals("Rejected")) {
+        } else if (item.getStatus().equalsIgnoreCase("Rejected")) {
             statusChip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected)));
         }
-
-
 
         holder.btn_viewAppliedAttendance.setOnClickListener(v -> {
             if (position != RecyclerView.NO_POSITION) {
@@ -99,15 +97,10 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
 
     }
 
-
     @Override
     public int getItemCount() {
         return items.size();
     }
-
-//    public void setOnItemClickListener(Object o) {
-//    }
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView empName;

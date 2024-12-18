@@ -20,19 +20,6 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/layout_padding">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/statusChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            app:chipBackgroundColor="@color/status_approved"
-            app:chipMinHeight="25dp"
-            app:elevation="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Approved" />
-
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/btn_viewAppliedAttendance"
             android:layout_width="@dimen/icon_size"
@@ -53,7 +40,7 @@
             android:layout_marginStart="@dimen/content_margin"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/statusChip"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_viewAppliedAttendance"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -87,9 +74,34 @@
                 android:text="Punch Date : "
                 android:textColor="@color/text_tertiary"
                 android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Status : "
+                    android:textColor="@color/text_tertiary"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/statusChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="@color/status_approved"
+                    app:chipMinHeight="25dp"
+                    app:elevation="2dp"
+                    tools:text="Approved" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
-
-
