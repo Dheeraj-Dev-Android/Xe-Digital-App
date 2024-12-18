@@ -145,5 +145,10 @@
     <color name="rejected_color">#F44336</color>
 
     <color name="chip_background">#FFFFFF</color>
+    <color name="color_background">#F5F5F5</color>
+    <color name="color_primary">#3F51B5</color>
+    <color name="color_primary_text">#212121</color>
+    <color name="color_secondary_text">#757575</color>
+    <color name="color_stroke">#E0E0E0</color>
 
 </resources>

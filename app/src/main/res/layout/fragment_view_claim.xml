@@ -1,137 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_white"
+    android:background="@color/color_background"
     tools:context=".ui.claim_management.ViewClaimFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="12dp">
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/FilterCard"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:strokeWidth="1dp">
+            android:layout_marginTop="45dp"
+            android:background="@android:color/white"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp">
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/FilterCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:backgroundTint="#F8F5F5"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/color_stroke"
+                app:strokeWidth="1dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:text="Filter Claims"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <!-- Date Range Inputs -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="3">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- From Date -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/fromDateInputLayout"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1.5"
-                        app:startIconDrawable="@drawable/ic_calendar">
+                        android:layout_marginBottom="12dp"
+                        android:text="Filter Claims"
+                        android:textColor="@color/color_primary_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/fromDateEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:clickable="true"
-                            android:focusable="false"
-                            android:hint="From Date"
-                            android:inputType="none"
-                            android:paddingStart="40dp"
-                            android:paddingEnd="5dp" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- To Date -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/toDateInputLayout"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
+                    <!-- Date Range Inputs -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1.5"
-                        app:startIconDrawable="@drawable/ic_calendar">
+                        android:orientation="horizontal"
+                        android:weightSum="3">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/toDateEditText"
-                            android:layout_width="match_parent"
+                        <!-- From Date -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/fromDateInputLayout"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:clickable="true"
-                            android:focusable="false"
-                            android:hint="To Date"
-                            android:inputType="none"
-                            android:paddingStart="40dp"
-                            android:paddingEnd="5dp" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1.5"
+                            app:boxStrokeColor="@color/color_primary"
+                            app:startIconDrawable="@drawable/ic_calendar">
 
-                    <!-- Filter Button -->
-                    <ImageButton
-                        android:id="@+id/filterButton"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="0.5"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="TODO"
-                        android:foregroundGravity="center_horizontal"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_filter" />
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/fromDateEditText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:hint="From Date"
+                                android:inputType="none"
+                                android:paddingStart="40dp"
+                                android:paddingEnd="5dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- To Date -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/toDateInputLayout"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.5"
+                            app:boxStrokeColor="@color/color_primary"
+                            app:startIconDrawable="@drawable/ic_calendar">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/toDateEditText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:hint="To Date"
+                                android:inputType="none"
+                                android:paddingStart="40dp"
+                                android:paddingEnd="5dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Filter Button -->
+                        <ImageButton
+                            android:id="@+id/filterButton"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="0.5"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="TODO"
+                            android:foregroundGravity="center_horizontal"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="8dp"
+                            android:src="@mipmap/ic_filter"
+                            app:icon="@mipmap/ic_filter"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>
 
-        <!-- Rest of the layout remains the same -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/claimsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/FilterCard" />
+            <!-- Empty State -->
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="No claims found"
+                android:textColor="@color/color_secondary_text"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/FilterCard" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <ProgressBar
-            android:id="@+id/loadingProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <!-- Main Content -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/claimsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <TextView
-            android:id="@+id/emptyStateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No claims found"
-            android:textSize="16sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    <!-- Loading Progress -->
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
