@@ -150,8 +150,8 @@ public class PendingApprovalViewFragment extends Fragment {
         }
 
         if (item.getStatus().equals("unapproved")) {
-            binding.approveButton.setVisibility(View.VISIBLE);
-            binding.rejectButton.setVisibility(View.VISIBLE);
+            binding.actionButtonsCard.setVisibility(View.VISIBLE);
+//            binding.rejectButton.setVisibility(View.VISIBLE);
 
             binding.approveButton.setOnClickListener(v -> {
                 if (listener != null) {
@@ -169,8 +169,8 @@ public class PendingApprovalViewFragment extends Fragment {
                 handleReject(attendanceId);
             });
         } else {
-            binding.approveButton.setVisibility(View.GONE);
-            binding.rejectButton.setVisibility(View.GONE);
+            binding.actionButtonsCard.setVisibility(View.GONE);
+            binding.actionButtonsCard.setVisibility(View.GONE);
         }
 
 
