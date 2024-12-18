@@ -53,10 +53,9 @@
                         android:textStyle="bold" />
 
                     <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/pieChart"
+                        android:id="@+id/leavePieChart"
                         android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:layout_marginTop="8dp" />
+                        android:layout_height="250dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

@@ -1,263 +1,309 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="50dp"
+    android:fillViewport="true"
     tools:context=".ui.dashboard.DashboardFragment">
 
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/punchCardView"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="#40C4FF"
-        app:strokeWidth="2dp">
+        android:layout_marginTop="45dp"
+        android:layout_marginBottom="12dp"
+        android:paddingBottom="16dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/punchCardView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/punch_card_background"
-            android:padding="16dp">
+            android:layout_margin="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="#40C4FF"
+            app:strokeWidth="2dp">
 
-            <TextView
-                android:id="@+id/todayDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="20 Feb 2024"
-                android:textColor="#333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/punch_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="#333333"
-                android:drawableEnd="@drawable/animated_arrow"
-                android:text="Punch Attendance"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/todayDate" />
+                android:layout_margin="10dp"
+                android:background="@drawable/punch_card_background"
+                android:padding="16dp">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/todayDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20 Feb 2024"
+                    android:textColor="#333333"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-    </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/punch_button"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#333333"
+                    android:drawableEnd="@drawable/animated_arrow"
+                    android:text="Punch Attendance"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/todayDate" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/employeeCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:elevation="4dp"
-        app:cardBackgroundColor="#FFFFFF"
-        app:cardCornerRadius="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/punchCardView"
-        app:strokeColor="#40C4FF"
-        app:strokeWidth="2dp">
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:background="@drawable/punch_card_background"
-            android:padding="10dp">
+        </com.google.android.material.card.MaterialCardView>
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_start"
-                android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/employeeCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:elevation="4dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/punchCardView"
+            app:strokeColor="#40C4FF"
+            app:strokeWidth="2dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:background="@drawable/punch_card_background"
+                android:padding="10dp">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.01" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_middle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.3" />
+
+                <ImageView
+                    android:id="@+id/ivEmployeeProfile"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:contentDescription="@string/user_profile_picture"
+                    android:elevation="5dp"
+                    android:src="@mipmap/ic_default_profile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Name : "
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/ivEmployeeProfile" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeNameValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="Employee Name"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/tvEmployeeName" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Email : "
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmployeeName" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeEmailValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="employee.t@consultEdge.global"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/tvEmployeeEmail" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeContact"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Contact : "
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmployeeEmail" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeContactValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="123-456-7890"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/tvEmployeeContact" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeDesignation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Designation : "
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmployeeContact" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeDesignationValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="Software Engineer"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/tvEmployeeDesignation" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeShift"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Shift : "
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmployeeDesignation" />
+
+                <TextView
+                    android:id="@+id/tvEmployeeShiftValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="9:00 AM - 5:00 PM"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/tvEmployeeShift" />
+
+                <TextView
+                    android:id="@+id/tvPunchInTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Punch In : "
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.045"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmployeeShift" />
+
+                <TextView
+                    android:id="@+id/tvPunchOutTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:text="Punch Out : "
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/tvPunchInTime"
+                    app:layout_constraintTop_toTopOf="@id/tvPunchInTime" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/leavePieChartContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:elevation="4dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/employeeCard"
+            app:strokeColor="#40C4FF"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/punch_card_background"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.01" />
+                android:padding="10dp">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_middle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.3" />
+                <TextView
+                    android:id="@+id/chartTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Leave Statistics : Leave Balance"
+                    android:textColor="@color/color_primary_text"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/ivEmployeeProfile"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:contentDescription="@string/user_profile_picture"
-                android:elevation="5dp"
-                android:src="@mipmap/ic_default_profile"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/leavePieChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp" />
 
-            <TextView
-                android:id="@+id/tvEmployeeName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Name : "
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/guideline_middle"
-                app:layout_constraintStart_toStartOf="@id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@id/ivEmployeeProfile" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/tvEmployeeNameValue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Employee Name"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                android:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guideline_middle"
-                app:layout_constraintTop_toTopOf="@id/tvEmployeeName" />
-
-            <TextView
-                android:id="@+id/tvEmployeeEmail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Email : "
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toStartOf="@id/guideline_middle"
-                app:layout_constraintStart_toStartOf="@id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@id/tvEmployeeName" />
-
-            <TextView
-                android:id="@+id/tvEmployeeEmailValue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="employee.t@consultEdge.global"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                android:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guideline_middle"
-                app:layout_constraintTop_toTopOf="@id/tvEmployeeEmail" />
-
-            <TextView
-                android:id="@+id/tvEmployeeContact"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Contact : "
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toStartOf="@id/guideline_middle"
-                app:layout_constraintStart_toStartOf="@id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@id/tvEmployeeEmail" />
-
-            <TextView
-                android:id="@+id/tvEmployeeContactValue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="123-456-7890"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                android:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guideline_middle"
-                app:layout_constraintTop_toTopOf="@id/tvEmployeeContact" />
-
-            <TextView
-                android:id="@+id/tvEmployeeDesignation"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Designation : "
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toStartOf="@id/guideline_middle"
-                app:layout_constraintStart_toStartOf="@id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@id/tvEmployeeContact" />
-
-            <TextView
-                android:id="@+id/tvEmployeeDesignationValue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Software Engineer"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                android:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guideline_middle"
-                app:layout_constraintTop_toTopOf="@id/tvEmployeeDesignation" />
-
-            <TextView
-                android:id="@+id/tvEmployeeShift"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Shift : "
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toStartOf="@id/guideline_middle"
-                app:layout_constraintStart_toStartOf="@id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@id/tvEmployeeDesignation" />
-
-            <TextView
-                android:id="@+id/tvEmployeeShiftValue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="9:00 AM - 5:00 PM"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                android:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guideline_middle"
-                app:layout_constraintTop_toTopOf="@id/tvEmployeeShift" />
-
-            <TextView
-                android:id="@+id/tvPunchInTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Punch In : "
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.045"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvEmployeeShift" />
-
-            <TextView
-                android:id="@+id/tvPunchOutTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:text="Punch Out : "
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/tvPunchInTime"
-                app:layout_constraintTop_toTopOf="@id/tvPunchInTime" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

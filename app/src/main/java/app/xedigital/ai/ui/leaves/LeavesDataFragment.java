@@ -38,9 +38,13 @@ public class LeavesDataFragment extends Fragment {
     private LeavesViewModel leavesViewModel;
     private LeaveAdapter leaveAdapter;
     private RecyclerView recyclerViewLeaves;
-    private PieChart pieChart;
     private TextView emptyStateText;
     private ProgressBar loadingProgress;
+    private PieChart leavePieChart;
+
+    public PieChart getLeavePieChart() {
+        return leavePieChart;
+    }
 
     public LeavesDataFragment() {
         // Required empty public constructor
@@ -56,7 +60,7 @@ public class LeavesDataFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_leaves_data, container, false);
 
         recyclerViewLeaves = view.findViewById(R.id.recyclerViewLeaves);
-        pieChart = view.findViewById(R.id.pieChart);
+        leavePieChart = view.findViewById(R.id.leavePieChart);
         emptyStateText = view.findViewById(R.id.emptyStateText);
         loadingProgress = view.findViewById(R.id.loadingProgress);
 
@@ -84,11 +88,11 @@ public class LeavesDataFragment extends Fragment {
                 if (leaves.isEmpty()) {
                     emptyStateText.setVisibility(View.VISIBLE);
                     recyclerViewLeaves.setVisibility(View.GONE);
-                    pieChart.setVisibility(View.GONE);
+                    leavePieChart.setVisibility(View.GONE);
                 } else {
                     emptyStateText.setVisibility(View.GONE);
                     recyclerViewLeaves.setVisibility(View.VISIBLE);
-                    pieChart.setVisibility(View.VISIBLE);
+                    leavePieChart.setVisibility(View.VISIBLE);
 
                     leaveList.clear();
                     leaveList.addAll(leaves);
@@ -101,14 +105,14 @@ public class LeavesDataFragment extends Fragment {
                 emptyStateText.setVisibility(View.VISIBLE);
                 emptyStateText.setText("Error loading data");
                 recyclerViewLeaves.setVisibility(View.GONE);
-                pieChart.setVisibility(View.GONE);
+                leavePieChart.setVisibility(View.GONE);
             }
         });
 
         loadingProgress.setVisibility(View.VISIBLE);
     }
 
-    private void updatePieChartData(List<LeavesItem> leaves) {
+    public void updatePieChartData(List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
         float totalBalanceLeaves = 0;
         float totalLeaves = 0;
@@ -138,7 +142,7 @@ public class LeavesDataFragment extends Fragment {
             }
         }
         if (entries.isEmpty()) {
-            pieChart.setVisibility(View.GONE);
+            leavePieChart.setVisibility(View.GONE);
             emptyStateText.setVisibility(View.VISIBLE);
             emptyStateText.setText("No balance leaves data available");
             return;
@@ -146,22 +150,22 @@ public class LeavesDataFragment extends Fragment {
 
         PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setValueFormatter(new PercentFormatter(pieChart));
+        dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
 
         PieData data = new PieData(dataSet);
-        pieChart.setData(data);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleRadius(35f);
-        pieChart.setTransparentCircleRadius(45f);
-        pieChart.animateXY(1000, 1000);
-        pieChart.setDrawEntryLabels(false);
+        leavePieChart.setData(data);
+        leavePieChart.getDescription().setEnabled(false);
+        leavePieChart.setDrawHoleEnabled(true);
+        leavePieChart.setHoleRadius(35f);
+        leavePieChart.setTransparentCircleRadius(45f);
+        leavePieChart.animateXY(1000, 1000);
+        leavePieChart.setDrawEntryLabels(false);
 
-//        pieChart.setCenterText("Balance Leaves: " + totalBalanceLeaves);
-//        pieChart.setCenterTextSize(14f);
+//        leavePieChart.setCenterText("Balance Leaves: " + totalBalanceLeaves);
+//        leavePieChart.setCenterTextSize(14f);
 
-        pieChart.invalidate();
+        leavePieChart.invalidate();
     }
 }

@@ -136,7 +136,7 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
             totalDaysText = itemView.findViewById(R.id.totalDaysText);
             progressText = itemView.findViewById(R.id.progressText);
             leaveProgress = itemView.findViewById(R.id.leaveProgress);
-            pieChart = itemView.findViewById(R.id.pieChart);
+            pieChart = itemView.findViewById(R.id.leavePieChart);
         }
     }
 }
