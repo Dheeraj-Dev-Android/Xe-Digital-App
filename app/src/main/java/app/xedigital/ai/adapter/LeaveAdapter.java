@@ -1,6 +1,5 @@
 package app.xedigital.ai.adapter;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import app.xedigital.ai.R;
@@ -66,54 +61,54 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
         }
 
         // Setup Pie Chart
-        setupPieChart(holder.pieChart, creditedLeaves, usedLeaves, balanceLeaves,debitedLeaves);
+//        setupPieChart(holder.pieChart, creditedLeaves, usedLeaves, balanceLeaves,debitedLeaves);
     }
 
-    private void setupPieChart(PieChart pieChart, float creditedLeaves, float usedLeaves, float balanceLeaves,float debitedLeaves) {
-        // Prepare chart entries
-        List<PieEntry> entries = new ArrayList<>();
-        List<Integer> colors = new ArrayList<>();
-
-        // Add Used Leaves
-        if (usedLeaves > 0) {
-            entries.add(new PieEntry(usedLeaves, "Used"));
-            colors.add(Color.RED);
-        }
-        // Add Balance Leaves
-        if (balanceLeaves > 0) {
-            entries.add(new PieEntry(balanceLeaves, "Balance"));
-            colors.add(Color.GREEN);
-        }
-        // Add Credited Leaves
-        if (creditedLeaves > 0) {
-            entries.add(new PieEntry(creditedLeaves, "Credited"));
-            colors.add(Color.BLUE);
-        }
-        // Add Debited Leaves
-        if (debitedLeaves > 0) {
-            entries.add(new PieEntry(debitedLeaves, "Debited"));
-            colors.add(Color.CYAN);
-        }
-
-        // Create dataset
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(colors);
-        dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueTextSize(8f);
-
-
-        // Create pie data object
-        PieData pieData = new PieData(dataSet);
-
-        // Customize chart
-        pieChart.setData(pieData);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleRadius(35f);
-        pieChart.setTransparentCircleRadius(45f);
-        pieChart.animateXY(1000, 1000);
-        pieChart.invalidate();
-    }
+//    private void setupPieChart(PieChart pieChart, float creditedLeaves, float usedLeaves, float balanceLeaves,float debitedLeaves) {
+//        // Prepare chart entries
+//        List<PieEntry> entries = new ArrayList<>();
+//        List<Integer> colors = new ArrayList<>();
+//
+//        // Add Used Leaves
+//        if (usedLeaves > 0) {
+//            entries.add(new PieEntry(usedLeaves, "Used"));
+//            colors.add(Color.RED);
+//        }
+//        // Add Balance Leaves
+//        if (balanceLeaves > 0) {
+//            entries.add(new PieEntry(balanceLeaves, "Balance"));
+//            colors.add(Color.GREEN);
+//        }
+//        // Add Credited Leaves
+//        if (creditedLeaves > 0) {
+//            entries.add(new PieEntry(creditedLeaves, "Credited"));
+//            colors.add(Color.BLUE);
+//        }
+//        // Add Debited Leaves
+//        if (debitedLeaves > 0) {
+//            entries.add(new PieEntry(debitedLeaves, "Debited"));
+//            colors.add(Color.CYAN);
+//        }
+//
+//        // Create dataset
+//        PieDataSet dataSet = new PieDataSet(entries, "");
+//        dataSet.setColors(colors);
+//        dataSet.setValueTextColor(Color.WHITE);
+//        dataSet.setValueTextSize(8f);
+//
+//
+//        // Create pie data object
+//        PieData pieData = new PieData(dataSet);
+//
+//        // Customize chart
+//        pieChart.setData(pieData);
+//        pieChart.getDescription().setEnabled(false);
+//        pieChart.setDrawHoleEnabled(true);
+//        pieChart.setHoleRadius(35f);
+//        pieChart.setTransparentCircleRadius(45f);
+//        pieChart.animateXY(1000, 1000);
+//        pieChart.invalidate();
+//    }
 
     @Override
     public int getItemCount() {
