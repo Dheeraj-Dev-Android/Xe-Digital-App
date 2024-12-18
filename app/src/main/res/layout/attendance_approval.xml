@@ -105,6 +105,7 @@
                         android:text="Shift"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -128,6 +129,7 @@
                         android:text="Punch In"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/shiftLabel" />
 
@@ -151,6 +153,7 @@
                         android:text="Punch Out"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/punchInLabel" />
 
@@ -174,6 +177,7 @@
                         android:text="Punch In Address"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/punchOutLabel" />
 
@@ -197,6 +201,7 @@
                         android:text="Punch Out Address"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/empPunchInAddress" />
 
@@ -258,6 +263,7 @@
                         android:text="Punch In"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -279,6 +285,7 @@
                         android:text="Punch Out"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/updatedPunchInLabel" />
 
@@ -300,6 +307,7 @@
                         android:text="Punch In Address"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/updatedPunchOutLabel" />
 
@@ -322,6 +330,7 @@
                         android:text="Punch Out Address"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/appliedPunchInAddress" />
 
@@ -385,6 +394,7 @@
                         android:text="Status"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -409,6 +419,7 @@
                         android:text="Updated By"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/statusLabel" />
 
@@ -432,6 +443,7 @@
                         android:text="Updated Date"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp"
+                        android:textStyle="bold|normal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/updatedByLabel" />
 
