@@ -4,6 +4,8 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -35,6 +37,19 @@ public class DateTimeUtils {
         return "N/A";
     }
 
+    public static String extractTime(String dateTimeString) {
+//        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+//        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, formatter);
+//        return offsetDateTime.toLocalTime().toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, formatter);
+        int hour = offsetDateTime.toLocalTime().getHour();
+        int minute = offsetDateTime.toLocalTime().getMinute();
+        String amPm = (hour < 12 || hour == 24) ? "AM" : "PM";
+        hour = (hour > 12) ? hour - 12 : hour; // Adjust hour for 12-hour format
+        hour = (hour == 0) ? 12 : hour; // Handle midnight (0 hour)
+        return String.format("%02d:%02d %s", hour, minute, amPm);
+    }
     public static String calculateLateTime(String punchInTime, String shiftStartTime) {
         if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
             return "N/A";

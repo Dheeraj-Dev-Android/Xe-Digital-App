@@ -9,6 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +36,8 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
     private RecyclerView recyclerViewDcr;
     private DcrAdapter dcrAdapter;
 
+    private ProgressBar loadingProgress;
+    private TextView emptyStateText;
     public void onFilterApplied(String startDate, String endDate) {
         dcrViewModel.fetchEmployeeDcr(startDate, endDate);
     }
@@ -50,6 +54,10 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
 
+        loadingProgress = binding.loadingProgress;
+        emptyStateText = binding.emptyStateText;
+
+        loadingProgress.setVisibility(View.VISIBLE);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", null);
         String userId = sharedPreferences.getString("userId", null);
@@ -68,10 +76,20 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
         recyclerViewDcr.setAdapter(dcrAdapter);
 
         dcrViewModel.getDcrData().observe(getViewLifecycleOwner(), dcrDataList -> {
+            loadingProgress.setVisibility(View.GONE);
+
             if (dcrDataList != null) {
                 List<EmployeesDcrDataItem> dcr = parseDcrData(dcrDataList);
-                dcrAdapter.updateData(dcr);
-                recyclerViewDcr.setAdapter(dcrAdapter);
+
+                if (dcr.isEmpty()) {
+                    emptyStateText.setVisibility(View.VISIBLE);
+                } else {
+                    emptyStateText.setVisibility(View.GONE);
+                    dcrAdapter.updateData(dcr);
+                    recyclerViewDcr.setAdapter(dcrAdapter);
+                }
+            } else {
+                emptyStateText.setVisibility(View.VISIBLE);
             }
         });
     }

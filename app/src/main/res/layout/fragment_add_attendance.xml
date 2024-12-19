@@ -28,18 +28,39 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Header -->
-                <TextView
-                    android:layout_width="match_parent"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/statusChipGroup"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:fontFamily="@font/quicksand_font_family"
-                    android:gravity="center"
-                    android:text="@string/add_attendance"
-                    android:textColor="@color/purple_700"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:singleSelection="false">
 
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/btn_viewAppliedAddAttendance"
+                        style="@style/Widget.MaterialComponents.Chip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View Applied Add Attendance"
+                        app:chipBackgroundColor="@color/chip_background"
+                        app:chipIconTint="@color/purple_700"
+                        app:chipStrokeColor="@color/purple_700"
+                        app:chipStrokeWidth="1dp" />
+                </com.google.android.material.chip.ChipGroup>
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="#E0E0E0"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
                 <!-- Date Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/datePunch"
@@ -146,11 +167,11 @@
                         android:id="@+id/etPunchInAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:gravity="center_vertical"
                         android:inputType="textMultiLine"
                         android:maxLines="3"
                         android:minLines="2"
-                        android:layout_gravity="center"
                         android:paddingStart="40dp"
                         android:paddingEnd="5dp"
                         android:scrollbars="vertical"

@@ -1,6 +1,7 @@
 package app.xedigital.ai.api;
 
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
+import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.approveClaim.ApproveClaimResponse;
@@ -133,6 +134,9 @@ public interface APIInterface {
 
     @GET("employees/uploadDoc/list/{empId}")
     retrofit2.Call<DocumentListResponse> getDocList(@Header("Authorization") String authToken, @Path("empId") String empId);
+
+    @GET("employees/attendance/add/regularizeList")
+    retrofit2.Call<AddedAttendanceListResponse> getAddedAttendance(@Header("Authorization") String authToken);
 
     //    POST APIs
     @POST("face/recognize")

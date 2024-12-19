@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -208,6 +209,8 @@ public class PendingApprovalViewFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Attendance Approved", Toast.LENGTH_SHORT).show();
+
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
                     if (listener != null) {
@@ -241,6 +244,7 @@ public class PendingApprovalViewFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Attendance Rejected", Toast.LENGTH_SHORT).show();
 
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();

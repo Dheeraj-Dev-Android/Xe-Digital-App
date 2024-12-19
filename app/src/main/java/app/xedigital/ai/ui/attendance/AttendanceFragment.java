@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +43,8 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
     private FragmentAttendanceBinding binding;
     private AttendanceViewModel attendanceViewModel;
     private RecyclerView recyclerViewAttendance;
+    private ProgressBar loadingProgress;
+    private TextView emptyStateText;
 
     public static String getDayOfWeek(String dateString) {
         if (dateString == null || dateString.equals("1900-01-01T00:00:00.000Z")) {
@@ -86,20 +90,31 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         recyclerViewAttendance = binding.recyclerViewAttendance;
         recyclerViewAttendance.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        loadingProgress = binding.loadingProgress;
+        emptyStateText = binding.emptyStateText;
+
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceList -> {
             if (attendanceList != null) {
                 Log.d(TAG, "Attendance List:\n " + attendanceList);
+                loadingProgress.setVisibility(View.GONE);
                 List<EmployeePunchDataItem> attendance = parseAttendanceData(attendanceList);
 //                AttendanceAdapter adapter = new AttendanceAdapter(attendance, attendanceViewModel);
 //                recyclerViewAttendance.setAdapter(adapter);
                 if (attendance.isEmpty()) {
                     showNoDataAlert();
+                    emptyStateText.setVisibility(View.VISIBLE);
+                    recyclerViewAttendance.setVisibility(View.GONE);
                 } else {
+                    emptyStateText.setVisibility(View.GONE);
+                    recyclerViewAttendance.setVisibility(View.VISIBLE);
                     AttendanceAdapter adapter = new AttendanceAdapter(attendance);
                     recyclerViewAttendance.setAdapter(adapter);
                 }
             } else {
                 Log.d(TAG, "Attendance List is null");
+                loadingProgress.setVisibility(View.VISIBLE);
+                emptyStateText.setVisibility(View.GONE);
+                recyclerViewAttendance.setVisibility(View.GONE);
             }
         });
         attendanceViewModel.toastMessage.observe(getViewLifecycleOwner(), message -> {
@@ -117,7 +132,7 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
     }
 
     private void showNoDataAlert() {
-        new AlertDialog.Builder(requireContext()).setTitle("Attendance").setMessage("NO Attendance Data Available").setPositiveButton("OK", null).show();
+        new AlertDialog.Builder(requireContext()).setTitle("Attendance").setMessage("No Attendance data available For this Month use Filter to get previous months attendance").setPositiveButton("OK", null).show();
     }
 
 

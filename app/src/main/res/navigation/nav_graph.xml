@@ -57,7 +57,34 @@
         android:id="@+id/nav_addAttendanceFragment"
         android:name="app.xedigital.ai.ui.attendance.AddAttendanceFragment"
         android:label="@string/menu_add_attendance"
-        tools:layout="@layout/fragment_add_attendance" />
+        tools:layout="@layout/fragment_add_attendance">
+        <action
+            android:id="@+id/action_nav_add_attendance_to_nav_View_add_attendance_fragment"
+            app:destination="@id/nav_View_add_attendance_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_View_add_attendance_fragment"
+        android:name="app.xedigital.ai.ui.attendance.ViewAddedAttendanceFragment"
+        android:label="View Added Attendance"
+        tools:layout="@layout/fragment_view_added_attendance">
+        <action
+            android:id="@+id/action_nav_View_add_attendance_fragment_to_nav_add_attendance_fragment"
+            app:destination="@id/nav_addAttendanceFragment" />
+        <action
+            android:id="@+id/action_nav_View_add_attendance_fragment_to_nav_detail_view_added_attendanceFragment"
+            app:destination="@id/nav_detail_view_added_attendanceFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/nav_detail_view_added_attendanceFragment"
+        android:name="app.xedigital.ai.ui.attendance.DetailViewAddAttendanceFragment"
+        android:label="Detail View Added Attendance"
+        tools:layout="@layout/fragment_detail_view_add_attendance">
+        <action
+            android:id="@+id/action_nav_detail_view_added_attendanceFragment_to_nav_View_add_attendance_fragment"
+            app:destination="@id/nav_View_add_attendance_fragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/regularizeFragment"

@@ -15,7 +15,7 @@
     <dimen name="stat_box_width">120dp</dimen>
 
     <!-- Layout spacing -->
-    <dimen name="layout_padding">16dp</dimen>
+    <dimen name="layout_padding">12dp</dimen>
     <dimen name="content_margin">16dp</dimen>
     <dimen name="text_spacing">8dp</dimen>
     <dimen name="card_margin">16dp</dimen>

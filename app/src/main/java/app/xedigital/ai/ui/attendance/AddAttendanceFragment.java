@@ -13,10 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONException;
@@ -49,6 +52,7 @@ public class AddAttendanceFragment extends Fragment {
     private Button btSubmit;
     private Button btnClear;
     private String token;
+    private Chip viewAppliedAddAttendance;
 
 
     @Override
@@ -77,6 +81,8 @@ public class AddAttendanceFragment extends Fragment {
         etRemarks = view.findViewById(R.id.etRemarks);
         btSubmit = view.findViewById(R.id.btSubmit);
         btnClear = view.findViewById(R.id.btClear);
+        viewAppliedAddAttendance = view.findViewById(R.id.btn_viewAppliedAddAttendance);
+
 
         return view;
     }
@@ -145,6 +151,11 @@ public class AddAttendanceFragment extends Fragment {
             }, year, month, day);
             datePickerDialog.show();
         });
+        viewAppliedAddAttendance.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_nav_add_attendance_to_nav_View_add_attendance_fragment);
+            Toast.makeText(requireContext(), "Applied Attendance Add", Toast.LENGTH_SHORT).show();
+        });
+
     }
 
     private void addAttendance(String userId, String date, String punchIn, String punchOut, String punchInAddress, String punchOutAddress, String remarks) {

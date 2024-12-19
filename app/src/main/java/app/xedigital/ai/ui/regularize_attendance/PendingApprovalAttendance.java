@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,6 +42,8 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
 
     private PendingApprovalViewFragment pendingApprovalViewFragment;
     private APIInterface apiInterface;
+    private ProgressBar loadingProgress;
+    private TextView emptyStateText;
 
 
     @Override
@@ -52,8 +56,10 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
         View view = inflater.inflate(R.layout.fragment_pending_approval_attendance, container, false);
 
         approvalRecyclerView = view.findViewById(R.id.approval_recycler_view);
+        loadingProgress = view.findViewById(R.id.loadingProgress);
+        emptyStateText = view.findViewById(R.id.emptyStateText);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-
+        loadingProgress.setVisibility(View.VISIBLE);
         apiInterface = APIClient.getInstance().getRegularizeListApproval();
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
@@ -68,18 +74,21 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
         call.enqueue(new Callback<RegularizeApprovalResponse>() {
             @Override
             public void onResponse(@NonNull Call<RegularizeApprovalResponse> call, @NonNull Response<RegularizeApprovalResponse> response) {
+                loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     RegularizeApprovalResponse apiResponse = response.body();
                     List<AttendanceRegularizeAppliedItem> items = apiResponse.getData().getAttendanceRegularizeApplied();
 
                     if (items.isEmpty()) {
+                        emptyStateText.setVisibility(View.VISIBLE);
                         Toast.makeText(getContext(), "No data found", Toast.LENGTH_SHORT).show();
                         new AlertDialog.Builder(getContext())
                                 .setTitle("Attendance Regularization Approval List")
-                                .setMessage("No data found in the list.")
+                                .setMessage("No Records Found.")
                                 .setPositiveButton("OK", null)
                                 .show();
                     } else {
+                        emptyStateText.setVisibility(View.GONE);
                         adapter = new RegularizeApprovalAdapter(items, authToken,userId, PendingApprovalAttendance.this, getContext());
                         approvalRecyclerView.setAdapter(adapter);
 //                        Log.d("Approval pending List", gson.toJson(response.body()));
@@ -100,6 +109,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
 
             @Override
             public void onFailure(@NonNull Call<RegularizeApprovalResponse> call, @NonNull Throwable t) {
+                loadingProgress.setVisibility(View.GONE);
                 Log.e("Approval pending List", "Error: " + t.getMessage());
                 Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
             }

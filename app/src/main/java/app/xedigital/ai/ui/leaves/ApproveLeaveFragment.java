@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,6 +49,8 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     private PendingLeaveApproveFragment pendingLeaveApproveFragment;
     private LeavePendingApprovalResponse leavePendingApprovalResponse;
     private APIInterface apiInterface;
+    private ProgressBar loadingProgress;
+    private TextView emptyStateText;
     private View view;
 
     public static ApproveLeaveFragment newInstance() {
@@ -68,7 +72,10 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         setHasOptionsMenu(true);
 
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
+        loadingProgress = view.findViewById(R.id.loadingProgress);
+        emptyStateText = view.findViewById(R.id.emptyStateText);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        loadingProgress.setVisibility(View.VISIBLE);
 
         apiInterface = APIClient.getInstance().getPendingApprovalLeaves();
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -139,12 +146,15 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
             @Override
             public void onResponse(@NonNull Call<LeavePendingApprovalResponse> call, @NonNull Response<LeavePendingApprovalResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    loadingProgress.setVisibility(View.GONE);
                     leavePendingApprovalResponse = response.body();
                     List<AppliedLeavesApproveItem> items = leavePendingApprovalResponse.getData().getAppliedLeaves();
                     if (items.isEmpty()) {
+                        emptyStateText.setVisibility(View.VISIBLE);
                         Toast.makeText(getContext(), "No Data Found", Toast.LENGTH_SHORT).show();
-                        new AlertDialog.Builder(getContext()).setTitle("No Data Found").setMessage("No Data Found").setPositiveButton("OK", null).show();
+                        new AlertDialog.Builder(getContext()).setTitle("Approve Leaves").setMessage("No Records Found").setPositiveButton("OK", null).show();
                     } else {
+                        emptyStateText.setVisibility(View.GONE);
                         approvalAdapter = new LeaveApprovalAdapter(items, authTokenHeader, userId, ApproveLeaveFragment.this, getContext());
                         approvalRecyclerView.setAdapter(approvalAdapter);
                     }
@@ -156,6 +166,7 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
 
             @Override
             public void onFailure(@NonNull Call<LeavePendingApprovalResponse> call, @NonNull Throwable t) {
+                loadingProgress.setVisibility(View.GONE);
                 Log.e("Approval pending List", "Error: " + t.getMessage());
                 Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
             }
