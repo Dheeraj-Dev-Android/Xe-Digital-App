@@ -24,7 +24,6 @@
         android:background="#F5F5F5"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/leaveApprovalRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -95,6 +94,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
+        android:layout_marginTop="5dp"
         android:paddingTop="8dp"
         android:scrollbarStyle="outsideOverlay"
         app:layout_constraintBottom_toBottomOf="parent"
