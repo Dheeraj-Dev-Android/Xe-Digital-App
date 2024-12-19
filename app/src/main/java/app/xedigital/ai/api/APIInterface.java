@@ -1,6 +1,7 @@
 package app.xedigital.ai.api;
 
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
+import app.xedigital.ai.model.addAttendanceRequest.AddedAttendanceCancelRequest;
 import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
@@ -222,4 +223,6 @@ public interface APIInterface {
     @POST("employees/uploadDoc")
     retrofit2.Call<ResponseBody> uploadDocument(@Header("Authorization") String token, @Body UploadDocumentRequest requestBody);
 
+    @PUT("employees/addAttendance/regularize/applied/status/{attendanceId}")
+    Call<ResponseBody> AddedAttendanceStatus(@Header("Authorization") String authToken, @Path("attendanceId") String attendanceId, @Body AddedAttendanceCancelRequest requestBody);
 }

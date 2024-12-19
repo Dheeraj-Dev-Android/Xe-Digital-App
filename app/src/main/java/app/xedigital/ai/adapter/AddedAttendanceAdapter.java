@@ -52,7 +52,7 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
             holder.statusChip.setChipBackgroundColorResource(R.color.status_approved);
         } else if (attendanceData.getStatus().equalsIgnoreCase("unapproved")) {
             holder.statusChip.setChipBackgroundColorResource(R.color.status_pending);
-        } else if (attendanceData.getStatus().equalsIgnoreCase("Cancel")) {
+        } else if (attendanceData.getStatus().equalsIgnoreCase("Cancelled")) {
             holder.statusChip.setChipBackgroundColorResource(R.color.status_rejected);
         }
 
