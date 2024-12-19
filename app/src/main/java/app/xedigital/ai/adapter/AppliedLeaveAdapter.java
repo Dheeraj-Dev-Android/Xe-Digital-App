@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
-import java.io.Serializable;
 import java.util.List;
 
 import app.xedigital.ai.R;
@@ -27,7 +26,7 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapter.ViewHolder> {
 
-    private final List<AppliedLeavesItem> appliedLeaves;
+    private List<AppliedLeavesItem> appliedLeaves;
 
     public AppliedLeaveAdapter(List<AppliedLeavesItem> appliedLeaves) {
         this.appliedLeaves = appliedLeaves;
@@ -47,9 +46,9 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
         holder.appliedDate.setText(formattedAppliedDate);
         holder.leaveName.setText(appliedLeave.getLeaveName());
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(appliedLeave.getFromDate());
-        holder.fromDate.setText("From "+ formattedFromDate);
+        holder.fromDate.setText("From " + formattedFromDate);
         String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(appliedLeave.getToDate());
-        holder.toDate.setText("To "+ formattedToDate);
+        holder.toDate.setText("To " + formattedToDate);
         holder.statusChip.setText(appliedLeave.getStatus());
 
         String status = appliedLeave.getStatus().toLowerCase();
@@ -94,6 +93,11 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
     @Override
     public int getItemCount() {
         return appliedLeaves.size();
+    }
+
+    public void updateList(List<AppliedLeavesItem> filteredList) {
+        this.appliedLeaves = filteredList;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

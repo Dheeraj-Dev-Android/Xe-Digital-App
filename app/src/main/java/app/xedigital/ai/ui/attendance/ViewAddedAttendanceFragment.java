@@ -16,9 +16,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.AddedAttendanceAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
@@ -35,7 +39,8 @@ public class ViewAddedAttendanceFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
-    private AddedAttendanceAdapter adapter;
+    private AddedAttendanceListResponse addedAttendanceListResponse;
+    private AddedAttendanceAdapter addedAttendanceAdapter;
 
     public ViewAddedAttendanceFragment() {
         // Required empty public constructor
@@ -55,7 +60,60 @@ public class ViewAddedAttendanceFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout using View Binding
         binding = FragmentViewAddedAttendanceBinding.inflate(inflater, container, false);
+
+        ChipGroup chipGroup = binding.statusChipGroup;
+        chipGroup.setSingleSelection(true);
+
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            // Handle chip selection
+            if (checkedIds.contains(R.id.chipAll)) {
+                filterLeaves("All");
+            } else if (checkedIds.contains(R.id.chipApproved)) {
+                filterLeaves("Approved");
+            } else if (checkedIds.contains(R.id.chipUnapproved)) {
+                filterLeaves("Unapproved");
+            } else if (checkedIds.contains(R.id.chipRejected)) {
+                filterLeaves("Rejected");
+            } else if (checkedIds.contains(R.id.chipCancelled)) {
+                filterLeaves("Cancelled");
+            } else {
+                filterLeaves("All");
+            }
+        });
+        // Attach click listeners to chips
+        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+            View child = chipGroup.getChildAt(i);
+            if (child instanceof Chip) {
+                child.setOnClickListener(this::onChipClicked);
+            }
+        }
         return binding.getRoot();
+    }
+
+    public void onChipClicked(View view) {
+        // Get the ChipGroup and the clicked chip
+        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
+        Chip clickedChip = (Chip) view;
+
+        // Check the clicked chip
+        chipGroup.check(clickedChip.getId());
+    }
+
+    private void filterLeaves(String status) {
+        if (addedAttendanceListResponse != null && addedAttendanceListResponse.getData() != null && addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied() != null) {
+            List<AddAttendanceRegularizeAppliedItem> originalList = addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied();
+            List<AddAttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
+            if (status.equals("All")) {
+                filteredList.addAll(originalList);
+            } else {
+                for (AddAttendanceRegularizeAppliedItem item : originalList) {
+                    if (item.getStatus().equalsIgnoreCase(status)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            addedAttendanceAdapter.updateAttendanceData(filteredList);
+        }
     }
 
     @Override
@@ -69,9 +127,9 @@ public class ViewAddedAttendanceFragment extends Fragment {
         loadingProgress = binding.loadingProgress;
         emptyStateText = binding.emptyStateText;
 
-        adapter = new AddedAttendanceAdapter(new ArrayList<>());
+        addedAttendanceAdapter = new AddedAttendanceAdapter(new ArrayList<>());
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(addedAttendanceAdapter);
 
         loadingProgress.setVisibility(View.VISIBLE);
         getAddedAttendance(authToken);
@@ -88,15 +146,12 @@ public class ViewAddedAttendanceFragment extends Fragment {
             public void onResponse(@NonNull Call<AddedAttendanceListResponse> call, @NonNull Response<AddedAttendanceListResponse> response) {
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
-                    AddedAttendanceListResponse attendanceListResponse = response.body();
-                    if (attendanceListResponse.getData() != null && !attendanceListResponse.getData().getAddAttendanceRegularizeApplied().isEmpty()) {
-//                        emptyStateText.setVisibility(View.GONE);
-//                        recyclerView.setVisibility(View.VISIBLE);
-//                        recyclerView.setAdapter(new AddedAttendanceAdapter(attendanceListResponse.getData().getAddAttendanceRegularizeApplied()));
-                        recyclerView.setAdapter(new AddedAttendanceAdapter(attendanceListResponse.getData().getAddAttendanceRegularizeApplied()));
-                        AddedAttendanceAdapter adapter = (AddedAttendanceAdapter) recyclerView.getAdapter(); // Get the adapter
-                        if (adapter != null) {
-                            adapter.updateAttendanceData(attendanceListResponse.getData().getAddAttendanceRegularizeApplied()); // Update data using the method
+                    addedAttendanceListResponse = response.body();
+                    if (addedAttendanceListResponse.getData() != null && !addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied().isEmpty()) {
+                        recyclerView.setAdapter(new AddedAttendanceAdapter(addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied()));
+                        addedAttendanceAdapter = (AddedAttendanceAdapter) recyclerView.getAdapter();
+                        if (addedAttendanceAdapter != null) {
+                            addedAttendanceAdapter.updateAttendanceData(addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied());
                         }
                     } else {
                         emptyStateText.setVisibility(View.VISIBLE);

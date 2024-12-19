@@ -26,7 +26,7 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeAppliedAdapter.ViewHolder> {
 
-    private final List<AttendanceRegularizeAppliedItem> items;
+    private List<AttendanceRegularizeAppliedItem> items;
 
     public RegularizeAppliedAdapter(List<AttendanceRegularizeAppliedItem> items) {
         this.items = items;
@@ -92,6 +92,11 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public void updateList(List<AttendanceRegularizeAppliedItem> filteredList) {
+        this.items = filteredList;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

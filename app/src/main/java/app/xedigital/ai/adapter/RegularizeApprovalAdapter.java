@@ -32,11 +32,11 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeApprovalAdapter.ViewHolder> {
 
-    private final List<AttendanceRegularizeAppliedItem> items;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String authToken;
     private final String userId;
     private final Context context;
+    private List<AttendanceRegularizeAppliedItem> items;
 
 
     public RegularizeApprovalAdapter(List<AttendanceRegularizeAppliedItem> items, String authToken, String userId, PendingApprovalAttendance pendingApprovalAttendance, Context context) {
@@ -101,6 +101,12 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
     public int getItemCount() {
         return items.size();
     }
+
+    public void updateList(List<AttendanceRegularizeAppliedItem> newItems) {
+        this.items = newItems;
+        notifyDataSetChanged();
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView empName;

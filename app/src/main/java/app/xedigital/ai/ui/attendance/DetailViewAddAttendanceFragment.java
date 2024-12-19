@@ -130,6 +130,9 @@ public class DetailViewAddAttendanceFragment extends Fragment {
                     appliedStatusChip.setTextColor(getResources().getColor(R.color.status_pending));
                 }
 
+                if (attendanceItem.getStatus().equalsIgnoreCase("Cancelled")) {
+                    actionButtonsCard.setVisibility(View.GONE);
+                }
                 TextView appliedStatusUpdateBy = view.findViewById(R.id.appliedStatusUpdateBy);
                 appliedStatusUpdateBy.setText(attendanceItem.getApprovedByName());
 
