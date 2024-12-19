@@ -10,8 +10,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="180dp"
         android:padding="24dp">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -72,8 +72,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/white"
                 android:layout_weight="1"
                 android:text="Clear"
+                android:textColor="@color/rejected_color"
                 app:iconGravity="textStart" />
 
             <com.google.android.material.button.MaterialButton
@@ -81,7 +83,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="@color/black"
+                android:backgroundTint="@color/OccasionalLeave"
                 android:enabled="false"
                 android:text="Submit"
                 android:textColor="@color/white" />

@@ -93,4 +93,5 @@ dependencies {
     implementation("org.jsoup:jsoup:1.18.1")
 //    implementation("com.google.mlkit:face-detection:16.1.5")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 }

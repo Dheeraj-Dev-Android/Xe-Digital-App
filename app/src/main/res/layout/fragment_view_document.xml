@@ -8,7 +8,7 @@
     android:fontFamily="@font/quicksand_font_family"
     tools:context=".ui.document_upload.ViewDocumentFragment">
 
-    <com.google.android.material.chip.ChipGroup
+    <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/statusChipGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -18,7 +18,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:singleSelection="false">
+        app:alignItems="center"
+        app:justifyContent="center">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/uploadDocumentsChip"
@@ -27,11 +28,11 @@
             android:layout_height="wrap_content"
             android:text="Upload Documents"
             app:chipBackgroundColor="@color/chip_background"
-            app:chipIconTint="@color/purple_700"
+            app:chipIcon="@drawable/ic_upload"
             app:chipStrokeColor="@color/purple_700"
             app:chipStrokeWidth="1dp" />
 
-    </com.google.android.material.chip.ChipGroup>
+    </com.google.android.flexbox.FlexboxLayout>
 
     <View
         android:id="@+id/divider"
