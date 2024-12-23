@@ -43,6 +43,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         String dayOfWeek = attendanceItem.getDayOfWeek();
         String punchIn = attendanceItem.getPunchIn();
         String punchOut = attendanceItem.getPunchOut();
+        holder.leaveTypeName.setVisibility(View.GONE);
 
         if ((dayOfWeek.equals("Sat") || dayOfWeek.equals("Sun")) && (punchIn == null || punchOut == null)) {
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
@@ -54,8 +55,38 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.overTimeTextView.setVisibility(View.GONE);
             holder.btnViewAttendance.setVisibility(View.GONE);
             holder.btnRegularize.setVisibility(View.GONE);
-        } else {
+            holder.leaveTypeName.setVisibility(View.GONE);
 
+        } else if (attendanceItem.getLeaveName() != null && !attendanceItem.getLeaveName().isEmpty()) {
+            // Leave data
+            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
+            holder.leaveTypeName.setVisibility(View.VISIBLE);
+            holder.leaveTypeName.setText("Leave Name: " + attendanceItem.getLeaveName());
+
+            holder.punchInTextView.setVisibility(View.GONE);
+            holder.punchOutTextView.setVisibility(View.GONE);
+            holder.totalTimeTextView.setVisibility(View.GONE);
+            holder.lateTimeTextView.setVisibility(View.GONE);
+            holder.overTimeTextView.setVisibility(View.GONE);
+            holder.btnViewAttendance.setVisibility(View.GONE);
+            holder.btnRegularize.setVisibility(View.GONE);
+
+        } else if (attendanceItem.getHolidayName() != null && !attendanceItem.getHolidayName().isEmpty()) {
+            // Holiday data
+            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
+            holder.leaveTypeName.setVisibility(View.VISIBLE);
+            holder.leaveTypeName.setText("Holiday Name: " + attendanceItem.getHolidayName());
+
+            holder.punchInTextView.setVisibility(View.GONE);
+            holder.punchOutTextView.setVisibility(View.GONE);
+            holder.totalTimeTextView.setVisibility(View.GONE);
+            holder.lateTimeTextView.setVisibility(View.GONE);
+            holder.overTimeTextView.setVisibility(View.GONE);
+            holder.btnViewAttendance.setVisibility(View.GONE);
+            holder.btnRegularize.setVisibility(View.GONE);
+
+        } else if (punchIn != null && !punchIn.isEmpty() && punchOut != null && !punchOut.isEmpty()) {
+            // Attendance data
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.punchInTextView.setVisibility(View.VISIBLE);
             holder.punchOutTextView.setVisibility(View.VISIBLE);
@@ -64,14 +95,40 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.overTimeTextView.setVisibility(View.VISIBLE);
             holder.btnViewAttendance.setVisibility(View.VISIBLE);
             holder.btnRegularize.setVisibility(View.VISIBLE);
+            holder.leaveTypeName.setVisibility(View.GONE);
 
             holder.punchInTextView.setText(DateTimeUtils.formatTime(attendanceItem.getPunchIn()));
             holder.punchOutTextView.setText(DateTimeUtils.formatTime(attendanceItem.getPunchOut()));
             holder.totalTimeTextView.setText(attendanceList.get(position).getTotalTime());
             holder.overTimeTextView.setText(attendanceList.get(position).getOvertime());
             holder.lateTimeTextView.setText(attendanceList.get(position).getLateTime());
+        } else {
+            //  No leave, holiday, or punch data - show LOP/LWP
+            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
+            holder.leaveTypeName.setVisibility(View.VISIBLE);
+            holder.leaveTypeName.setText("Loss of Pay (LOP) / Leave Without Pay (LWP)");
 
+            holder.punchInTextView.setVisibility(View.GONE);
+            holder.punchOutTextView.setVisibility(View.GONE);
+            holder.totalTimeTextView.setVisibility(View.GONE);
+            holder.lateTimeTextView.setVisibility(View.GONE);
+            holder.overTimeTextView.setVisibility(View.GONE);
+            holder.btnViewAttendance.setVisibility(View.GONE);
+            holder.btnRegularize.setVisibility(View.GONE);
         }
+
+
+//        if (attendanceItem.getLeaveName()!=null){
+//            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
+//            holder.leaveTypeName.setVisibility(View.VISIBLE);
+//            holder.leaveTypeName.setText("Leave Name : "+attendanceItem.getLeaveName());
+//
+//        }else if (attendanceItem.getHolidayName() != null){
+//            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
+//            holder.leaveTypeName.setVisibility(View.VISIBLE);
+//            holder.leaveTypeName.setText("Holiday Name : "+attendanceItem.getHolidayName());
+//
+//        }
     }
 
     @Override
@@ -86,6 +143,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         public TextView totalTimeTextView;
         public TextView lateTimeTextView;
         public TextView overTimeTextView;
+        public TextView leaveTypeName;
         public ImageButton btnViewAttendance;
         public ImageButton btnRegularize;
 
@@ -97,6 +155,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             totalTimeTextView = itemView.findViewById(R.id.totalTimeTextView);
             lateTimeTextView = itemView.findViewById(R.id.lateTimeTextView);
             overTimeTextView = itemView.findViewById(R.id.overTimeTextView);
+            leaveTypeName = itemView.findViewById(R.id.leaveNameTextView);
             btnViewAttendance = itemView.findViewById(R.id.btn_viewAttendance);
             btnRegularize = itemView.findViewById(R.id.btn_regularize);
 
