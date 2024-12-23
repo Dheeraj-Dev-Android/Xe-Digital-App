@@ -37,10 +37,11 @@
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/tv_policy_status"
             app:layout_constraintStart_toEndOf="@id/btn_policyIcon"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Travel Policy" />
+
+        <!--            app:layout_constraintEnd_toStartOf="@id/tv_policy_status"-->
 
         <TextView
             android:id="@+id/tv_policy_date"
@@ -53,17 +54,17 @@
             app:layout_constraintTop_toBottomOf="@id/tv_policy_name"
             tools:text="Created on: Jun 21, 2023" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/tv_policy_status"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Active"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textStyle="bold|italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <!--        <com.google.android.material.chip.Chip-->
+        <!--            android:id="@+id/tv_policy_status"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:text="Active"-->
+        <!--            android:textAlignment="center"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textStyle="bold|italic"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
