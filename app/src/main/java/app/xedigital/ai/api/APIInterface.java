@@ -37,6 +37,7 @@ import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
 import app.xedigital.ai.model.shifts.ShiftTypeResponse;
 import app.xedigital.ai.model.uploadDocument.UploadDocumentRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
+import app.xedigital.ai.model.vms.GetVisitorsResponse;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -138,6 +139,9 @@ public interface APIInterface {
 
     @GET("employees/attendance/add/regularizeList")
     retrofit2.Call<AddedAttendanceListResponse> getAddedAttendance(@Header("Authorization") String authToken);
+
+    @GET("visitors?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=")
+    retrofit2.Call<GetVisitorsResponse> getVisitors(@Header("Authorization") String authToken);
 
     //    POST APIs
     @POST("face/recognize")

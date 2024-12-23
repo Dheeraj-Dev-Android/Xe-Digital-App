@@ -367,4 +367,11 @@
             app:destination="@id/nav_documents" />
 
     </fragment>
+    <fragment
+        android:id="@+id/nav_vms"
+        android:name="app.xedigital.ai.ui.vms.VmsFragment"
+        android:label="VMS"
+        tools:layout="@layout/fragment_v_m_s">
+
+    </fragment>
 </navigation>

@@ -11,19 +11,6 @@
         android:id="@+id/nav_profile"
         android:title="@string/menu_profile" />
 
-    <!--    <group android:checkableBehavior="single">-->
-    <!--        <item android:title="@string/menu_attendance">-->
-    <!--            <menu>-->
-    <!--                <item-->
-    <!--                    android:id="@+id/nav_attendance"-->
-    <!--                    android:title="@string/view_attendance" />-->
-    <!--                <item-->
-    <!--                    android:id="@+id/nav_addAttendanceFragment"-->
-    <!--                    android:title="@string/menu_add_attendance" />-->
-    <!--            </menu>-->
-    <!--        </item>-->
-    <!--    </group>-->
-
     <!--Attendance start-->
     <group android:checkableBehavior="single">
         <item
@@ -108,6 +95,9 @@
     <item
         android:id="@+id/nav_documents"
         android:title="@string/menu_documents_upload" />
+    <item
+        android:id="@+id/nav_vms"
+        android:title="VMS (Coming Soon*)" />
 
     <item
         android:id="@+id/nav_payroll"

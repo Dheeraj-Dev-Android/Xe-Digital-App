@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -38,9 +39,13 @@ public class NetworkUtils {
         if (networkCapabilities != null) {
             int downSpeed = networkCapabilities.getLinkDownstreamBandwidthKbps();
             int upSpeed = networkCapabilities.getLinkUpstreamBandwidthKbps();
+            Log.d("NetworkSpeed", "Down Speed: " + downSpeed + " Mbps, Up Speed: " + upSpeed + " Mbps");
             return new NetworkSpeed(downSpeed, upSpeed);
+
         } else {
+            Log.d("NetworkSpeed", "Network capabilities are null");
             return new NetworkSpeed(0, 0);
+
         }
     }
 

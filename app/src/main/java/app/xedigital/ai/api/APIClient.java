@@ -178,6 +178,10 @@ public class APIClient {
     public APIInterface getDocumentList() {
         return retrofit2.create(APIInterface.class);
     }
+
+    public APIInterface getVisitors() {
+        return retrofit2.create(APIInterface.class);
+    }
 }
 
 
