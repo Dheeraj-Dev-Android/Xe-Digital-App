@@ -1,8 +1,10 @@
 package app.xedigital.ai;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,17 +24,41 @@ import com.google.android.material.navigation.NavigationView;
 import app.xedigital.ai.activity.LoginActivity;
 import app.xedigital.ai.activity.PunchActivity;
 import app.xedigital.ai.databinding.ActivityMainBinding;
+import app.xedigital.ai.utills.NetworkUtils;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
-    private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
+    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
+
+    private AlertDialog noInternetDialog;
+    private boolean isShowingNoInternetDialog = false;
+    private AlertDialog slowNetworkDialog;
+    private boolean isShowingSlowNetworkDialog = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
+//        if (!NetworkUtils.isNetworkAvailable(this)) {
+//            showNoInternetAlert();
+//        }
+        noInternetDialog = new AlertDialog.Builder(this)
+                .setTitle("No Internet Connection")
+                .setMessage("Please check your internet connection and try again.")
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .create();
+
+        // Create the slow network alert dialog
+        slowNetworkDialog = new AlertDialog.Builder(this)
+                .setTitle("Slow Network Connection")
+                .setMessage("Your network connection is slow. Some features might be affected.")
+                .setPositiveButton("OK", null)
+                .setCancelable(true)
+                .create();
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -40,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_viewAttendanceFragment, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment,
-                R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves,R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_logout).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_viewAttendanceFragment, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -71,6 +96,49 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
+
+    //    private void showNoInternetAlert() {
+//        new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).show();
+//    }
+    public void showNoInternetAlert() {
+        if (!isShowingNoInternetDialog) {
+            noInternetDialog.show();
+            isShowingNoInternetDialog = true;
+        }
+    }
+
+    public void hideNoInternetAlert() {
+        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+            noInternetDialog.dismiss();
+            isShowingNoInternetDialog = false;
+        }
+    }
+
+    public void showSlowNetworkAlert() {
+        if (!isShowingSlowNetworkDialog) {
+            slowNetworkDialog.show();
+            isShowingSlowNetworkDialog = true;
+        }
+    }
+
+    public void hideSlowNetworkAlert() {
+        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
+            slowNetworkDialog.dismiss();
+            isShowingSlowNetworkDialog = false;
+        }
+    }
+
+//    private void showNoInternetSnackbar() {
+//        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+//                "No Internet Connection. Please check your network.", Snackbar.LENGTH_INDEFINITE);
+//        snackbar.setAction("OK", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                finish(); // Close the app
+//            }
+//        });
+//        snackbar.show();
+//    }
 
     private void toggleDcrVisibility(Menu menu) {
         MenuItem dcrItem = menu.findItem(R.id.nav_dcr_menu);
@@ -155,12 +223,33 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 // Handle successful punch, navigate to a different fragment
                 NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-                navController.navigate(R.id.nav_dashboard); // Replace with your target fragment ID
+                navController.navigate(R.id.nav_dashboard);
             } else {
-                // Handle punch failure (e.g., show a message)
                 // You might want to check for specific result codes for different errors
                 Toast.makeText(this, "Punch failed", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Use the string literal instead of the deprecated constant
+        registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {
+            noInternetDialog.show();
+            isShowingNoInternetDialog = true; // Set the flag to true
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(networkChangeReceiver);
+        // Dismiss the AlertDialog if it's showing
+        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+            noInternetDialog.dismiss();
+            isShowingNoInternetDialog = false; // Set the flag to false
         }
     }
 }

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,7 +64,7 @@ public class DashboardFragment extends Fragment {
     public LeavesViewModel leavesViewModel;
     private Handler handler;
     private Runnable runnable;
-    //    private PieChart pieChart;
+    private ProgressBar loader;
     private PieChart leavePieChart;
     private FragmentDashboardBinding binding;
 
@@ -121,6 +122,8 @@ public class DashboardFragment extends Fragment {
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesData();
 
+        loader = view.findViewById(R.id.loader);
+
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
             @Override
@@ -135,8 +138,9 @@ public class DashboardFragment extends Fragment {
             }
         };
         handler.post(runnable);
-
+        loader.setVisibility(View.VISIBLE);
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
+            loader.setVisibility(View.GONE);
             // Null check before accessing Employee object
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
@@ -191,8 +195,9 @@ public class DashboardFragment extends Fragment {
                 binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
             }
         });
-
+        loader.setVisibility(View.VISIBLE);
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
+            loader.setVisibility(View.GONE);
             if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
                 new Thread(() -> {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -232,7 +237,9 @@ public class DashboardFragment extends Fragment {
         });
 
 //        To show leave Chart here
+        loader.setVisibility(View.VISIBLE);
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
+            loader.setVisibility(View.GONE);
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {

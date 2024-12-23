@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -47,13 +46,13 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
         // Convert boolean to String
 //        String status = policy.isActive() ? "Active" : "Inactive";
 //        holder.policyStatus.setText(status);
-        if (policy.isActive()) {
-            holder.policyStatus.setText("Active");
-            holder.policyStatus.setChipBackgroundColorResource(R.color._000000);
-        } else {
-            holder.policyStatus.setText("Inactive");
-            holder.policyStatus.setChipBackgroundColorResource(R.color.status_pending);
-        }
+//        if (policy.isActive()) {
+//            holder.policyStatus.setText("Active");
+//            holder.policyStatus.setChipBackgroundColorResource(R.color._000000);
+//        } else {
+//            holder.policyStatus.setText("Inactive");
+//            holder.policyStatus.setChipBackgroundColorResource(R.color.status_pending);
+//        }
 
         holder.policyViewIcon.setOnClickListener(v -> {
             PoliciesItem policy1 = policies.get(holder.getBindingAdapterPosition());
@@ -74,7 +73,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
         public ShapeableImageView policyViewIcon;
         public TextView policyName;
         public TextView policyDate;
-        public Chip policyStatus;
+//        public Chip policyStatus;
 
 
         public PolicyViewHolder(@NonNull View itemView) {
@@ -82,7 +81,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
             policyViewIcon = itemView.findViewById(R.id.btn_policyIcon);
             policyName = itemView.findViewById(R.id.tv_policy_name);
             policyDate = itemView.findViewById(R.id.tv_policy_date);
-            policyStatus = itemView.findViewById(R.id.tv_policy_status);
+//            policyStatus = itemView.findViewById(R.id.tv_policy_status);
 
         }
     }

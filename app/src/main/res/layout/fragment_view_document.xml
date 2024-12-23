@@ -12,7 +12,7 @@
         android:id="@+id/statusChipGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="45dp"
         android:layout_marginBottom="16dp"
         android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,7 +30,7 @@
             app:chipBackgroundColor="@color/chip_background"
             app:chipIcon="@drawable/ic_upload"
             app:chipStrokeColor="@color/purple_700"
-            app:chipStrokeWidth="1dp" />
+            app:chipStrokeWidth="1.5dp" />
 
     </com.google.android.flexbox.FlexboxLayout>
 
@@ -40,7 +40,7 @@
         android:layout_height="2dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:background="#E0E0E0"
+        android:background="#CAC8C8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/statusChipGroup" />
