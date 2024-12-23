@@ -91,7 +91,9 @@ public class PunchActivity extends AppCompatActivity {
     private String authToken, userId;
     private FusedLocationProviderClient fusedLocationClient;
     private String currentAddress = "";
+    private AlertDialog attendanceSuccessDialog;
     private ProgressBar progressBar;
+    private LocationCallback locationCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -553,7 +555,7 @@ public class PunchActivity extends AppCompatActivity {
                     }
 
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);
-                    AlertDialog dialog = builder.setTitle("Attendance Success").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (dialog1, which) -> {
+                    attendanceSuccessDialog = builder.setTitle("Attendance Success").setMessage(Html.fromHtml(formattedMessage.toString(), Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (dialog1, which) -> {
                         dialog1.dismiss();
                         setResult(Activity.RESULT_OK);
                         finish();
@@ -576,6 +578,10 @@ public class PunchActivity extends AppCompatActivity {
                             return;
                         }
                         finish();
+
+                        if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
+                            attendanceSuccessDialog.dismiss();
+                        }
                     }, 5000);
                 });
             }
@@ -621,8 +627,7 @@ public class PunchActivity extends AppCompatActivity {
     private void getCurrentLocation(AddressCallback callback) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
-
-            LocationCallback locationCallback = new LocationCallback() {
+            locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
                     Location location = locationResult.getLastLocation();
@@ -703,9 +708,18 @@ public class PunchActivity extends AppCompatActivity {
         try {
             ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(this).get();
             cameraProvider.unbindAll();
+            cameraProvider = null;
         } catch (ExecutionException | InterruptedException e) {
             Log.e(TAG, "Error unbinding camera preview: " + e.getMessage(), e);
         }
+        if (locationCallback != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+        // Dismiss the dialog if it's showing
+        if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
+            attendanceSuccessDialog.dismiss();
+        }
+
     }
 
 }
