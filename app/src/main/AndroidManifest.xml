@@ -50,18 +50,23 @@
         <!-- Activities -->
         <activity
             android:name=".activity.PunchActivity"
-            android:exported="true" /> <!-- Launcher Activity -->
+            android:exported="true" />
+        <!-- Launcher Activity -->
+        <activity
+            android:name=".activity.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar.Starting">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.XEDigital.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:enableOnBackInvokedCallback="true"

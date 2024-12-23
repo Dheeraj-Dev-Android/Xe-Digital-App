@@ -151,4 +151,8 @@
     <color name="color_secondary_text">#757575</color>
     <color name="color_stroke">#E0E0E0</color>
 
+    <color name="background_start">@color/colorPrimary</color>
+    <color name="background_end">#F5F5F5</color>
+
+
 </resources>

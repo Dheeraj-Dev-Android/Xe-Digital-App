@@ -5,36 +5,52 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import app.xedigital.ai.activity.SplashActivity;
 import app.xedigital.ai.utills.NetworkUtils;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
-    //    @Override
-//    public void onReceive(Context context, Intent intent) {
-//        if (!NetworkUtils.isNetworkAvailable(context)) {
-////            showNoInternetSnackbar(context);
-//            showNoInternetAlert(context);
-//        }
-//    }
 
     private static final int SLOW_NETWORK_THRESHOLD_KBPS = 10;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!NetworkUtils.isNetworkAvailable(context)) {
-            ((MainActivity) context).showNoInternetAlert();
+            handleNetworkStateChange(context, false, false);
         } else {
-            ((MainActivity) context).hideNoInternetAlert(); // Hide the alert if internet is restored
+            boolean isSpeedGood = Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                    NetworkUtils.getNetworkSpeed(context).downSpeed >= SLOW_NETWORK_THRESHOLD_KBPS;
+            handleNetworkStateChange(context, true, isSpeedGood);
+        }
+    }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                NetworkUtils.NetworkSpeed speed = NetworkUtils.getNetworkSpeed(context);
-                if (speed.downSpeed < SLOW_NETWORK_THRESHOLD_KBPS) {
-                    ((MainActivity) context).showSlowNetworkAlert();
+    private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood) {
+        if (context instanceof SplashActivity) {
+            SplashActivity splashActivity = (SplashActivity) context;
+            if (!isNetworkAvailable) {
+                splashActivity.showNoInternetAlert();
+            } else {
+                splashActivity.hideNoInternetAlert();
+                if (!isSpeedGood) {
+                    splashActivity.showSlowNetworkAlert();
                 } else {
-                    ((MainActivity) context).hideSlowNetworkAlert();
+                    splashActivity.hideSlowNetworkAlert();
+                }
+            }
+        } else if (context instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) context;
+            if (!isNetworkAvailable) {
+                mainActivity.showNoInternetAlert();
+            } else {
+                mainActivity.hideNoInternetAlert();
+                if (!isSpeedGood) {
+                    mainActivity.showSlowNetworkAlert();
+                } else {
+                    mainActivity.hideSlowNetworkAlert();
                 }
             }
         }
     }
+}
 
 //    private void showNoInternetSnackbar(Context context) {
 //        Snackbar snackbar = Snackbar.make(((MainActivity) context).findViewById(android.R.id.content),
@@ -56,4 +72,4 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 //                    .show();
 //        }
 //    }
-}
+

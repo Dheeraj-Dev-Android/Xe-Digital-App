@@ -130,4 +130,10 @@
     <style name="MyNeutralButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/rejected_status_color</item>
     </style>
+
+    <style name="Theme.XEDigital.NoActionBar.Starting">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/color_white</item>
+    </style>
 </resources>

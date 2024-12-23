@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@color/white"
         tools:context=".activity.LoginActivity">
 
@@ -17,8 +17,8 @@
             android:id="@+id/backgroundPattern"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:alpha="0.5"
-            android:background="@drawable/background_combined"
+            android:alpha="0.7"
+            android:background="@drawable/gradient_3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -135,7 +135,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="@string/_2024_powered_by_xe_digital"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/white"
+            android:textStyle="bold|italic"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

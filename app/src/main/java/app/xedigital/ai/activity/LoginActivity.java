@@ -13,10 +13,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Objects;
+
 import app.xedigital.ai.MainActivity;
+import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.login.LoginModelResponse1;
@@ -42,10 +48,14 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             return;
         }
+        Glide.with(this)
+                .load(R.mipmap.ic_launcher)
+                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                .into(binding.logoImage);
         binding.btnSignin.setOnClickListener(v -> {
             String email, password;
-            email = binding.editEmail.getText().toString();
-            password = binding.editPassword.getText().toString();
+            email = Objects.requireNonNull(binding.editEmail.getText()).toString();
+            password = Objects.requireNonNull(binding.editPassword.getText()).toString();
 
             if (email.isEmpty() || password.isEmpty()) {
                 binding.editEmail.setError("Please Enter Your Email");
