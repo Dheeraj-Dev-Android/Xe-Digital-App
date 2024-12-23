@@ -71,11 +71,16 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
         setHasOptionsMenu(true);
 
+
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         loadingProgress.setVisibility(View.VISIBLE);
+
+
+        approvalAdapter = new LeaveApprovalAdapter(new ArrayList<>(), authTokenHeader, userId, ApproveLeaveFragment.this, getContext()); // Initialize with an empty list
+        approvalRecyclerView.setAdapter(approvalAdapter);
 
         apiInterface = APIClient.getInstance().getPendingApprovalLeaves();
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -136,7 +141,11 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
                     }
                 }
             }
-            approvalAdapter.updateList(filteredList);
+            if (approvalAdapter != null) {
+                approvalAdapter.updateList(filteredList);
+            } else {
+                Log.e("ApproveLeaveFragment", "approvalAdapter is null in filterLeaves");
+            }
         }
     }
 
