@@ -16,7 +16,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 //        }
 //    }
 
-    private static final int SLOW_NETWORK_THRESHOLD_KBPS = 1500;
+    private static final int SLOW_NETWORK_THRESHOLD_KBPS = 10;
 
     @Override
     public void onReceive(Context context, Intent intent) {
