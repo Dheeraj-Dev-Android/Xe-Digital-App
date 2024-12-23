@@ -28,7 +28,6 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -254,7 +253,57 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    private void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
+//    private void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
+//        Map<String, Float> leaveData = new HashMap<>();
+//        float totalBalanceLeaves = 0;
+//        float totalLeaves = 0;
+//
+//        for (LeavesItem leave : leaves) {
+//            String leaveType = leave.getLeavetype();
+//            if (leaveType != null) {
+//                float creditedLeaves = leave.getCreditLeave();
+//                float usedLeaves = leave.getUsedLeave();
+//                float debitedLeaves = leave.getDebitLeave();
+//
+//                float balanceLeaves = creditedLeaves - usedLeaves - debitedLeaves;
+//
+//                leaveData.put(leaveType, balanceLeaves);
+//                totalBalanceLeaves += balanceLeaves;
+//                totalLeaves += creditedLeaves;
+//            }
+//        }
+//
+//        List<PieEntry> entries = new ArrayList<>();
+//
+//        for (Map.Entry<String, Float> entry : leaveData.entrySet()) {
+//            if (entry.getValue() > 0) {
+//                entries.add(new PieEntry(entry.getValue(), entry.getKey()));
+//            }
+//        }
+//
+//        if (entries.isEmpty()) {
+//            pieChart.setVisibility(View.GONE);
+//            return;
+//        }
+//
+//        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+//        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+//        dataSet.setValueFormatter(new PercentFormatter(pieChart));
+//        dataSet.setValueTextSize(16f);
+//        dataSet.setValueTextColor(Color.WHITE);
+//
+//        PieData data = new PieData(dataSet);
+//        pieChart.setData(data);
+//        pieChart.getDescription().setEnabled(false);
+//        pieChart.setDrawHoleEnabled(true);
+//        pieChart.setHoleRadius(25f);
+//        pieChart.setTransparentCircleRadius(45f);
+//        pieChart.animateXY(1000, 1000);
+//        pieChart.setDrawEntryLabels(false);
+//        pieChart.invalidate();
+//    }
+
+    public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
         float totalBalanceLeaves = 0;
         float totalLeaves = 0;
@@ -287,8 +336,23 @@ public class DashboardFragment extends Fragment {
             return;
         }
 
+        // Create a color map for leave types
+        Map<String, Integer> leaveTypeColors = new HashMap<>();
+        leaveTypeColors.put("Casual Leave", Color.BLUE);
+        leaveTypeColors.put("Sick Leave", Color.RED);
+        leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
+        // Add more leave types and colors as needed
+
+        // Create a list of colors for the pie chart slices
+        List<Integer> colors = new ArrayList<>();
+        for (PieEntry entry : entries) {
+            String leaveType = entry.getLabel();
+            int color = leaveTypeColors.getOrDefault(leaveType, Color.GRAY);
+            colors.add(color);
+        }
+
         PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSet.setColors(colors);
         dataSet.setValueFormatter(new PercentFormatter(pieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);

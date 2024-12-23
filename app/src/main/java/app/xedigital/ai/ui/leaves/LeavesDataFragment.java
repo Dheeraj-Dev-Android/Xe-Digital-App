@@ -21,7 +21,6 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,12 +41,12 @@ public class LeavesDataFragment extends Fragment {
     private ProgressBar loadingProgress;
     private PieChart leavePieChart;
 
-    public PieChart getLeavePieChart() {
-        return leavePieChart;
-    }
-
     public LeavesDataFragment() {
         // Required empty public constructor
+    }
+
+    public PieChart getLeavePieChart() {
+        return leavePieChart;
     }
 
     @Override
@@ -148,8 +147,22 @@ public class LeavesDataFragment extends Fragment {
             return;
         }
 
+        // Create a color map for leave types
+        Map<String, Integer> leaveTypeColors = new HashMap<>();
+        leaveTypeColors.put("Casual Leave", Color.BLUE);
+        leaveTypeColors.put("Sick Leave", Color.RED);
+        leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
+
+        // Create a list of colors for the pie chart slices
+        List<Integer> colors = new ArrayList<>();
+        for (PieEntry entry : entries) {
+            String leaveType = entry.getLabel();
+            int color = leaveTypeColors.getOrDefault(leaveType, Color.GRAY);
+            colors.add(color);
+        }
+
         PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSet.setColors(colors);
         dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
