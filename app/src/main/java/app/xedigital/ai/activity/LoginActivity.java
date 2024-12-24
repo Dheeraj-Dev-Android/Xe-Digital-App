@@ -89,19 +89,18 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginModelResponse1 loginResponse = response.body();
 
-//                    String responseJson = gson.toJson(loginResponse);
-//                    Log.d(TAG, "Login Response:\n " + responseJson);
-
                     if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
                         getIntent().putExtra("userId", loginResponse.getData().getUser().getId());
                         getIntent().putExtra("authToken", loginResponse.getData().getToken());
+                        getIntent().putExtra("empEmail",loginResponse.getData().getUser().getEmail());
 
                         String userId = loginResponse.getData().getUser().getId();
                         String authToken = loginResponse.getData().getToken();
+                        String empEmail = loginResponse.getData().getUser().getEmail();
 
-                        Log.d(TAG, "User ID: " + userId);
+                        Log.w(TAG, "User ID: " + userId+"empEmail"+empEmail);
 
-                        storeInSharedPreferences(userId, authToken);
+                        storeInSharedPreferences(userId, authToken, empEmail);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                         finish();
@@ -121,11 +120,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void storeInSharedPreferences(String userId, String authToken) {
+    private void storeInSharedPreferences(String userId, String authToken, String empEmail) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userId", userId);
         editor.putString("authToken", authToken);
+        editor.putString("empEmail",empEmail);
         editor.apply();
 
     }

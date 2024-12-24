@@ -372,6 +372,20 @@
         android:name="app.xedigital.ai.ui.vms.VmsFragment"
         android:label="VMS"
         tools:layout="@layout/fragment_v_m_s">
+        <action
+            android:id="@+id/action_nav_vms_to_nav_preApproved_visitors"
+            app:destination="@+id/nav_preApproved_visitors" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_preApproved_visitors"
+        android:name="app.xedigital.ai.ui.vms.VisitorPreApprovedFragment"
+        android:label="Created Pre-Approved Visitors"
+        tools:layout="@layout/fragment_visitor_pre_approved">
+        <action
+            android:id="@+id/action_nav_preApproved_visitors_to_nav_vms"
+            app:destination="@+id/nav_vms" />
 
     </fragment>
 </navigation>

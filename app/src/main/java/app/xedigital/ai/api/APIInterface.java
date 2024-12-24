@@ -38,6 +38,7 @@ import app.xedigital.ai.model.shifts.ShiftTypeResponse;
 import app.xedigital.ai.model.uploadDocument.UploadDocumentRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.model.vms.GetVisitorsResponse;
+import app.xedigital.ai.ui.userProfileEmail.UserProfileByEmailResponse;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -142,6 +143,11 @@ public interface APIInterface {
 
     @GET("visitors?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=")
     retrofit2.Call<GetVisitorsResponse> getVisitors(@Header("Authorization") String authToken);
+
+    @GET("employees/profile/email/{empEmail}")
+    retrofit2.Call<UserProfileByEmailResponse> getUserProfileByEmail(@Path("empEmail") String empEmail, @Header("Authorization") String authToken);
+    @GET("visitors/detail/{contact}")
+    retrofit2.Call<ResponseBody> getVisitorDetail(@Path("contact") String contact, @Header("Authorization") String authToken);
 
     //    POST APIs
     @POST("face/recognize")

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import app.xedigital.ai.R;
@@ -23,7 +24,7 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
     private List<VisitorsItem> visitors;
 
     public VisitorsAdapter(List<VisitorsItem> visitors) {
-        this.visitors = visitors;
+        this.visitors = visitors != null ? visitors : new ArrayList<>();
     }
 
     @NonNull
@@ -82,10 +83,14 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         }
 
     }
-
     @Override
     public int getItemCount() {
-        return visitors.size();
+        return visitors != null ? visitors.size() : 0;
+    }
+
+    public void updateVisitors(List<VisitorsItem> visitorsItems) {
+        this.visitors = visitorsItems != null ? visitorsItems : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
