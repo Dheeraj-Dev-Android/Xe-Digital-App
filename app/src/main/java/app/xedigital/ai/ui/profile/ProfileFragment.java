@@ -22,15 +22,15 @@ import app.xedigital.ai.model.profile.Employee;
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private FragmentProfileBinding binding;
-//    private CircularProgressIndicator progressIndicator;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
-//        progressIndicator = binding.progressIndicator;
-
+        binding.profileLoader.setVisibility(View.VISIBLE);
+        binding.emptyStateText.setVisibility(View.GONE);
+        binding.punchCardView.setVisibility(View.GONE);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
         String authToken = sharedPreferences.getString("authToken", null);
@@ -38,10 +38,9 @@ public class ProfileFragment extends Fragment {
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
         // Show the ProgressBar initially
-//        progressIndicator.setVisibility(View.VISIBLE);
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
-//            progressIndicator.setVisibility(View.GONE);
+            binding.profileLoader.setVisibility(View.GONE);
             if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null) {
 
                 Employee employee = userProfile.getData().getEmployee();
@@ -87,7 +86,11 @@ public class ProfileFragment extends Fragment {
                 } else {
                     Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
                 }
+                binding.punchCardView.setVisibility(View.VISIBLE);
+                binding.emptyStateText.setVisibility(View.GONE);
             } else {
+                binding.punchCardView.setVisibility(View.GONE);
+                binding.emptyStateText.setVisibility(View.VISIBLE);
                 Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
             }
         });

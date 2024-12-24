@@ -572,7 +572,6 @@ public class LeavesFragment extends Fragment {
                     try {
                         UserBranchResponse responseBranch = response.body();
                         String responseString = gson.toJson(responseBranch);
-//                        Log.d("BranchData", "Response: " + responseString);
                         hrMail = responseBranch.getData().getBranch().getNotificationEmail();
                         Log.d("BranchData", "Notification Email: " + hrMail);
                     } catch (Exception e) {
