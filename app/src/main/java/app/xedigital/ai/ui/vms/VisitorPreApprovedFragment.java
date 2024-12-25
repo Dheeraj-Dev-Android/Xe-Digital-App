@@ -22,14 +22,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.datepicker.MaterialDatePicker;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentVisitorPreApprovedBinding;
-import okhttp3.ResponseBody;
+import app.xedigital.ai.model.visitorsDetails.VisitorsDetailsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -146,19 +145,15 @@ public class VisitorPreApprovedFragment extends Fragment {
             APIInterface checkContact = APIClient.getInstance().getApi();
 
             // Make the API call
-            Call<ResponseBody> call = checkContact.getVisitorDetail(contact, "jwt " + authToken1);
-            call.enqueue(new Callback<ResponseBody>() {
+            Call<VisitorsDetailsResponse> call = checkContact.getVisitorDetail(contact, "jwt " + authToken1);
+            call.enqueue(new Callback<VisitorsDetailsResponse>() {
                 @Override
-                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                public void onResponse(@NonNull Call<VisitorsDetailsResponse> call, @NonNull Response<VisitorsDetailsResponse> response) {
                     if (response.isSuccessful()) {
                         // Handle successful response
-                        try {
-                            String responseBody = response.body().string();
+                        String responseBody = response.body().getData().toString();
 
-                            Log.d("API Response", responseBody);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        Log.d("API Response", responseBody);
                     } else {
                         // Handle error response
                         Log.e("API Error", "Error: " + response.code() + " - " + response.message());
@@ -167,7 +162,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<VisitorsDetailsResponse> call, @NonNull Throwable t) {
                     // Handle network or other errors
                     Log.e("API Failure", "Failure: " + t.getMessage(), t);
                     Toast.makeText(requireContext(), "Failed to fetch visitor details", Toast.LENGTH_SHORT).show();
