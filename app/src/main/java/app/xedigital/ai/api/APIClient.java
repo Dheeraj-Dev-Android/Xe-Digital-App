@@ -37,6 +37,10 @@ public class APIClient {
         return retrofit2.create(APIInterface.class);
     }
 
+    public APIInterface getRecognize() {
+        return retrofit1.create(APIInterface.class);
+    }
+
     public APIInterface getLogin() {
         return retrofit2.create(APIInterface.class);
     }

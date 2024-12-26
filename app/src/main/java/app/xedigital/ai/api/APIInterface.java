@@ -157,6 +157,9 @@ public interface APIInterface {
     @POST("employees/face")
     retrofit2.Call<ResponseBody> FaceDetailApi(@Header("Authorization") String token, @Body RequestBody requestBody);
 
+    @POST("/face/recognize")
+    retrofit2.Call<ResponseBody> VmsFaceRecognitionApi(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
     @POST("employees/attendance/punch")
     retrofit2.Call<ResponseBody> AttendanceApi(@Header("Authorization") String token, @Body RequestBody requestBody);
 

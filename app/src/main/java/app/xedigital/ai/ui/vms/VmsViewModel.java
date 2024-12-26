@@ -1,5 +1,6 @@
 package app.xedigital.ai.ui.vms;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -45,7 +46,7 @@ public class VmsViewModel extends ViewModel {
 
         call.enqueue(new Callback<GetVisitorsResponse>() {
             @Override
-            public void onResponse(Call<GetVisitorsResponse> call, Response<GetVisitorsResponse> response) {
+            public void onResponse(@NonNull Call<GetVisitorsResponse> call, @NonNull Response<GetVisitorsResponse> response) {
                 isLoading.setValue(false);
                 if (response.isSuccessful()) {
                     GetVisitorsResponse visitorsResponse = response.body();
