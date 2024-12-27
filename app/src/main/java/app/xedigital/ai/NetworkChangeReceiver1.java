@@ -8,7 +8,7 @@ import android.os.Build;
 import app.xedigital.ai.activity.SplashActivity;
 import app.xedigital.ai.utills.NetworkUtils;
 
-public class NetworkChangeReceiver extends BroadcastReceiver {
+public class NetworkChangeReceiver1 extends BroadcastReceiver {
 
     private static final int SLOW_NETWORK_THRESHOLD_KBPS = 10;
 
