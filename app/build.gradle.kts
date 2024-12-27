@@ -94,4 +94,5 @@ dependencies {
 //    implementation("com.google.mlkit:face-detection:16.1.5")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation("com.airbnb.android:lottie:5.2.0")
 }

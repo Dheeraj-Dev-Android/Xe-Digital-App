@@ -52,4 +52,18 @@
         app:itemTextAppearance="@style/NavigationViewTextAppearance"
         app:menu="@menu/activity_main_drawer" />
 
+    <include
+        android:id="@+id/noInternetLayout"
+        layout="@layout/no_internet_connection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/slowInternetLayout"
+        layout="@layout/slow_internet_connection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,20 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        noInternetDialog = new AlertDialog.Builder(this)
-                .setTitle("No Internet Connection")
-                .setMessage("Please check your internet connection and try again.")
-                .setPositiveButton("OK", (dialog, which) -> finish())
-                .setCancelable(false)
-                .create();
+        noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
 
         // Create the slow network alert dialog
-        slowNetworkDialog = new AlertDialog.Builder(this)
-                .setTitle("Slow Network Connection")
-                .setMessage("Your network connection is slow. Some features might be affected.")
-                .setPositiveButton("OK", null)
-                .setCancelable(true)
-                .create();
+        slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -95,32 +87,49 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showNoInternetAlert() {
-        if (!isShowingNoInternetDialog) {
-            noInternetDialog.show();
-            isShowingNoInternetDialog = true;
-        }
+//    public void showNoInternetAlert() {
+//        if (!isShowingNoInternetDialog) {
+//            noInternetDialog.show();
+//            isShowingNoInternetDialog = true;
+//        }
+//    }
+//
+//    public void hideNoInternetAlert() {
+//        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+//            noInternetDialog.dismiss();
+//            isShowingNoInternetDialog = false;
+//        }
+//    }
+//
+//    public void showSlowNetworkAlert() {
+//        if (!isShowingSlowNetworkDialog) {
+//            slowNetworkDialog.show();
+//            isShowingSlowNetworkDialog = true;
+//        }
+//    }
+//
+//    public void hideSlowNetworkAlert() {
+//        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
+//            slowNetworkDialog.dismiss();
+//            isShowingSlowNetworkDialog = false;
+//        }
+//    }
+
+    public void showNoInternetLayout() {
+        findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
     }
 
-    public void hideNoInternetAlert() {
-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
-            noInternetDialog.dismiss();
-            isShowingNoInternetDialog = false;
-        }
+    public void hideNoInternetLayout() {
+        findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
     }
 
-    public void showSlowNetworkAlert() {
-        if (!isShowingSlowNetworkDialog) {
-            slowNetworkDialog.show();
-            isShowingSlowNetworkDialog = true;
-        }
+    public void showSlowInternetLayout() {
+        findViewById(R.id.slowInternetLayout).setVisibility(View.VISIBLE);
+        // Update speed in slowInternetLayout if needed
     }
 
-    public void hideSlowNetworkAlert() {
-        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
-            slowNetworkDialog.dismiss();
-            isShowingSlowNetworkDialog = false;
-        }
+    public void hideSlowInternetLayout() {
+        findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
     }
 
     private void toggleDcrVisibility(Menu menu) {
@@ -214,14 +223,56 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        // Use the string literal instead of the deprecated constant
+//        registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+//        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {
+//            noInternetDialog.show();
+//            isShowingNoInternetDialog = true; // Set the flag to true
+//        }
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        unregisterReceiver(networkChangeReceiver);
+//        // Dismiss the AlertDialog if it's showing
+//        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+//            noInternetDialog.dismiss();
+//            isShowingNoInternetDialog = false; // Set the flag to false
+//        }
+//    }
+
+    public void onRetryButtonClicked(View view) {
+        // Code to retry network operations
+        if (NetworkUtils.isNetworkAvailable(this)) {
+            hideNoInternetLayout();
+
+        } else {
+
+            Toast.makeText(this, "Still no internet connection", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onOpenSettingsButtonClicked(View view) {
+        // Code to open network settings
+        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        // Use the string literal instead of the deprecated constant
         registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {
-            noInternetDialog.show();
-            isShowingNoInternetDialog = true; // Set the flag to true
+
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            showNoInternetLayout();
+        } else if (!NetworkUtils.isNetworkSpeedGood(this)) {
+            showSlowInternetLayout();
+        } else {
+            hideNoInternetLayout();
+            hideSlowInternetLayout();
         }
     }
 
@@ -229,10 +280,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(networkChangeReceiver);
-        // Dismiss the AlertDialog if it's showing
-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
-            noInternetDialog.dismiss();
-            isShowingNoInternetDialog = false; // Set the flag to false
-        }
+        hideNoInternetLayout();
+        hideSlowInternetLayout();
     }
 }

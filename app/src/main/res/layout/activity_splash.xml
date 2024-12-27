@@ -57,4 +57,17 @@
 
     </LinearLayout>
 
+    <include
+        android:id="@+id/noInternetLayout"
+        layout="@layout/no_internet_connection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/slowInternetLayout"
+        layout="@layout/slow_internet_connection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -49,6 +49,21 @@ public class NetworkUtils {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public static boolean isNetworkSpeedGood(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+
+        if (networkCapabilities != null) {
+            int downSpeed = networkCapabilities.getLinkDownstreamBandwidthKbps();
+            // Define your threshold for good network speed
+            int goodSpeedThresholdKbps = 1000; // Example: 1 Mbps
+            return downSpeed >= goodSpeedThresholdKbps;
+        } else {
+            return false; // Assume slow network if capabilities are null
+        }
+    }
+
     public static class NetworkSpeed {
         public int downSpeed;
         public int upSpeed;
