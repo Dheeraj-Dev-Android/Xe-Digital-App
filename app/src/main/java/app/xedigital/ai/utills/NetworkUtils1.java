@@ -9,7 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
-public class NetworkUtils {
+public class NetworkUtils1 {
 
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
