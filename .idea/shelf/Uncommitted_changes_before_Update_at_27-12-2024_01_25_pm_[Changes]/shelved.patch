@@ -1,0 +1,2424 @@
+Index: app/src/main/java/app/xedigital/ai/activity/SplashActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package app.xedigital.ai.activity;\r\n\r\nimport android.app.AlertDialog;\r\nimport android.content.Intent;\r\nimport android.content.IntentFilter;\r\nimport android.os.Bundle;\r\nimport android.os.Handler;\r\nimport android.widget.Button;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport com.bumptech.glide.Glide;\r\nimport com.bumptech.glide.load.resource.bitmap.CircleCrop;\r\nimport com.bumptech.glide.request.RequestOptions;\r\n\r\nimport app.xedigital.ai.NetworkChangeReceiver;\r\nimport app.xedigital.ai.R;\r\nimport app.xedigital.ai.utills.NetworkUtils;\r\n\r\npublic class SplashActivity extends AppCompatActivity {\r\n    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();\r\n\r\n    private AlertDialog noInternetDialog;\r\n    private boolean isShowingNoInternetDialog = false;\r\n    private AlertDialog slowNetworkDialog;\r\n    private boolean isShowingSlowNetworkDialog = false;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_splash);\r\n\r\n        Glide.with(this)\r\n                .load(R.mipmap.ic_launcher)\r\n                .apply(RequestOptions.bitmapTransform(new CircleCrop()))\r\n                .into((android.widget.ImageView) findViewById(R.id.iv_app_logo));\r\n\r\n        noInternetDialog = new AlertDialog.Builder(this)\r\n                .setTitle(\"No Internet Connection\")\r\n                .setMessage(\"Please check your internet connection and try again.\")\r\n                .setPositiveButton(\"OK\", (dialog, which) -> finish())\r\n                .setCancelable(false)\r\n                .create();\r\n\r\n        // Create the slow network alert dialog\r\n        slowNetworkDialog = new AlertDialog.Builder(this)\r\n                .setTitle(\"Slow Network Connection\")\r\n                .setMessage(\"Your network connection is slow. Some features might be affected.\")\r\n                .setPositiveButton(\"OK\", null)\r\n                .setCancelable(true)\r\n                .create();\r\n\r\n        new Handler().postDelayed(() -> {\r\n            // Check network status before starting LoginActivity\r\n            if (NetworkUtils.isNetworkAvailable(this)) {\r\n                Intent mainIntent = new Intent(SplashActivity.this, LoginActivity.class);\r\n                startActivity(mainIntent);\r\n                finish();\r\n            } else {\r\n                showNoInternetAlert();\r\n            }\r\n        }, 3000);\r\n\r\n        Button btnGetStarted = findViewById(R.id.btn_get_started);\r\n        btnGetStarted.setOnClickListener(v -> {\r\n            Intent mainIntent = new Intent(SplashActivity.this, LoginActivity.class);\r\n            startActivity(mainIntent);\r\n            finish();\r\n        });\r\n    }\r\n\r\n    public void showNoInternetAlert() {\r\n        if (!isShowingNoInternetDialog) {\r\n            noInternetDialog.show();\r\n            isShowingNoInternetDialog = true;\r\n        }\r\n    }\r\n\r\n    public void hideNoInternetAlert() {\r\n        if (noInternetDialog != null && noInternetDialog.isShowing()) {\r\n            noInternetDialog.dismiss();\r\n            isShowingNoInternetDialog = false;\r\n        }\r\n    }\r\n\r\n    public void showSlowNetworkAlert() {\r\n        if (!isShowingSlowNetworkDialog) {\r\n            slowNetworkDialog.show();\r\n            isShowingSlowNetworkDialog = true;\r\n        }\r\n    }\r\n\r\n    public void hideSlowNetworkAlert() {\r\n        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {\r\n            slowNetworkDialog.dismiss();\r\n            isShowingSlowNetworkDialog = false;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    protected void onResume() {\r\n        super.onResume();\r\n        registerReceiver(networkChangeReceiver, new IntentFilter(\"android.net.conn.CONNECTIVITY_CHANGE\"));\r\n        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {\r\n            noInternetDialog.show();\r\n            isShowingNoInternetDialog = true;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    protected void onPause() {\r\n        super.onPause();\r\n        unregisterReceiver(networkChangeReceiver);\r\n        if (noInternetDialog != null && noInternetDialog.isShowing()) {\r\n            noInternetDialog.dismiss();\r\n            isShowingNoInternetDialog = false;\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/app/xedigital/ai/activity/SplashActivity.java b/app/src/main/java/app/xedigital/ai/activity/SplashActivity.java
+--- a/app/src/main/java/app/xedigital/ai/activity/SplashActivity.java	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/java/app/xedigital/ai/activity/SplashActivity.java	(date 1735284153804)
+@@ -3,12 +3,17 @@
+ import android.app.AlertDialog;
+ import android.content.Intent;
+ import android.content.IntentFilter;
++import android.os.Build;
+ import android.os.Bundle;
+ import android.os.Handler;
++import android.provider.Settings;
++import android.view.View;
+ import android.widget.Button;
++import android.widget.Toast;
+ 
+ import androidx.appcompat.app.AppCompatActivity;
+ 
++import com.airbnb.lottie.LottieAnimationView;
+ import com.bumptech.glide.Glide;
+ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+ import com.bumptech.glide.request.RequestOptions;
+@@ -24,31 +29,23 @@
+     private boolean isShowingNoInternetDialog = false;
+     private AlertDialog slowNetworkDialog;
+     private boolean isShowingSlowNetworkDialog = false;
++    private LottieAnimationView noInternetAnimation;
++//    private LottieAnimationView particleAnimation;
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_splash);
++        noInternetAnimation = findViewById(R.id.noInternetAnimation);
++//        particleAnimation = findViewById(R.id.particleAnimation);
+ 
+-        Glide.with(this)
+-                .load(R.mipmap.ic_launcher)
+-                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+-                .into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
+ 
+-        noInternetDialog = new AlertDialog.Builder(this)
+-                .setTitle("No Internet Connection")
+-                .setMessage("Please check your internet connection and try again.")
+-                .setPositiveButton("OK", (dialog, which) -> finish())
+-                .setCancelable(false)
+-                .create();
++        Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
++
++        noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
+ 
+         // Create the slow network alert dialog
+-        slowNetworkDialog = new AlertDialog.Builder(this)
+-                .setTitle("Slow Network Connection")
+-                .setMessage("Your network connection is slow. Some features might be affected.")
+-                .setPositiveButton("OK", null)
+-                .setCancelable(true)
+-                .create();
++        slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
+ 
+         new Handler().postDelayed(() -> {
+             // Check network status before starting LoginActivity
+@@ -57,7 +54,8 @@
+                 startActivity(mainIntent);
+                 finish();
+             } else {
+-                showNoInternetAlert();
++//                showNoInternetAlert();
++                showNoInternetLayout();
+             }
+         }, 3000);
+ 
+@@ -69,41 +67,44 @@
+         });
+     }
+ 
+-    public void showNoInternetAlert() {
+-        if (!isShowingNoInternetDialog) {
+-            noInternetDialog.show();
+-            isShowingNoInternetDialog = true;
+-        }
++    public void showNoInternetLayout() {
++        findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
++        noInternetAnimation.playAnimation();
++//        particleAnimation.playAnimation();
+     }
+ 
+-    public void hideNoInternetAlert() {
+-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+-            noInternetDialog.dismiss();
+-            isShowingNoInternetDialog = false;
+-        }
++    public void hideNoInternetLayout() {
++        findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
++        noInternetAnimation.pauseAnimation();
++//        particleAnimation.pauseAnimation();
+     }
++
++    public void showSlowInternetLayout() {
++        findViewById(R.id.slowInternetLayout).setVisibility(View.VISIBLE);
++        noInternetAnimation.playAnimation();
++//        particleAnimation.playAnimation();
+ 
+-    public void showSlowNetworkAlert() {
+-        if (!isShowingSlowNetworkDialog) {
+-            slowNetworkDialog.show();
+-            isShowingSlowNetworkDialog = true;
+-        }
+     }
+ 
+-    public void hideSlowNetworkAlert() {
+-        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
+-            slowNetworkDialog.dismiss();
+-            isShowingSlowNetworkDialog = false;
+-        }
++    public void hideSlowInternetLayout() {
++        findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
++        noInternetAnimation.pauseAnimation();
++//        particleAnimation.pauseAnimation();
+     }
+ 
+     @Override
+     protected void onResume() {
+         super.onResume();
+         registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+-        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {
+-            noInternetDialog.show();
+-            isShowingNoInternetDialog = true;
++
++        if (!NetworkUtils.isNetworkAvailable(this)) {
++            showNoInternetLayout();
++        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !NetworkUtils.isNetworkSpeedGood(this)) {
++            showSlowInternetLayout();
++        } else {
++            hideNoInternetLayout();
++            hideSlowInternetLayout();
++
+         }
+     }
+ 
+@@ -111,9 +112,22 @@
+     protected void onPause() {
+         super.onPause();
+         unregisterReceiver(networkChangeReceiver);
+-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+-            noInternetDialog.dismiss();
+-            isShowingNoInternetDialog = false;
++
++    }
++
++    public void onRetryButtonClicked(View view) {
++        // Code to retry network operations
++        if (NetworkUtils.isNetworkAvailable(this)) {
++            hideNoInternetLayout();
++
++        } else {
++            // Potentially show a toast or message if the network is still not available
++            Toast.makeText(this, "Still no internet connection", Toast.LENGTH_SHORT).show();
+         }
+     }
++
++    public void onOpenSettingsButtonClicked(View view) {
++        // Code to open network settings
++        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
++    }
+ }
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_main.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.drawerlayout.widget.DrawerLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:id=\"@+id/drawer_layout\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:fitsSystemWindows=\"true\"\r\n    tools:openDrawer=\"start\">\r\n\r\n    <androidx.coordinatorlayout.widget.CoordinatorLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\">\r\n\r\n        <include\r\n            android:id=\"@+id/app_bar_main\"\r\n            layout=\"@layout/app_bar_main\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"match_parent\" />\r\n\r\n        <!--        <androidx.fragment.app.FragmentContainerView-->\r\n        <!--            android:id=\"@+id/nav_host_fragment_content_main\"-->\r\n        <!--            android:name=\"androidx.navigation.fragment.NavHostFragment\"-->\r\n        <!--            android:layout_width=\"match_parent\"-->\r\n        <!--            android:layout_height=\"match_parent\"-->\r\n        <!--            app:defaultNavHost=\"true\"-->\r\n        <!--            android:layout_marginTop=\"10dp\"-->\r\n        <!--            app:layout_constraintLeft_toLeftOf=\"parent\"-->\r\n        <!--            app:layout_constraintRight_toRightOf=\"parent\"-->\r\n        <!--            app:layout_constraintTop_toTopOf=\"parent\"-->\r\n        <!--            app:navGraph=\"@navigation/nav_graph\" />-->\r\n\r\n        <!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->\r\n        <!--            android:id=\"@+id/fab\"-->\r\n        <!--            android:layout_width=\"wrap_content\"-->\r\n        <!--            android:layout_height=\"wrap_content\"-->\r\n        <!--            android:layout_gravity=\"bottom|end\"-->\r\n        <!--            android:layout_margin=\"16dp\"-->\r\n        <!--            app:srcCompat=\"@android:drawable/ic_dialog_email\" />-->\r\n\r\n    </androidx.coordinatorlayout.widget.CoordinatorLayout>\r\n\r\n    <com.google.android.material.navigation.NavigationView\r\n        android:id=\"@+id/nav_view\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"match_parent\"\r\n        android:layout_gravity=\"start\"\r\n        android:layout_marginTop=\"25dp\"\r\n        android:elevation=\"4dp\"\r\n        android:fitsSystemWindows=\"true\"\r\n        app:headerLayout=\"@layout/nav_header_main\"\r\n        app:itemTextAppearance=\"@style/NavigationViewTextAppearance\"\r\n        app:menu=\"@menu/activity_main_drawer\" />\r\n\r\n</androidx.drawerlayout.widget.DrawerLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_main.xml b/app/src/main/res/layout/activity_main.xml
+--- a/app/src/main/res/layout/activity_main.xml	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/res/layout/activity_main.xml	(date 1735216817274)
+@@ -52,4 +52,18 @@
+         app:itemTextAppearance="@style/NavigationViewTextAppearance"
+         app:menu="@menu/activity_main_drawer" />
+ 
++    <include
++        android:id="@+id/noInternetLayout"
++        layout="@layout/no_internet_connection"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:visibility="gone" />
++
++    <include
++        android:id="@+id/slowInternetLayout"
++        layout="@layout/slow_internet_connection"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:visibility="gone" />
++
+ </androidx.drawerlayout.widget.DrawerLayout>
+\ No newline at end of file
+Index: app/src/main/res/drawable/futuristic_button_bg.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/futuristic_button_bg.xml b/app/src/main/res/drawable/futuristic_button_bg.xml
+new file mode 100644
+--- /dev/null	(date 1735282270192)
++++ b/app/src/main/res/drawable/futuristic_button_bg.xml	(date 1735282270192)
+@@ -0,0 +1,16 @@
++<?xml version="1.0" encoding="utf-8"?>
++<ripple xmlns:android="http://schemas.android.com/apk/res/android"
++    android:color="#804FCCFF">
++    <item>
++        <shape android:shape="rectangle">
++            <gradient
++                android:angle="135"
++                android:endColor="#4FCCFF"
++                android:startColor="#6DB4FF" />
++            <corners android:radius="16dp" />
++            <stroke
++                android:width="1dp"
++                android:color="#804FCCFF" />
++        </shape>
++    </item>
++</ripple>
+\ No newline at end of file
+Index: app/src/main/res/raw/particles_background.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/raw/particles_background.json b/app/src/main/res/raw/particles_background.json
+new file mode 100644
+--- /dev/null	(date 1735284107114)
++++ b/app/src/main/res/raw/particles_background.json	(date 1735284107114)
+@@ -0,0 +1,250 @@
++{
++  "v": "5.9.0",
++  "fr": 30,
++  "ip": 0,
++  "op": 90,
++  "w": 400,
++  "h": 800,
++  "nm": "Floating Particles",
++  "ddd": 0,
++  "assets": [],
++  "layers": [
++    {
++      "ddd": 0,
++      "ind": 1,
++      "ty": 4,
++      "nm": "Particle System 1",
++      "sr": 1,
++      "ks": {
++        "o": { "a": 0, "k": 100 },
++        "r": { "a": 0, "k": 0 },
++        "p": { "a": 0, "k": [200, 400, 0] },
++        "a": { "a": 0, "k": [0, 0, 0] },
++        "s": { "a": 0, "k": [100, 100, 100] }
++      },
++      "ao": 0,
++      "shapes": [
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ty": "rc",
++              "d": 1,
++              "s": { "a": 0, "k": [8, 8] },
++              "p": {
++                "a": 1,
++                "k": [
++                  {
++                    "i": { "x": 0.667, "y": 1 },
++                    "o": { "x": 0.333, "y": 0 },
++                    "t": 0,
++                    "s": [-100, 200]
++                  },
++                  {
++                    "t": 90,
++                    "s": [-100, -200]
++                  }
++                ]
++              },
++              "r": { "a": 0, "k": 0 }
++            },
++            {
++              "ty": "fl",
++              "c": { "a": 0, "k": [0.31, 0.8, 1, 1] },
++              "o": {
++                "a": 1,
++                "k": [
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 0,
++                    "s": [0]
++                  },
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 15,
++                    "s": [100]
++                  },
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 75,
++                    "s": [100]
++                  },
++                  {
++                    "t": 90,
++                    "s": [0]
++                  }
++                ]
++              }
++            }
++          ],
++          "np": 2
++        }
++      ],
++      "ip": 0,
++      "op": 90,
++      "st": 0,
++      "bm": 0
++    },
++    {
++      "ddd": 0,
++      "ind": 2,
++      "ty": 4,
++      "nm": "Particle System 2",
++      "sr": 1,
++      "ks": {
++        "o": { "a": 0, "k": 100 },
++        "r": { "a": 0, "k": 0 },
++        "p": { "a": 0, "k": [200, 400, 0] },
++        "a": { "a": 0, "k": [0, 0, 0] },
++        "s": { "a": 0, "k": [100, 100, 100] }
++      },
++      "ao": 0,
++      "shapes": [
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ty": "rc",
++              "d": 1,
++              "s": { "a": 0, "k": [6, 6] },
++              "p": {
++                "a": 1,
++                "k": [
++                  {
++                    "i": { "x": 0.667, "y": 1 },
++                    "o": { "x": 0.333, "y": 0 },
++                    "t": 30,
++                    "s": [100, 200]
++                  },
++                  {
++                    "t": 120,
++                    "s": [100, -200]
++                  }
++                ]
++              },
++              "r": { "a": 0, "k": 0 }
++            },
++            {
++              "ty": "fl",
++              "c": { "a": 0, "k": [0.4, 0.85, 1, 1] },
++              "o": {
++                "a": 1,
++                "k": [
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 30,
++                    "s": [0]
++                  },
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 45,
++                    "s": [100]
++                  },
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 105,
++                    "s": [100]
++                  },
++                  {
++                    "t": 120,
++                    "s": [0]
++                  }
++                ]
++              }
++            }
++          ],
++          "np": 2
++        }
++      ],
++      "ip": 0,
++      "op": 90,
++      "st": 0,
++      "bm": 0
++    },
++    {
++      "ddd": 0,
++      "ind": 3,
++      "ty": 4,
++      "nm": "Particle System 3",
++      "sr": 1,
++      "ks": {
++        "o": { "a": 0, "k": 100 },
++        "r": { "a": 0, "k": 45 },
++        "p": { "a": 0, "k": [200, 400, 0] },
++        "a": { "a": 0, "k": [0, 0, 0] },
++        "s": { "a": 0, "k": [100, 100, 100] }
++      },
++      "ao": 0,
++      "shapes": [
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ty": "rc",
++              "d": 1,
++              "s": { "a": 0, "k": [4, 4] },
++              "p": {
++                "a": 1,
++                "k": [
++                  {
++                    "i": { "x": 0.667, "y": 1 },
++                    "o": { "x": 0.333, "y": 0 },
++                    "t": 15,
++                    "s": [0, 200]
++                  },
++                  {
++                    "t": 105,
++                    "s": [0, -200]
++                  }
++                ]
++              },
++              "r": { "a": 0, "k": 0 }
++            },
++            {
++              "ty": "fl",
++              "c": { "a": 0, "k": [0.5, 0.9, 1, 1] },
++              "o": {
++                "a": 1,
++                "k": [
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 15,
++                    "s": [0]
++                  },
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 30,
++                    "s": [100]
++                  },
++                  {
++                    "i": { "x": [0.667], "y": [1] },
++                    "o": { "x": [0.333], "y": [0] },
++                    "t": 90,
++                    "s": [100]
++                  },
++                  {
++                    "t": 105,
++                    "s": [0]
++                  }
++                ]
++              }
++            }
++          ],
++          "np": 2
++        }
++      ],
++      "ip": 0,
++      "op": 90,
++      "st": 0,
++      "bm": 0
++    }
++  ]
++}
+\ No newline at end of file
+Index: app/src/main/res/raw/no_internet_animation.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/raw/no_internet_animation.json b/app/src/main/res/raw/no_internet_animation.json
+new file mode 100644
+--- /dev/null	(date 1735279787461)
++++ b/app/src/main/res/raw/no_internet_animation.json	(date 1735279787461)
+@@ -0,0 +1,1244 @@
++{
++  "v": "4.8.0",
++  "meta": {
++    "g": "LottieFiles AE 1.0.0",
++    "a": "",
++    "k": "",
++    "d": "",
++    "tc": ""
++  },
++  "fr": 29.9700012207031,
++  "ip": 0,
++  "op": 61.0000024845809,
++  "w": 260,
++  "h": 260,
++  "nm": "Not Done",
++  "ddd": 0,
++  "assets": [],
++  "layers": [
++    {
++      "ddd": 0,
++      "ind": 1,
++      "ty": 4,
++      "nm": "Shape Layer 2",
++      "sr": 1,
++      "ks": {
++        "o": {
++          "a": 0,
++          "k": 100,
++          "ix": 11
++        },
++        "r": {
++          "a": 0,
++          "k": 0,
++          "ix": 10
++        },
++        "p": {
++          "a": 0,
++          "k": [
++            131,
++            130,
++            0
++          ],
++          "ix": 2
++        },
++        "a": {
++          "a": 0,
++          "k": [
++            0,
++            0,
++            0
++          ],
++          "ix": 1
++        },
++        "s": {
++          "a": 1,
++          "k": [
++            {
++              "i": {
++                "x": [
++                  0.667,
++                  0.667,
++                  0.667
++                ],
++                "y": [
++                  1,
++                  1,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.333,
++                  0.333,
++                  0.333
++                ],
++                "y": [
++                  0,
++                  0,
++                  0
++                ]
++              },
++              "t": 0,
++              "s": [
++                0,
++                0,
++                100
++              ]
++            },
++            {
++              "i": {
++                "x": [
++                  0.667,
++                  0.667,
++                  0.667
++                ],
++                "y": [
++                  -0.137,
++                  -0.137,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.333,
++                  0.333,
++                  0.333
++                ],
++                "y": [
++                  0,
++                  0,
++                  0
++                ]
++              },
++              "t": 4,
++              "s": [
++                0,
++                0,
++                100
++              ]
++            },
++            {
++              "i": {
++                "x": [
++                  0.667,
++                  0.667,
++                  0.667
++                ],
++                "y": [
++                  1,
++                  1,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.333,
++                  0.333,
++                  0.333
++                ],
++                "y": [
++                  28.416,
++                  28.416,
++                  0
++                ]
++              },
++              "t": 24,
++              "s": [
++                100,
++                100,
++                100
++              ]
++            },
++            {
++              "t": 29.0000011811942,
++              "s": [
++                100,
++                100,
++                100
++              ]
++            }
++          ],
++          "ix": 6
++        }
++      },
++      "ao": 0,
++      "shapes": [
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ind": 0,
++              "ty": "sh",
++              "ix": 1,
++              "ks": {
++                "a": 0,
++                "k": {
++                  "i": [
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "o": [
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "v": [
++                    [
++                      153.888,
++                      72.281
++                    ]
++                  ],
++                  "c": false
++                },
++                "ix": 2
++              },
++              "nm": "Path 1",
++              "mn": "ADBE Vector Shape - Group",
++              "hd": false
++            },
++            {
++              "ty": "st",
++              "c": {
++                "a": 0,
++                "k": [
++                  0.2901960784313726,
++                  0.2901960784313726,
++                  0.2901960784313726,
++                  1
++                ],
++                "ix": 3
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 4
++              },
++              "w": {
++                "a": 0,
++                "k": 9,
++                "ix": 5
++              },
++              "lc": 1,
++              "lj": 1,
++              "ml": 4,
++              "bm": 0,
++              "nm": "Stroke 1",
++              "mn": "ADBE Vector Graphic - Stroke",
++              "hd": false
++            },
++            {
++              "ty": "fl",
++              "c": {
++                "a": 0,
++                "k": [
++                  0.2901960784313726,
++                  0.5647058823529412,
++                  0.8862745098039215,
++                  1
++                ],
++                "ix": 4
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 5
++              },
++              "r": 1,
++              "bm": 0,
++              "nm": "Fill 1",
++              "mn": "ADBE Vector Graphic - Fill",
++              "hd": false
++            },
++            {
++              "ty": "tr",
++              "p": {
++                "a": 0,
++                "k": [
++                  0,
++                  0
++                ],
++                "ix": 2
++              },
++              "a": {
++                "a": 0,
++                "k": [
++                  0,
++                  0
++                ],
++                "ix": 1
++              },
++              "s": {
++                "a": 0,
++                "k": [
++                  100,
++                  100
++                ],
++                "ix": 3
++              },
++              "r": {
++                "a": 0,
++                "k": 0,
++                "ix": 6
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 7
++              },
++              "sk": {
++                "a": 0,
++                "k": 0,
++                "ix": 4
++              },
++              "sa": {
++                "a": 0,
++                "k": 0,
++                "ix": 5
++              },
++              "nm": "Transform"
++            }
++          ],
++          "nm": "Shape 2",
++          "np": 3,
++          "cix": 2,
++          "bm": 0,
++          "ix": 1,
++          "mn": "ADBE Vector Group",
++          "hd": false
++        },
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ind": 0,
++              "ty": "sh",
++              "ix": 1,
++              "ks": {
++                "a": 0,
++                "k": {
++                  "i": [
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "o": [
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "v": [
++                    [
++                      -35.743,
++                      34.684
++                    ],
++                    [
++                      34.684,
++                      -35.743
++                    ]
++                  ],
++                  "c": false
++                },
++                "ix": 2
++              },
++              "nm": "Path 1",
++              "mn": "ADBE Vector Shape - Group",
++              "hd": false
++            },
++            {
++              "ty": "st",
++              "c": {
++                "a": 0,
++                "k": [
++                  0.2901960784313726,
++                  0.2901960784313726,
++                  0.2901960784313726,
++                  1
++                ],
++                "ix": 3
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 4
++              },
++              "w": {
++                "a": 0,
++                "k": 9,
++                "ix": 5
++              },
++              "lc": 2,
++              "lj": 1,
++              "ml": 4,
++              "bm": 0,
++              "nm": "Stroke 1",
++              "mn": "ADBE Vector Graphic - Stroke",
++              "hd": false
++            },
++            {
++              "ty": "fl",
++              "c": {
++                "a": 0,
++                "k": [
++                  0.2901960784313726,
++                  0.2901960784313726,
++                  0.2901960784313726,
++                  1
++                ],
++                "ix": 4
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 5
++              },
++              "r": 1,
++              "bm": 0,
++              "nm": "Fill 1",
++              "mn": "ADBE Vector Graphic - Fill",
++              "hd": false
++            },
++            {
++              "ty": "tr",
++              "p": {
++                "a": 0,
++                "k": [
++                  0,
++                  0
++                ],
++                "ix": 2
++              },
++              "a": {
++                "a": 0,
++                "k": [
++                  0,
++                  0
++                ],
++                "ix": 1
++              },
++              "s": {
++                "a": 0,
++                "k": [
++                  100,
++                  100
++                ],
++                "ix": 3
++              },
++              "r": {
++                "a": 0,
++                "k": 0,
++                "ix": 6
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 7
++              },
++              "sk": {
++                "a": 0,
++                "k": 0,
++                "ix": 4
++              },
++              "sa": {
++                "a": 0,
++                "k": 0,
++                "ix": 5
++              },
++              "nm": "Transform"
++            }
++          ],
++          "nm": "Shape 1",
++          "np": 3,
++          "cix": 2,
++          "bm": 0,
++          "ix": 2,
++          "mn": "ADBE Vector Group",
++          "hd": false
++        },
++        {
++          "ty": "tm",
++          "s": {
++            "a": 1,
++            "k": [
++              {
++                "i": {
++                  "x": [
++                    0.667
++                  ],
++                  "y": [
++                    1
++                  ]
++                },
++                "o": {
++                  "x": [
++                    0.333
++                  ],
++                  "y": [
++                    0
++                  ]
++                },
++                "t": 24,
++                "s": [
++                  100
++                ]
++              },
++              {
++                "t": 29.0000011811942,
++                "s": [
++                  0
++                ]
++              }
++            ],
++            "ix": 1
++          },
++          "e": {
++            "a": 0,
++            "k": 100,
++            "ix": 2
++          },
++          "o": {
++            "a": 0,
++            "k": 0,
++            "ix": 3
++          },
++          "m": 1,
++          "ix": 3,
++          "nm": "Trim Paths 1",
++          "mn": "ADBE Vector Filter - Trim",
++          "hd": false
++        }
++      ],
++      "ip": 0,
++      "op": 899.000036617021,
++      "st": 0,
++      "bm": 0
++    },
++    {
++      "ddd": 0,
++      "ind": 5,
++      "ty": 4,
++      "nm": "wifi_black_24dp1 Outlines",
++      "sr": 1,
++      "ks": {
++        "o": {
++          "a": 0,
++          "k": 100,
++          "ix": 11
++        },
++        "r": {
++          "a": 0,
++          "k": 0,
++          "ix": 10
++        },
++        "p": {
++          "a": 0,
++          "k": [
++            130,
++            130,
++            0
++          ],
++          "ix": 2
++        },
++        "a": {
++          "a": 0,
++          "k": [
++            12,
++            12,
++            0
++          ],
++          "ix": 1
++        },
++        "s": {
++          "a": 1,
++          "k": [
++            {
++              "i": {
++                "x": [
++                  0.667,
++                  0.667,
++                  0.667
++                ],
++                "y": [
++                  1,
++                  1,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.333,
++                  0.333,
++                  0.333
++                ],
++                "y": [
++                  0,
++                  0,
++                  0
++                ]
++              },
++              "t": 0,
++              "s": [
++                0,
++                0,
++                100
++              ]
++            },
++            {
++              "i": {
++                "x": [
++                  0.667,
++                  0.667,
++                  0.667
++                ],
++                "y": [
++                  0.763,
++                  0.763,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.333,
++                  0.333,
++                  0.333
++                ],
++                "y": [
++                  0,
++                  0,
++                  0
++                ]
++              },
++              "t": 4,
++              "s": [
++                0,
++                0,
++                100
++              ]
++            },
++            {
++              "i": {
++                "x": [
++                  0.667,
++                  0.667,
++                  0.667
++                ],
++                "y": [
++                  1,
++                  1,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.333,
++                  0.333,
++                  0.333
++                ],
++                "y": [
++                  -0.816,
++                  -0.816,
++                  0
++                ]
++              },
++              "t": 24,
++              "s": [
++                478.824,
++                478.824,
++                100
++              ]
++            },
++            {
++              "t": 29.0000011811942,
++              "s": [
++                444,
++                444,
++                100
++              ]
++            }
++          ],
++          "ix": 6
++        }
++      },
++      "ao": 0,
++      "shapes": [
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ind": 0,
++              "ty": "sh",
++              "ix": 1,
++              "ks": {
++                "a": 0,
++                "k": {
++                  "i": [
++                    [
++                      3.87,
++                      -3.86
++                    ],
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      -2.76,
++                      -2.76
++                    ],
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "o": [
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      2.76,
++                      -2.76
++                    ],
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      -3.86,
++                      -3.86
++                    ]
++                  ],
++                  "v": [
++                    [
++                      -7,
++                      1.535
++                    ],
++                    [
++                      -5,
++                      3.535
++                    ],
++                    [
++                      5,
++                      3.535
++                    ],
++                    [
++                      7,
++                      1.535
++                    ]
++                  ],
++                  "c": true
++                },
++                "ix": 2
++              },
++              "nm": "Path 1",
++              "mn": "ADBE Vector Shape - Group",
++              "hd": false
++            },
++            {
++              "ind": 1,
++              "ty": "sh",
++              "ix": 2,
++              "ks": {
++                "a": 0,
++                "k": {
++                  "i": [
++                    [
++                      1.66,
++                      -1.66
++                    ],
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "o": [
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      -1.65,
++                      -1.66
++                    ]
++                  ],
++                  "v": [
++                    [
++                      -3,
++                      5.535
++                    ],
++                    [
++                      0,
++                      8.535
++                    ],
++                    [
++                      3,
++                      5.535
++                    ]
++                  ],
++                  "c": true
++                },
++                "ix": 2
++              },
++              "nm": "Path 2",
++              "mn": "ADBE Vector Shape - Group",
++              "hd": false
++            },
++            {
++              "ind": 2,
++              "ty": "sh",
++              "ix": 3,
++              "ks": {
++                "a": 0,
++                "k": {
++                  "i": [
++                    [
++                      6.08,
++                      -6.07
++                    ],
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      -4.97,
++                      -4.97
++                    ],
++                    [
++                      0,
++                      0
++                    ]
++                  ],
++                  "o": [
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      4.97,
++                      -4.97
++                    ],
++                    [
++                      0,
++                      0
++                    ],
++                    [
++                      -6.07,
++                      -6.07
++                    ]
++                  ],
++                  "v": [
++                    [
++                      -11,
++                      -2.465
++                    ],
++                    [
++                      -9,
++                      -0.465
++                    ],
++                    [
++                      9,
++                      -0.465
++                    ],
++                    [
++                      11,
++                      -2.465
++                    ]
++                  ],
++                  "c": true
++                },
++                "ix": 2
++              },
++              "nm": "Path 3",
++              "mn": "ADBE Vector Shape - Group",
++              "hd": false
++            },
++            {
++              "ty": "mm",
++              "mm": 1,
++              "nm": "Merge Paths 1",
++              "mn": "ADBE Vector Filter - Merge",
++              "hd": false
++            },
++            {
++              "ty": "fl",
++              "c": {
++                "a": 0,
++                "k": [
++                  0.2901960784313726,
++                  0.5647058823529412,
++                  0.8862745098039215,
++                  1
++                ],
++                "ix": 4
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 5
++              },
++              "r": 1,
++              "bm": 0,
++              "nm": "Fill 1",
++              "mn": "ADBE Vector Graphic - Fill",
++              "hd": false
++            },
++            {
++              "ty": "tr",
++              "p": {
++                "a": 0,
++                "k": [
++                  12,
++                  11.465
++                ],
++                "ix": 2
++              },
++              "a": {
++                "a": 0,
++                "k": [
++                  0,
++                  0
++                ],
++                "ix": 1
++              },
++              "s": {
++                "a": 0,
++                "k": [
++                  100,
++                  100
++                ],
++                "ix": 3
++              },
++              "r": {
++                "a": 0,
++                "k": 0,
++                "ix": 6
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 7
++              },
++              "sk": {
++                "a": 0,
++                "k": 0,
++                "ix": 4
++              },
++              "sa": {
++                "a": 0,
++                "k": 0,
++                "ix": 5
++              },
++              "nm": "Transform"
++            }
++          ],
++          "nm": "Group 1",
++          "np": 5,
++          "cix": 2,
++          "bm": 0,
++          "ix": 1,
++          "mn": "ADBE Vector Group",
++          "hd": false
++        }
++      ],
++      "ip": 0,
++      "op": 899.000036617021,
++      "st": 0,
++      "bm": 0
++    },
++    {
++      "ddd": 0,
++      "ind": 8,
++      "ty": 4,
++      "nm": "Settings Outlines",
++      "sr": 1,
++      "ks": {
++        "o": {
++          "a": 0,
++          "k": 100,
++          "ix": 11
++        },
++        "r": {
++          "a": 0,
++          "k": 0,
++          "ix": 10
++        },
++        "p": {
++          "a": 0,
++          "k": [
++            130,
++            130,
++            0
++          ],
++          "ix": 2
++        },
++        "a": {
++          "a": 0,
++          "k": [
++            95.067,
++            95.067,
++            0
++          ],
++          "ix": 1
++        },
++        "s": {
++          "a": 1,
++          "k": [
++            {
++              "i": {
++                "x": [
++                  0.116,
++                  0.116,
++                  0.667
++                ],
++                "y": [
++                  1,
++                  1,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  1,
++                  1,
++                  0.333
++                ],
++                "y": [
++                  -0.004,
++                  -0.004,
++                  0
++                ]
++              },
++              "t": 0,
++              "s": [
++                0,
++                0,
++                100
++              ]
++            },
++            {
++              "i": {
++                "x": [
++                  0.833,
++                  0.833,
++                  0.833
++                ],
++                "y": [
++                  1,
++                  1,
++                  1
++                ]
++              },
++              "o": {
++                "x": [
++                  0.167,
++                  0.167,
++                  0.167
++                ],
++                "y": [
++                  0,
++                  0,
++                  0
++                ]
++              },
++              "t": 24,
++              "s": [
++                100,
++                100,
++                100
++              ]
++            },
++            {
++              "t": 29.0000011811942,
++              "s": [
++                90,
++                90,
++                100
++              ]
++            }
++          ],
++          "ix": 6
++        }
++      },
++      "ao": 0,
++      "shapes": [
++        {
++          "ty": "gr",
++          "it": [
++            {
++              "ind": 0,
++              "ty": "sh",
++              "ix": 1,
++              "ks": {
++                "a": 0,
++                "k": {
++                  "i": [
++                    [
++                      -52.366,
++                      0
++                    ],
++                    [
++                      0,
++                      -52.366
++                    ],
++                    [
++                      52.366,
++                      0
++                    ],
++                    [
++                      0,
++                      52.366
++                    ]
++                  ],
++                  "o": [
++                    [
++                      52.366,
++                      0
++                    ],
++                    [
++                      0,
++                      52.366
++                    ],
++                    [
++                      -52.366,
++                      0
++                    ],
++                    [
++                      0,
++                      -52.366
++                    ]
++                  ],
++                  "v": [
++                    [
++                      0,
++                      -94.817
++                    ],
++                    [
++                      94.817,
++                      0
++                    ],
++                    [
++                      0,
++                      94.817
++                    ],
++                    [
++                      -94.817,
++                      0
++                    ]
++                  ],
++                  "c": true
++                },
++                "ix": 2
++              },
++              "nm": "Path 1",
++              "mn": "ADBE Vector Shape - Group",
++              "hd": false
++            },
++            {
++              "ty": "fl",
++              "c": {
++                "a": 0,
++                "k": [
++                  0.9450980392156862,
++                  0.9529411764705882,
++                  0.9607843137254902,
++                  1
++                ],
++                "ix": 4
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 5
++              },
++              "r": 1,
++              "bm": 0,
++              "nm": "Fill 1",
++              "mn": "ADBE Vector Graphic - Fill",
++              "hd": false
++            },
++            {
++              "ty": "tr",
++              "p": {
++                "a": 0,
++                "k": [
++                  95.067,
++                  95.067
++                ],
++                "ix": 2
++              },
++              "a": {
++                "a": 0,
++                "k": [
++                  0,
++                  0
++                ],
++                "ix": 1
++              },
++              "s": {
++                "a": 0,
++                "k": [
++                  100,
++                  100
++                ],
++                "ix": 3
++              },
++              "r": {
++                "a": 0,
++                "k": 0,
++                "ix": 6
++              },
++              "o": {
++                "a": 0,
++                "k": 100,
++                "ix": 7
++              },
++              "sk": {
++                "a": 0,
++                "k": 0,
++                "ix": 4
++              },
++              "sa": {
++                "a": 0,
++                "k": 0,
++                "ix": 5
++              },
++              "nm": "Transform"
++            }
++          ],
++          "nm": "Group 1",
++          "np": 2,
++          "cix": 2,
++          "bm": 0,
++          "ix": 1,
++          "mn": "ADBE Vector Group",
++          "hd": false
++        }
++      ],
++      "ip": 0,
++      "op": 899.000036617021,
++      "st": 0,
++      "bm": 0
++    }
++  ],
++  "markers": []
++}
+\ No newline at end of file
+Index: app/src/main/res/drawable/ic_refresh.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/ic_refresh.xml b/app/src/main/res/drawable/ic_refresh.xml
+new file mode 100644
+--- /dev/null	(date 1735214403822)
++++ b/app/src/main/res/drawable/ic_refresh.xml	(date 1735214403822)
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#000000"
++        android:pathData="M17.65,6.35C16.2,4.9 14.21,4 12,4c-4.42,0 -7.99,3.58 -7.99,8s3.57,8 7.99,8c3.73,0 6.84,-2.55 7.73,-6h-2.08c-0.82,2.33 -3.04,4 -5.65,4 -3.31,0 -6,-2.69 -6,-6s2.69,-6 6,-6c1.66,0 3.14,0.69 4.22,1.78L13,11h7V4l-2.35,2.35z"/>
++</vector>
+\ No newline at end of file
+Index: app/src/main/res/drawable/ic_settings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/ic_settings.xml b/app/src/main/res/drawable/ic_settings.xml
+new file mode 100644
+--- /dev/null	(date 1735214423643)
++++ b/app/src/main/res/drawable/ic_settings.xml	(date 1735214423643)
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#000000"
++        android:pathData="M19.14,12.94c0.04,-0.3 0.06,-0.61 0.06,-0.94c0,-0.32 -0.02,-0.64 -0.07,-0.94l2.03,-1.58c0.18,-0.14 0.23,-0.41 0.12,-0.61l-1.92,-3.32c-0.12,-0.22 -0.37,-0.29 -0.59,-0.22l-2.39,0.96c-0.5,-0.38 -1.03,-0.7 -1.62,-0.94L14.4,2.81c-0.04,-0.24 -0.24,-0.41 -0.48,-0.41h-3.84c-0.24,0 -0.43,0.17 -0.47,0.41L9.25,5.35C8.66,5.59 8.12,5.92 7.63,6.29L5.24,5.33c-0.22,-0.08 -0.47,0 -0.59,0.22L2.74,8.87C2.62,9.08 2.66,9.34 2.86,9.48l2.03,1.58C4.84,11.36 4.8,11.69 4.8,12s0.02,0.64 0.07,0.94l-2.03,1.58c-0.18,0.14 -0.23,0.41 -0.12,0.61l1.92,3.32c0.12,0.22 0.37,0.29 0.59,0.22l2.39,-0.96c0.5,0.38 1.03,0.7 1.62,0.94l0.36,2.54c0.05,0.24 0.24,0.41 0.48,0.41h3.84c0.24,0 0.44,-0.17 0.47,-0.41l0.36,-2.54c0.59,-0.24 1.13,-0.56 1.62,-0.94l2.39,0.96c0.22,0.08 0.47,0 0.59,-0.22l1.92,-3.32c0.12,-0.22 0.07,-0.47 -0.12,-0.61L19.14,12.94zM12,15.6c-1.98,0 -3.6,-1.62 -3.6,-3.6s1.62,-3.6 3.6,-3.6s3.6,1.62 3.6,3.6S13.98,15.6 12,15.6z"/>
++</vector>
+\ No newline at end of file
+Index: app/src/main/res/values/colors.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<resources>\r\n    <color name=\"purple_200\">#FFBB86FC</color>\r\n    <color name=\"purple_500\">#FF6200EE</color>\r\n    <color name=\"purple_700\">#FF3700B3</color>\r\n    <color name=\"teal_200\">#FF03DAC5</color>\r\n    <color name=\"teal_700\">#FF018786</color>\r\n    <color name=\"black\">#FF000000</color>\r\n    <color name=\"white\">#FFFFFFFF</color>\r\n\r\n    <!--    <color name=\"colorPrimary\">#024265</color>-->\r\n    <!--    <color name=\"colorPrimaryDark\">#024265</color>-->\r\n    <!--    <color name=\"colorAccent\">#05af9b</color>-->\r\n    <color name=\"primary\">#6200EE</color>\r\n    <color name=\"primary_dark\">#3700B3</color>\r\n    <color name=\"secondary\">#03DAC5</color>\r\n    <color name=\"secondary_dark\">#018786</color>\r\n\r\n    <color name=\"color_one\">#fb7268</color>\r\n    <color name=\"color_white\">#ededf2</color>\r\n    <color name=\"color_two\">#E3E0E0</color>\r\n\r\n    <color name=\"SickLeave\">#FFA726</color>\r\n    <color name=\"PrivilegeLeave\">#66BB6A</color>\r\n    <color name=\"CasualLeave\">#E91E63</color>\r\n    <color name=\"OccasionalLeave\">#29B6F6</color>\r\n    <color name=\"RestrictedHoliday\">#F44336</color>\r\n    <color name=\"LossOfPay\">#009688</color>\r\n    <color name=\"LeaveWithoutPay\">#FF5722</color>\r\n    <color name=\"shimmer_placeholder\">#BEBDBD</color>\r\n\r\n    <color name=\"stroke_color\">#E0E0E0</color>\r\n    <color name=\"text_primary\">#1F2937</color>\r\n    <color name=\"text_secondary\">#4B5563</color>\r\n    <color name=\"text_tertiary\">#6B7280</color>\r\n\r\n    <color name=\"status_approved\">#059669</color>\r\n    <color name=\"status_pending\">#D97706</color>\r\n    <color name=\"status_rejected\">#DC2626</color>\r\n    <color name=\"icon_tint\">#3B82F6</color>\r\n    <color name=\"icon_background\">#EFF6FF</color>\r\n\r\n    <!--    <color name=\"colorSecondary\">#1976D2</color>-->\r\n    <!--    <color name=\"colorSecondaryDark\">#1565C0</color>-->\r\n    <!--    <color name=\"background\">#F5F5F5</color>-->\r\n\r\n    <color name=\"progress_good\">#00C853</color>\r\n    <color name=\"progress_warning\">#FFB300</color>\r\n    <color name=\"progress_critical\">#FF5252</color>\r\n    <color name=\"balance_color\">#00796B</color>\r\n\r\n    <color name=\"credited_background\">#E3F2FD</color>\r\n    <color name=\"debited_background\">#FFEBEE</color>\r\n    <color name=\"balance_background\">#E8F5E9</color>\r\n    <color name=\"used_background\">#E8F5E9</color>\r\n    <color name=\"total_background\">#E8F5E9</color>\r\n\r\n    <color name=\"card_background\">#F8F9FA</color>\r\n    <color name=\"ripple_color\">#1F000000</color>\r\n\r\n    <color name=\"card_gradient_start\">#FFFFFF</color>\r\n    <color name=\"card_gradient_end\">#F8F9FF</color>\r\n\r\n    <!-- Status Badge Colors -->\r\n    <color name=\"status_gradient_start\">#4A90E2</color>\r\n    <color name=\"status_gradient_end\">#357ABD</color>\r\n\r\n    <!-- Button Colors -->\r\n    <color name=\"button_gradient_start\">#6366F1</color>\r\n    <color name=\"button_gradient_end\">#4F46E5</color>\r\n\r\n\r\n    <!-- Primary Colors -->\r\n    <color name=\"colorPrimary\">#2196F3</color>          <!-- Blue 500 -->\r\n    <color name=\"colorPrimaryVariant\">#1976D2</color>   <!-- Blue 700 -->\r\n    <color name=\"colorPrimaryDark\">#1565C0</color>      <!-- Blue 800 -->\r\n\r\n    <!-- Secondary Colors -->\r\n    <color name=\"colorSecondary\">#00BCD4</color>        <!-- Cyan 500 -->\r\n    <color name=\"colorSecondaryVariant\">#0097A7</color> <!-- Cyan 700 -->\r\n    <color name=\"colorSecondaryDark\">#00838F</color>    <!-- Cyan 800 -->\r\n\r\n    <!-- Accent -->\r\n    <color name=\"colorAccent\">#FF4081</color>           <!-- Pink A200 -->\r\n\r\n    <!-- Background Colors -->\r\n    <color name=\"background\">#FAFAFA</color>            <!-- Grey 50 -->\r\n    <color name=\"surface\">#FFFFFF</color>\r\n    <color name=\"error\">#B00020</color>\r\n\r\n    <!-- Text Colors -->\r\n    <color name=\"textPrimary\">#212121</color>           <!-- Grey 900 -->\r\n    <color name=\"textSecondary\">#757575</color>         <!-- Grey 600 -->\r\n\r\n    <!-- Status Colors -->\r\n    <color name=\"success\">#4CAF50</color>               <!-- Green 500 -->\r\n    <color name=\"warning\">#FFC107</color>               <!-- Amber 500 -->\r\n    <color name=\"info\">#2196F3</color>                  <!-- Blue 500 -->\r\n\r\n    <!-- Custom Gradient Colors -->\r\n    <color name=\"gradient_start\">#357ABD</color>\r\n    <color name=\"gradient_end\">#4F46E5</color>\r\n\r\n    <color name=\"primary_color\">#2196F3</color>\r\n\r\n    <!-- Text Colors -->\r\n    <color name=\"primary_text\">#212121</color>\r\n    <color name=\"secondary_text\">#757575</color>\r\n\r\n    <!-- Background Colors -->\r\n    <color name=\"background_light\">#F5F5F5</color>\r\n    <color name=\"surface_color\">#FFFFFF</color>\r\n\r\n    <!-- Accent and State Colors -->\r\n    <color name=\"success_color\">#4CAF50</color>\r\n    <color name=\"error_color\">#FF5252</color>\r\n    <color name=\"warning_color\">#FFC107</color>\r\n\r\n    <!-- Neutral Colors -->\r\n    <color name=\"divider_color\">#BDBDBD</color>\r\n    <color name=\"icon_color\">#757575</color>\r\n    <color name=\"_000000\">#448AFF</color>\r\n    <color name=\"_0000\">#3F996D</color>\r\n\r\n    <color name=\"card_stroke\">#E0E0E0</color>\r\n\r\n    <!-- Status Colors -->\r\n    <color name=\"status_active_background\">#E6F2E6</color>\r\n    <color name=\"status_active_text\">#2E7D32</color>\r\n\r\n    <color name=\"primary_text_color\">#333333</color>\r\n    <color name=\"secondary_text_color\">#666666</color>\r\n\r\n    <color name=\"pending_status_color\">#FFC107</color> <!-- Amber -->\r\n    <color name=\"approved_status_color\">#4CAF50</color> <!-- Green -->\r\n    <color name=\"rejected_status_color\">#F44336</color> <!-- Red -->\r\n    <color name=\"default_status_color\">#808080</color> <!-- Gray -->\r\n\r\n    <color name=\"primary_dark_color\">#1976D2</color>\r\n    <color name=\"primary_light_color\">#BBDEFB</color>\r\n\r\n    <!-- Status Colors -->\r\n    <color name=\"approved_color\">#4CAF50</color>\r\n    <color name=\"pending_color\">#FFC107</color>\r\n    <color name=\"rejected_color\">#F44336</color>\r\n\r\n    <color name=\"chip_background\">#FFFFFF</color>\r\n    <color name=\"color_background\">#F5F5F5</color>\r\n    <color name=\"color_primary\">#3F51B5</color>\r\n    <color name=\"color_primary_text\">#212121</color>\r\n    <color name=\"color_secondary_text\">#757575</color>\r\n    <color name=\"color_stroke\">#E0E0E0</color>\r\n\r\n    <color name=\"background_start\">@color/colorPrimary</color>\r\n    <color name=\"background_end\">#F5F5F5</color>\r\n\r\n\r\n</resources>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/values/colors.xml b/app/src/main/res/values/colors.xml
+--- a/app/src/main/res/values/colors.xml	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/res/values/colors.xml	(date 1735214359408)
+@@ -153,6 +153,8 @@
+ 
+     <color name="background_start">@color/colorPrimary</color>
+     <color name="background_end">#F5F5F5</color>
+-
++    <color name="background_dark">#1A1A1A</color>
++    <color name="white_70">#B3FFFFFF</color>
++    <color name="warning_bg">#FFF3E0</color>
+ 
+ </resources>
+\ No newline at end of file
+Index: app/src/main/res/drawable/glassmorphism_bg.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/glassmorphism_bg.xml b/app/src/main/res/drawable/glassmorphism_bg.xml
+new file mode 100644
+--- /dev/null	(date 1735214310657)
++++ b/app/src/main/res/drawable/glassmorphism_bg.xml	(date 1735214310657)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android">
++    <gradient
++        android:startColor="#80FFFFFF"
++        android:endColor="#40FFFFFF"
++        android:angle="45"/>
++</shape>
+Index: app/src/main/java/app/xedigital/ai/utills/NetworkUtils.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package app.xedigital.ai.utills;\r\n\r\nimport android.content.Context;\r\nimport android.net.ConnectivityManager;\r\nimport android.net.Network;\r\nimport android.net.NetworkCapabilities;\r\nimport android.os.Build;\r\nimport android.util.Log;\r\n\r\nimport androidx.annotation.RequiresApi;\r\n\r\npublic class NetworkUtils {\r\n\r\n    public static boolean isNetworkAvailable(Context context) {\r\n        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);\r\n        if (connectivityManager == null) {\r\n            return false;\r\n        }\r\n\r\n        Network activeNetwork = connectivityManager.getActiveNetwork();\r\n        if (activeNetwork == null) {\r\n            return false;\r\n        }\r\n\r\n        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);\r\n        if (networkCapabilities == null) {\r\n            return false;\r\n        }\r\n\r\n        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&\r\n                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);\r\n    }\r\n\r\n    @RequiresApi(api = Build.VERSION_CODES.M)\r\n    public static NetworkSpeed getNetworkSpeed(Context context) {\r\n        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);\r\n        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());\r\n\r\n        if (networkCapabilities != null) {\r\n            int downSpeed = networkCapabilities.getLinkDownstreamBandwidthKbps();\r\n            int upSpeed = networkCapabilities.getLinkUpstreamBandwidthKbps();\r\n            Log.d(\"NetworkSpeed\", \"Down Speed: \" + downSpeed + \" Mbps, Up Speed: \" + upSpeed + \" Mbps\");\r\n            return new NetworkSpeed(downSpeed, upSpeed);\r\n\r\n        } else {\r\n            Log.d(\"NetworkSpeed\", \"Network capabilities are null\");\r\n            return new NetworkSpeed(0, 0);\r\n\r\n        }\r\n    }\r\n\r\n    public static class NetworkSpeed {\r\n        public int downSpeed;\r\n        public int upSpeed;\r\n\r\n        public NetworkSpeed(int downSpeed, int upSpeed) {\r\n            this.downSpeed = downSpeed;\r\n            this.upSpeed = upSpeed;\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/app/xedigital/ai/utills/NetworkUtils.java b/app/src/main/java/app/xedigital/ai/utills/NetworkUtils.java
+--- a/app/src/main/java/app/xedigital/ai/utills/NetworkUtils.java	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/java/app/xedigital/ai/utills/NetworkUtils.java	(date 1735216817279)
+@@ -49,6 +49,21 @@
+         }
+     }
+ 
++    @RequiresApi(api = Build.VERSION_CODES.M)
++    public static boolean isNetworkSpeedGood(Context context) {
++        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
++        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
++
++        if (networkCapabilities != null) {
++            int downSpeed = networkCapabilities.getLinkDownstreamBandwidthKbps();
++            // Define your threshold for good network speed
++            int goodSpeedThresholdKbps = 1000; // Example: 1 Mbps
++            return downSpeed >= goodSpeedThresholdKbps;
++        } else {
++            return false; // Assume slow network if capabilities are null
++        }
++    }
++
+     public static class NetworkSpeed {
+         public int downSpeed;
+         public int upSpeed;
+Index: app/src/main/java/app/xedigital/ai/NetworkChangeReceiver.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package app.xedigital.ai;\r\n\r\nimport android.content.BroadcastReceiver;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.os.Build;\r\n\r\nimport app.xedigital.ai.activity.SplashActivity;\r\nimport app.xedigital.ai.utills.NetworkUtils;\r\n\r\npublic class NetworkChangeReceiver extends BroadcastReceiver {\r\n\r\n    private static final int SLOW_NETWORK_THRESHOLD_KBPS = 10;\r\n\r\n    @Override\r\n    public void onReceive(Context context, Intent intent) {\r\n        if (!NetworkUtils.isNetworkAvailable(context)) {\r\n            handleNetworkStateChange(context, false, false);\r\n        } else {\r\n            boolean isSpeedGood = Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||\r\n                    NetworkUtils.getNetworkSpeed(context).downSpeed >= SLOW_NETWORK_THRESHOLD_KBPS;\r\n            handleNetworkStateChange(context, true, isSpeedGood);\r\n        }\r\n    }\r\n\r\n    private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood) {\r\n        if (context instanceof SplashActivity) {\r\n            SplashActivity splashActivity = (SplashActivity) context;\r\n            if (!isNetworkAvailable) {\r\n                splashActivity.showNoInternetAlert();\r\n            } else {\r\n                splashActivity.hideNoInternetAlert();\r\n                if (!isSpeedGood) {\r\n                    splashActivity.showSlowNetworkAlert();\r\n                } else {\r\n                    splashActivity.hideSlowNetworkAlert();\r\n                }\r\n            }\r\n        } else if (context instanceof MainActivity) {\r\n            MainActivity mainActivity = (MainActivity) context;\r\n            if (!isNetworkAvailable) {\r\n                mainActivity.showNoInternetAlert();\r\n            } else {\r\n                mainActivity.hideNoInternetAlert();\r\n                if (!isSpeedGood) {\r\n                    mainActivity.showSlowNetworkAlert();\r\n                } else {\r\n                    mainActivity.hideSlowNetworkAlert();\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n//    private void showNoInternetSnackbar(Context context) {\r\n//        Snackbar snackbar = Snackbar.make(((MainActivity) context).findViewById(android.R.id.content),\r\n//                \"No Internet Connection. Please check your network.\", Snackbar.LENGTH_INDEFINITE);\r\n//        snackbar.setAction(\"OK\", view -> ((MainActivity) context).finish());\r\n//        snackbar.show();\r\n//    }\r\n//\r\n//    private void showNoInternetAlert(Context context) {\r\n//        Activity activity = (Activity) context;\r\n//\r\n//        // Check if the Activity is not null before proceeding\r\n//        if (activity != null && !activity.isFinishing()) {\r\n//            new AlertDialog.Builder(activity)\r\n//                    .setTitle(\"No Internet Connection\")\r\n//                    .setMessage(\"Please check your internet connection and try again.\")\r\n//                    .setPositiveButton(\"OK\", (dialog, which) -> activity.finish())\r\n//                    .setCancelable(false)\r\n//                    .show();\r\n//        }\r\n//    }\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/app/xedigital/ai/NetworkChangeReceiver.java b/app/src/main/java/app/xedigital/ai/NetworkChangeReceiver.java
+--- a/app/src/main/java/app/xedigital/ai/NetworkChangeReceiver.java	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/java/app/xedigital/ai/NetworkChangeReceiver.java	(date 1735280832136)
+@@ -10,66 +10,65 @@
+ 
+ public class NetworkChangeReceiver extends BroadcastReceiver {
+ 
++
+     private static final int SLOW_NETWORK_THRESHOLD_KBPS = 10;
++    private static final int MINIMUM_SPEED_KBPS = 10;
+ 
+     @Override
+     public void onReceive(Context context, Intent intent) {
+-        if (!NetworkUtils.isNetworkAvailable(context)) {
+-            handleNetworkStateChange(context, false, false);
+-        } else {
+-            boolean isSpeedGood = Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+-                    NetworkUtils.getNetworkSpeed(context).downSpeed >= SLOW_NETWORK_THRESHOLD_KBPS;
+-            handleNetworkStateChange(context, true, isSpeedGood);
++        boolean isNetworkAvailable = NetworkUtils.isNetworkAvailable(context);
++        boolean isSpeedGood = isNetworkAvailable && NetworkUtils.getNetworkSpeed(context).downSpeed >= SLOW_NETWORK_THRESHOLD_KBPS;
++
++        handleNetworkStateChange(context, isNetworkAvailable, isSpeedGood);
++
++
++        if (isNetworkAvailable && NetworkUtils.getNetworkSpeed(context).downSpeed < MINIMUM_SPEED_KBPS) {
++
++            if (context instanceof MainActivity) {
++                MainActivity mainActivity = (MainActivity) context;
++                mainActivity.showSlowInternetLayout();
++            } else if (context instanceof SplashActivity) {
++                SplashActivity splashActivity = (SplashActivity) context;
++                splashActivity.showSlowInternetLayout();
++            }
++        } else if (isNetworkAvailable) {
++            if (context instanceof MainActivity) {
++                MainActivity mainActivity = (MainActivity) context;
++                mainActivity.hideSlowInternetLayout();
++            } else if (context instanceof SplashActivity) {
++                SplashActivity splashActivity = (SplashActivity) context;
++                splashActivity.hideSlowInternetLayout();
++            }
+         }
++
+     }
++
+ 
+     private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood) {
+         if (context instanceof SplashActivity) {
+             SplashActivity splashActivity = (SplashActivity) context;
+             if (!isNetworkAvailable) {
+-                splashActivity.showNoInternetAlert();
++                splashActivity.showNoInternetLayout();
+             } else {
+-                splashActivity.hideNoInternetAlert();
++                splashActivity.hideNoInternetLayout();
+                 if (!isSpeedGood) {
+-                    splashActivity.showSlowNetworkAlert();
++                    splashActivity.showSlowInternetLayout();
+                 } else {
+-                    splashActivity.hideSlowNetworkAlert();
++                    splashActivity.hideSlowInternetLayout();
+                 }
+             }
+         } else if (context instanceof MainActivity) {
+             MainActivity mainActivity = (MainActivity) context;
+             if (!isNetworkAvailable) {
+-                mainActivity.showNoInternetAlert();
++                mainActivity.showNoInternetLayout();
+             } else {
+-                mainActivity.hideNoInternetAlert();
++                mainActivity.hideNoInternetLayout();
+                 if (!isSpeedGood) {
+-                    mainActivity.showSlowNetworkAlert();
++                    mainActivity.showSlowInternetLayout();
+                 } else {
+-                    mainActivity.hideSlowNetworkAlert();
++                    mainActivity.hideSlowInternetLayout();
+                 }
+             }
+         }
+     }
+ }
+-
+-//    private void showNoInternetSnackbar(Context context) {
+-//        Snackbar snackbar = Snackbar.make(((MainActivity) context).findViewById(android.R.id.content),
+-//                "No Internet Connection. Please check your network.", Snackbar.LENGTH_INDEFINITE);
+-//        snackbar.setAction("OK", view -> ((MainActivity) context).finish());
+-//        snackbar.show();
+-//    }
+-//
+-//    private void showNoInternetAlert(Context context) {
+-//        Activity activity = (Activity) context;
+-//
+-//        // Check if the Activity is not null before proceeding
+-//        if (activity != null && !activity.isFinishing()) {
+-//            new AlertDialog.Builder(activity)
+-//                    .setTitle("No Internet Connection")
+-//                    .setMessage("Please check your internet connection and try again.")
+-//                    .setPositiveButton("OK", (dialog, which) -> activity.finish())
+-//                    .setCancelable(false)
+-//                    .show();
+-//        }
+-//    }
+-
+Index: app/src/main/res/layout/activity_splash.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<RelativeLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:background=\"@drawable/welcome_background\">\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_centerInParent=\"true\"\r\n        android:background=\"#00EDEDF2\"\r\n        android:gravity=\"center\"\r\n        android:orientation=\"vertical\"\r\n        android:padding=\"24dp\">\r\n\r\n        <ImageView\r\n            android:id=\"@+id/iv_app_logo\"\r\n            android:layout_width=\"120dp\"\r\n            android:layout_height=\"120dp\"\r\n            android:layout_marginBottom=\"24dp\"\r\n            android:contentDescription=\"@string/app_logo_description\"\r\n            android:src=\"@mipmap/ic_launcher\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/tv_welcome_title\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginBottom=\"16dp\"\r\n            android:fontFamily=\"@font/quicksand_font_family\"\r\n            android:text=\"@string/welcome_title\"\r\n            android:textColor=\"@color/primary_text\"\r\n            android:textSize=\"28sp\"\r\n            android:textStyle=\"bold\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/tv_welcome_message\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginBottom=\"32dp\"\r\n            android:fontFamily=\"@font/quicksand_regular\"\r\n            android:gravity=\"center\"\r\n            android:text=\"@string/welcome_message\"\r\n            android:textColor=\"#FFFFFF\"\r\n            android:textSize=\"16sp\" />\r\n\r\n        <androidx.appcompat.widget.AppCompatButton\r\n            android:id=\"@+id/btn_get_started\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:background=\"@drawable/button_primary_background\"\r\n            android:paddingTop=\"16dp\"\r\n            android:paddingBottom=\"16dp\"\r\n            android:text=\"@string/get_started\"\r\n            android:textAllCaps=\"false\"\r\n            android:textColor=\"@color/white\"\r\n            android:textSize=\"16sp\" />\r\n\r\n    </LinearLayout>\r\n\r\n</RelativeLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_splash.xml b/app/src/main/res/layout/activity_splash.xml
+--- a/app/src/main/res/layout/activity_splash.xml	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/res/layout/activity_splash.xml	(date 1735216817304)
+@@ -56,5 +56,18 @@
+             android:textSize="16sp" />
+ 
+     </LinearLayout>
++    <include
++        android:id="@+id/noInternetLayout"
++        layout="@layout/no_internet_connection"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:visibility="gone" />
++
++    <include
++        android:id="@+id/slowInternetLayout"
++        layout="@layout/slow_internet_connection"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:visibility="gone" />
+ 
+ </RelativeLayout>
+\ No newline at end of file
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n}\r\n\r\nandroid {\r\n    namespace = \"app.xedigital.ai\"\r\n    compileSdk = 34\r\n\r\n    defaultConfig {\r\n        applicationId = \"app.xedigital.ai\"\r\n        minSdk = 28\r\n        targetSdk = 35\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n        ndk {\r\n            abiFilters += listOf(\"armeabi-v7a\", \"arm64-v8a\", \"x86\", \"x86_64\")\r\n        }\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"), \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_1_8\r\n        targetCompatibility = JavaVersion.VERSION_1_8\r\n        isCoreLibraryDesugaringEnabled = true\r\n\r\n    }\r\n    buildFeatures {\r\n        viewBinding = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n\r\n    implementation(libs.appcompat)\r\n    implementation(libs.material)\r\n    implementation(libs.constraintlayout)\r\n    implementation(libs.lifecycle.livedata.ktx)\r\n    implementation(libs.lifecycle.viewmodel.ktx)\r\n    implementation(libs.navigation.fragment)\r\n    implementation(libs.navigation.ui)\r\n    implementation(libs.legacy.support.v4)\r\n    implementation(libs.activity)\r\n    implementation(libs.filament.android)\r\n    implementation(libs.tracing.perfetto.handshake)\r\n    implementation(libs.firebase.crashlytics.buildtools)\r\n    implementation(libs.protolite.well.known.types)\r\n    implementation(libs.media3.common)\r\n    implementation(libs.play.services.location)\r\n    implementation(libs.compilercommon)\r\n    implementation(libs.cronet.embedded)\r\n    implementation(libs.compiler)\r\n    implementation(libs.transport.api)\r\n    implementation(libs.core.i18n)\r\n    implementation(libs.leanback)\r\n    implementation(libs.rendering)\r\n    implementation(libs.ui.text.android)\r\n    implementation(libs.firebase.vertexai)\r\n    implementation(libs.impress)\r\n//    implementation(libs.firebase.inappmessaging)\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.ext.junit)\r\n    androidTestImplementation(libs.espresso.core)\r\n    implementation(libs.retrofit)\r\n    implementation(libs.converterGson)\r\n    implementation(libs.cardView)\r\n    implementation(libs.mpandroidchart)\r\n    implementation(libs.recyclerView)\r\n    implementation(libs.camera.core)\r\n    implementation(libs.camera.camera2)\r\n    implementation(libs.camera.lifecycle)\r\n    implementation(libs.camera.video)\r\n    implementation(libs.camera.view)\r\n    implementation(libs.camera.extensions)\r\n    implementation(libs.navigation.fragment)\r\n    implementation(libs.navigation.ui)\r\n    implementation(libs.play.services.location)\r\n    coreLibraryDesugaring(\"com.android.tools:desugar_jdk_libs:2.1.3\")\r\n    implementation (\"com.github.PhilJay:MPAndroidChart:v3.1.0\")\r\n    implementation(\"com.google.code.gson:gson:2.11.0\")\r\n    implementation(\"com.github.bumptech.glide:glide:4.16.0\")\r\n    annotationProcessor(\"com.github.bumptech.glide:compiler:4.16.0\")\r\n    implementation(\"com.facebook.shimmer:shimmer:0.5.0\")\r\n    implementation(\"com.squareup.okhttp3:logging-interceptor:4.12.0\")\r\n    implementation(\"org.jsoup:jsoup:1.18.1\")\r\n//    implementation(\"com.google.mlkit:face-detection:16.1.5\")\r\n    implementation(\"com.github.chrisbanes:PhotoView:2.3.0\")\r\n    implementation(\"com.google.android.flexbox:flexbox:3.0.0\")\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/build.gradle.kts	(date 1735214614971)
+@@ -94,4 +94,6 @@
+ //    implementation("com.google.mlkit:face-detection:16.1.5")
+     implementation("com.github.chrisbanes:PhotoView:2.3.0")
+     implementation("com.google.android.flexbox:flexbox:3.0.0")
++    implementation("com.airbnb.android:lottie:5.2.0")
++
+ }
+\ No newline at end of file
+Index: app/src/main/res/layout/no_internet_connection.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/no_internet_connection.xml b/app/src/main/res/layout/no_internet_connection.xml
+new file mode 100644
+--- /dev/null	(date 1735284206693)
++++ b/app/src/main/res/layout/no_internet_connection.xml	(date 1735284206693)
+@@ -0,0 +1,105 @@
++<?xml version="1.0" encoding="utf-8"?>
++<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:id="@+id/noInternetContainer"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:background="@color/black">
++
++    <!-- Animated background particles -->
++    <!--    <com.airbnb.lottie.LottieAnimationView-->
++    <!--        android:id="@+id/particleAnimation"-->
++    <!--        android:layout_width="match_parent"-->
++    <!--        android:layout_height="match_parent"-->
++    <!--        app:lottie_autoPlay="true"-->
++    <!--        app:lottie_loop="true"-->
++    <!--        app:lottie_rawRes="@raw/particles_background" />-->
++
++    <com.airbnb.lottie.LottieAnimationView
++        android:id="@+id/noInternetAnimation"
++        android:layout_width="240dp"
++        android:layout_height="240dp"
++        android:layout_gravity="center_horizontal"
++        android:layout_marginTop="80dp"
++        app:lottie_autoPlay="true"
++        app:lottie_loop="true"
++        app:lottie_rawRes="@raw/no_internet_animation" />
++
++    <androidx.constraintlayout.widget.ConstraintLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_gravity="center"
++        android:layout_marginTop="100dp"
++        android:padding="24dp">
++
++        <com.google.android.material.card.MaterialCardView
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:background="@drawable/futuristic_glass_bg"
++            app:cardBackgroundColor="#00FFFFFF"
++            app:layout_constraintTop_toTopOf="parent">
++
++            <LinearLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:orientation="vertical"
++                android:padding="28dp">
++
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:fontFamily="@font/quicksand_semibold"
++                    android:shadowColor="#804FCCFF"
++                    android:shadowDx="0"
++                    android:shadowDy="0"
++                    android:shadowRadius="8"
++                    android:text="No Internet Connection"
++                    android:textColor="#4FCCFF"
++                    android:textSize="24sp" />
++
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:layout_marginTop="12dp"
++                    android:fontFamily="@font/quicksand_light"
++                    android:text="Please check your internet connection and try again"
++                    android:textColor="#E6FFFFFF"
++                    android:textSize="16sp" />
++
++                <com.google.android.material.button.MaterialButton
++                    android:id="@+id/btnRetry"
++                    android:layout_width="match_parent"
++                    android:layout_height="56dp"
++                    android:layout_marginTop="28dp"
++                    android:background="@drawable/futuristic_button_bg"
++                    android:onClick="onRetryButtonClicked"
++                    android:text="Try Again"
++                    android:textAllCaps="false"
++                    android:textColor="#FFFFFF"
++                    android:textSize="16sp"
++                    app:icon="@drawable/ic_refresh"
++                    app:iconGravity="textStart"
++                    app:iconPadding="12dp"
++                    app:iconTint="#FFFFFF" />
++
++                <com.google.android.material.button.MaterialButton
++                    android:id="@+id/btnOpenSettings"
++                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
++                    android:layout_width="match_parent"
++                    android:layout_height="56dp"
++                    android:layout_marginTop="12dp"
++                    android:onClick="onOpenSettingsButtonClicked"
++                    android:text="Open Settings"
++                    android:textAllCaps="false"
++                    android:textColor="#4FCCFF"
++                    android:textSize="16sp"
++                    app:icon="@drawable/ic_settings"
++                    app:iconGravity="textStart"
++                    app:iconPadding="12dp"
++                    app:iconTint="#4FCCFF"
++                    app:strokeColor="#4FCCFF"
++                    app:strokeWidth="1dp" />
++            </LinearLayout>
++        </com.google.android.material.card.MaterialCardView>
++    </androidx.constraintlayout.widget.ConstraintLayout>
++</FrameLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/slow_internet_connection.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/slow_internet_connection.xml b/app/src/main/res/layout/slow_internet_connection.xml
+new file mode 100644
+--- /dev/null	(date 1735216817300)
++++ b/app/src/main/res/layout/slow_internet_connection.xml	(date 1735216817300)
+@@ -0,0 +1,61 @@
++<?xml version="1.0" encoding="utf-8"?>
++<FrameLayout android:id="@+id/slowInternetContainer"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    android:layout_gravity="top"
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto">
++
++    <com.google.android.material.card.MaterialCardView
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_margin="16dp"
++        app:cardCornerRadius="16dp"
++        app:cardElevation="8dp"
++        android:backgroundTint="@color/warning_bg">
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="horizontal"
++            android:gravity="center_vertical"
++            android:padding="16dp">
++
++            <com.google.android.material.progressindicator.CircularProgressIndicator
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:indeterminate="true"
++                app:indicatorSize="24dp"
++                app:trackThickness="2dp"/>
++
++            <LinearLayout
++                android:layout_width="0dp"
++                android:layout_height="wrap_content"
++                android:layout_weight="1"
++                android:orientation="vertical"
++                android:layout_marginStart="16dp">
++
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:text="Slow Internet Connection"
++                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"/>
++
++                <TextView
++                    android:id="@+id/tvSpeed"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:text="Current speed: 0.5 Mbps"
++                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"/>
++            </LinearLayout>
++
++            <ImageButton
++                android:id="@+id/btnDismiss"
++                android:layout_width="48dp"
++                android:layout_height="48dp"
++                android:background="?attr/selectableItemBackgroundBorderless"
++                android:src="@drawable/ic_close"
++                android:contentDescription="Dismiss"/>
++        </LinearLayout>
++    </com.google.android.material.card.MaterialCardView>
++</FrameLayout>
+\ No newline at end of file
+Index: app/src/main/res/drawable/futuristic_glass_bg.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/futuristic_glass_bg.xml b/app/src/main/res/drawable/futuristic_glass_bg.xml
+new file mode 100644
+--- /dev/null	(date 1735282297269)
++++ b/app/src/main/res/drawable/futuristic_glass_bg.xml	(date 1735282297269)
+@@ -0,0 +1,29 @@
++<?xml version="1.0" encoding="utf-8"?>
++<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
++    <!-- Base blur layer -->
++    <item>
++        <shape android:shape="rectangle">
++            <solid android:color="#1AFFFFFF" />
++            <corners android:radius="28dp" />
++        </shape>
++    </item>
++    <!-- Gradient overlay -->
++    <item>
++        <shape android:shape="rectangle">
++            <gradient
++                android:angle="135"
++                android:endColor="#266DB4FF"
++                android:startColor="#264FCCFF" />
++            <corners android:radius="28dp" />
++        </shape>
++    </item>
++    <!-- Border glow effect -->
++    <item>
++        <shape android:shape="rectangle">
++            <stroke
++                android:width="1dp"
++                android:color="#804FCCFF" />
++            <corners android:radius="28dp" />
++        </shape>
++    </item>
++</layer-list>
+\ No newline at end of file
+Index: app/src/main/java/app/xedigital/ai/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package app.xedigital.ai;\r\n\r\nimport android.app.Activity;\r\nimport android.app.AlertDialog;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.content.IntentFilter;\r\nimport android.content.SharedPreferences;\r\nimport android.os.Bundle;\r\nimport android.view.Menu;\r\nimport android.view.MenuItem;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.appcompat.app.AppCompatDelegate;\r\nimport androidx.drawerlayout.widget.DrawerLayout;\r\nimport androidx.navigation.NavController;\r\nimport androidx.navigation.Navigation;\r\nimport androidx.navigation.ui.AppBarConfiguration;\r\nimport androidx.navigation.ui.NavigationUI;\r\n\r\nimport com.google.android.material.navigation.NavigationView;\r\n\r\nimport app.xedigital.ai.activity.LoginActivity;\r\nimport app.xedigital.ai.activity.PunchActivity;\r\nimport app.xedigital.ai.databinding.ActivityMainBinding;\r\nimport app.xedigital.ai.utills.NetworkUtils;\r\n\r\npublic class MainActivity extends AppCompatActivity {\r\n    private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;\r\n    private AppBarConfiguration mAppBarConfiguration;\r\n    private NavController navController;\r\n    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();\r\n\r\n    private AlertDialog noInternetDialog;\r\n    private boolean isShowingNoInternetDialog = false;\r\n    private AlertDialog slowNetworkDialog;\r\n    private boolean isShowingSlowNetworkDialog = false;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);\r\n\r\n        noInternetDialog = new AlertDialog.Builder(this)\r\n                .setTitle(\"No Internet Connection\")\r\n                .setMessage(\"Please check your internet connection and try again.\")\r\n                .setPositiveButton(\"OK\", (dialog, which) -> finish())\r\n                .setCancelable(false)\r\n                .create();\r\n\r\n        // Create the slow network alert dialog\r\n        slowNetworkDialog = new AlertDialog.Builder(this)\r\n                .setTitle(\"Slow Network Connection\")\r\n                .setMessage(\"Your network connection is slow. Some features might be affected.\")\r\n                .setPositiveButton(\"OK\", null)\r\n                .setCancelable(true)\r\n                .create();\r\n\r\n        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());\r\n        setContentView(binding.getRoot());\r\n        setSupportActionBar(binding.appBarMain.toolbar);\r\n\r\n        DrawerLayout drawer = binding.drawerLayout;\r\n        NavigationView navigationView = binding.navView;\r\n\r\n        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_viewAttendanceFragment, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.nav_logout).setOpenableLayout(drawer).build();\r\n\r\n        navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);\r\n        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);\r\n        NavigationUI.setupWithNavController(navigationView, navController);\r\n\r\n        navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener(MenuItem -> {\r\n            handleLogout();\r\n            return true;\r\n        });\r\n\r\n        // Set click listener for attendance menu item\r\n        MenuItem attendanceItem = navigationView.getMenu().findItem(R.id.nav_attendance_menu);\r\n        attendanceItem.setOnMenuItemClickListener(item -> {\r\n            toggleAttendanceVisibility(navigationView.getMenu());\r\n            return true;\r\n        });\r\n\r\n        MenuItem leavesItem = navigationView.getMenu().findItem(R.id.nav_leaves_menu);\r\n        leavesItem.setOnMenuItemClickListener(item -> {\r\n            toggleLeavesVisibility(navigationView.getMenu());\r\n            return true;\r\n        });\r\n\r\n        MenuItem dcrItem = navigationView.getMenu().findItem(R.id.nav_dcr_menu);\r\n        dcrItem.setOnMenuItemClickListener(item -> {\r\n            toggleDcrVisibility(navigationView.getMenu());\r\n            return true;\r\n        });\r\n    }\r\n\r\n    public void showNoInternetAlert() {\r\n        if (!isShowingNoInternetDialog) {\r\n            noInternetDialog.show();\r\n            isShowingNoInternetDialog = true;\r\n        }\r\n    }\r\n\r\n    public void hideNoInternetAlert() {\r\n        if (noInternetDialog != null && noInternetDialog.isShowing()) {\r\n            noInternetDialog.dismiss();\r\n            isShowingNoInternetDialog = false;\r\n        }\r\n    }\r\n\r\n    public void showSlowNetworkAlert() {\r\n        if (!isShowingSlowNetworkDialog) {\r\n            slowNetworkDialog.show();\r\n            isShowingSlowNetworkDialog = true;\r\n        }\r\n    }\r\n\r\n    public void hideSlowNetworkAlert() {\r\n        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {\r\n            slowNetworkDialog.dismiss();\r\n            isShowingSlowNetworkDialog = false;\r\n        }\r\n    }\r\n\r\n    private void toggleDcrVisibility(Menu menu) {\r\n        MenuItem dcrItem = menu.findItem(R.id.nav_dcr_menu);\r\n        boolean isDcrVisible = menu.findItem(R.id.nav_dcr).isVisible();\r\n        // Toggle visibility of submenu items\r\n        menu.findItem(R.id.nav_dcr).setVisible(!isDcrVisible);\r\n        menu.findItem(R.id.nav_dcr_form).setVisible(!isDcrVisible);\r\n        // Change icon based on visibility\r\n        if (isDcrVisible) {\r\n            dcrItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);\r\n        } else {\r\n            dcrItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);\r\n        }\r\n\r\n    }\r\n\r\n    private void toggleLeavesVisibility(Menu menu) {\r\n        MenuItem leavesItem = menu.findItem(R.id.nav_leaves_menu);\r\n        boolean isLeavesVisible = menu.findItem(R.id.nav_leaves).isVisible();\r\n        // Toggle visibility of submenu items\r\n        menu.findItem(R.id.nav_leaves).setVisible(!isLeavesVisible);\r\n        menu.findItem(R.id.nav_leaves_data).setVisible(!isLeavesVisible);\r\n        menu.findItem(R.id.nav_applied_leaves).setVisible(!isLeavesVisible);\r\n        menu.findItem(R.id.nav_approve_leaves).setVisible(!isLeavesVisible);\r\n        // Change icon based on visibility\r\n        if (isLeavesVisible) {\r\n            leavesItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);\r\n        } else {\r\n            leavesItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);\r\n        }\r\n    }\r\n\r\n    private void toggleAttendanceVisibility(Menu menu) {\r\n        MenuItem attendanceItem = menu.findItem(R.id.nav_attendance_menu);\r\n        boolean isAddAttendanceVisible = menu.findItem(R.id.nav_addAttendanceFragment).isVisible();\r\n        // Toggle visibility of submenu items\r\n        menu.findItem(R.id.nav_attendance).setVisible(!isAddAttendanceVisible);\r\n        menu.findItem(R.id.nav_addAttendanceFragment).setVisible(!isAddAttendanceVisible);\r\n        menu.findItem(R.id.nav_regularizeAppliedFragment).setVisible(!isAddAttendanceVisible);\r\n        menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(!isAddAttendanceVisible);\r\n        // Change icon based on visibility\r\n        if (isAddAttendanceVisible) {\r\n            attendanceItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);\r\n        } else {\r\n            attendanceItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);\r\n        }\r\n    }\r\n\r\n    private void handleLogout() {\r\n        SharedPreferences sharedPreferences = getSharedPreferences(\"MyPrefs\", Context.MODE_PRIVATE);\r\n        SharedPreferences.Editor editor = sharedPreferences.edit();\r\n        editor.remove(\"authToken\");\r\n//        editor.putBoolean(\"isLoggedIn\", false);\r\n        editor.apply();\r\n\r\n        Intent intent = new Intent(this, LoginActivity.class);\r\n        startActivity(intent);\r\n        finish();\r\n    }\r\n\r\n//    @Override\r\n//    public boolean onCreateOptionsMenu(Menu menu) {\r\n//        getMenuInflater().inflate(R.menu.main, menu);\r\n//        return true;\r\n//    }\r\n\r\n    @Override\r\n    public boolean onSupportNavigateUp() {\r\n        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);\r\n        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();\r\n    }\r\n\r\n    public void startPunchActivity() {\r\n        Intent intent = new Intent(this, PunchActivity.class);\r\n        startActivityForResult(intent, REQUEST_CODE_PUNCH_ACTIVITY);\r\n    }\r\n\r\n    @Override\r\n    protected void onActivityResult(int requestCode, int resultCode, Intent data) {\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n        if (requestCode == REQUEST_CODE_PUNCH_ACTIVITY) {\r\n            if (resultCode == Activity.RESULT_OK) {\r\n                // Handle successful punch, navigate to a different fragment\r\n                NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);\r\n                navController.navigate(R.id.nav_dashboard);\r\n            } else {\r\n                // You might want to check for specific result codes for different errors\r\n                Toast.makeText(this, \"Punch failed\", Toast.LENGTH_SHORT).show();\r\n            }\r\n        }\r\n    }\r\n\r\n    @Override\r\n    protected void onResume() {\r\n        super.onResume();\r\n        // Use the string literal instead of the deprecated constant\r\n        registerReceiver(networkChangeReceiver, new IntentFilter(\"android.net.conn.CONNECTIVITY_CHANGE\"));\r\n        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {\r\n            noInternetDialog.show();\r\n            isShowingNoInternetDialog = true; // Set the flag to true\r\n        }\r\n    }\r\n\r\n    @Override\r\n    protected void onPause() {\r\n        super.onPause();\r\n        unregisterReceiver(networkChangeReceiver);\r\n        // Dismiss the AlertDialog if it's showing\r\n        if (noInternetDialog != null && noInternetDialog.isShowing()) {\r\n            noInternetDialog.dismiss();\r\n            isShowingNoInternetDialog = false; // Set the flag to false\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/app/xedigital/ai/MainActivity.java b/app/src/main/java/app/xedigital/ai/MainActivity.java
+--- a/app/src/main/java/app/xedigital/ai/MainActivity.java	(revision d9550a054e68a9cc617d6451d68b2aacdf4b5fdc)
++++ b/app/src/main/java/app/xedigital/ai/MainActivity.java	(date 1735283187613)
+@@ -6,9 +6,12 @@
+ import android.content.Intent;
+ import android.content.IntentFilter;
+ import android.content.SharedPreferences;
++import android.os.Build;
+ import android.os.Bundle;
++import android.provider.Settings;
+ import android.view.Menu;
+ import android.view.MenuItem;
++import android.view.View;
+ import android.widget.Toast;
+ 
+ import androidx.appcompat.app.AppCompatActivity;
+@@ -21,6 +24,7 @@
+ 
+ import com.google.android.material.navigation.NavigationView;
+ 
++
+ import app.xedigital.ai.activity.LoginActivity;
+ import app.xedigital.ai.activity.PunchActivity;
+ import app.xedigital.ai.databinding.ActivityMainBinding;
+@@ -95,32 +99,49 @@
+         });
+     }
+ 
+-    public void showNoInternetAlert() {
+-        if (!isShowingNoInternetDialog) {
+-            noInternetDialog.show();
+-            isShowingNoInternetDialog = true;
+-        }
++//    public void showNoInternetAlert() {
++//        if (!isShowingNoInternetDialog) {
++//            noInternetDialog.show();
++//            isShowingNoInternetDialog = true;
++//        }
++//    }
++//
++//    public void hideNoInternetAlert() {
++//        if (noInternetDialog != null && noInternetDialog.isShowing()) {
++//            noInternetDialog.dismiss();
++//            isShowingNoInternetDialog = false;
++//        }
++//    }
++//
++//    public void showSlowNetworkAlert() {
++//        if (!isShowingSlowNetworkDialog) {
++//            slowNetworkDialog.show();
++//            isShowingSlowNetworkDialog = true;
++//        }
++//    }
++//
++//    public void hideSlowNetworkAlert() {
++//        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
++//            slowNetworkDialog.dismiss();
++//            isShowingSlowNetworkDialog = false;
++//        }
++//    }
++
++    public void showNoInternetLayout() {
++        findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
+     }
+ 
+-    public void hideNoInternetAlert() {
+-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+-            noInternetDialog.dismiss();
+-            isShowingNoInternetDialog = false;
+-        }
++    public void hideNoInternetLayout() {
++        findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
+     }
+ 
+-    public void showSlowNetworkAlert() {
+-        if (!isShowingSlowNetworkDialog) {
+-            slowNetworkDialog.show();
+-            isShowingSlowNetworkDialog = true;
+-        }
++    public void showSlowInternetLayout() {
++        findViewById(R.id.slowInternetLayout).setVisibility(View.VISIBLE);
++        // Update speed in slowInternetLayout if needed
+     }
+ 
+-    public void hideSlowNetworkAlert() {
+-        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
+-            slowNetworkDialog.dismiss();
+-            isShowingSlowNetworkDialog = false;
+-        }
++    public void hideSlowInternetLayout() {
++        findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
+     }
+ 
+     private void toggleDcrVisibility(Menu menu) {
+@@ -214,14 +235,58 @@
+         }
+     }
+ 
++//    @Override
++//    protected void onResume() {
++//        super.onResume();
++//        // Use the string literal instead of the deprecated constant
++//        registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
++//        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {
++//            noInternetDialog.show();
++//            isShowingNoInternetDialog = true; // Set the flag to true
++//        }
++//    }
++//
++//    @Override
++//    protected void onPause() {
++//        super.onPause();
++//        unregisterReceiver(networkChangeReceiver);
++//        // Dismiss the AlertDialog if it's showing
++//        if (noInternetDialog != null && noInternetDialog.isShowing()) {
++//            noInternetDialog.dismiss();
++//            isShowingNoInternetDialog = false; // Set the flag to false
++//        }
++//    }
++
++    public void onRetryButtonClicked(View view) {
++        // Code to retry network operations
++        if (NetworkUtils.isNetworkAvailable(this)) {
++            hideNoInternetLayout();
++            // ... any logic you need to execute when network is available ...
++        } else {
++            // Potentially show a toast or message if the network is still not available
++            Toast.makeText(this, "Still no internet connection", Toast.LENGTH_SHORT).show();
++        }
++    }
++
++    public void onOpenSettingsButtonClicked(View view) {
++        // Code to open network settings
++        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
++    }
++
+     @Override
+     protected void onResume() {
+         super.onResume();
+-        // Use the string literal instead of the deprecated constant
+         registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+-        if (!NetworkUtils.isNetworkAvailable(this) && !isShowingNoInternetDialog) {
+-            noInternetDialog.show();
+-            isShowingNoInternetDialog = true; // Set the flag to true
++
++        // Check network status and show/hide layouts accordingly
++        if (!NetworkUtils.isNetworkAvailable(this)) {
++            showNoInternetLayout(); // Show no internet layout if needed
++        } else if (!NetworkUtils.isNetworkSpeedGood(this)) {
++            showSlowInternetLayout(); // Show slow internet layout if needed
++        } else {
++            hideNoInternetLayout();
++            hideSlowInternetLayout();
++            // ... Your app's normal flow when network is good ...
+         }
+     }
+ 
+@@ -229,10 +294,7 @@
+     protected void onPause() {
+         super.onPause();
+         unregisterReceiver(networkChangeReceiver);
+-        // Dismiss the AlertDialog if it's showing
+-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+-            noInternetDialog.dismiss();
+-            isShowingNoInternetDialog = false; // Set the flag to false
+-        }
++         hideNoInternetLayout();
++         hideSlowInternetLayout();
+     }
+ }
+\ No newline at end of file
