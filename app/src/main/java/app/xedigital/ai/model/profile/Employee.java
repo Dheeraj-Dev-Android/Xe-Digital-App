@@ -41,7 +41,7 @@ public class Employee {
     private Department department;
 
     @SerializedName("profileImageUrl")
-    private Object profileImageUrl;
+    private String profileImageUrl;
 
     @SerializedName("email")
     private String email;
@@ -79,203 +79,214 @@ public class Employee {
     @SerializedName("_id")
     private String id;
 
-    public String getJoiningType() {
-        return joiningType;
-    }
+    @SerializedName("crossmanager")
+    private Crossmanager crossmanager;
 
     public void setJoiningType(String joiningType) {
         this.joiningType = joiningType;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getJoiningType() {
+        return joiningType;
     }
 
     public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
 
-    public boolean isIsVerified() {
-        return isVerified;
+    public String getFirstname() {
+        return firstname;
     }
 
     public void setIsVerified(boolean isVerified) {
         this.isVerified = isVerified;
     }
 
-    public Shift getShift() {
-        return shift;
+    public boolean isIsVerified() {
+        return isVerified;
     }
 
     public void setShift(Shift shift) {
         this.shift = shift;
     }
 
-    public String getJoiningDate() {
-        return joiningDate;
+    public Shift getShift() {
+        return shift;
     }
 
     public void setJoiningDate(String joiningDate) {
         this.joiningDate = joiningDate;
     }
 
-    public String getEmployeeCode() {
-        return employeeCode;
+    public String getJoiningDate() {
+        return joiningDate;
     }
 
     public void setEmployeeCode(String employeeCode) {
         this.employeeCode = employeeCode;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getEmployeeCode() {
+        return employeeCode;
     }
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getContact() {
-        return contact;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
     public void setContact(String contact) {
         this.contact = contact;
     }
 
-    public int getV() {
-        return v;
+    public String getContact() {
+        return contact;
     }
 
     public void setV(int v) {
         this.v = v;
     }
 
-    public boolean isIsHROrAdmin() {
-        return isHROrAdmin;
+    public int getV() {
+        return v;
     }
 
     public void setIsHROrAdmin(boolean isHROrAdmin) {
         this.isHROrAdmin = isHROrAdmin;
     }
 
-    public String getCompany() {
-        return company;
+    public boolean isIsHROrAdmin() {
+        return isHROrAdmin;
     }
 
     public void setCompany(String company) {
         this.company = company;
     }
 
-    public Department getDepartment() {
-        return department;
+    public String getCompany() {
+        return company;
     }
 
     public void setDepartment(Department department) {
         this.department = department;
     }
 
-    public Object getProfileImageUrl() {
+    public Department getDepartment() {
+        return department;
+    }
+
+    public String getProfileImageUrl() {
         return profileImageUrl;
     }
 
-    public void setProfileImageUrl(Object profileImageUrl) {
+    public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
+    public String getEmail() {
+        return email;
     }
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public ReportingManager getReportingManager() {
-        return reportingManager;
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
     public void setReportingManager(ReportingManager reportingManager) {
         this.reportingManager = reportingManager;
     }
 
-    public String getLevel() {
-        return level;
+    public ReportingManager getReportingManager() {
+        return reportingManager;
     }
 
     public void setLevel(String level) {
         this.level = level;
     }
 
-    public boolean isActive() {
-        return active;
+    public String getLevel() {
+        return level;
     }
 
     public void setActive(boolean active) {
         this.active = active;
     }
 
-    public String getDateOfBirth() {
-        return dateOfBirth;
+    public boolean isActive() {
+        return active;
     }
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getDateOfBirth() {
+        return dateOfBirth;
     }
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
 
-    public String getEmployeeType() {
-        return employeeType;
+    public String getLastname() {
+        return lastname;
     }
 
     public void setEmployeeType(String employeeType) {
         this.employeeType = employeeType;
     }
 
-    public Object getPartner() {
-        return partner;
+    public String getEmployeeType() {
+        return employeeType;
     }
 
     public void setPartner(Object partner) {
         this.partner = partner;
     }
 
-    public String getGrade() {
-        return grade;
+    public Object getPartner() {
+        return partner;
     }
 
     public void setGrade(String grade) {
         this.grade = grade;
     }
 
-    public String getDesignation() {
-        return designation;
+    public String getGrade() {
+        return grade;
     }
 
     public void setDesignation(String designation) {
         this.designation = designation;
     }
 
-    public String getId() {
-        return id;
+    public String getDesignation() {
+        return designation;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Crossmanager getCrossmanager() {
+        return crossmanager;
+    }
+
+    public void setCrossmanager(Crossmanager crossmanager) {
+        this.crossmanager = crossmanager;
     }
 }

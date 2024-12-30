@@ -229,6 +229,7 @@
                         android:layout_height="wrap_content"
                         android:hint="Contact Number"
                         android:inputType="phone"
+                        android:maxLength="10"
                         android:paddingStart="40dp"
                         android:paddingEnd="5dp" />
                 </com.google.android.material.textfield.TextInputLayout>

@@ -2,7 +2,9 @@ package app.xedigital.ai.model.profile;
 
 import com.google.gson.annotations.SerializedName;
 
-public class UserProfileResponse {
+import java.io.Serializable;
+
+public class UserProfileResponse implements Serializable {
 
     @SerializedName("data")
     private Data data;
@@ -16,35 +18,35 @@ public class UserProfileResponse {
     @SerializedName("statusCode")
     private int statusCode;
 
-    public Data getData() {
-        return data;
-    }
-
     public void setData(Data data) {
         this.data = data;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public Data getData() {
+        return data;
     }
 
     public void setSuccess(boolean success) {
         this.success = success;
     }
 
-    public String getMessage() {
-        return message;
+    public boolean isSuccess() {
+        return success;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public int getStatusCode() {
-        return statusCode;
+    public String getMessage() {
+        return message;
     }
 
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
     }
 }

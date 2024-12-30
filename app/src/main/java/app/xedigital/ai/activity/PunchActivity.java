@@ -646,30 +646,78 @@ public class PunchActivity extends AppCompatActivity {
         }
     }
 
-    private void getAddressFromLocation(double latitude, double longitude, AddressCallback callback) {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                StringBuilder completeAddress = new StringBuilder();
-                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                    completeAddress.append(address.getAddressLine(i)).append("\n");
-                }
-                currentAddress = completeAddress.toString();
-                callback.onAddressReceived(currentAddress);
-            } else {
-                Log.e(TAG, "No address found for location");
-                currentAddress = "Location not found";
-                callback.onAddressReceived(currentAddress);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Error getting address: " + e.getMessage());
-            currentAddress = "Location not found";
-            callback.onAddressReceived(currentAddress);
-        }
-    }
+//    private void getAddressFromLocation(double latitude, double longitude, AddressCallback callback) {
+//        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+//        try {
+//            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+//            if (addresses != null && !addresses.isEmpty()) {
+//                Address address = addresses.get(0);
+//                StringBuilder completeAddress = new StringBuilder();
+//                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+//                    completeAddress.append(address.getAddressLine(i)).append("\n");
+//                }
+//                currentAddress = completeAddress.toString();
+//                callback.onAddressReceived(currentAddress);
+//            } else {
+//                Log.e(TAG, "No address found for location");
+//                currentAddress = "Location not found";
+//                callback.onAddressReceived(currentAddress);
+//            }
+//        } catch (IOException e) {
+//            Log.e(TAG, "Error getting address: " + e.getMessage());
+//            currentAddress = "Location not found";
+//            callback.onAddressReceived(currentAddress);
+//        }
+//    }
 
+    private void getAddressFromLocation(final double latitude, final double longitude, final AddressCallback callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Geocoder geocoder = new Geocoder(PunchActivity.this, Locale.getDefault());
+                Address address = null;
+                int retryCount = 0;
+                int maxRetries = 3;
+
+                while (address == null && retryCount < maxRetries) {
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                        if (addresses != null && !addresses.isEmpty()) {
+                            address = addresses.get(0);
+                            break; // Exit the loop if an address is found
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error getting address:", e);
+                        retryCount++;
+                        try {
+                            Thread.sleep((long) (Math.pow(2, retryCount) * 1000));
+                        } catch (InterruptedException interruptedException) {
+                            interruptedException.printStackTrace();
+                            // You might want to handle the interruption if necessary
+                            break; // Exit the loop if interrupted
+                        }
+                    }
+                }
+
+                final String addressResult;
+                if (address != null) {
+                    StringBuilder completeAddress = new StringBuilder();
+                    for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                        completeAddress.append(address.getAddressLine(i)).append("\n");
+                    }
+                    addressResult = completeAddress.toString();
+                } else {
+                    addressResult = "Location not found";
+                    Log.e(TAG, "No address found for location or max retries reached");
+                }
+
+                runOnUiThread(() -> {
+                    currentAddress = addressResult;
+                    callback.onAddressReceived(addressResult);
+                });
+            }
+        }).start();
+    }
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);

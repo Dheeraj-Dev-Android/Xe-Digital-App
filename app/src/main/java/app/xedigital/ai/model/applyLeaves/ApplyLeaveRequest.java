@@ -7,6 +7,9 @@ public class ApplyLeaveRequest {
     @SerializedName("leaveName")
     private String leaveName;
 
+    @SerializedName("crossManagerEmail")
+    private String crossManagerEmail;
+
     @SerializedName("reason")
     private String reason;
 
@@ -21,6 +24,9 @@ public class ApplyLeaveRequest {
 
     @SerializedName("empLastName")
     private String empLastName;
+
+    @SerializedName("crossManager")
+    private String crossManager;
 
     @SerializedName("toDate")
     private String toDate;
@@ -55,6 +61,9 @@ public class ApplyLeaveRequest {
     @SerializedName("reportingManagerLastName")
     private String reportingManagerLastName;
 
+    @SerializedName("crossManagerName")
+    private String crossManagerName;
+
     @SerializedName("contactNumber")
     private String contactNumber;
 
@@ -67,171 +76,195 @@ public class ApplyLeaveRequest {
     @SerializedName("status")
     private String status;
 
-    public String getLeaveName() {
-        return leaveName;
-    }
-
     public void setLeaveName(String leaveName) {
         this.leaveName = leaveName;
     }
 
-    public String getReason() {
-        return reason;
+    public String getLeaveName() {
+        return leaveName;
+    }
+
+    public String getCrossManagerEmail() {
+        return crossManagerEmail;
+    }
+
+    public void setCrossManagerEmail(String crossManagerEmail) {
+        this.crossManagerEmail = crossManagerEmail;
     }
 
     public void setReason(String reason) {
         this.reason = reason;
     }
 
-    public String getLeavingStation() {
-        return leavingStation;
+    public String getReason() {
+        return reason;
     }
 
     public void setLeavingStation(String leavingStation) {
         this.leavingStation = leavingStation;
     }
 
-    public String getLeavetype() {
-        return leavetype;
+    public String getLeavingStation() {
+        return leavingStation;
     }
 
     public void setLeavetype(String leavetype) {
         this.leavetype = leavetype;
     }
 
-    public String getReportingManager() {
-        return reportingManager;
+    public String getLeavetype() {
+        return leavetype;
     }
 
     public void setReportingManager(String reportingManager) {
         this.reportingManager = reportingManager;
     }
 
-    public String getEmpLastName() {
-        return empLastName;
+    public String getReportingManager() {
+        return reportingManager;
     }
 
     public void setEmpLastName(String empLastName) {
         this.empLastName = empLastName;
     }
 
-    public String getToDate() {
-        return toDate;
+    public String getEmpLastName() {
+        return empLastName;
+    }
+
+    public String getCrossManager() {
+        return crossManager;
+    }
+
+    public void setCrossManager(String crossManager) {
+        this.crossManager = crossManager;
     }
 
     public void setToDate(String toDate) {
         this.toDate = toDate;
     }
 
-    public String getEmpFirstName() {
-        return empFirstName;
+    public String getToDate() {
+        return toDate;
     }
 
     public void setEmpFirstName(String empFirstName) {
         this.empFirstName = empFirstName;
     }
 
-    public String getEmpEmail() {
-        return empEmail;
+    public String getEmpFirstName() {
+        return empFirstName;
     }
 
     public void setEmpEmail(String empEmail) {
         this.empEmail = empEmail;
     }
 
-    public String getAppliedDate() {
-        return appliedDate;
+    public String getEmpEmail() {
+        return empEmail;
     }
 
     public void setAppliedDate(String appliedDate) {
         this.appliedDate = appliedDate;
     }
 
-    public String getReportingManagerName() {
-        return reportingManagerName;
+    public String getAppliedDate() {
+        return appliedDate;
     }
 
     public void setReportingManagerName(String reportingManagerName) {
         this.reportingManagerName = reportingManagerName;
     }
 
-    public String getSelectTypeFrom() {
-        return selectTypeFrom;
+    public String getReportingManagerName() {
+        return reportingManagerName;
     }
 
     public void setSelectTypeFrom(String selectTypeFrom) {
         this.selectTypeFrom = selectTypeFrom;
     }
 
-    public String getEmployee() {
-        return employee;
+    public String getSelectTypeFrom() {
+        return selectTypeFrom;
     }
 
     public void setEmployee(String employee) {
         this.employee = employee;
     }
 
-    public String getSelectTypeTo() {
-        return selectTypeTo;
+    public String getEmployee() {
+        return employee;
     }
 
     public void setSelectTypeTo(String selectTypeTo) {
         this.selectTypeTo = selectTypeTo;
     }
 
-    public String getFromDate() {
-        return fromDate;
+    public String getSelectTypeTo() {
+        return selectTypeTo;
     }
 
     public void setFromDate(String fromDate) {
         this.fromDate = fromDate;
     }
 
-    public String getVacationAddress() {
-        return vacationAddress;
+    public String getFromDate() {
+        return fromDate;
     }
 
     public void setVacationAddress(String vacationAddress) {
         this.vacationAddress = vacationAddress;
     }
 
-    public String getReportingManagerLastName() {
-        return reportingManagerLastName;
+    public String getVacationAddress() {
+        return vacationAddress;
     }
 
     public void setReportingManagerLastName(String reportingManagerLastName) {
         this.reportingManagerLastName = reportingManagerLastName;
     }
 
-    public String getContactNumber() {
-        return contactNumber;
+    public String getReportingManagerLastName() {
+        return reportingManagerLastName;
+    }
+
+    public String getCrossManagerName() {
+        return crossManagerName;
+    }
+
+    public void setCrossManagerName(String crossManagerName) {
+        this.crossManagerName = crossManagerName;
     }
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getContactNumber() {
+        return contactNumber;
     }
 
     public void setDepartment(String department) {
         this.department = department;
     }
 
-    public String getHrEmail() {
-        return hrEmail;
+    public String getDepartment() {
+        return department;
     }
 
     public void setHrEmail(String hrEmail) {
         this.hrEmail = hrEmail;
     }
 
-    public String getStatus() {
-        return status;
+    public String getHrEmail() {
+        return hrEmail;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

@@ -11,7 +11,7 @@ public class Data {
     private String assignDate;
 
     @SerializedName("creditLeave")
-    private int creditLeave;
+    private double creditLeave;
 
     @SerializedName("debitLeave")
     private float debitLeave;
@@ -23,7 +23,7 @@ public class Data {
     private double usedLeave;
 
     @SerializedName("openingLeave")
-    private int openingLeave;
+    private double openingLeave;
 
     public String getCreatedAt() {
         return createdAt;
@@ -41,7 +41,7 @@ public class Data {
         this.assignDate = assignDate;
     }
 
-    public int getCreditLeave() {
+    public double getCreditLeave() {
         return creditLeave;
     }
 
@@ -73,7 +73,7 @@ public class Data {
         this.usedLeave = usedLeave;
     }
 
-    public int getOpeningLeave() {
+    public double getOpeningLeave() {
         return openingLeave;
     }
 

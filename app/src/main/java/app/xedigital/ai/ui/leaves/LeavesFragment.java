@@ -94,6 +94,9 @@ public class LeavesFragment extends Fragment {
     private String reportingManagerName;
     private String reportingManagerLastname;
     private String reportingManagerEmail;
+    private String crossFunctionalManagerName;
+    private String crossFunctionalManagerEmail;
+    private String crossFunctionalManagerId;
     private String authToken;
     private double finalUsedDays;
 
@@ -168,6 +171,10 @@ public class LeavesFragment extends Fragment {
                 reportingManagerName = employee.getReportingManager().getFirstname();
                 reportingManagerLastname = employee.getReportingManager().getLastname();
                 reportingManagerEmail = employee.getReportingManager().getEmail();
+                crossFunctionalManagerName = employee.getCrossmanager().getFirstname();
+                crossFunctionalManagerEmail = employee.getCrossmanager().getEmail();
+                crossFunctionalManagerId = employee.getCrossmanager().getId();
+
 //
 //                Log.e(TAG, "userID: " + userId);
                 Log.e(TAG, "employee department: " + empDepartment);
@@ -408,6 +415,9 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setReportingManager(reportingManagerEmail);
         applyLeaveRequest.setReportingManagerName(reportingManagerName);
         applyLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
+        applyLeaveRequest.setCrossManager(crossFunctionalManagerId);
+        applyLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
+        applyLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
 
 
         Call<ResponseBody> applyLeave = APIClient.getInstance().LeavesApply().LeavesApply("jwt " + authToken, applyLeaveRequest);

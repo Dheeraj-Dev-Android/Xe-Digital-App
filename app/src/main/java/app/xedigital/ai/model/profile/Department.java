@@ -19,43 +19,43 @@ public class Department {
     @SerializedName("_id")
     private String id;
 
-    public boolean isJsonMemberDefault() {
-        return jsonMemberDefault;
-    }
-
     public void setJsonMemberDefault(boolean jsonMemberDefault) {
         this.jsonMemberDefault = jsonMemberDefault;
     }
 
-    public String getName() {
-        return name;
+    public boolean isJsonMemberDefault() {
+        return jsonMemberDefault;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public boolean isActive() {
-        return active;
+    public String getDescription() {
+        return description;
     }
 
     public void setActive(boolean active) {
         this.active = active;
     }
 
-    public String getId() {
-        return id;
+    public boolean isActive() {
+        return active;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }
