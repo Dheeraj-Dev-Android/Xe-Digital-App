@@ -183,6 +183,9 @@
         <action
             android:id="@+id/action_nav_view_applied_leaves_to_nav_applied_leaves"
             app:destination="@id/nav_applied_leaves" />
+        <action
+            android:id="@+id/action_nav_view_applied_leaves_to_nav_cross_approval_leave"
+            app:destination="@id/nav_cross_approval_leave" />
     </fragment>
     <fragment
         android:id="@+id/nav_approve_leaves"
@@ -192,6 +195,9 @@
         <action
             android:id="@+id/action_nav_approve_leaves_to_nav_approve_leave_data"
             app:destination="@id/nav_approve_leave_data" />
+        <action
+            android:id="@+id/action_nav_approve_leaves_to_nav_cross_approval_leave"
+            app:destination="@id/nav_cross_approval_leave" />
     </fragment>
     <fragment
         android:id="@+id/nav_approve_leave_data"
@@ -200,6 +206,19 @@
         tools:layout="@layout/fragment_pending_approval_attendance">
         <action
             android:id="@+id/action_nav_approve_leave_data_to_nav_approve_leaves"
+            app:destination="@id/nav_approve_leaves" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_cross_approval_leave"
+        android:name="app.xedigital.ai.ui.leaves.CrossFMApprovalFragment"
+        android:label="Cross FM Approval"
+        tools:layout="@layout/fragment_cross_f_m_approval">
+        <action
+            android:id="@+id/action_nav_cross_approval_leave_to_nav_view_applied_leaves"
+            app:destination="@id/nav_view_applied_leaves" />
+        <action
+            android:id="@+id/action_nav_cross_approval_leave_to_nav_approve_leaves"
             app:destination="@id/nav_approve_leaves" />
     </fragment>
 

@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,6 +55,7 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
     private View view;
+    private Button crossApproval;
 
     public static ApproveLeaveFragment newInstance() {
         return new ApproveLeaveFragment();
@@ -75,8 +79,16 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
+        crossApproval = view.findViewById(R.id.btnCrossApproval);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         loadingProgress.setVisibility(View.VISIBLE);
+
+        crossApproval.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
+            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
+
+        });
 
 
         approvalAdapter = new LeaveApprovalAdapter(new ArrayList<>(), authTokenHeader, userId, ApproveLeaveFragment.this, getContext()); // Initialize with an empty list

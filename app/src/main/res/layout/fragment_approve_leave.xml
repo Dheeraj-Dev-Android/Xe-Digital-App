@@ -7,6 +7,17 @@
     android:layout_marginTop="45dp"
     android:orientation="vertical"
     tools:context=".ui.leaves.ApproveLeaveFragment">
+
+
+    <!-- Added Cross Approval Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCrossApproval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Cross Approval"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <!-- Chips Filter Section -->
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -19,7 +30,7 @@
         app:layout_constraintBottom_toTopOf="@+id/leaveApprovalRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/btnCrossApproval">
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/statusChipGroup"
@@ -80,6 +91,26 @@
                 app:chipBackgroundColor="#F44336" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
+    <!-- End of Chips Filter Section -->
+    <!--    <com.google.android.material.chip.ChipGroup-->
+    <!--        android:id="@+id/crossfmApproverChipGroup"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:paddingStart="16dp"-->
+    <!--        android:paddingEnd="16dp"-->
+    <!--        app:singleSelection="false">-->
+
+    <!--        <com.google.android.material.chip.Chip-->
+    <!--            android:id="@+id/crossFMApproval"-->
+    <!--            style="@style/Widget.MaterialComponents.Chip.Choice"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:onClick="onChipClicked"-->
+    <!--            android:text="Cross Approval"-->
+    <!--            android:textColor="@android:color/white"-->
+    <!--            app:chipBackgroundColor="#F44336" />-->
+
+    <!--    </com.google.android.material.chip.ChipGroup>-->
 
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView

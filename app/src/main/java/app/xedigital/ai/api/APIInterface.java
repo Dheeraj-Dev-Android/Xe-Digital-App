@@ -150,6 +150,9 @@ public interface APIInterface {
     @GET("visitors/detail/{contact}")
     retrofit2.Call<VisitorsDetailsResponse> getVisitorDetail(@Path("contact") String contact, @Header("Authorization") String authToken);
 
+    @GET("leaves/applied/report/crmanager/{employeeId}")
+    retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeavesCR(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
