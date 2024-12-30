@@ -11,7 +11,7 @@ import app.xedigital.ai.utills.NetworkUtils;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
-    private static final int SLOW_NETWORK_THRESHOLD_KBPS = 80; // Threshold for considering a network as slow (in Kbps)
+    private static final int SLOW_NETWORK_THRESHOLD_KBPS = 80;
     private static final int MINIMUM_SPEED_KBPS = 80; // Minimum speed (in Kbps) to show a slow internet warning
 
     @Override

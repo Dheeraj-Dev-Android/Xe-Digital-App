@@ -14,7 +14,9 @@ import com.google.gson.GsonBuilder;
 
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.profile.Crossmanager;
 import app.xedigital.ai.model.profile.UserProfileResponse;
+import app.xedigital.ai.utills.CrossmanagerTypeAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,7 +26,9 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<UserProfileResponse> _userProfile = new MutableLiveData<>();
     private final APIInterface apiInterface;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    private final Gson gson;
     public LiveData<UserProfileResponse> userProfile = _userProfile;
     private String userId;
     private String authToken;
@@ -35,7 +39,14 @@ public class ProfileViewModel extends ViewModel {
     public ProfileViewModel() {
         apiInterface = APIClient.getInstance().getLogin();
         APIInterface apiInterface1 = APIClient.getInstance().getUser();
+
+//        // Initialize Gson with the custom deserializer
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Crossmanager.class, new CrossmanagerTypeAdapter())
+                .setPrettyPrinting()
+                .create();
     }
+
 
     public void storeLoginData(String userId, String authToken) {
         this.userId = userId;

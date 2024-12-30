@@ -415,6 +415,12 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setReportingManager(reportingManagerEmail);
         applyLeaveRequest.setReportingManagerName(reportingManagerName);
         applyLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
+        if (crossFunctionalManagerName == null || crossFunctionalManagerName.isEmpty() ||
+                crossFunctionalManagerEmail == null || crossFunctionalManagerEmail.isEmpty()) {
+            showAlertDialog1("No Cross-functional Manager",
+                    "No cross-functional manager available. Please contact your Admin Or HR.");
+            return;
+        }
         applyLeaveRequest.setCrossManager(crossFunctionalManagerId);
         applyLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
         applyLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
@@ -423,6 +429,7 @@ public class LeavesFragment extends Fragment {
         Call<ResponseBody> applyLeave = APIClient.getInstance().LeavesApply().LeavesApply("jwt " + authToken, applyLeaveRequest);
 
         applyLeave.enqueue(new Callback<ResponseBody>() {
+
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 try {
@@ -463,6 +470,15 @@ public class LeavesFragment extends Fragment {
                 }).show();
             }
         });
+
+    }
+
+    private void showAlertDialog1(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(title).setMessage(message).setPositiveButton("OK", (dialog, which) -> {
+            clearForm();
+            dialog.dismiss();
+        }).show();
 
     }
 

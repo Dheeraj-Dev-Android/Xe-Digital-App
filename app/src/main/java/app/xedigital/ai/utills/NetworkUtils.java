@@ -85,7 +85,7 @@ public class NetworkUtils {
         if (networkCapabilities != null) {
             int downSpeedKbps = networkCapabilities.getLinkDownstreamBandwidthKbps();
             // Define your threshold for good network speed (in Kbps)
-            int goodSpeedThresholdKbps = 1000; // Example: 1 Mbps = 1000 Kbps
+            int goodSpeedThresholdKbps = 80; // Example: 1 Mbps = 1000 Kbps
 
             boolean isGoodSpeed = downSpeedKbps >= goodSpeedThresholdKbps;
             if (!isGoodSpeed) {
