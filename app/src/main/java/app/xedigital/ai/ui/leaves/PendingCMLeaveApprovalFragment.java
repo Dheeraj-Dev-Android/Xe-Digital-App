@@ -2,7 +2,6 @@ package app.xedigital.ai.ui.leaves;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
@@ -40,8 +39,7 @@ import java.util.TimeZone;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.databinding.LeaveApprovalBinding;
-import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesApproveItem;
+import app.xedigital.ai.model.cmLeaveApprovalPending.AppliedLeavesItem;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
@@ -51,24 +49,26 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class PendingLeaveApproveFragment extends Fragment {
+public class PendingCMLeaveApprovalFragment extends Fragment {
+
     public static final String ARG_LEAVE_ID = "leave_id";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private APIInterface apiInterface;
-    private AppliedLeavesApproveItem item;
-    private String reportingManager;
+    private AppliedLeavesItem item;
+    private String crossManager;
     private String managerId;
     private String leaveId;
-    private LeaveApprovalBinding binding;
     private ProfileViewModel profileViewModel;
     private OnLeaveApprovalActionListener listener;
+    private Button leaveBtnApprove, leaveBtnReject, leaveBtnCancel;
 
-    public PendingLeaveApproveFragment() {
+
+    public PendingCMLeaveApprovalFragment() {
         // Required empty public constructor
     }
 
-    public static PendingLeaveApproveFragment newInstance(AppliedLeavesApproveItem item) {
-        PendingLeaveApproveFragment fragment = new PendingLeaveApproveFragment();
+    public static PendingCMLeaveApprovalFragment newInstance(AppliedLeavesItem item) {
+        PendingCMLeaveApprovalFragment fragment = new PendingCMLeaveApprovalFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_LEAVE_ID, item);
         fragment.setArguments(args);
@@ -80,9 +80,7 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String formattedDateTime = dateTimeFormat.format(currentDateTime);
-        Log.d("LeaveApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
-        return formattedDateTime;
+        return dateTimeFormat.format(currentDateTime);
 
     }
 
@@ -94,7 +92,7 @@ public class PendingLeaveApproveFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            item = (AppliedLeavesApproveItem) getArguments().getSerializable(ARG_LEAVE_ID);
+            item = (AppliedLeavesItem) getArguments().getSerializable(ARG_LEAVE_ID);
         }
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         apiInterface = APIClient.getInstance().UpdateLeaveListApproval();
@@ -107,108 +105,119 @@ public class PendingLeaveApproveFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = LeaveApprovalBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_pending_c_m_leave_approval, container, false);
+        TextView empName = view.findViewById(R.id.empName);
+        TextView empEmail = view.findViewById(R.id.empEmail);
+        TextView empDesignation = view.findViewById(R.id.empDesignation);
+        TextView empLeaveType = view.findViewById(R.id.empLeaveType);
+        TextView empFromDate = view.findViewById(R.id.empFromDate);
+        TextView empSelectTypeFrom = view.findViewById(R.id.empSelectTypeFrom);
+        TextView empToDate = view.findViewById(R.id.empToDate);
+        TextView empSelectTypeTo = view.findViewById(R.id.empSelectTypeTo);
+        TextView empAppliedDate = view.findViewById(R.id.empAppliedDate);
+        TextView empReason = view.findViewById(R.id.empReason);
+        TextView empContactNumber = view.findViewById(R.id.empContactNumber);
+        TextView empVacationAddress = view.findViewById(R.id.empVacationAddress);
+        TextView empLeaveingStation = view.findViewById(R.id.empLeavingStation);
+        TextView empStatusUpdatedBy = view.findViewById(R.id.empStatusUpdatedBy);
+        TextView empComments = view.findViewById(R.id.empComments);
+        TextView empApprovedDate = view.findViewById(R.id.empStatusUpdatedDate);
+        Chip empStatusChip = view.findViewById(R.id.empStatusChip);
 
-        binding.empName.setText(item.getFirstname() + " " + item.getLastname());
-        binding.empEmail.setText(item.getEmail());
-        binding.empDesignation.setText(item.getDesignation());
-        binding.empLeaveType.setText(item.getLeavetype().getLeavetypeName());
-        String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());
-        binding.empFromDate.setText(formattedFromDate);
-        binding.empSelectTypeFrom.setText(item.getSelectTypeFrom());
-        String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(item.getToDate());
-        binding.empToDate.setText(formattedToDate);
-        binding.empSelectTypeTo.setText(item.getSelectTypeTo());
-        String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        binding.empAppliedDate.setText(formattedAppliedDate);
-        binding.empReason.setText(item.getReason());
-        binding.empContactNumber.setText(item.getContactNumber());
-        binding.empAddress.setText(item.getVacationAddress());
-        binding.empVacationAddress.setText(item.getVacationAddress());
-        binding.empLeavingStation.setText(item.getLeavingStation());
-        binding.empStatusUpdatedBy.setText(item.getApprovedByName());
-        String formattedApprovedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
-        binding.empStatusUpdatedDate.setText(formattedApprovedDate);
-        binding.empComments.setText(item.getComment());
-//        binding.empTotalDays.setText();
+        leaveBtnApprove = view.findViewById(R.id.leaveBtnApprove);
+        leaveBtnReject = view.findViewById(R.id.leaveBtnReject);
+        leaveBtnCancel = view.findViewById(R.id.leaveBtnCancel);
 
+        // Populate data
+        if (item != null) {
+            empName.setText(item.getEmpFirstName() + " " + item.getEmpLastName());
+            empEmail.setText(item.getEmpEmail());
+            empDesignation.setText(item.getDepartment());
+            empLeaveType.setText(item.getLeaveName());
+            String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());
+            empFromDate.setText(formattedFromDate);
+            empSelectTypeFrom.setText(item.getSelectTypeFrom());
+            String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(item.getToDate());
+            empToDate.setText(formattedToDate);
+            empSelectTypeTo.setText(item.getSelectTypeTo());
+            String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
+            empAppliedDate.setText(formattedAppliedDate);
+            empReason.setText(item.getReason());
+            empContactNumber.setText(item.getContactNumber());
+            empVacationAddress.setText(item.getVacationAddress());
+            empLeaveingStation.setText(item.getLeavingStation());
+            String formattedAprrovedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
+            empApprovedDate.setText(formattedAprrovedDate);
+            empStatusUpdatedBy.setText(item.getApprovedByName());
+            empComments.setText(item.getComment());
+            empStatusChip.setText(item.getStatus());
+            // Set chip color based on status using if-else
+            if (item.getStatus().equalsIgnoreCase("Pending")) {
+                empStatusChip.setChipBackgroundColorResource(R.color.pending_color);
+            } else if (item.getStatus().equalsIgnoreCase("Approved")) {
+                empStatusChip.setChipBackgroundColorResource(R.color.approved_color);
+            } else if (item.getStatus().equalsIgnoreCase("Rejected")) {
+                empStatusChip.setChipBackgroundColorResource(R.color.rejected_color);
+            }
 
-        String status = item.getStatus().toLowerCase();
-        Context context = binding.empStatusChip.getContext();
+            if (item.getStatus().equals("unapproved")) {
+                leaveBtnApprove.setVisibility(View.VISIBLE);
+                leaveBtnReject.setVisibility(View.VISIBLE);
+                leaveBtnCancel.setVisibility(View.VISIBLE);
 
-        binding.empStatusChip.setText(status);
+                leaveBtnApprove.setOnClickListener(v -> {
+                    String leaveId = item.getId();
+                    if (listener != null) {
+                        listener.onApprove(item);
+                    }
+                    handleApprove(leaveId);
+                });
 
-        int chipBackgroundColor;
+                leaveBtnReject.setOnClickListener(v -> {
+                    String leaveId = item.getId();
+                    if (listener != null) {
+                        listener.onReject(item);
+                    }
+                    showCommentPopup("Reject", leaveId);
+                });
 
-        if (status.equals("approved")) {
-            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_approved);
-        } else if (status.equals("cancelled")) {
-            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_rejected);
-        } else if (status.equals("rejected")) {
-            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_rejected);
-        } else if (status.equals("unapproved")) {
-            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_pending);
-        } else {
-            chipBackgroundColor = ContextCompat.getColor(context, R.color.status_pending);
-        }
+                leaveBtnCancel.setOnClickListener(v -> {
+                    String leaveId = item.getId();
+                    if (listener != null) {
+                        listener.onCancel(item);
+                    }
+                    showCommentPopup("Cancel", leaveId);
+                });
 
-        binding.empStatusChip.setChipBackgroundColor(ColorStateList.valueOf(chipBackgroundColor));
+            } else {
+                leaveBtnApprove.setVisibility(View.GONE);
+                leaveBtnReject.setVisibility(View.GONE);
+                leaveBtnCancel.setVisibility(View.GONE);
+            }
 
-        if (item.getStatus().equals("unapproved")) {
-            binding.leaveBtnApprove.setVisibility(View.VISIBLE);
-            binding.leaveBtnReject.setVisibility(View.VISIBLE);
-            binding.leaveBtnCancel.setVisibility(View.VISIBLE);
-
-            binding.leaveBtnApprove.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onApprove(item);
-                }
-                String leaveId = item.getId();
-                handleApprove(leaveId);
-            });
-
-            binding.leaveBtnReject.setOnClickListener(v -> {
-                String leaveId = item.getId();
-                if (listener != null) {
-                    listener.onReject(item);
-                }
-                showCommentPopup("Reject", leaveId);
-            });
-            binding.leaveBtnCancel.setOnClickListener(v -> {
-                String leaveId = item.getId();
-                if (listener != null) {
-                    listener.onReject(item);
-                }
-                showCommentPopup("Cancel", leaveId);
-            });
-
-        } else {
-            binding.leaveBtnApprove.setVisibility(View.GONE);
-            binding.leaveBtnReject.setVisibility(View.GONE);
-            binding.leaveBtnCancel.setVisibility(View.GONE);
         }
         if (requireContext() instanceof FragmentActivity) {
             profileViewModel = new ViewModelProvider((FragmentActivity) requireContext()).get(ProfileViewModel.class);
         }
 
-        if (ViewTreeLifecycleOwner.get(binding.getRoot()) != null) {
-            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(binding.getRoot())), userProfile -> {
+        if (ViewTreeLifecycleOwner.get(view) != null) {
+            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(view)), userProfile -> {
                 if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee().getReportingManager() != null) {
-                    String reportingManagerFirstName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
-                    String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
-                    String reportingManagerId = userProfile.getData().getEmployee().getReportingManager().getId();
-                    if (reportingManagerFirstName != null && reportingManagerLastName != null && reportingManagerId != null) {
-                        managerId = reportingManagerId;
-                        reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                        Log.e("RegularizeApprovalAdapter", "reportingManager: " + reportingManager);
+                    String crossManagerFirstName = userProfile.getData().getEmployee().getCrossmanager().getFirstname();
+                    String crossManagerLastName = userProfile.getData().getEmployee().getCrossmanager().getLastname();
+                    String crossManagerId = userProfile.getData().getEmployee().getCrossmanager().getId();
+                    if (crossManagerFirstName != null && crossManagerLastName != null && crossManagerId != null) {
+                        managerId = crossManagerId;
+                        crossManager = crossManagerFirstName + " " + crossManagerLastName;
                     }
                 }
             });
         }
         return view;
     }
+
 
     private void showCommentPopup(final String action, final String leaveId) {
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.comment_popup, null);
@@ -263,12 +272,13 @@ public class PendingLeaveApproveFragment extends Fragment {
         backButton.setOnClickListener(v -> alertDialog.dismiss());
     }
 
-    void handleCancel(String leaveId, String comment) {
-        Log.e("LeaveCancel", "handleCancel: " + leaveId);
+
+    public void handleReject(String leaveId, String comment) {
+        Log.e("CMLeaveRejected", "handleReject: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
-        requestBody.setStatus("Cancelled");
+        requestBody.setStatus("Rejected");
         requestBody.setApprovedBy(managerId);
-        requestBody.setApprovedByName(reportingManager);
+        requestBody.setApprovedByName(crossManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         requestBody.setComment(comment);
 
@@ -281,36 +291,77 @@ public class PendingLeaveApproveFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.d("LeaveCancel", "onResponse: " + response.body());
+                    Log.e("CMLeaveRejected", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.detach(PendingLeaveApproveFragment.this).attach(PendingLeaveApproveFragment.this).commit();
+                    ft.detach(PendingCMLeaveApprovalFragment.this).attach(PendingCMLeaveApprovalFragment.this).commit();
                     if (listener != null) {
                         listener.onCancel(item);
                     }
                     // Navigate to the destination fragment
-                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_approve_leave_data_to_nav_approve_leaves);
-                    Toast.makeText(requireContext(), "Leave Cancelled", Toast.LENGTH_SHORT).show();
-                    Log.d("LeaveCancel", "onResponse: " + gson.toJson(response.body()));
+                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_pendingCMLeaveApproval_to_nav_cross_approval_leave);
+                    Toast.makeText(requireContext(), "Leave Rejected Successfully", Toast.LENGTH_SHORT).show();
+                    Log.d("CMLeaveRejected", "onResponse: " + gson.toJson(response.body()));
                 } else {
-                    Log.e("LeaveCancel", "onResponse: " + response.errorBody());
+                    Log.e("CMLeaveRejected", "onResponse: " + response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                Toast.makeText(requireContext(), "Leave Rejected Failed", Toast.LENGTH_SHORT).show();
+                Log.e("CMLeaveRejected", "onFailure: " + throwable.getMessage());
+            }
+        });
+    }
+
+    void handleCancel(String leaveId, String comment) {
+        Log.e("CMLeaveCancel", "handleCancel: " + leaveId);
+        LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
+        requestBody.setStatus("Cancelled");
+        requestBody.setApprovedBy(managerId);
+        requestBody.setApprovedByName(crossManager);
+        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
+        requestBody.setComment(comment);
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", "");
+
+        Call<ResponseBody> leaveCancel = apiInterface.LeavesStatus("jwt " + authToken, leaveId, requestBody);
+        leaveCancel.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    updateUIBasedOnStatus();
+                    Log.d("CMLeaveCancel", "onResponse: " + response.body());
+                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                    ft.detach(PendingCMLeaveApprovalFragment.this).attach(PendingCMLeaveApprovalFragment.this).commit();
+                    if (listener != null) {
+                        listener.onCancel(item);
+                    }
+                    // Navigate to the destination fragment
+                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_pendingCMLeaveApproval_to_nav_cross_approval_leave);
+                    Toast.makeText(requireContext(), "Leave Cancelled", Toast.LENGTH_SHORT).show();
+                    Log.d("CMLeaveCancel", "onResponse: " + gson.toJson(response.body()));
+                } else {
+                    Log.e("CMLeaveCancel", "onResponse: " + response.errorBody());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Toast.makeText(requireContext(), "Leave Cancelled Failed", Toast.LENGTH_SHORT).show();
-                Log.e("LeaveCancel", "onFailure: " + throwable.getMessage());
+                Log.e("CMLeaveCancel", "onFailure: " + throwable.getMessage());
             }
         });
 
     }
 
     public void handleApprove(String leaveId) {
-        Log.e("LeaveApproval", "handleApprove: " + leaveId);
+        Log.e("CMLeaveApproval", "handleApprove: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Approved");
         requestBody.setApprovedBy(managerId);
-        requestBody.setApprovedByName(reportingManager);
+        requestBody.setApprovedByName(crossManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         requestBody.setComment("");
 
@@ -323,18 +374,18 @@ public class PendingLeaveApproveFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.d("LeaveApproval", "onResponse: " + response.body());
+                    Log.d("CMLeaveApproval", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.detach(PendingLeaveApproveFragment.this).attach(PendingLeaveApproveFragment.this).commit();
+                    ft.detach(PendingCMLeaveApprovalFragment.this).attach(PendingCMLeaveApprovalFragment.this).commit();
                     if (listener != null) {
                         listener.onCancel(item);
                     }
                     // Navigate to the destination fragment
-                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_approve_leave_data_to_nav_approve_leaves);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_pendingCMLeaveApproval_to_nav_cross_approval_leave);
                     Toast.makeText(requireContext(), "Leave Approved Successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("LeaveApproval", "onResponse: " + gson.toJson(response.body()));
+                    Log.d("CMLeaveApproval", "onResponse: " + gson.toJson(response.body()));
                 } else {
-                    Log.e("LeaveApproval", "onResponse: " + response.errorBody());
+                    Log.e("CMLeaveApproval", "onResponse: " + response.errorBody());
                 }
             }
 
@@ -345,65 +396,24 @@ public class PendingLeaveApproveFragment extends Fragment {
         });
     }
 
-    public void handleReject(String leaveId, String comment) {
-        Log.e("LeaveRejected", "handleReject: " + leaveId);
-        LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
-        requestBody.setStatus("Rejected");
-        requestBody.setApprovedBy(managerId);
-        requestBody.setApprovedByName(reportingManager);
-        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
-        requestBody.setComment(comment);
-
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-
-        Call<ResponseBody> leaveCancel = apiInterface.LeavesStatus("jwt " + authToken, leaveId, requestBody);
-        leaveCancel.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    updateUIBasedOnStatus();
-                    Log.e("LeaveApproval", "onResponse: " + response.body());
-                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.detach(PendingLeaveApproveFragment.this).attach(PendingLeaveApproveFragment.this).commit();
-                    if (listener != null) {
-                        listener.onCancel(item);
-                    }
-                    // Navigate to the destination fragment
-                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_approve_leave_data_to_nav_approve_leaves);
-                    Toast.makeText(requireContext(), "Leave Rejected Successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("LeaveRejected", "onResponse: " + gson.toJson(response.body()));
-                } else {
-                    Log.e("LeaveRejected", "onResponse: " + response.errorBody());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Toast.makeText(requireContext(), "Leave Rejected Failed", Toast.LENGTH_SHORT).show();
-                Log.e("LeaveRejected", "onFailure: " + throwable.getMessage());
-            }
-        });
-    }
-
     private void updateUIBasedOnStatus() {
         // Hide/show buttons based on the current status of 'item'
         if (item.getStatus().equals("Cancelled") || item.getStatus().equals("Rejected") || item.getStatus().equals("Approved")) {
-            binding.leaveBtnApprove.setVisibility(View.GONE);
-            binding.leaveBtnReject.setVisibility(View.GONE);
-            binding.leaveBtnCancel.setVisibility(View.GONE);
+            leaveBtnApprove.setVisibility(View.GONE);
+            leaveBtnReject.setVisibility(View.GONE);
+            leaveBtnCancel.setVisibility(View.GONE);
         } else {
-            binding.leaveBtnApprove.setVisibility(View.VISIBLE);
-            binding.leaveBtnReject.setVisibility(View.VISIBLE);
-            binding.leaveBtnCancel.setVisibility(View.VISIBLE);
+            leaveBtnApprove.setVisibility(View.VISIBLE);
+            leaveBtnReject.setVisibility(View.VISIBLE);
+            leaveBtnCancel.setVisibility(View.VISIBLE);
         }
     }
 
     public interface OnLeaveApprovalActionListener {
-        void onApprove(AppliedLeavesApproveItem item);
+        void onApprove(AppliedLeavesItem item);
 
-        void onReject(AppliedLeavesApproveItem item);
+        void onReject(AppliedLeavesItem item);
 
-        void onCancel(AppliedLeavesApproveItem item);
+        void onCancel(AppliedLeavesItem item);
     }
 }

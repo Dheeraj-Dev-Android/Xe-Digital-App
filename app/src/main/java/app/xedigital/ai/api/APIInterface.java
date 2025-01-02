@@ -11,6 +11,7 @@ import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
+import app.xedigital.ai.model.cmLeaveApprovalPending.CMLeavePendingResponse;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
@@ -151,7 +152,7 @@ public interface APIInterface {
     retrofit2.Call<VisitorsDetailsResponse> getVisitorDetail(@Path("contact") String contact, @Header("Authorization") String authToken);
 
     @GET("leaves/applied/report/crmanager/{employeeId}")
-    retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeavesCR(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+    Call<CMLeavePendingResponse> getPendingApprovalLeavesCR(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
     //    POST APIs
     @POST("face/recognize")

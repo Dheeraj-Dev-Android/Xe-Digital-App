@@ -4,11 +4,20 @@ import com.google.gson.annotations.SerializedName;
 
 public class LeaveUpdateRequest {
 
+    @SerializedName("crossManagerEmail")
+    private String crossManagerEmail;
+
     @SerializedName("reason")
     private String reason;
 
-    @SerializedName("firstname")
-    private String firstname;
+    @SerializedName("crossManager")
+    private String crossManager;
+
+    @SerializedName("empFirstName")
+    private String empFirstName;
+
+    @SerializedName("empEmail")
+    private String empEmail;
 
     @SerializedName("approvedBy")
     private String approvedBy;
@@ -16,14 +25,17 @@ public class LeaveUpdateRequest {
     @SerializedName("selectTypeFrom")
     private String selectTypeFrom;
 
-    @SerializedName("employeeCode")
-    private String employeeCode;
-
     @SerializedName("createdAt")
     private String createdAt;
 
-    @SerializedName("contact")
-    private String contact;
+    @SerializedName("reportingManagerLastName")
+    private String reportingManagerLastName;
+
+    @SerializedName("crossManagerName")
+    private String crossManagerName;
+
+    @SerializedName("__v")
+    private int v;
 
     @SerializedName("contactNumber")
     private String contactNumber;
@@ -34,17 +46,29 @@ public class LeaveUpdateRequest {
     @SerializedName("appliedBy")
     private String appliedBy;
 
-    @SerializedName("email")
-    private String email;
+    @SerializedName("company")
+    private String company;
+
+    @SerializedName("department")
+    private String department;
 
     @SerializedName("updatedAt")
     private String updatedAt;
+
+    @SerializedName("leaveName")
+    private String leaveName;
 
     @SerializedName("leavingStation")
     private String leavingStation;
 
     @SerializedName("leavetype")
-    private Leavetype leavetype;
+    private String leavetype;
+
+    @SerializedName("reportingManager")
+    private String reportingManager;
+
+    @SerializedName("empLastName")
+    private String empLastName;
 
     @SerializedName("toDate")
     private String toDate;
@@ -52,11 +76,11 @@ public class LeaveUpdateRequest {
     @SerializedName("appliedDate")
     private String appliedDate;
 
+    @SerializedName("reportingManagerName")
+    private String reportingManagerName;
+
     @SerializedName("selectTypeTo")
     private String selectTypeTo;
-
-    @SerializedName("lastname")
-    private String lastname;
 
     @SerializedName("fromDate")
     private String fromDate;
@@ -70,209 +94,141 @@ public class LeaveUpdateRequest {
     @SerializedName("comment")
     private String comment;
 
-    @SerializedName("designation")
-    private String designation;
-
     @SerializedName("_id")
     private String id;
+
+    @SerializedName("hrEmail")
+    private String hrEmail;
 
     @SerializedName("status")
     private String status;
 
-    public String getReason() {
-        return reason;
+    public void setCrossManagerEmail(String crossManagerEmail) {
+        this.crossManagerEmail = crossManagerEmail;
     }
 
     public void setReason(String reason) {
         this.reason = reason;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public void setCrossManager(String crossManager) {
+        this.crossManager = crossManager;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setEmpFirstName(String empFirstName) {
+        this.empFirstName = empFirstName;
     }
 
-    public String getApprovedBy() {
-        return approvedBy;
+    public void setEmpEmail(String empEmail) {
+        this.empEmail = empEmail;
     }
 
     public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
     }
 
-    public String getSelectTypeFrom() {
-        return selectTypeFrom;
-    }
-
     public void setSelectTypeFrom(String selectTypeFrom) {
         this.selectTypeFrom = selectTypeFrom;
-    }
-
-    public String getEmployeeCode() {
-        return employeeCode;
-    }
-
-    public void setEmployeeCode(String employeeCode) {
-        this.employeeCode = employeeCode;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
     }
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getContact() {
-        return contact;
+    public void setReportingManagerLastName(String reportingManagerLastName) {
+        this.reportingManagerLastName = reportingManagerLastName;
     }
 
-    public void setContact(String contact) {
-        this.contact = contact;
+    public void setCrossManagerName(String crossManagerName) {
+        this.crossManagerName = crossManagerName;
     }
 
-    public String getContactNumber() {
-        return contactNumber;
+    public void setV(int v) {
+        this.v = v;
     }
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
 
-    public String getApprovedByName() {
-        return approvedByName;
-    }
-
     public void setApprovedByName(String approvedByName) {
         this.approvedByName = approvedByName;
-    }
-
-    public String getAppliedBy() {
-        return appliedBy;
     }
 
     public void setAppliedBy(String appliedBy) {
         this.appliedBy = appliedBy;
     }
 
-    public String getEmail() {
-        return email;
+    public void setCompany(String company) {
+        this.company = company;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public String getLeavingStation() {
-        return leavingStation;
+    public void setLeaveName(String leaveName) {
+        this.leaveName = leaveName;
     }
 
     public void setLeavingStation(String leavingStation) {
         this.leavingStation = leavingStation;
     }
 
-    public Leavetype getLeavetype() {
-        return leavetype;
-    }
-
-    public void setLeavetype(Leavetype leavetype) {
+    public void setLeavetype(String leavetype) {
         this.leavetype = leavetype;
     }
 
-    public String getToDate() {
-        return toDate;
+    public void setReportingManager(String reportingManager) {
+        this.reportingManager = reportingManager;
+    }
+
+    public void setEmpLastName(String empLastName) {
+        this.empLastName = empLastName;
     }
 
     public void setToDate(String toDate) {
         this.toDate = toDate;
     }
 
-    public String getAppliedDate() {
-        return appliedDate;
-    }
-
     public void setAppliedDate(String appliedDate) {
         this.appliedDate = appliedDate;
     }
 
-    public String getSelectTypeTo() {
-        return selectTypeTo;
+    public void setReportingManagerName(String reportingManagerName) {
+        this.reportingManagerName = reportingManagerName;
     }
 
     public void setSelectTypeTo(String selectTypeTo) {
         this.selectTypeTo = selectTypeTo;
     }
 
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getFromDate() {
-        return fromDate;
-    }
-
     public void setFromDate(String fromDate) {
         this.fromDate = fromDate;
-    }
-
-    public String getApprovedDate() {
-        return approvedDate;
     }
 
     public void setApprovedDate(String approvedDate) {
         this.approvedDate = approvedDate;
     }
 
-    public String getVacationAddress() {
-        return vacationAddress;
-    }
-
     public void setVacationAddress(String vacationAddress) {
         this.vacationAddress = vacationAddress;
-    }
-
-    public String getComment() {
-        return comment;
     }
 
     public void setComment(String comment) {
         this.comment = comment;
     }
 
-    public String getDesignation() {
-        return designation;
-    }
-
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
-
-    public String getId() {
-        return id;
-    }
-
     public void setId(String id) {
         this.id = id;
     }
 
-    public String getStatus() {
-        return status;
+    public void setHrEmail(String hrEmail) {
+        this.hrEmail = hrEmail;
     }
 
     public void setStatus(String status) {

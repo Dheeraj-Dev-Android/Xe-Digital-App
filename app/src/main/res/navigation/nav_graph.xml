@@ -220,6 +220,19 @@
         <action
             android:id="@+id/action_nav_cross_approval_leave_to_nav_approve_leaves"
             app:destination="@id/nav_approve_leaves" />
+        <action
+            android:id="@+id/action_nav_cross_approval_leave_to_nav_pendingCMLeaveApproval"
+            app:destination="@id/nav_pendingCMLeaveApproval" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_pendingCMLeaveApproval"
+        android:name="app.xedigital.ai.ui.leaves.PendingCMLeaveApprovalFragment"
+        android:label="Pending CM Approval"
+        tools:layout="@layout/fragment_pending_c_m_leave_approval">
+        <action
+            android:id="@+id/action_nav_pendingCMLeaveApproval_to_nav_cross_approval_leave"
+            app:destination="@id/nav_cross_approval_leave" />
     </fragment>
 
     <fragment
