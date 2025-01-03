@@ -29,7 +29,7 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class DocumentListAdapter extends RecyclerView.Adapter<DocumentListAdapter.ViewHolder> {
 
-    private List<DocumentsItem> documentList;
+    private final List<DocumentsItem> documentList;
 
     public DocumentListAdapter(List<DocumentsItem> documentList) {
         this.documentList = documentList;

@@ -14,8 +14,8 @@ import retrofit2.Response;
 
 public class VisitorPreApprovedViewModel extends ViewModel {
 
-    private MutableLiveData<UserProfileByEmailResponse> userProfileLiveData;
-    private APIInterface apiService;
+    private final MutableLiveData<UserProfileByEmailResponse> userProfileLiveData;
+    private final APIInterface apiService;
 
     public VisitorPreApprovedViewModel() {
         userProfileLiveData = new MutableLiveData<UserProfileByEmailResponse>();

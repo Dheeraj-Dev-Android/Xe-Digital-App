@@ -26,10 +26,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ShiftsViewModel extends ViewModel {
-    private MutableLiveData<String> hrMailLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> hrMailLiveData = new MutableLiveData<>();
     private MutableLiveData<List<ShiftsItem>> shiftData;
     private String authToken;
-    private Gson gson;
+    private final Gson gson;
     private String hrMail;
     private MutableLiveData<List<ShiftTypesItem>> shiftTimes;
     public ShiftsViewModel() {

@@ -23,12 +23,12 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.utills.NetworkUtils;
 
 public class SplashActivity extends AppCompatActivity {
-    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
+    private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
 
     private AlertDialog noInternetDialog;
-    private boolean isShowingNoInternetDialog = false;
+    private final boolean isShowingNoInternetDialog = false;
     private AlertDialog slowNetworkDialog;
-    private boolean isShowingSlowNetworkDialog = false;
+    private final boolean isShowingSlowNetworkDialog = false;
     private LottieAnimationView noInternetAnimation;
 //    private LottieAnimationView particleAnimation;
 

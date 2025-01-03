@@ -16,8 +16,8 @@ import java.util.List;
 import app.xedigital.ai.R;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
-    private Context context;
-    private List<String> imageUrls;
+    private final Context context;
+    private final List<String> imageUrls;
 
     public ImageAdapter(Context context, List<String> imageUrls) {
         this.context = context;

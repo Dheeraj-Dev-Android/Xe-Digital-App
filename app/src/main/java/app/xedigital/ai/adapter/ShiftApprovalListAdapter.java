@@ -53,7 +53,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
     private String fName;
     private String lName;
     private String empId;
-    private LifecycleOwner lifecycleOwner;
+    private final LifecycleOwner lifecycleOwner;
 
     public ShiftApprovalListAdapter(Context context, List<EmployeeShiftdataItem> shiftApprovalDataList, LifecycleOwner lifecycleOwner, ProfileViewModel profileViewModel) {
         this.context = context;

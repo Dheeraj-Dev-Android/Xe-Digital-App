@@ -26,7 +26,7 @@ import app.xedigital.ai.model.shiftApplied.EmployeeShiftdataItem;
 
 public class ShiftAppliedAdapter extends RecyclerView.Adapter<ShiftAppliedAdapter.ShiftViewHolder> {
 
-    private List<EmployeeShiftdataItem> shiftList;
+    private final List<EmployeeShiftdataItem> shiftList;
 
     public ShiftAppliedAdapter(List<EmployeeShiftdataItem> shiftList) {
         this.shiftList = shiftList;

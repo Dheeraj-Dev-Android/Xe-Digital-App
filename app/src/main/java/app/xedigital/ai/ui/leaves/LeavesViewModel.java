@@ -28,7 +28,7 @@ public class LeavesViewModel extends ViewModel {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     public LiveData<LeavesResponse> leavesData = _leavesData;
     private String authToken;
-    private MutableLiveData<LeaveTypeResponse> _leavesTypeData = new MutableLiveData<>();
+    private final MutableLiveData<LeaveTypeResponse> _leavesTypeData = new MutableLiveData<>();
     public LiveData<LeaveTypeResponse> leavesTypeData = _leavesTypeData;
 
     public LeavesViewModel() {

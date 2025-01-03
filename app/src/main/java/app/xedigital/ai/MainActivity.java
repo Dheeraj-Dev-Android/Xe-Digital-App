@@ -32,12 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
-    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
+    private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
 
     private AlertDialog noInternetDialog;
-    private boolean isShowingNoInternetDialog = false;
+    private final boolean isShowingNoInternetDialog = false;
     private AlertDialog slowNetworkDialog;
-    private boolean isShowingSlowNetworkDialog = false;
+    private final boolean isShowingSlowNetworkDialog = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

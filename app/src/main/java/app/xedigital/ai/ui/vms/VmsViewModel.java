@@ -18,9 +18,9 @@ import retrofit2.Response;
 
 public class VmsViewModel extends ViewModel {
 
-    private MutableLiveData<List<VisitorsItem>> visitors;
-    private MutableLiveData<Boolean> isLoading;
-    private MutableLiveData<String> error;
+    private final MutableLiveData<List<VisitorsItem>> visitors;
+    private final MutableLiveData<Boolean> isLoading;
+    private final MutableLiveData<String> error;
 
     public VmsViewModel() {
         visitors = new MutableLiveData<>();

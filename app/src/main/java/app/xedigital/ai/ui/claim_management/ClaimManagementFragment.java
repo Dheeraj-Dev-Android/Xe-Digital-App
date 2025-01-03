@@ -77,7 +77,7 @@ public class ClaimManagementFragment extends Fragment {
     private ClaimManagementViewModel claimManagementViewModel;
     private Calendar calendar;
     private SimpleDateFormat dateFormatter;
-    private List<Uri> selectedFiles = new ArrayList<>();
+    private final List<Uri> selectedFiles = new ArrayList<>();
     private ActivityResultLauncher<Intent> filePickerLauncher;
     private LinearLayout selectedFilesContainer;
     private TextView underProcessText, selectedEmpTransport;
@@ -370,7 +370,7 @@ public class ClaimManagementFragment extends Fragment {
                             } else {
                                 // Throw an error or display an error message
                                 Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
-                                throw new IllegalStateException("File size exceeds 1MB: " + uri.toString());
+                                throw new IllegalStateException("File size exceeds 1MB: " + uri);
                             }
                         }
                     } else if (data.getData() != null) {
@@ -380,7 +380,7 @@ public class ClaimManagementFragment extends Fragment {
                         } else {
                             // Throw an error or display an error message
                             Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
-                            throw new IllegalStateException("File size exceeds 1MB: " + uri.toString());
+                            throw new IllegalStateException("File size exceeds 1MB: " + uri);
                         }
                     }
                     updateSelectedFileText();

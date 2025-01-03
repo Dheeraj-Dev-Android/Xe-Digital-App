@@ -27,7 +27,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
     private OnClaimClickListener listener;
 
     public ClaimsAdapter(List<EmployeeClaimdataItem> claimList) {
-        this.claimList = claimList;
+        ClaimsAdapter.claimList = claimList;
         notifyDataSetChanged();
     }
 
@@ -51,7 +51,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
     }
 
     public void updateData(List<EmployeeClaimdataItem> filteredList) {
-        this.claimList = filteredList;
+        claimList = filteredList;
         notifyDataSetChanged();
     }
 
@@ -66,9 +66,9 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
     class ClaimViewHolder extends RecyclerView.ViewHolder {
         TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
         TextView viewDetailsButton, actionButton;
-        private Context context;
-        private OnClaimClickListener listener;
-        private List<EmployeeClaimdataItem> claimList;
+        private final Context context;
+        private final OnClaimClickListener listener;
+        private final List<EmployeeClaimdataItem> claimList;
 
         public ClaimViewHolder(@NonNull View itemView, Context context, OnClaimClickListener listener, List<EmployeeClaimdataItem> claimList) {
             super(itemView);
