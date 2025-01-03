@@ -5,13 +5,13 @@
     <item
         android:id="@+id/action_cross_manager"
         android:icon="@mipmap/cross_menu"
-        android:orderInCategory="100"
         android:title="@string/cross_manager"
-        app:showAsAction="ifRoom|withText" />
+        android:tooltipText="Cross Manager"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_filter"
         android:icon="@mipmap/ic_filter"
-        android:title=""
+        android:title="Filter By Date"
         android:tooltipText="Filter By Date"
         app:showAsAction="always" />
 </menu>
