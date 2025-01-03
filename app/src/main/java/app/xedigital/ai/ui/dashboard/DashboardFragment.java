@@ -313,17 +313,19 @@ public class DashboardFragment extends Fragment {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {
-                    binding.leavePieChart.setVisibility(View.GONE);
+//                    binding.leavePieChart.setVisibility(View.GONE);
+                    Log.e("DashboardFragment", "No leaves data available");
                 } else {
                     binding.leavePieChart.setVisibility(View.VISIBLE);
                     updatePieChartData(binding.leavePieChart, leaves);
                 }
             } else {
-                binding.leavePieChart.setVisibility(View.GONE);
+//                binding.leavePieChart.setVisibility(View.GONE);
+                Log.e("DashboardFragment", "No leaves data available");
             }
             // Check if other data is loaded as well
             if (profileViewModel.userProfile.getValue() != null && attendanceViewModel.attendance.getValue() != null) {
-                loader.setVisibility(View.GONE); // Hide the loader when all data is loaded
+                loader.setVisibility(View.GONE);
             }
         });
     }
