@@ -4,39 +4,53 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import app.xedigital.ai.adapter.HolidayAdapter;
 import app.xedigital.ai.databinding.FragmentHolidaysBinding;
-
-import java.util.Collections;
 
 public class HolidaysFragment extends Fragment {
 
     private FragmentHolidaysBinding binding;
     private HolidayAdapter holidayAdapter;
+    private ProgressBar progressBar;
+    private TextView textViewEmpty;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HolidaysViewModel holidaysViewModel = new ViewModelProvider(this).get(HolidaysViewModel.class);
 
         binding = FragmentHolidaysBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Initialize RecyclerView and adapter ONCE
-        holidayAdapter = new HolidayAdapter(Collections.emptyList());
-        RecyclerView recyclerView = binding.recyclerViewHolidays;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(holidayAdapter);
+        progressBar = binding.progressBar;
+        textViewEmpty = binding.textViewEmpty;
 
-        // Observe ViewModel data and UPDATE adapter
-        holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), holidays -> holidayAdapter.updateHolidays(holidays));
+        // Initialize RecyclerView and adapter
+        holidayAdapter = new HolidayAdapter();
+        binding.recyclerViewHolidays.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerViewHolidays.setAdapter(holidayAdapter);
+
+        // Observe ViewModel data
+        holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), holidays -> {
+            if (holidays == null || holidays.isEmpty()) {
+                binding.recyclerViewHolidays.setVisibility(View.GONE);
+                binding.textViewEmpty.setVisibility(View.VISIBLE);
+            } else {
+                binding.recyclerViewHolidays.setVisibility(View.VISIBLE);
+                binding.textViewEmpty.setVisibility(View.GONE);
+                holidayAdapter.updateHolidays(holidays);
+            }
+
+            binding.progressBar.setVisibility(View.GONE);
+        });
+        binding.progressBar.setVisibility(View.VISIBLE);
 
         return root;
     }

@@ -9,14 +9,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.model.holiday.HolidaysItem;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import app.xedigital.ai.R;
+import app.xedigital.ai.model.holiday.HolidaysItem;
 
 public class HolidayAdapter extends RecyclerView.Adapter<HolidayAdapter.HolidayViewHolder> {
 
@@ -24,6 +25,10 @@ public class HolidayAdapter extends RecyclerView.Adapter<HolidayAdapter.HolidayV
 
     public HolidayAdapter(List<HolidaysItem> holidays) {
         this.holidays = holidays;
+    }
+
+    public HolidayAdapter() {
+        this.holidays = new ArrayList<>();
     }
 
     @NonNull

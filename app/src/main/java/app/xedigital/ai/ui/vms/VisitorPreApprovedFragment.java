@@ -26,6 +26,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +43,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentVisitorPreApprovedBinding;
+import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.visitorsDetails.VisitorsDetailsResponse;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -159,7 +163,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                 String company = Objects.requireNonNull(binding.etCompany.getText()).toString();
                 String preApprovedDate = Objects.requireNonNull(binding.etPreApprovedDate.getText()).toString();
                 Toast.makeText(requireContext(), "Form submitted successfully", Toast.LENGTH_SHORT).show();
-
+                submitPreApprovedVisitor(v);
             }
         });
 
@@ -223,6 +227,50 @@ public class VisitorPreApprovedFragment extends Fragment {
 
     }
 
+    private void submitPreApprovedVisitor(View button) {
+        if (isValidInput()) {
+            showLoader();
+            button.setEnabled(false);
+
+            // Create an instance of PreApprovedVisitorRequest
+            PreApprovedVisitorRequest request = new PreApprovedVisitorRequest();
+            request.setName(binding.etName.getText().toString());
+            request.setEmail(binding.etEmail.getText().toString());
+            request.setContact(binding.etContact.getText().toString());
+            request.setCompanyFrom(binding.etCompany.getText().toString());
+            request.setPreApprovedDate(binding.etPreApprovedDate.getText().toString());
+
+            request.setApprovalStatus("approved");
+            request.setType("create");
+
+
+            APIInterface submitPreApprovedVisitor = APIClient.getInstance().getApi();
+            Call<ResponseBody> call = submitPreApprovedVisitor.PreApprovedVisitor(authToken, request);
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    hideLoader();
+                    button.setEnabled(true);
+
+                    if (response.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Form submitted successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    hideLoader();
+                    button.setEnabled(true);
+
+                    Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     private void callFaceRecognitionApi(Uri imageUri) {
         if (imageUri != null) {
             try {
@@ -245,8 +293,8 @@ public class VisitorPreApprovedFragment extends Fragment {
                 RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonObject.toString());
 
                 // 4. Make the API call (rest of your code remains the same)
-                APIInterface apiInterface = APIClient.getInstance().getRecognize();
-                Call<ResponseBody> call = apiInterface.VmsFaceRecognitionApi("jwt " + authToken, requestBody);
+                APIInterface callFaceRecognitionApi = APIClient.getInstance().getRecognize();
+                Call<ResponseBody> call = callFaceRecognitionApi.VmsFaceRecognitionApi("jwt " + authToken, requestBody);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -255,7 +303,12 @@ public class VisitorPreApprovedFragment extends Fragment {
 
                             try {
                                 assert response.body() != null;
-                                Log.d("FaceRecognition", "Success: " + response.body().string());
+                                String faceRecognitionResponse = response.body().string();
+                                Log.d("FaceRecognition", "Success: " + faceRecognitionResponse);
+
+                                // Call VisitorFaceDetailApi with the response data
+                                JsonObject requestBody = getVisitorFaceDetailRequestBody(faceRecognitionResponse);
+                                callVisitorFaceDetailApi(requestBody);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -283,6 +336,60 @@ public class VisitorPreApprovedFragment extends Fragment {
         }
     }
 
+    // Helper method to extract data and create request body
+    private JsonObject getVisitorFaceDetailRequestBody(String faceRecognitionResponse) {
+        Gson gson = new Gson();
+        JsonElement jsonElement = gson.fromJson(faceRecognitionResponse, JsonElement.class);
+
+        // Extract data from the response
+        JsonObject data = jsonElement.getAsJsonObject().get("data").getAsJsonObject();
+
+        // Create the request body for callVisitorFaceDetailApi
+        JsonObject requestBody = new JsonObject();
+        requestBody.add("Similarity", data.get("Similarity"));
+        requestBody.add("Face", data.get("Face"));
+
+        return requestBody;
+    }
+
+    private void callVisitorFaceDetailApi(JsonObject requestBody) {
+        String requestBodyJson = new Gson().toJson(requestBody);
+
+        // Create RequestBody from JSON string
+        RequestBody requestBodyFinal = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), requestBodyJson);
+
+        APIInterface callVisitorFaceDetailApi = APIClient.getInstance().getFace();
+        Call<ResponseBody> call = callVisitorFaceDetailApi.VisitorFaceDetailApi("jwt " + authToken, requestBodyFinal);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    // Handle successful response from VisitorFaceDetailApi
+                    try {
+                        assert response.body() != null;
+                        Log.d("VisitorFaceDetail", "Success: " + response.body().string());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    // Handle error response from VisitorFaceDetailApi
+                    try {
+                        assert response.errorBody() != null;
+                        Log.e("VisitorFaceDetail", "Error: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                // Handle API failure for VisitorFaceDetailApi
+                Log.e("VisitorFaceDetail", "Failure: " + t.getMessage());
+            }
+        });
+
+    }
     // Helper function to convert image Uri to base64 string
     private String imageUriToBase64(Uri imageUri) throws IOException {
         InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);

@@ -111,6 +111,10 @@
     <string name="welcome_message">Discover amazing features and experiences</string>
     <string name="get_started">Get Started</string>
     <string name="app_logo_description">App Logo</string>
+    <string name="empty_state_image">Empty State Image</string>
+    <string name="no_items_found">No Data Available</string>
+    <string name="no_data_available">No Data Available</string>
+    <string name="retry">Retry</string>
 
 
 </resources>

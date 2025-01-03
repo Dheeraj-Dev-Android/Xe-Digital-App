@@ -25,6 +25,7 @@ import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import app.xedigital.ai.model.login.LoginModelResponse1;
 import app.xedigital.ai.model.policy.PolicyResponse;
+import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
 import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
@@ -243,4 +244,10 @@ public interface APIInterface {
 
     @PUT("employees/addAttendance/regularize/applied/status/{attendanceId}")
     Call<ResponseBody> AddedAttendanceStatus(@Header("Authorization") String authToken, @Path("attendanceId") String attendanceId, @Body AddedAttendanceCancelRequest requestBody);
+
+    @POST("visitors/face")
+    retrofit2.Call<ResponseBody> VisitorFaceDetailApi(@Header("Authorization") String token, @Body RequestBody requestBody);
+
+    @POST("visitors/preapproved")
+    retrofit2.Call<ResponseBody> PreApprovedVisitor(@Header("Authorization") String authToken, @Body PreApprovedVisitorRequest requestBody);
 }

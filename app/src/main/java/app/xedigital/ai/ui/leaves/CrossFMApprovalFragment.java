@@ -18,12 +18,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.CrossManagerLeaveApprovalAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.cmLeaveApprovalPending.AppliedLeavesItem;
 import app.xedigital.ai.model.cmLeaveApprovalPending.CMLeavePendingResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,19 +44,14 @@ public class CrossFMApprovalFragment extends Fragment {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
+    private CrossManagerLeaveApprovalAdapter crossManagerLeaveApprovalAdapter;
+    private CMLeavePendingResponse cmLeavePendingApprovalResponse; // Make this a member variable
     private LinearLayout emptyStateView;
     private Button retryButton;
 
 
     public CrossFMApprovalFragment() {
         // Required empty public constructor
-    }
-
-
-    public static CrossFMApprovalFragment newInstance(String param1, String param2) {
-        CrossFMApprovalFragment fragment = new CrossFMApprovalFragment();
-        Bundle args = new Bundle();
-        return fragment;
     }
 
     @Override
@@ -73,12 +75,76 @@ public class CrossFMApprovalFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         swipeRefreshLayout.setOnRefreshListener(() -> fetchPendingLeaves());
-
         retryButton.setOnClickListener(v -> fetchPendingLeaves());
 
         fetchPendingLeaves();
 
+        ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
+        chipGroup.setSingleSelection(true);
+
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.contains(R.id.chipAll)) {
+                filterLeaves("All");
+            } else if (checkedIds.contains(R.id.chipApproved)) {
+                filterLeaves("Approved");
+            } else if (checkedIds.contains(R.id.chipUnapproved)) {
+                filterLeaves("Unapproved");
+            } else if (checkedIds.contains(R.id.chipRejected)) {
+                filterLeaves("Rejected");
+            } else if (checkedIds.contains(R.id.chipCancelled)) {
+                filterLeaves("Cancelled");
+            } else {
+                filterLeaves("All");
+            }
+        });
+        // Attach click listeners to chips
+//        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+//            View child = chipGroup.getChildAt(i);
+//            if (child instanceof Chip) {
+//                child.setOnClickListener(this::onChipClicked);
+//            }
+//        }
+
         return view;
+    }
+
+    public void onChipClicked(View view) {
+        // Get the ChipGroup and the clicked chip
+        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
+        Chip clickedChip = (Chip) view;
+
+        // Check the clicked chip
+        chipGroup.check(clickedChip.getId());
+    }
+
+    private void filterLeaves(String status) {
+        if (cmLeavePendingApprovalResponse != null && cmLeavePendingApprovalResponse.getData() != null && cmLeavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
+            List<AppliedLeavesItem> originalList = cmLeavePendingApprovalResponse.getData().getAppliedLeaves();
+            List<AppliedLeavesItem> filteredList;
+
+            if (status.equals("All")) {
+                filteredList = new ArrayList<>(originalList);
+            } else {
+                filteredList = originalList.stream()
+                        .filter(item -> item.getStatus().equalsIgnoreCase(status))
+                        .collect(Collectors.toList());
+            }
+
+            if (crossManagerLeaveApprovalAdapter != null) {
+                crossManagerLeaveApprovalAdapter.updateList(filteredList);
+
+                if (filteredList.isEmpty()) {
+                    emptyStateView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    emptyStateView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+
+            } else {
+                Log.e("CrossManagerLeaveApprovalAdapter", "Adapter is null");
+            }
+        }
     }
 
     private void fetchPendingLeaves() {
@@ -97,9 +163,9 @@ public class CrossFMApprovalFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(false);
 
                 if (response.isSuccessful()) {
-                    CMLeavePendingResponse cmLeavePendingApprovalResponse = response.body();
+                    cmLeavePendingApprovalResponse = response.body();
                     if (cmLeavePendingApprovalResponse != null && !cmLeavePendingApprovalResponse.getData().getAppliedLeaves().isEmpty()) {
-                        CrossManagerLeaveApprovalAdapter crossManagerLeaveApprovalAdapter = new CrossManagerLeaveApprovalAdapter(cmLeavePendingApprovalResponse.getData().getAppliedLeaves(), requireContext());
+                        crossManagerLeaveApprovalAdapter = new CrossManagerLeaveApprovalAdapter(cmLeavePendingApprovalResponse.getData().getAppliedLeaves(), requireContext());
                         recyclerView.setAdapter(crossManagerLeaveApprovalAdapter);
                         recyclerView.setVisibility(View.VISIBLE);
                     } else {
@@ -107,7 +173,6 @@ public class CrossFMApprovalFragment extends Fragment {
                         recyclerView.setVisibility(View.GONE);
                     }
                 } else {
-
                     emptyStateView.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 }
@@ -122,6 +187,6 @@ public class CrossFMApprovalFragment extends Fragment {
                 Toast.makeText(requireContext(), "Network Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
+
 }

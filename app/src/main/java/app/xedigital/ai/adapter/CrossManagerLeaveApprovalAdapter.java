@@ -92,6 +92,11 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
         return leaves.size();
     }
 
+    public void updateList(List<AppliedLeavesItem> filteredList) {
+        this.leaves = filteredList;
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView empName;
         TextView fromDate;
