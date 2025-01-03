@@ -83,6 +83,12 @@ public class ProfileFragment extends Fragment {
                         binding.reportingManagerEmail.setText("Email ");
                         binding.reportingManagerEmailValue.setText(employee.getReportingManager().getEmail());
                     }
+                    if (employee.getCrossmanager() != null) {
+                        binding.crossManagerTitle.setText("Name ");
+                        binding.crossManagerName.setText(employee.getCrossmanager().getFirstname() + " " + employee.getCrossmanager().getLastname());
+                        binding.crossManagerEmail.setText("Email ");
+                        binding.crossManagerEmailValue.setText(employee.getCrossmanager().getEmail());
+                    }
                 } else {
                     Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
                 }

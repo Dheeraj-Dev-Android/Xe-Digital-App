@@ -195,6 +195,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Designation : "
+                    android:layout_marginBottom="8dp"
                     android:textColor="@color/black"
                     android:textSize="13sp"
                     app:layout_constraintEnd_toStartOf="@id/guideline_middle"
@@ -210,6 +211,7 @@
                     android:text="Software Engineer"
                     android:textColor="@color/black"
                     android:textSize="13sp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/tvEmployeeDesignation" />

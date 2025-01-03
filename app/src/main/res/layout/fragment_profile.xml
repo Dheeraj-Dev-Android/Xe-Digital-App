@@ -201,6 +201,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Department"
+                    android:layout_marginBottom="8dp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@id/guideline_middle"
                     app:layout_constraintStart_toStartOf="@id/guideline_start"
@@ -215,6 +216,7 @@
                     android:text="-"
                     android:textColor="@color/black"
                     android:textSize="13sp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/department_title" />
@@ -250,6 +252,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Level/Grade"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@id/guideline_middle"
@@ -265,6 +268,7 @@
                     android:text="-"
                     android:textColor="@color/black"
                     android:textSize="13sp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/level_grade_title" />
@@ -381,6 +385,72 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/reporting_manager_email" />
+
+
+                <!--                Cross Functional Manager-->
+
+                <TextView
+                    android:id="@+id/cross_manager_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Cross Functional Manager"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/reporting_manager_email" />
+
+                <!-- (Name) -->
+                <TextView
+                    android:id="@+id/cross_manager_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Name"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/cross_manager_header" />
+
+                <TextView
+                    android:id="@+id/cross_manager_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="-"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/cross_manager_title" />
+
+                <!-- Reporting Manager (Email) -->
+                <TextView
+                    android:id="@+id/cross_manager_email"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Email"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_middle"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintTop_toBottomOf="@id/cross_manager_title" />
+
+                <TextView
+                    android:id="@+id/cross_manager_email_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                    android:autoSizeTextType="uniform"
+                    android:text="-"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guideline_middle"
+                    app:layout_constraintTop_toTopOf="@id/cross_manager_email" />
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
