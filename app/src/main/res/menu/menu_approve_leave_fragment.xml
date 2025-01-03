@@ -2,16 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_cross_manager"
-        android:icon="@mipmap/cross_menu"
-        android:title="@string/cross_manager"
-        android:tooltipText="Cross Manager"
-        app:showAsAction="always" />
+    <!--    <item-->
+    <!--        android:id="@+id/action_cross_manager"-->
+    <!--        android:icon="@mipmap/cross_menu"-->
+    <!--        android:title="@string/cross_manager"-->
+    <!--        android:tooltipText="Cross Manager"-->
+    <!--        app:showAsAction="always" />-->
     <item
         android:id="@+id/action_filter"
         android:icon="@mipmap/ic_filter"
         android:title="Filter By Date"
         android:tooltipText="Filter By Date"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_cross_manager"
+        android:title="@string/cross_manager"
+        app:showAsAction="never" />
 </menu>

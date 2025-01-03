@@ -8,16 +8,6 @@
     android:orientation="vertical"
     tools:context=".ui.leaves.ApproveLeaveFragment">
 
-
-    <!-- Added Cross Approval Button -->
-    <!--    <com.google.android.material.button.MaterialButton-->
-    <!--        android:id="@+id/btnCrossApproval"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_margin="16dp"-->
-    <!--        android:text="Cross Approval"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
     <!-- Chips Filter Section -->
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -38,6 +28,8 @@
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             app:singleSelection="false">
 
             <com.google.android.material.chip.Chip
@@ -92,25 +84,6 @@
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
     <!-- End of Chips Filter Section -->
-    <!--    <com.google.android.material.chip.ChipGroup-->
-    <!--        android:id="@+id/crossfmApproverChipGroup"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:paddingStart="16dp"-->
-    <!--        android:paddingEnd="16dp"-->
-    <!--        app:singleSelection="false">-->
-
-    <!--        <com.google.android.material.chip.Chip-->
-    <!--            android:id="@+id/crossFMApproval"-->
-    <!--            style="@style/Widget.MaterialComponents.Chip.Choice"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:onClick="onChipClicked"-->
-    <!--            android:text="Cross Approval"-->
-    <!--            android:textColor="@android:color/white"-->
-    <!--            app:chipBackgroundColor="#F44336" />-->
-
-    <!--    </com.google.android.material.chip.ChipGroup>-->
 
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -135,17 +108,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/emptyStateText"
+
+    <!-- Enhanced empty state container -->
+    <LinearLayout
+        android:id="@+id/emptyStateContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="No Records Available "
-        android:textSize="16sp"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3">
 
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="No Records Available"
+            android:src="@drawable/ic_empty_state" />
+
+        <TextView
+            android:id="@+id/emptyStateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:gravity="center"
+            android:text="No Records Available"
+            android:textColor="@color/purple_700"
+            android:textSize="16sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

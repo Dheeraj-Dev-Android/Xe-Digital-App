@@ -11,9 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -53,9 +52,8 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     private LeavePendingApprovalResponse leavePendingApprovalResponse;
     private APIInterface apiInterface;
     private ProgressBar loadingProgress;
-    private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     private View view;
-    private Button crossApproval;
 
     public static ApproveLeaveFragment newInstance() {
         return new ApproveLeaveFragment();
@@ -78,18 +76,9 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
 
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
-//        crossApproval = view.findViewById(R.id.btnCrossApproval);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         loadingProgress.setVisibility(View.VISIBLE);
-
-//        crossApproval.setOnClickListener(v -> {
-//            NavController navController = Navigation.findNavController(v);
-//            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
-//            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
-//
-//        });
-
 
         approvalAdapter = new LeaveApprovalAdapter(new ArrayList<>(), authTokenHeader, userId, ApproveLeaveFragment.this, getContext()); // Initialize with an empty list
         approvalRecyclerView.setAdapter(approvalAdapter);
@@ -171,11 +160,11 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
                     leavePendingApprovalResponse = response.body();
                     List<AppliedLeavesApproveItem> items = leavePendingApprovalResponse.getData().getAppliedLeaves();
                     if (items.isEmpty()) {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        emptyStateContainer.setVisibility(View.VISIBLE);
                         Toast.makeText(getContext(), "No Data Found", Toast.LENGTH_SHORT).show();
                         new AlertDialog.Builder(getContext()).setTitle("Approve Leaves").setMessage("No Records Found").setPositiveButton("OK", null).show();
                     } else {
-                        emptyStateText.setVisibility(View.GONE);
+                        emptyStateContainer.setVisibility(View.GONE);
                         approvalAdapter = new LeaveApprovalAdapter(items, authTokenHeader, userId, ApproveLeaveFragment.this, getContext());
                         approvalRecyclerView.setAdapter(approvalAdapter);
                     }
@@ -235,13 +224,18 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
             filterBottomSheetDialogFragment.setFilterLeaveApprovalListener(this);
             filterBottomSheetDialogFragment.show(getParentFragmentManager(), filterBottomSheetDialogFragment.getTag());
             return true;
+//        } else if (item.getItemId() == R.id.action_cross_manager) {
+//            NavController navController = Navigation.findNavController(view);
+//            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
+//            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
+//            return true;
+//        }
         } else if (item.getItemId() == R.id.action_cross_manager) {
             NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
             Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
             return true;
         }
-
         return false;
     }
 
