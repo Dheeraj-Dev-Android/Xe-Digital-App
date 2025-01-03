@@ -9,8 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.VisitorsAdapter;
@@ -32,8 +32,8 @@ public class VmsFragment extends Fragment {
     private VmsViewModel mViewModel;
     private RecyclerView recyclerView;
     private VisitorsAdapter visitorsAdapter;
-    private ProgressBar loadingProgress;
-    private TextView emptyStateText;
+    private CircularProgressIndicator loadingProgress;
+    private LinearLayout emptyStateContainer;
 
     public static VmsFragment newInstance() {
         return new VmsFragment();
@@ -42,11 +42,13 @@ public class VmsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_v_m_s, container, false);
+
+        // Initialize views
         recyclerView = view.findViewById(R.id.VisitorsListRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
 
-        // Find the chips by their IDs
+        // Find and setup chips
         Chip preApprovedVisitorChip = view.findViewById(R.id.preApprovedVisitorChip);
         Chip checkVisitorsChip = view.findViewById(R.id.checkVisitorsChip);
 
@@ -58,10 +60,10 @@ public class VmsFragment extends Fragment {
 
         checkVisitorsChip.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Check Visitors", Toast.LENGTH_SHORT).show();
-            // Create an Intent to open the link in a web browser
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://app.xedigital.ai/checkin/home"));
             startActivity(intent);
         });
+
         return view;
     }
 
@@ -72,7 +74,7 @@ public class VmsFragment extends Fragment {
         // Initialize ViewModel
         mViewModel = new ViewModelProvider(this).get(VmsViewModel.class);
 
-        // Initialize adapter
+        // Initialize adapter and RecyclerView
         visitorsAdapter = new VisitorsAdapter(null);
         recyclerView.setAdapter(visitorsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -80,14 +82,18 @@ public class VmsFragment extends Fragment {
         // Observe ViewModel LiveData
         mViewModel.getVisitors().observe(getViewLifecycleOwner(), visitorsItems -> {
             visitorsAdapter.updateVisitors(visitorsItems);
-            updateVisibility(visitorsItems == null || visitorsItems.isEmpty());
+            updateUIState(visitorsItems == null || visitorsItems.isEmpty(), false);
         });
 
-        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> loadingProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE));
+        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            updateUIState(false, isLoading);
+        });
 
         mViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Log.e("VmsFragment", "Error: " + error);
+                Toast.makeText(requireContext(), "Error loading visitors", Toast.LENGTH_SHORT).show();
+                updateUIState(true, false);
             }
         });
 
@@ -97,8 +103,22 @@ public class VmsFragment extends Fragment {
         mViewModel.fetchVisitors(authToken);
     }
 
-    private void updateVisibility(boolean isEmpty) {
-        recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-        emptyStateText.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+    private void updateUIState(boolean isEmpty, boolean isLoading) {
+        if (isLoading) {
+            // Show loading state
+            loadingProgress.setVisibility(View.VISIBLE);
+            emptyStateContainer.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
+        } else if (isEmpty) {
+            // Show empty state
+            loadingProgress.setVisibility(View.GONE);
+            emptyStateContainer.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            // Show content
+            loadingProgress.setVisibility(View.GONE);
+            emptyStateContainer.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }

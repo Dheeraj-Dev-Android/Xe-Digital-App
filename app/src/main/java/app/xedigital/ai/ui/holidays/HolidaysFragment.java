@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -20,7 +20,7 @@ public class HolidaysFragment extends Fragment {
     private FragmentHolidaysBinding binding;
     private HolidayAdapter holidayAdapter;
     private ProgressBar progressBar;
-    private TextView textViewEmpty;
+    private LinearLayout textViewEmpty;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

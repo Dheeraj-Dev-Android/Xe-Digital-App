@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.Collections;
 import java.util.List;
 
 import app.xedigital.ai.api.APIClient;
@@ -50,20 +51,30 @@ public class VmsViewModel extends ViewModel {
                 isLoading.setValue(false);
                 if (response.isSuccessful()) {
                     GetVisitorsResponse visitorsResponse = response.body();
-                    if (visitorsResponse != null) {
-                        visitors.setValue(visitorsResponse.getData().getVisitors());
+                    if (visitorsResponse != null && visitorsResponse.getData() != null) {
+                        List<VisitorsItem> visitorsList = visitorsResponse.getData().getVisitors();
+                        // Check if the visitors list is empty and post an empty list if it is
+                        if (visitorsList == null || visitorsList.isEmpty()) {
+                            visitors.setValue(Collections.emptyList());
+                        } else {
+                            visitors.setValue(visitorsList);
+                        }
                     } else {
-                        error.setValue("Empty response body");
+                        // Handle case where visitorsResponse or visitorsResponse.getData() is null
+                        error.setValue("Empty response body or data");
+                        visitors.setValue(Collections.emptyList()); // Post an empty list for empty state
                     }
                 } else {
                     error.setValue("Response code: " + response.code());
+                    visitors.setValue(Collections.emptyList()); // Post an empty list for error state
                 }
             }
 
             @Override
-            public void onFailure(Call<GetVisitorsResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<GetVisitorsResponse> call, @NonNull Throwable t) {
                 isLoading.setValue(false);
                 error.setValue("Network error: " + t.getMessage());
+                visitors.setValue(Collections.emptyList()); // Post an empty list for network error state
             }
         });
     }

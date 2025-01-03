@@ -83,10 +83,10 @@ public class ViewDocumentFragment extends Fragment {
 
                         // Show/hide emptyStateText based on data
                         if (documents.isEmpty()) {
-                            binding.emptyStateText.setVisibility(View.VISIBLE);
+                            binding.emptyStateContainer.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
                         } else {
-                            binding.emptyStateText.setVisibility(View.GONE);
+                            binding.emptyStateContainer.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
                         }
                     } catch (Exception e) {
@@ -101,6 +101,8 @@ public class ViewDocumentFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<DocumentListResponse> call, @NonNull Throwable throwable) {
+                Log.d("TAG", "onFailure: " + throwable.getMessage());
+
 
             }
         });

@@ -9,8 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,7 +37,7 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
     private DcrAdapter dcrAdapter;
 
     private ProgressBar loadingProgress;
-    private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     public void onFilterApplied(String startDate, String endDate) {
         dcrViewModel.fetchEmployeeDcr(startDate, endDate);
     }
@@ -55,7 +55,7 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
         setHasOptionsMenu(true);
 
         loadingProgress = binding.loadingProgress;
-        emptyStateText = binding.emptyStateText;
+        emptyStateContainer = binding.emptyStateContainer;
 
         loadingProgress.setVisibility(View.VISIBLE);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -82,14 +82,14 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
                 List<EmployeesDcrDataItem> dcr = parseDcrData(dcrDataList);
 
                 if (dcr.isEmpty()) {
-                    emptyStateText.setVisibility(View.VISIBLE);
+                    emptyStateContainer.setVisibility(View.VISIBLE);
                 } else {
-                    emptyStateText.setVisibility(View.GONE);
+                    emptyStateContainer.setVisibility(View.GONE);
                     dcrAdapter.updateData(dcr);
                     recyclerViewDcr.setAdapter(dcrAdapter);
                 }
             } else {
-                emptyStateText.setVisibility(View.VISIBLE);
+                emptyStateContainer.setVisibility(View.VISIBLE);
             }
         });
     }

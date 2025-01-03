@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -50,7 +50,7 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
     private DatePickerDialog datePickerDialog;
     private ImageButton filterButton;
     private ProgressBar loadingProgress;
-    private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     private EditText fromDateEditText;
     private EditText toDateEditText;
     private List<EmployeeClaimdataItem> claimList = new ArrayList<>();
@@ -85,7 +85,7 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
         claimsRecyclerView = view.findViewById(R.id.claimsRecyclerView);
         filterButton = view.findViewById(R.id.filterButton);
         loadingProgress = view.findViewById(R.id.loadingProgress);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         fromDateEditText = view.findViewById(R.id.fromDateEditText);
         toDateEditText = view.findViewById(R.id.toDateEditText);
 
@@ -156,7 +156,7 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
 
     private void fetchClaims() {
         loadingProgress.setVisibility(View.VISIBLE);
-        emptyStateText.setVisibility(View.GONE);
+        emptyStateContainer.setVisibility(View.GONE);
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -177,15 +177,15 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                         originalClaimList.addAll(claimList);
 
                         if (claimList.isEmpty()) {
-                            emptyStateText.setVisibility(View.VISIBLE);
+                            emptyStateContainer.setVisibility(View.VISIBLE);
                             Log.d("API Response", "No data available");
                         } else {
                             claimsAdapter.updateData(claimList);
-                            emptyStateText.setVisibility(View.GONE);
+                            emptyStateContainer.setVisibility(View.GONE);
                             Log.d("API Response", "Data fetched successfully");
                         }
                     } else {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        emptyStateContainer.setVisibility(View.VISIBLE);
                         Log.e("API Error", "Data or employeeClaimdata is null in response");
                     }
                 } else {

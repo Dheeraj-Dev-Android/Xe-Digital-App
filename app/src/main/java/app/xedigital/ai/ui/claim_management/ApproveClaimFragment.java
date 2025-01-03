@@ -9,11 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -51,7 +50,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
     private DatePickerDialog datePickerDialog;
     private ImageButton filterButton;
     private ProgressBar loadingProgress;
-    private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     private EditText fromDateEditText;
     private EditText toDateEditText;
     private APIInterface apiInterface;
@@ -85,7 +84,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         recyclerView = view.findViewById(R.id.claimsApproveRecyclerView);
         filterButton = view.findViewById(R.id.filterButton);
         loadingProgress = view.findViewById(R.id.loadingProgress);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         fromDateEditText = view.findViewById(R.id.fromDateEditText);
         toDateEditText = view.findViewById(R.id.toDateEditText);
 
@@ -108,18 +107,16 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
                     Date fromDateObj = dateFormat.parse(fromDate);
                     Date toDateObj = dateFormat.parse(toDate);
 
+                    assert toDateObj != null;
                     if (toDateObj.before(fromDateObj)) {
 
                         Toast.makeText(requireContext(), "To date cannot be before from date", Toast.LENGTH_SHORT).show();
                     } else {
                         // Filter claims by date range
 //                        filterClaimsByDateRange(fromDate, toDate);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadingProgress.setVisibility(View.VISIBLE);
-                                filterClaimsByDateRange(fromDate, toDate);
-                            }
+                        new Handler().postDelayed(() -> {
+                            loadingProgress.setVisibility(View.VISIBLE);
+                            filterClaimsByDateRange(fromDate, toDate);
                         }, 300);
                     }
                 } catch (androidx.core.net.ParseException e) {
@@ -140,12 +137,9 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
-        datePickerDialog = new DatePickerDialog(requireContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, monthOfYear + 1, dayOfMonth);
-                editText.setText(selectedDate);
-            }
+        datePickerDialog = new DatePickerDialog(requireContext(), (view, year1, monthOfYear, dayOfMonth) -> {
+            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year1, monthOfYear + 1, dayOfMonth);
+            editText.setText(selectedDate);
         }, year, month, day);
 
         datePickerDialog.show();
@@ -153,7 +147,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
 
     private void getClaimsForApproval() {
         loadingProgress.setVisibility(View.VISIBLE);
-        emptyStateText.setVisibility(View.GONE);
+        emptyStateContainer.setVisibility(View.GONE);
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -171,11 +165,11 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
                         originalClaimList.clear();
                         originalClaimList.addAll(claimList);
                         if (claimList.isEmpty()) {
-                            emptyStateText.setVisibility(View.VISIBLE);
+                            emptyStateContainer.setVisibility(View.VISIBLE);
                             Log.d("API Response", "No data available");
                         } else {
                             approveClaimAdapter.updateData(claimList);
-                            emptyStateText.setVisibility(View.GONE);
+                            emptyStateContainer.setVisibility(View.GONE);
                             Log.d("API Response", "Data fetched successfully");
                         }
                         approveClaimAdapter = new ApproveClaimAdapter(approveClaimResponse.getData().getEmployeeClaimdata());
@@ -183,7 +177,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
                         recyclerView.setAdapter(approveClaimAdapter);
                         Log.d("ApproveClaimFragment", "Response: " + approveClaimResponse);
                     } else {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        emptyStateContainer.setVisibility(View.VISIBLE);
                         Log.e("ApproveClaimFragment", "Data is null or empty in response");
                     }
 

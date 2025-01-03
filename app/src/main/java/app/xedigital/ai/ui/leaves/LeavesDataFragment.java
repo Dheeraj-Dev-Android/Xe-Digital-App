@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,6 +38,7 @@ public class LeavesDataFragment extends Fragment {
     private LeavesViewModel leavesViewModel;
     private LeaveAdapter leaveAdapter;
     private RecyclerView recyclerViewLeaves;
+    private LinearLayout emptyStateContainer;
     private TextView emptyStateText;
     private ProgressBar loadingProgress;
     private PieChart leavePieChart;
@@ -60,7 +62,7 @@ public class LeavesDataFragment extends Fragment {
 
         recyclerViewLeaves = view.findViewById(R.id.recyclerViewLeaves);
         leavePieChart = view.findViewById(R.id.leavePieChart);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         loadingProgress = view.findViewById(R.id.loadingProgress);
 
         leaveAdapter = new LeaveAdapter(leaveList);
@@ -85,11 +87,11 @@ public class LeavesDataFragment extends Fragment {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {
-                    emptyStateText.setVisibility(View.VISIBLE);
+                    emptyStateContainer.setVisibility(View.VISIBLE);
                     recyclerViewLeaves.setVisibility(View.GONE);
-                    leavePieChart.setVisibility(View.GONE);
+//                    leavePieChart.setVisibility(View.GONE);
                 } else {
-                    emptyStateText.setVisibility(View.GONE);
+                    emptyStateContainer.setVisibility(View.GONE);
                     recyclerViewLeaves.setVisibility(View.VISIBLE);
                     leavePieChart.setVisibility(View.VISIBLE);
 
@@ -101,10 +103,10 @@ public class LeavesDataFragment extends Fragment {
                 }
             } else {
 
-                emptyStateText.setVisibility(View.VISIBLE);
+                emptyStateContainer.setVisibility(View.VISIBLE);
                 emptyStateText.setText("Error loading data");
                 recyclerViewLeaves.setVisibility(View.GONE);
-                leavePieChart.setVisibility(View.GONE);
+//                leavePieChart.setVisibility(View.GONE);
             }
         });
 
@@ -141,8 +143,8 @@ public class LeavesDataFragment extends Fragment {
             }
         }
         if (entries.isEmpty()) {
-            leavePieChart.setVisibility(View.VISIBLE);
-            emptyStateText.setVisibility(View.VISIBLE);
+//            leavePieChart.setVisibility(View.VISIBLE);
+            emptyStateContainer.setVisibility(View.VISIBLE);
             emptyStateText.setText("No balance leaves data available");
             return;
         }
