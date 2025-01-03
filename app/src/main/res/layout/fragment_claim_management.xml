@@ -13,7 +13,7 @@
         android:layout_marginTop="45dp"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
+
         android:paddingBottom="32dp">
 
         <LinearLayout
@@ -21,8 +21,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp">
+            android:paddingHorizontal="12dp">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/viewClaimChip"
@@ -56,9 +55,9 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="#E0E0E0"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:background="@color/purple_700"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -164,28 +163,36 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Travel" />
+                android:text="Travel"
+                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeWidth="1dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/foodChip"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Food" />
+                android:text="Food"
+                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeWidth="1dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/accommodationChip"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accommodation" />
+                android:text="Accommodation"
+                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeWidth="1dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/miscChip"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Miscellaneous" />
+                android:text="Miscellaneous"
+                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeWidth="1dp" />
         </com.google.android.material.chip.ChipGroup>
 
         <!-- Under Process Text -->

@@ -45,24 +45,56 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/emptyStateText"
+        <!--        <TextView-->
+        <!--            android:id="@+id/emptyStateText"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="16dp"-->
+        <!--            android:fontFamily="@font/quicksand_font_family"-->
+        <!--            android:text="No leave records found"-->
+        <!--            android:textColor="@color/color_secondary_text"-->
+        <!--            android:textSize="16sp"-->
+        <!--            android:visibility="gone"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/chartCard" />-->
+
+        <!-- Enhanced empty state container -->
+        <LinearLayout
+            android:id="@+id/emptyStateContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:fontFamily="@font/quicksand_font_family"
-            android:text="No leave records found"
-            android:textColor="@color/color_secondary_text"
-            android:textSize="16sp"
+            android:gravity="center"
+            android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chartCard" />
+            app:layout_constraintTop_toBottomOf="@id/chartCard"
+            app:layout_constraintVertical_bias="0.3">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:contentDescription="No leave records found"
+                android:src="@drawable/ic_empty_state" />
+
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/quicksand_font_family"
+                android:gravity="center"
+                android:text="No leave records found"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewLeaves"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_marginTop="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@id/chartCard" />

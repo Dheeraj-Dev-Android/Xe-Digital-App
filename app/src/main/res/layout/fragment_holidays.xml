@@ -33,18 +33,48 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Center both vertically and horizontally using constraints -->
-    <TextView
+    <!--    <TextView-->
+    <!--        android:id="@+id/textViewEmpty"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:fontFamily="@font/quicksand_font_family"-->
+    <!--        android:gravity="center"-->
+    <!--        android:text="No holidays found"-->
+    <!--        android:textSize="16sp"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <LinearLayout
         android:id="@+id/textViewEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/quicksand_font_family"
         android:gravity="center"
-        android:text="No holidays found"
-        android:textSize="16sp"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="No holidays found"
+            android:src="@drawable/ic_empty_state" />
+
+        <TextView
+            android:id="@+id/emptyStateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:gravity="center"
+            android:text="No data available"
+            android:textColor="@color/purple_700"
+            android:textSize="16sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,11 +15,11 @@
         android:layout_marginTop="45dp"
         android:layout_marginBottom="16dp"
         android:paddingHorizontal="16dp"
+        app:alignItems="center"
+        app:justifyContent="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:alignItems="center"
-        app:justifyContent="center">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/uploadDocumentsChip"
@@ -57,27 +57,54 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider" />
 
-    <ProgressBar
+    <!-- Enhanced loading state with CircularProgressIndicator -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/loadingProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminate="true"
         android:visibility="gone"
+        app:indicatorColor="@color/purple_700"
+        app:indicatorSize="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintVertical_bias="0.3"
+        app:trackColor="@color/purple_200"
+        app:trackCornerRadius="4dp"
+        app:trackThickness="4dp" />
 
-    <TextView
-        android:id="@+id/emptyStateText"
+    <!-- Enhanced empty state container -->
+    <LinearLayout
+        android:id="@+id/emptyStateContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="No Documents found"
-        android:textSize="16sp"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintVertical_bias="0.3">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="No documents found"
+            android:src="@drawable/ic_empty_state" />
+
+        <TextView
+            android:id="@+id/emptyStateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:gravity="center"
+            android:text="No Documents found"
+            android:textColor="@color/purple_700"
+            android:textSize="16sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

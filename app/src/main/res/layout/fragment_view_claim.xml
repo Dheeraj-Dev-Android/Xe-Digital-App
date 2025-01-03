@@ -19,7 +19,8 @@
             android:layout_marginTop="45dp"
             android:background="@android:color/white"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="16dp">
+            android:paddingVertical="16dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/FilterCard"
@@ -46,14 +47,12 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <!-- Date Range Inputs -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:weightSum="3">
 
-                        <!-- From Date -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/fromDateInputLayout"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -76,7 +75,6 @@
                                 android:paddingEnd="5dp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- To Date -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/toDateInputLayout"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -98,59 +96,86 @@
                                 android:paddingEnd="5dp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- Filter Button -->
                         <ImageButton
                             android:id="@+id/filterButton"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:layout_gravity="center_vertical"
-                            android:layout_weight="0.5"
+                            android:layout_marginStart="8dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="TODO"
-                            android:foregroundGravity="center_horizontal"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
+                            android:contentDescription="Filter claims"
                             android:padding="8dp"
-                            android:src="@mipmap/ic_filter"
-                            app:icon="@mipmap/ic_filter"
-                            app:iconGravity="textStart"
-                            app:iconPadding="0dp" />
+                            android:src="@mipmap/ic_filter" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Empty State -->
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main content container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/claimsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp" />
+
+        <!-- Enhanced loading state -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loadingProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/color_primary"
+            app:indicatorSize="48dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3"
+            app:trackCornerRadius="4dp"
+            app:trackThickness="4dp" />
+
+        <!-- Enhanced empty state -->
+        <LinearLayout
+            android:id="@+id/emptyStateContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:contentDescription="No claims found"
+                android:src="@drawable/ic_empty_state" />
+
             <TextView
                 android:id="@+id/emptyStateText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="No claims found"
-                android:textColor="@color/color_secondary_text"
-                android:textSize="16sp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/FilterCard" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+                android:fontFamily="@font/quicksand_font_family"
+                android:gravity="center"
+                android:text="No Claims Found"
+                android:textColor="@color/color_primary"
+                android:textSize="16sp" />
+        </LinearLayout>
 
-    <!-- Main Content -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/claimsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:clipToPadding="false"
-        android:paddingHorizontal="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Loading Progress -->
-    <ProgressBar
-        android:id="@+id/loadingProgress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

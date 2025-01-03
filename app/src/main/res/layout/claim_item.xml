@@ -29,8 +29,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:text="Claim ID: CL001"
-                android:textSize="16sp"
                 android:textColor="@color/primary_text_color"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
 
@@ -92,12 +92,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
+        <TextView
                 android:id="@+id/amountText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -124,8 +119,8 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginEnd="8dp"
+                android:layout_weight="1"
                 android:text="View Details" />
 
             <com.google.android.material.button.MaterialButton
