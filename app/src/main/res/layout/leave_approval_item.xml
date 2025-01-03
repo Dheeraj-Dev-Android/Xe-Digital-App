@@ -18,7 +18,7 @@
         android:padding="8dp">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/leaveStatusChip"
+            android:id="@+id/approveLeaveStatusChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -30,7 +30,7 @@
             tools:text="Approved" />
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/btn_viewDetailLeave"
+            android:id="@+id/viewDetailButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/circular_background"
@@ -49,12 +49,12 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@id/leaveStatusChip"
-            app:layout_constraintStart_toEndOf="@id/btn_viewDetailLeave"
+            app:layout_constraintEnd_toStartOf="@id/approveLeaveStatusChip"
+            app:layout_constraintStart_toEndOf="@id/viewDetailButton"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/empName"
+                android:id="@+id/empNameTextView"
                 style="@style/TextAppearance.Material3.TitleMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/fromDate"
+                    android:id="@+id/fromDateTextView"
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                     tools:text="From: 01 Jan" />
 
                 <TextView
-                    android:id="@+id/toDate"
+                    android:id="@+id/toDateTextView"
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/appliedDate"
+                android:id="@+id/appliedDateTextView"
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

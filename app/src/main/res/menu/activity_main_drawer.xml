@@ -97,7 +97,7 @@
         android:title="@string/menu_documents_upload" />
     <item
         android:id="@+id/nav_vms"
-        android:title="VMS (Coming Soon*)" />
+        android:title="@string/vms" />
 
     <item
         android:id="@+id/nav_payroll"

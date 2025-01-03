@@ -79,16 +79,16 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
-        crossApproval = view.findViewById(R.id.btnCrossApproval);
+//        crossApproval = view.findViewById(R.id.btnCrossApproval);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         loadingProgress.setVisibility(View.VISIBLE);
 
-        crossApproval.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
-            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
-
-        });
+//        crossApproval.setOnClickListener(v -> {
+//            NavController navController = Navigation.findNavController(v);
+//            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
+//            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
+//
+//        });
 
 
         approvalAdapter = new LeaveApprovalAdapter(new ArrayList<>(), authTokenHeader, userId, ApproveLeaveFragment.this, getContext()); // Initialize with an empty list
@@ -235,7 +235,13 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
             filterBottomSheetDialogFragment.setFilterLeaveApprovalListener(this);
             filterBottomSheetDialogFragment.show(getParentFragmentManager(), filterBottomSheetDialogFragment.getTag());
             return true;
+        } else if (item.getItemId() == R.id.action_cross_manager) {
+            NavController navController = Navigation.findNavController(view);
+            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
+            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
+            return true;
         }
+
         return false;
     }
 

@@ -10,14 +10,14 @@
 
 
     <!-- Added Cross Approval Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCrossApproval"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Cross Approval"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--    <com.google.android.material.button.MaterialButton-->
+    <!--        android:id="@+id/btnCrossApproval"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:text="Cross Approval"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
     <!-- Chips Filter Section -->
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -30,7 +30,7 @@
         app:layout_constraintBottom_toTopOf="@+id/leaveApprovalRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnCrossApproval">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/statusChipGroup"

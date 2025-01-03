@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_cross_manager"
+        android:icon="@mipmap/cross_menu"
+        android:orderInCategory="100"
+        android:title="@string/cross_manager"
+        app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/action_filter"
         android:icon="@mipmap/ic_filter"

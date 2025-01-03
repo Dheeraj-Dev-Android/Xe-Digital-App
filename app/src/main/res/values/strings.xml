@@ -115,6 +115,8 @@
     <string name="no_items_found">No Data Available</string>
     <string name="no_data_available">No Data Available</string>
     <string name="retry">Retry</string>
+    <string name="vms">VMS</string>
+    <string name="cross_manager">Cross Manager</string>
 
 
 </resources>

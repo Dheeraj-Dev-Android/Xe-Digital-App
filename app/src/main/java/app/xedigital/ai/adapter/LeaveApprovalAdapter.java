@@ -27,10 +27,10 @@ import app.xedigital.ai.ui.leaves.ApproveLeaveFragment;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdapter.ViewHolder> {
-    private List<AppliedLeavesApproveItem> items;
     private final String authToken;
     private final String userId;
     private final Context context;
+    private List<AppliedLeavesApproveItem> items;
 
     public LeaveApprovalAdapter(List<AppliedLeavesApproveItem> items, String authToken, String userId, ApproveLeaveFragment approveLeaveFragment, Context context) {
         this.items = items;
@@ -50,16 +50,22 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppliedLeavesApproveItem item = items.get(position);
 
-        holder.empName.setText(item.getFirstname() + " " + item.getLastname());
+//        holder.empName.setText(item.getFirstname() + " " + item.getLastname());
+
+
+        holder.empName.setText((item.getFirstname() != null ? item.getFirstname() : "") + " " + (item.getLastname() != null ? item.getLastname() : ""));
+
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());
-        holder.fromDate.setText("From Date : " + formattedFromDate);
+        holder.fromDate.setText("From Date : " + (formattedFromDate != null ? formattedFromDate : ""));
+
         String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(item.getToDate());
-        holder.toDate.setText("To Date : " + formattedToDate);
+        holder.toDate.setText("To Date : " + (formattedToDate != null ? formattedToDate : ""));
+
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
+        holder.appliedDate.setText("Applied Date : " + (formattedAppliedDate != null ? formattedAppliedDate : ""));
 
         // Bind data to the Chip
-        Chip statusChip = holder.itemView.findViewById(R.id.leaveStatusChip);
+        Chip statusChip = holder.itemView.findViewById(R.id.approveLeaveStatusChip);
         statusChip.setText(item.getStatus());
 
         int statusColor;
@@ -111,24 +117,20 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView empName;
-        //        TextView leaveName;
         TextView fromDate;
         TextView toDate;
         TextView appliedDate;
         Chip statusChip;
         ShapeableImageView btnViewDetailLeave;
 
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            empName = itemView.findViewById(R.id.empName);
-//            leaveName = itemView.findViewById(R.id.leaveName);
-            fromDate = itemView.findViewById(R.id.fromDate);
-            toDate = itemView.findViewById(R.id.toDate);
-            appliedDate = itemView.findViewById(R.id.appliedDate);
-            statusChip = itemView.findViewById(R.id.statusChip);
-            btnViewDetailLeave = itemView.findViewById(R.id.btn_viewDetailLeave);
+            empName = itemView.findViewById(R.id.empNameTextView);
+            fromDate = itemView.findViewById(R.id.fromDateTextView);
+            toDate = itemView.findViewById(R.id.toDateTextView);
+            appliedDate = itemView.findViewById(R.id.appliedDateTextView);
+            statusChip = itemView.findViewById(R.id.approveLeaveStatusChip);
+            btnViewDetailLeave = itemView.findViewById(R.id.viewDetailButton);
         }
-
     }
 }

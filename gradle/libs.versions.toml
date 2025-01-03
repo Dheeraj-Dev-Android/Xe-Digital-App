@@ -31,6 +31,7 @@ uiTextAndroid = "1.7.5"
 firebaseVertexai = "16.0.2"
 impress = "0.0.1"
 engageCore = "1.5.5"
+carUiLib = "2.6.0"
 
 [libraries]
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
@@ -73,6 +74,7 @@ ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", ver
 firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai", version.ref = "firebaseVertexai" }
 impress = { group = "com.google.ar", name = "impress", version.ref = "impress" }
 engage-core = { group = "com.google.android.engage", name = "engage-core", version.ref = "engageCore" }
+car-ui-lib = { group = "com.android.car.ui", name = "car-ui-lib", version.ref = "carUiLib" }
 
 
 [plugins]
