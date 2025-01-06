@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModel;
 
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.bucket.BucketRequest;
+import app.xedigital.ai.model.bucket.BucketResponse;
+import app.xedigital.ai.model.faceAdd.AddFaceRequest;
+import app.xedigital.ai.model.faceAdd.AddFaceResponse;
 import app.xedigital.ai.ui.userProfileEmail.UserProfileByEmailResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -18,7 +22,7 @@ public class VisitorPreApprovedViewModel extends ViewModel {
     private final APIInterface apiService;
 
     public VisitorPreApprovedViewModel() {
-        userProfileLiveData = new MutableLiveData<UserProfileByEmailResponse>();
+        userProfileLiveData = new MutableLiveData<>();
         apiService = APIClient.getInstance().getUser();
     }
 
@@ -48,4 +52,13 @@ public class VisitorPreApprovedViewModel extends ViewModel {
             }
         });
     }
+
+    public void addFace(String token, AddFaceRequest requestBody, Callback<AddFaceResponse> callback) {
+        apiService.FaceAddApi(token, requestBody).enqueue(callback);
+    }
+
+    public void addBucket(String token, BucketRequest requestBody, Callback<BucketResponse> callback) {
+        apiService.addBucket(token, requestBody).enqueue(callback);
+    }
+
 }

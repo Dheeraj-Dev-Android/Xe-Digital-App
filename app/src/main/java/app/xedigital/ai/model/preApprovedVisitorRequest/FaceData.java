@@ -4,14 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class FaceData {
 
-    @SerializedName("Similarity")
-    private Object similarity;
+    @SerializedName("FaceDetail")
+    private FaceDetail faceDetail;
 
     @SerializedName("Face")
     private Face face;
 
-    public void setSimilarity(Object similarity) {
-        this.similarity = similarity;
+    public void setFaceDetail(FaceDetail faceDetail) {
+        this.faceDetail = faceDetail;
     }
 
     public void setFace(Face face) {

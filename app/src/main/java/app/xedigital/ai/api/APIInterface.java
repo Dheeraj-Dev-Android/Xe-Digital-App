@@ -8,6 +8,8 @@ import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.approveClaim.ApproveClaimResponse;
 import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
+import app.xedigital.ai.model.bucket.BucketRequest;
+import app.xedigital.ai.model.bucket.BucketResponse;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
@@ -17,6 +19,8 @@ import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimResponse;
 import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
+import app.xedigital.ai.model.faceAdd.AddFaceRequest;
+import app.xedigital.ai.model.faceAdd.AddFaceResponse;
 import app.xedigital.ai.model.getDocuments.DocumentListResponse;
 import app.xedigital.ai.model.holiday.HolidayModelResponse;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
@@ -149,6 +153,7 @@ public interface APIInterface {
 
     @GET("employees/profile/email/{empEmail}")
     retrofit2.Call<UserProfileByEmailResponse> getUserProfileByEmail(@Path("empEmail") String empEmail, @Header("Authorization") String authToken);
+
     @GET("visitors/detail/{contact}")
     retrofit2.Call<VisitorsDetailsResponse> getVisitorDetail(@Path("contact") String contact, @Header("Authorization") String authToken);
 
@@ -164,6 +169,12 @@ public interface APIInterface {
 
     @POST("/face/recognize")
     retrofit2.Call<ResponseBody> VmsFaceRecognitionApi(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("face/add")
+    retrofit2.Call<AddFaceResponse> FaceAddApi(@Header("Authorization") String token, @Body AddFaceRequest requestBody);
+
+    @POST("images/add/bucket")
+    retrofit2.Call<BucketResponse> addBucket(@Header("Authorization") String token, @Body BucketRequest requestBody);
 
     @POST("employees/attendance/punch")
     retrofit2.Call<ResponseBody> AttendanceApi(@Header("Authorization") String token, @Body RequestBody requestBody);
@@ -251,7 +262,7 @@ public interface APIInterface {
     @POST("visitors/preapproved")
     retrofit2.Call<ResponseBody> PreApprovedVisitor(@Header("Authorization") String authToken, @Body PreApprovedVisitorRequest requestBody);
 
-    @PUT("https://app.xedigital.ai/api/v1/users/profile/{userId}")
+    @PUT("users/profile/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<ResponseBody> editUserProfile(@Path("userId") String id, @Header("Authorization") String authToken, @Body RequestBody requestBody);
 

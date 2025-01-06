@@ -58,7 +58,7 @@ public class VisitorPreApprovedFragment extends Fragment {
     private FragmentVisitorPreApprovedBinding binding;
     private VisitorPreApprovedViewModel mViewModel;
     private Uri selectedImageUri;
-    private String authToken;
+    private String authToken, userId, empEmail;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     public static VisitorPreApprovedFragment newInstance() {
@@ -85,7 +85,8 @@ public class VisitorPreApprovedFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(VisitorPreApprovedViewModel.class);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
-        String empEmail = sharedPreferences.getString("empEmail", "");
+        userId = sharedPreferences.getString("userId", "");
+        empEmail = sharedPreferences.getString("empEmail", "");
         Log.w("VisitorPreApprovedFragment", "empEmail: " + empEmail);
         mViewModel.fetchUserProfile(empEmail, "jwt " + authToken);
 
@@ -218,7 +219,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                             binding.etCompany.setText("");
                             binding.etPreApprovedDate.setText("");
                             binding.ivProfile.setImageDrawable(ResourcesCompat.getDrawable(getResources(), android.R.drawable.ic_menu_camera, null));
-                            Toast.makeText(requireContext(), "No Visitor Found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "No Visitor Found,please fill detail", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(requireContext(), "Failed to fetch visitor details", Toast.LENGTH_SHORT).show();
@@ -249,12 +250,34 @@ public class VisitorPreApprovedFragment extends Fragment {
             request.setCompanyFrom(Objects.requireNonNull(binding.etCompany.getText()).toString());
             request.setPreApprovedDate(Objects.requireNonNull(binding.etPreApprovedDate.getText()).toString());
 
+            request.setWhomToMeet(userId);
+//            request.setDepartment("60e82cf36ba1893ddb00191d");
+            request.setProfileImage("");
+//            request.setProfileImagePath("https://visitors-profile-images.s3.ap-south-1.amazonaws.com/814gdko69t.jpg");
+            request.setGovernmentIdUploadedImage("");
+            request.setGovernmentIdUploadedImagePath("");
             request.setApprovalStatus("approved");
+//            request.setApprovalDate("2025-01-06T10:41:33.159Z");
+//            request.setCompany("60b47a7c777af75d3f8346b1");
+//            request.setActive(true);
+            request.setIsPreApproved(true);
             request.setType("create");
-
+//            request.setIsProfileImageDetailFound(false);
+//
+//
+//            FaceData faceData = new FaceData();
+//            Face face = new Face();
+//            BoundingBox boundingBox = new BoundingBox();
+//            boundingBox.setWidth(0.2820533215999603);
+//            boundingBox.setHeight(0.4170183539390564);
+//            boundingBox.setLeft(0.3498215079307556);
+//            boundingBox.setTop(0.14774657785892487);
+//            face.setBoundingBox(boundingBox);
+//
+//            request.setFaceData(faceData);
 
             APIInterface submitPreApprovedVisitor = APIClient.getInstance().getApi();
-            Call<ResponseBody> call = submitPreApprovedVisitor.PreApprovedVisitor(authToken, request);
+            Call<ResponseBody> call = submitPreApprovedVisitor.PreApprovedVisitor("jwt " + authToken, request);
 
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
