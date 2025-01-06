@@ -339,15 +339,33 @@ public class VisitorPreApprovedFragment extends Fragment {
         Gson gson = new Gson();
         JsonElement jsonElement = gson.fromJson(faceRecognitionResponse, JsonElement.class);
 
-        // Extract data from the response
-        JsonObject data = jsonElement.getAsJsonObject().get("data").getAsJsonObject();
+        if (jsonElement != null && jsonElement.isJsonObject()) {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-        // Create the request body for callVisitorFaceDetailApi
-        JsonObject requestBody = new JsonObject();
-        requestBody.add("Similarity", data.get("Similarity"));
-        requestBody.add("Face", data.get("Face"));
+            if (jsonObject.has("data") && !jsonObject.get("data").isJsonNull()) {
+                JsonElement dataElement = jsonObject.get("data");
 
-        return requestBody;
+                if (dataElement.isJsonObject()) {
+                    JsonObject data = dataElement.getAsJsonObject();
+
+                    // Create the request body for callVisitorFaceDetailApi
+                    JsonObject requestBody = new JsonObject();
+                    if (data.has("Similarity") && !data.get("Similarity").isJsonNull()) {
+                        requestBody.add("Similarity", data.get("Similarity"));
+                    }
+                    if (data.has("Face") && !data.get("Face").isJsonNull()) {
+                        requestBody.add("Face", data.get("Face"));
+                    }
+
+                    return requestBody;
+                }
+            }
+        }
+
+        // Handle the case where data is null or not a JSON object
+        Log.e("VisitorPreApprovedFragment", "Invalid face recognition response: " + faceRecognitionResponse);
+        // You might want to throw an exception or return an empty JsonObject here
+        return new JsonObject();
     }
 
     private void callVisitorFaceDetailApi(JsonObject requestBody) {
