@@ -145,6 +145,19 @@
         <action
             android:id="@+id/action_nav_account_to_nav_dashboard"
             app:destination="@id/nav_dashboard" />
+        <action
+            android:id="@+id/action_nav_profile_to_nav_edit_profile"
+            app:destination="@id/nav_edit_profile" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_edit_profile"
+        android:name="app.xedigital.ai.ui.profile.EditProfileFragment"
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile">
+        <action
+            android:id="@+id/action_nav_edit_profile_to_nav_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
 
     <fragment

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 
@@ -27,7 +32,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
-
+        setHasOptionsMenu(true);
         binding.profileLoader.setVisibility(View.VISIBLE);
         binding.emptyStateText.setVisibility(View.GONE);
         binding.punchCardView.setVisibility(View.GONE);
@@ -107,5 +112,25 @@ public class ProfileFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.edit_profile, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (super.onOptionsItemSelected(item)) {
+            return true;
+        }
+        if (item.getItemId() == R.id.action_edit_profile) {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_profile_to_nav_edit_profile);
+            Toast.makeText(requireContext(), "Edit Profile", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 }

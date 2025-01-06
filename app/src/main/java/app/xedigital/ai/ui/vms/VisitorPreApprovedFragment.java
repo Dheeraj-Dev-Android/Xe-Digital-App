@@ -108,17 +108,36 @@ public class VisitorPreApprovedFragment extends Fragment {
                 Intent data = result.getData();
                 if (data != null && data.getData() != null) {
                     selectedImageUri = data.getData();
-                    binding.ivProfile.setImageURI(selectedImageUri);
-                    callFaceRecognitionApi(selectedImageUri);
+
+                    try {
+                        // 1. Get image size and format
+                        long imageSizeBytes = getImageSize(selectedImageUri);
+                        long imageSizeMB = imageSizeBytes / (1024 * 1024);
+                        String imageFormat = getImageFormat(selectedImageUri);
+
+                        // 2. Check size and format
+                        if (imageSizeMB <= 1 && isValidFormat(imageFormat)) {
+                            // Image is within limits, proceed
+                            binding.ivProfile.setImageURI(selectedImageUri);
+                            callFaceRecognitionApi(selectedImageUri);
+                        } else {
+                            // Image is too large or invalid format, display error
+                            String errorMessage = imageSizeMB > 1 ? "Image size must be less than 1MB" : "Invalid image format. Only JPG, JPEG, and PNG are allowed.";
+                            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        Log.e("ImageCheck", "Error checking image: " + e.getMessage());
+                        Toast.makeText(requireContext(), "Error checking image", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
+
 
         binding.btnSelectImage.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             imagePickerLauncher.launch(intent);
         });
-
 
         binding.etPreApprovedDate.setOnClickListener(v -> {
             long today = Calendar.getInstance().getTimeInMillis();
@@ -132,13 +151,11 @@ public class VisitorPreApprovedFragment extends Fragment {
                 Calendar todayCal = Calendar.getInstance();
 
                 if (selectedCal.get(Calendar.YEAR) >= todayCal.get(Calendar.YEAR) && selectedCal.get(Calendar.MONTH) >= todayCal.get(Calendar.MONTH) && selectedCal.get(Calendar.DAY_OF_MONTH) >= todayCal.get(Calendar.DAY_OF_MONTH)) {
-                    // Format the date and set it to the EditText
                     binding.etPreApprovedDate.setText(datePicker.getHeaderText());
                 } else {
                     Toast.makeText(requireContext(), "Please select a future date", Toast.LENGTH_SHORT).show();
                 }
             });
-
             datePicker.show(getParentFragmentManager(), "datePicker");
         });
 
@@ -175,10 +192,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                 return;
             }
 
-
             APIInterface checkContact = APIClient.getInstance().getApi();
-
-            // Make the API call
             Call<VisitorsDetailsResponse> call = checkContact.getVisitorDetail(contact, "jwt " + authToken);
             call.enqueue(new Callback<VisitorsDetailsResponse>() {
                 @Override
@@ -195,18 +209,14 @@ public class VisitorPreApprovedFragment extends Fragment {
                             // Set the image if available
                             String imageUrl = visitorsDetails.getData().getVisitor().getProfileImagePath();
                             if (imageUrl != null && !imageUrl.isEmpty()) {
-                                // Use a library like Glide or Picasso to load the image from the URL
                                 Glide.with(requireContext()).load(imageUrl).placeholder(R.drawable.placeholder_image).error(R.drawable.error_image).into(binding.ivProfile);
                             }
 
                         } else {
-                            binding.etContact.setText("");
                             binding.etName.setText("");
                             binding.etEmail.setText("");
                             binding.etCompany.setText("");
                             binding.etPreApprovedDate.setText("");
-//                            binding.ivProfile.setImageDrawable(Resources.getSystem().getDrawable(android.R.drawable.ic_menu_camera));
-
                             binding.ivProfile.setImageDrawable(ResourcesCompat.getDrawable(getResources(), android.R.drawable.ic_menu_camera, null));
                             Toast.makeText(requireContext(), "No Visitor Found", Toast.LENGTH_SHORT).show();
                         }
@@ -217,7 +227,6 @@ public class VisitorPreApprovedFragment extends Fragment {
 
                 @Override
                 public void onFailure(@NonNull Call<VisitorsDetailsResponse> call, @NonNull Throwable t) {
-                    // Handle network or other errors
                     hideLoader();
                     Log.e("API Failure", "Failure: " + t.getMessage(), t);
                     Toast.makeText(requireContext(), "Failed to fetch visitor details", Toast.LENGTH_SHORT).show();
@@ -234,11 +243,11 @@ public class VisitorPreApprovedFragment extends Fragment {
 
             // Create an instance of PreApprovedVisitorRequest
             PreApprovedVisitorRequest request = new PreApprovedVisitorRequest();
-            request.setName(binding.etName.getText().toString());
-            request.setEmail(binding.etEmail.getText().toString());
-            request.setContact(binding.etContact.getText().toString());
-            request.setCompanyFrom(binding.etCompany.getText().toString());
-            request.setPreApprovedDate(binding.etPreApprovedDate.getText().toString());
+            request.setName(Objects.requireNonNull(binding.etName.getText()).toString());
+            request.setEmail(Objects.requireNonNull(binding.etEmail.getText()).toString());
+            request.setContact(Objects.requireNonNull(binding.etContact.getText()).toString());
+            request.setCompanyFrom(Objects.requireNonNull(binding.etCompany.getText()).toString());
+            request.setPreApprovedDate(Objects.requireNonNull(binding.etPreApprovedDate.getText()).toString());
 
             request.setApprovalStatus("approved");
             request.setType("create");
@@ -249,7 +258,7 @@ public class VisitorPreApprovedFragment extends Fragment {
 
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                     hideLoader();
                     button.setEnabled(true);
 
@@ -261,7 +270,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                     hideLoader();
                     button.setEnabled(true);
 
@@ -274,15 +283,9 @@ public class VisitorPreApprovedFragment extends Fragment {
     private void callFaceRecognitionApi(Uri imageUri) {
         if (imageUri != null) {
             try {
-                long imageSizeBytes = getImageSize(imageUri);
-                long imageSizeMB = imageSizeBytes / (1024 * 1024);
 
-                if (imageSizeMB > 1) {
-                    // Image is larger than 1MB, compress it
-                    imageUri = compressImage(imageUri);
-                }
-
-                String imageBase64 = imageUriToBase64(imageUri);
+                byte[] compressedImageBytes = compressImage(imageUri);
+                String imageBase64 = Base64.encodeToString(compressedImageBytes, Base64.DEFAULT);
 
                 // 2. Create JSON payload
                 JSONObject jsonObject = new JSONObject();
@@ -292,15 +295,12 @@ public class VisitorPreApprovedFragment extends Fragment {
                 // 3. Create RequestBody from JSON
                 RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonObject.toString());
 
-                // 4. Make the API call (rest of your code remains the same)
                 APIInterface callFaceRecognitionApi = APIClient.getInstance().getRecognize();
                 Call<ResponseBody> call = callFaceRecognitionApi.VmsFaceRecognitionApi("jwt " + authToken, requestBody);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                        // Handle API response
                         if (response.isSuccessful()) {
-
                             try {
                                 assert response.body() != null;
                                 String faceRecognitionResponse = response.body().string();
@@ -313,7 +313,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                                 throw new RuntimeException(e);
                             }
                         } else {
-                            // Error: Handle error response
                             try {
                                 assert response.errorBody() != null;
                                 Log.e("FaceRecognition", "Error: " + response.errorBody().string());
@@ -325,7 +324,6 @@ public class VisitorPreApprovedFragment extends Fragment {
 
                     @Override
                     public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                        // Handle API failure
                         Log.e("FaceRecognition", "Failure: " + t.getMessage());
                     }
                 });
@@ -364,7 +362,6 @@ public class VisitorPreApprovedFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
-                    // Handle successful response from VisitorFaceDetailApi
                     try {
                         assert response.body() != null;
                         Log.d("VisitorFaceDetail", "Success: " + response.body().string());
@@ -372,7 +369,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    // Handle error response from VisitorFaceDetailApi
                     try {
                         assert response.errorBody() != null;
                         Log.e("VisitorFaceDetail", "Error: " + response.errorBody().string());
@@ -384,15 +380,16 @@ public class VisitorPreApprovedFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                // Handle API failure for VisitorFaceDetailApi
                 Log.e("VisitorFaceDetail", "Failure: " + t.getMessage());
             }
         });
 
     }
+
     // Helper function to convert image Uri to base64 string
     private String imageUriToBase64(Uri imageUri) throws IOException {
         InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
+        assert inputStream != null;
         byte[] bytes = getBytes(inputStream);
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
@@ -419,22 +416,36 @@ public class VisitorPreApprovedFragment extends Fragment {
     }
 
     // Compress image and return new Uri
-    private Uri compressImage(Uri imageUri) throws IOException {
+    private byte[] compressImage(Uri imageUri) throws IOException {
         // 1. Get Bitmap from Uri
         InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-        assert inputStream != null;
-        inputStream.close();
+        if (inputStream != null) {
+            inputStream.close();
+        }
 
         // 2. Compress Bitmap to a ByteArrayOutputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream); // Adjust quality as needed
+        if (bitmap != null) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
+        }
 
-        // 3. Get new Uri from compressed ByteArrayOutputStream
-        String fileName = "compressed_image.jpg";
-        Uri compressedImageUri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bitmap, fileName, null));
+        // 3. Return the compressed byte array
+        return outputStream.toByteArray();
+    }
 
-        return compressedImageUri;
+    // Helper function to get image format
+    private String getImageFormat(Uri imageUri) {
+        String mimeType = requireContext().getContentResolver().getType(imageUri);
+        if (mimeType != null) {
+            return mimeType.substring(mimeType.lastIndexOf("/") + 1);
+        }
+        return "";
+    }
+
+    // Helper function to validate image format
+    private boolean isValidFormat(String format) {
+        return format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg") || format.equalsIgnoreCase("png");
     }
 
     private boolean isValidInput() {
@@ -464,8 +475,6 @@ public class VisitorPreApprovedFragment extends Fragment {
             binding.etPreApprovedDate.setError("Pre-approved date is required");
             return false;
         }
-
-
         return true;
     }
 

@@ -148,7 +148,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Profile Image"
+                        android:text="Profile Image (jpg/png)"
                         android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                     <LinearLayout

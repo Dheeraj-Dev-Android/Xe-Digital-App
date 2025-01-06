@@ -250,4 +250,9 @@ public interface APIInterface {
 
     @POST("visitors/preapproved")
     retrofit2.Call<ResponseBody> PreApprovedVisitor(@Header("Authorization") String authToken, @Body PreApprovedVisitorRequest requestBody);
+
+    @PUT("https://app.xedigital.ai/api/v1/users/profile/{userId}")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<ResponseBody> editUserProfile(@Path("userId") String id, @Header("Authorization") String authToken, @Body RequestBody requestBody);
+
 }

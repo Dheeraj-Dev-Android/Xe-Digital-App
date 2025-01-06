@@ -16,12 +16,14 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="16dp">
+            android:paddingVertical="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/statusChipGroup"
+                android:id="@+id/navigationChipGroup"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:chipSpacingHorizontal="4dp"
@@ -65,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@id/statusChipGroup">
+                app:layout_constraintTop_toBottomOf="@id/navigationChipGroup">
 
                 <View
                     android:id="@+id/divider"
@@ -74,10 +76,11 @@
                     android:background="@color/purple_200" />
             </com.google.android.material.card.MaterialCardView>
 
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/VisitorsListRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
