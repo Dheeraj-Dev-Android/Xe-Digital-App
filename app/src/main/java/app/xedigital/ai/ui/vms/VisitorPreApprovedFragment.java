@@ -201,6 +201,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                     hideLoader();
                     if (response.isSuccessful()) {
                         VisitorsDetailsResponse visitorsDetails = response.body();
+                        Log.w("VisitorPreApprovedFragment", "VisitorsDetailsResponse: " + visitorsDetails);
                         if (visitorsDetails != null && visitorsDetails.getData() != null && visitorsDetails.getData().getVisitor() != null) {
                             Toast.makeText(requireContext(), "Visitor Found", Toast.LENGTH_SHORT).show();
                             binding.etName.setText(visitorsDetails.getData().getVisitor().getName());
