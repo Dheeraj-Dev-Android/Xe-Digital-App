@@ -46,11 +46,6 @@
             android:id="@+id/action_nav_viewAttendanceFragment_to_nav_attendance"
             app:destination="@id/nav_attendance" />
 
-        <action
-            android:id="@+id/action_viewAttendanceFragment_to_attendanceFragment"
-            app:destination="@id/nav_attendance"
-            app:popUpTo="@id/nav_attendance"
-            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
