@@ -52,6 +52,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
@@ -92,7 +93,7 @@ public class PunchActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private String currentAddress = "";
     private AlertDialog attendanceSuccessDialog;
-    private ProgressBar progressBar;
+    private MaterialCardView progressBar;
     private LocationCallback locationCallback;
 
     @Override
@@ -100,6 +101,7 @@ public class PunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_punch);
+        progressBar = findViewById(R.id.loadingPanel);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -179,6 +181,7 @@ public class PunchActivity extends AppCompatActivity {
                             Toast.makeText(PunchActivity.this, "Captured", Toast.LENGTH_SHORT).show();
                             Log.i(TAG, "Captured");
                             captureImage();
+                            progressBar.setVisibility(View.VISIBLE);
                             captureText.setEnabled(true);
                             captureText.setText("Capture");
                             captureText.setVisibility(View.GONE);
@@ -204,12 +207,6 @@ public class PunchActivity extends AppCompatActivity {
             dialog.dismiss();
             setResult(Activity.RESULT_CANCELED);
             finish();
-            // Find the NavController correctly
-//            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-            // Check if the current destination is the same as the one you want to navigate to
-//            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-//                navController.navigate(R.id.nav_dashboard);
-//            }
         }).show();
     }
 
@@ -226,7 +223,7 @@ public class PunchActivity extends AppCompatActivity {
                 ImageView imageView = dialogView.findViewById(R.id.capturedImage);
 
                 Glide.with(PunchActivity.this).load(savedUri).into(imageView);
-                progressBar = findViewById(R.id.progressBar);
+
                 progressBar.setVisibility(View.VISIBLE);
 
                 String savedImagePath = photoFile.getAbsolutePath();
@@ -241,17 +238,6 @@ public class PunchActivity extends AppCompatActivity {
                     AtomicReference<Bitmap> bitmap;
                     bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
 
-//                    InputImage image = InputImage.fromBitmap(bitmap.get(), 0);
-//                    FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).build();
-//                    FaceDetector detector = FaceDetection.getClient(options);
-
-//                    Task<List<Face>> result = detector.process(image);
-//                    result.addOnSuccessListener(faces -> {
-//                        ProgressBar progressBar = findViewById(R.id.progressBar);
-//                        progressBar.setVisibility(View.GONE);
-//                        if (faces.isEmpty()) {
-//                            handleError("No faces detected in the image. Please try again with a clear image showing your face.");
-//                        } else {
                     try {
                         int newWidth = 500;
                         int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
@@ -273,23 +259,10 @@ public class PunchActivity extends AppCompatActivity {
                         Log.e(TAG, "Error processing image: " + e.getMessage(), e);
                         handleError("Error processing image: " + e.getMessage());
                     }
-//                        }
-                    progressBar = findViewById(R.id.progressBar);
-                    progressBar.setVisibility(View.GONE);
-//                    });
-//                    Log.d(TAG, "Face Detection Result: " + result);
-//                    result.addOnFailureListener(e -> {
-//                        Log.e(TAG, "Face detection failed: " + e.getMessage(), e);
-//                        handleError("Error detecting faces. Please try again.");
-//                        // Hide progress bar (if you're using one)
-//                        progressBar = findViewById(R.id.progressBar);
-//                        progressBar.setVisibility(View.GONE);
-//                    });
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing image: " + e.getMessage(), e);
                     Log.e(TAG, "Error during face detection: " + e.getMessage(), e);
                     handleError("Error detecting faces. Please try again.");
-                    progressBar = findViewById(R.id.progressBar);
                     progressBar.setVisibility(View.GONE);
                 }
             }
@@ -494,7 +467,6 @@ public class PunchActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         ProgressBar progressBar = findViewById(R.id.progressBar);
-                        progressBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
                             try {
                                 String responseBody = response.body().string();
@@ -502,10 +474,12 @@ public class PunchActivity extends AppCompatActivity {
                                 String message = responseJson.getString("message");
                                 Log.d(TAG, "Attendance Response Message: " + message);
                                 showAttendanceSuccessAlert(responseBody);
+                                progressBar.setVisibility(View.GONE);
 
                                 String responseJsonn = gson.toJson(responseBody);
                                 Log.d(TAG, "Attendance Response Body:\n" + responseJsonn);
                             } catch (IOException | JSONException e) {
+                                progressBar.setVisibility(View.GONE);
                                 Log.e(TAG, "Error reading response body: " + e.getMessage(), e);
                                 throw new RuntimeException(e);
                             }
@@ -515,17 +489,20 @@ public class PunchActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                         Log.e(TAG, "Attendance Error: " + throwable.getMessage(), throwable);
+                        progressBar.setVisibility(View.GONE);
                         throw new RuntimeException(throwable);
                     }
                 });
             } catch (JSONException e) {
                 Log.e(TAG, "Error creating request body: " + e.getMessage(), e);
+                progressBar.setVisibility(View.GONE);
                 throw new RuntimeException(e);
             }
         });
     }
 
     private void showAttendanceSuccessAlert(String responseBody) {
+        progressBar.setVisibility(View.GONE);
         try {
             JSONObject responseJson = new JSONObject(responseBody);
             boolean success = responseJson.getBoolean("success");
@@ -551,7 +528,7 @@ public class PunchActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) {
-                        return; // Do not show dialog if activity is finished or destroyed
+                        return;
                     }
 
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PunchActivity.this);
@@ -559,21 +536,8 @@ public class PunchActivity extends AppCompatActivity {
                         dialog1.dismiss();
                         setResult(Activity.RESULT_OK);
                         finish();
-//                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-//                        // Check if the current destination is the same as the one you want to navigate to
-//                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-//                            navController.navigate(R.id.nav_dashboard);
-//                        }
                     }).show();
                     new Handler().postDelayed(() -> {
-//                        if (dialog.isShowing()) {
-//                            dialog.dismiss();
-//                            NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-//                            // Check if the current destination is the same as the one you want to navigate to
-//                            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-//                                navController.navigate(R.id.nav_dashboard);
-//                            }
-//                        }
                         if (isFinishing()) {
                             return;
                         }
@@ -592,11 +556,11 @@ public class PunchActivity extends AppCompatActivity {
     }
 
     private void showAttendanceFailedAlert(String message) {
+        progressBar.setVisibility(View.GONE);
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) {
-                return; // Do not show dialog if activity is finished or destroyed
+                return;
             }
-
             AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
             builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
                 dialog.dismiss();
@@ -605,16 +569,8 @@ public class PunchActivity extends AppCompatActivity {
                 dialog.dismiss();
                 setResult(Activity.RESULT_CANCELED);
                 finish();
-//                NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-//                if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-//                    navController.navigate(R.id.nav_dashboard);
-//                } else {
-//                    Log.w(TAG, "Navigation to dashboard is not safe from current destination.");
-//                    Toast.makeText(PunchActivity.this, "Navigation failed. Please try again later.", Toast.LENGTH_SHORT).show();
-//                }
             }).create().show();
-//            AlertDialog alertDialog = builder.create();
-//            alertDialog.show();
+
         });
     }
 
@@ -645,30 +601,6 @@ public class PunchActivity extends AppCompatActivity {
             callback.onAddressReceived("Location not found");
         }
     }
-
-//    private void getAddressFromLocation(double latitude, double longitude, AddressCallback callback) {
-//        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//        try {
-//            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-//            if (addresses != null && !addresses.isEmpty()) {
-//                Address address = addresses.get(0);
-//                StringBuilder completeAddress = new StringBuilder();
-//                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-//                    completeAddress.append(address.getAddressLine(i)).append("\n");
-//                }
-//                currentAddress = completeAddress.toString();
-//                callback.onAddressReceived(currentAddress);
-//            } else {
-//                Log.e(TAG, "No address found for location");
-//                currentAddress = "Location not found";
-//                callback.onAddressReceived(currentAddress);
-//            }
-//        } catch (IOException e) {
-//            Log.e(TAG, "Error getting address: " + e.getMessage());
-//            currentAddress = "Location not found";
-//            callback.onAddressReceived(currentAddress);
-//        }
-//    }
 
     private void getAddressFromLocation(final double latitude, final double longitude, final AddressCallback callback) {
         new Thread(() -> {

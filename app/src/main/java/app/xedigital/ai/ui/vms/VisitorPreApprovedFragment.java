@@ -213,7 +213,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                             if (imageUrl != null && !imageUrl.isEmpty()) {
                                 Glide.with(requireContext()).load(imageUrl).placeholder(R.drawable.placeholder_image).error(R.drawable.error_image).into(binding.ivProfile);
                             }
-
                         } else {
                             binding.etName.setText("");
                             binding.etEmail.setText("");
@@ -289,7 +288,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                         Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                     hideLoader();
@@ -303,7 +301,6 @@ public class VisitorPreApprovedFragment extends Fragment {
     private void callFaceRecognitionApi(Uri imageUri) {
         if (imageUri != null) {
             try {
-
                 byte[] compressedImageBytes = compressImage(imageUri);
                 String imageBase64 = Base64.encodeToString(compressedImageBytes, Base64.DEFAULT);
 
