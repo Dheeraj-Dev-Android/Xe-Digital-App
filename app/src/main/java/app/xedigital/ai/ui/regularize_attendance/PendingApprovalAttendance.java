@@ -49,7 +49,6 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
     private RegularizeApprovalResponse regularizeApprovalResponse;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +123,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
             adapter.updateList(filteredList);
         }
     }
+
     private void getRegularizeApproval() {
         Call<RegularizeApprovalResponse> call = apiInterface.getRegularizeApproval("jwt " + authToken);
         call.enqueue(new Callback<RegularizeApprovalResponse>() {
@@ -144,7 +144,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
                                 .show();
                     } else {
                         emptyStateText.setVisibility(View.GONE);
-                        adapter = new RegularizeApprovalAdapter(items, authToken,userId, PendingApprovalAttendance.this, getContext());
+                        adapter = new RegularizeApprovalAdapter(items, authToken, userId, PendingApprovalAttendance.this, getContext());
                         approvalRecyclerView.setAdapter(adapter);
 //                        Log.d("Approval pending List", gson.toJson(response.body()));
 //                        adapter.setOnItemClickListener(item -> {
@@ -180,6 +180,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
         ft.detach(pendingApprovalViewFragment).attach(pendingApprovalViewFragment).commit();
         getRegularizeApproval();
     }
+
     public void onReject(AttendanceRegularizeAppliedItem item) {
         FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
         ft.detach(pendingApprovalViewFragment).attach(pendingApprovalViewFragment).commit();

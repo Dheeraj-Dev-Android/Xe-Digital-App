@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -87,11 +88,11 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
     }
 
     public class ClaimViewHolder extends RecyclerView.ViewHolder {
-        TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
-        TextView viewDetailsButton, actionButton;
         private final Context context;
         private final OnClaimClickListener listener;
         private final List<EmployeeClaimdataItem> claimList;
+        TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
+        TextView viewDetailsButton, actionButton;
 
         public ClaimViewHolder(@NonNull View itemView, Context context, OnClaimClickListener listener, List<EmployeeClaimdataItem> claimList) {
             super(itemView);
@@ -167,9 +168,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                     String message = "Choose an action for this claim:\nClaim ID: " + claim.getClaimId();
                     builder.setMessage(message);
 
-                    builder.setPositiveButton("approve", (dialog, which) -> {
-                        updateClaimStatus(claim, "approved", "");
-                    });
+                    builder.setPositiveButton("approve", (dialog, which) -> updateClaimStatus(claim, "approved", ""));
 
                     builder.setNeutralButton("cancel", null);
                     builder.setNegativeButton("reject", null);
@@ -308,7 +307,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             profileViewModel.storeLoginData(userId, authToken);
             profileViewModel.fetchUserProfile();
 
-            profileViewModel.userProfile.observe(ViewTreeLifecycleOwner.get(itemView), userProfile -> {
+            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(itemView)), userProfile -> {
                 if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee() != null) {
                     String reportingManagerFirstName = userProfile.getData().getEmployee().getFirstname();
                     String reportingManagerLastName = userProfile.getData().getEmployee().getLastname();

@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "app.xedigital.ai"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "app.xedigital.ai"
@@ -85,8 +85,8 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.play.services.location)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
-    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")

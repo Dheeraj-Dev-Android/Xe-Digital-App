@@ -75,7 +75,7 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
             if (position != RecyclerView.NO_POSITION) {
                 AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
                 String leaveId = appliedLeaveItem.getId();
-                if (appliedLeaveItem != null && leaveId != null) {
+                if (leaveId != null) {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);

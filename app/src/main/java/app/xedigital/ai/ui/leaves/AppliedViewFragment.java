@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.text.ParseException;
@@ -37,7 +38,7 @@ public class AppliedViewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = AppliedLeaveItemBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         if (appliedLeaveItem != null) {
@@ -47,13 +48,13 @@ public class AppliedViewFragment extends Fragment {
             binding.startDateSelectedType.setText(appliedLeaveItem.getSelectTypeFrom());
             binding.endDateTextView.setText(DateTimeUtils.getDayOfWeekAndDate(appliedLeaveItem.getToDate()));
             binding.endDateSelectedType.setText(appliedLeaveItem.getSelectTypeTo());
-            binding.totalDaysTextView.setText("Total Days : "+getTotalDays(appliedLeaveItem));
+            binding.totalDaysTextView.setText("Total Days : " + getTotalDays(appliedLeaveItem));
             binding.reasonTextView.setText(appliedLeaveItem.getReason());
-            binding.approvedByTextView.setText( appliedLeaveItem.getApprovedByName());
+            binding.approvedByTextView.setText(appliedLeaveItem.getApprovedByName());
             binding.approvedDateTextView.setText("Updated on : " + DateTimeUtils.getDayOfWeekAndDate(appliedLeaveItem.getApprovedDate()));
-            binding.approvedComment.setText("Comment : "+appliedLeaveItem.getComment());
+            binding.approvedComment.setText("Comment : " + appliedLeaveItem.getComment());
             binding.leavingStationTextView.setText(appliedLeaveItem.getLeavingStation());
-            binding.LeavingStationAddress.setText("Vacation Address : "+appliedLeaveItem.getVacationAddress());
+            binding.LeavingStationAddress.setText("Vacation Address : " + appliedLeaveItem.getVacationAddress());
 
             // Set status chip text and color based on leave status
             String status = appliedLeaveItem.getStatus();
@@ -67,7 +68,7 @@ public class AppliedViewFragment extends Fragment {
             } else if (status.equalsIgnoreCase("Rejected")) {
                 binding.statusChip.setChipBackgroundColorResource(R.color.status_rejected);
                 binding.statusChip.setTextColor(getResources().getColor(R.color.white));
-            }else if (status.equalsIgnoreCase("Cancelled")) {
+            } else if (status.equalsIgnoreCase("Cancelled")) {
                 binding.statusChip.setChipBackgroundColorResource(R.color.status_rejected);
                 binding.statusChip.setTextColor(getResources().getColor(R.color.white));
             }

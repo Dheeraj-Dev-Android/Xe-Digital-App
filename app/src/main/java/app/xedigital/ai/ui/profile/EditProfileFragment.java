@@ -181,7 +181,6 @@ public class EditProfileFragment extends Fragment {
     private void clearForm() {
         binding.editTextPassword.setText("");
         binding.editTextConfirmPassword.setText("");
-        // Clear any other fields you want to reset
     }
 
     private void navigateToProfileFragment() {
@@ -208,8 +207,6 @@ public class EditProfileFragment extends Fragment {
             binding.editTextConfirmPassword.setError("Passwords do not match");
             return false;
         }
-
-
         return true;
     }
 

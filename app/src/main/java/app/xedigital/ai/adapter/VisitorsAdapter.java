@@ -83,6 +83,7 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         }
 
     }
+
     @Override
     public int getItemCount() {
         return visitors != null ? visitors.size() : 0;

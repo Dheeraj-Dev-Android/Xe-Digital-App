@@ -74,7 +74,7 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
                 AppliedLeavesItem appliedLeavesItem = leaves.get(position);
                 String leaveId = appliedLeavesItem.getId();
 
-                if (leaveId != null && appliedLeavesItem != null) {
+                if (leaveId != null) {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(ARG_LEAVE_ID, appliedLeavesItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_cross_approval_leave_to_nav_pendingCMLeaveApproval, bundle);

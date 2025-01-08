@@ -85,9 +85,7 @@ public class VmsFragment extends Fragment {
             updateUIState(visitorsItems == null || visitorsItems.isEmpty(), false);
         });
 
-        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            updateUIState(false, isLoading);
-        });
+        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> updateUIState(false, isLoading));
 
         mViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {

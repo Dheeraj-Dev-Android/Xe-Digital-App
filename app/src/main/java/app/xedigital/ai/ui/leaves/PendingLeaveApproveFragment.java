@@ -80,9 +80,8 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String formattedDateTime = dateTimeFormat.format(currentDateTime);
-        Log.d("LeaveApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
-        return formattedDateTime;
+        //        Log.d("LeaveApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
+        return dateTimeFormat.format(currentDateTime);
 
     }
 
@@ -133,7 +132,6 @@ public class PendingLeaveApproveFragment extends Fragment {
         binding.empStatusUpdatedDate.setText(formattedApprovedDate);
         binding.empComments.setText(item.getComment());
 //        binding.empTotalDays.setText();
-
 
         String status = item.getStatus().toLowerCase();
         Context context = binding.empStatusChip.getContext();
@@ -202,7 +200,7 @@ public class PendingLeaveApproveFragment extends Fragment {
                     if (reportingManagerFirstName != null && reportingManagerLastName != null && reportingManagerId != null) {
                         managerId = reportingManagerId;
                         reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                        Log.e("RegularizeApprovalAdapter", "reportingManager: " + reportingManager);
+//                        Log.e("RegularizeApprovalAdapter", "reportingManager: " + reportingManager);
                     }
                 }
             });
@@ -264,7 +262,7 @@ public class PendingLeaveApproveFragment extends Fragment {
     }
 
     void handleCancel(String leaveId, String comment) {
-        Log.e("LeaveCancel", "handleCancel: " + leaveId);
+//        Log.e("LeaveCancel", "handleCancel: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Cancelled");
         requestBody.setApprovedBy(managerId);
@@ -281,7 +279,7 @@ public class PendingLeaveApproveFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.d("LeaveCancel", "onResponse: " + response.body());
+//                    Log.d("LeaveCancel", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingLeaveApproveFragment.this).attach(PendingLeaveApproveFragment.this).commit();
                     if (listener != null) {
@@ -306,7 +304,7 @@ public class PendingLeaveApproveFragment extends Fragment {
     }
 
     public void handleApprove(String leaveId) {
-        Log.e("LeaveApproval", "handleApprove: " + leaveId);
+//        Log.e("LeaveApproval", "handleApprove: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Approved");
         requestBody.setApprovedBy(managerId);
@@ -323,7 +321,7 @@ public class PendingLeaveApproveFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.d("LeaveApproval", "onResponse: " + response.body());
+//                    Log.d("LeaveApproval", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingLeaveApproveFragment.this).attach(PendingLeaveApproveFragment.this).commit();
                     if (listener != null) {
@@ -346,7 +344,7 @@ public class PendingLeaveApproveFragment extends Fragment {
     }
 
     public void handleReject(String leaveId, String comment) {
-        Log.e("LeaveRejected", "handleReject: " + leaveId);
+//        Log.e("LeaveRejected", "handleReject: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Rejected");
         requestBody.setApprovedBy(managerId);
@@ -363,7 +361,7 @@ public class PendingLeaveApproveFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.e("LeaveApproval", "onResponse: " + response.body());
+//                    Log.e("LeaveApproval", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingLeaveApproveFragment.this).attach(PendingLeaveApproveFragment.this).commit();
                     if (listener != null) {

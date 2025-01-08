@@ -50,6 +50,7 @@ public class DateTimeUtils {
         hour = (hour == 0) ? 12 : hour; // Handle midnight (0 hour)
         return String.format("%02d:%02d %s", hour, minute, amPm);
     }
+
     public static String calculateLateTime(String punchInTime, String shiftStartTime) {
         if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
             return "N/A";

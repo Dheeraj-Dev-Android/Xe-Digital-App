@@ -39,20 +39,14 @@ import retrofit2.Callback;
 public class DetailViewAddAttendanceFragment extends Fragment {
     private AddAttendanceRegularizeAppliedItem attendanceItem;
     private MaterialCardView actionButtonsCard;
+
     public DetailViewAddAttendanceFragment() {
         // Required empty public constructor
     }
 
     public static DetailViewAddAttendanceFragment newInstance(String param1, String param2) {
-        DetailViewAddAttendanceFragment fragment = new DetailViewAddAttendanceFragment();
 
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+        return new DetailViewAddAttendanceFragment();
     }
 
     public static String getCurrentDateTimeInUTC() {
@@ -63,6 +57,12 @@ public class DetailViewAddAttendanceFragment extends Fragment {
         String formattedDateTime = dateTimeFormat.format(currentDateTime);
         Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
         return formattedDateTime;
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
     }
 

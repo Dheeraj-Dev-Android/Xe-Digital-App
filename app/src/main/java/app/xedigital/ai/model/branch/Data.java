@@ -2,12 +2,12 @@ package app.xedigital.ai.model.branch;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Data{
+public class Data {
 
-	@SerializedName("branch")
-	private Branch branch;
+    @SerializedName("branch")
+    private Branch branch;
 
-	public Branch getBranch(){
-		return branch;
-	}
+    public Branch getBranch() {
+        return branch;
+    }
 }

@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="45dp"
         android:orientation="vertical"
-        android:paddingBottom="15dp"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:paddingBottom="15dp">
 
         <!-- Role and Status Row -->
         <LinearLayout

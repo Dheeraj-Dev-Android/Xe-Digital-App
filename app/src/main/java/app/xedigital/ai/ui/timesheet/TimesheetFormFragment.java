@@ -18,13 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import app.xedigital.ai.R;
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.databinding.FragmentDcrFormBinding;
-import app.xedigital.ai.model.branch.UserBranchResponse;
-import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
-import app.xedigital.ai.model.user.UserModelResponse;
-import app.xedigital.ai.ui.profile.ProfileViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
@@ -44,6 +37,13 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
 
+import app.xedigital.ai.R;
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.databinding.FragmentDcrFormBinding;
+import app.xedigital.ai.model.branch.UserBranchResponse;
+import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
+import app.xedigital.ai.model.user.UserModelResponse;
+import app.xedigital.ai.ui.profile.ProfileViewModel;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;

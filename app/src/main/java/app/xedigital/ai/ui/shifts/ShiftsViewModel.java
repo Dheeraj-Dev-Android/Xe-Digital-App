@@ -27,11 +27,12 @@ import retrofit2.Response;
 
 public class ShiftsViewModel extends ViewModel {
     private final MutableLiveData<String> hrMailLiveData = new MutableLiveData<>();
+    private final Gson gson;
     private MutableLiveData<List<ShiftsItem>> shiftData;
     private String authToken;
-    private final Gson gson;
     private String hrMail;
     private MutableLiveData<List<ShiftTypesItem>> shiftTimes;
+
     public ShiftsViewModel() {
         // Initialize Gson instance
         gson = new GsonBuilder().setPrettyPrinting().create();

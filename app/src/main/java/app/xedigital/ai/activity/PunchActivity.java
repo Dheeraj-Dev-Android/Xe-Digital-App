@@ -252,27 +252,27 @@ public class PunchActivity extends AppCompatActivity {
 //                        if (faces.isEmpty()) {
 //                            handleError("No faces detected in the image. Please try again with a clear image showing your face.");
 //                        } else {
-                            try {
-                                int newWidth = 500;
-                                int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
-                                bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
+                    try {
+                        int newWidth = 500;
+                        int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
+                        bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
 
-                                String base64Image = convertImageToBase64(bitmap.get());
-                                if (base64Image.length() >= 10) {
-                                    Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
-                                }
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.put("collection_name", "consultedgeglobalpvtltd_5e970n");
-                                jsonObject.put("image", base64Image);
+                        String base64Image = convertImageToBase64(bitmap.get());
+                        if (base64Image.length() >= 10) {
+                            Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
+                        }
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("collection_name", "consultedgeglobalpvtltd_5e970n");
+                        jsonObject.put("image", base64Image);
 
-                                String requestBodyJson = jsonObject.toString();
-                                RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
+                        String requestBodyJson = jsonObject.toString();
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
 //                   API CALL
-                                sendImageToApi(requestBody);
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error processing image: " + e.getMessage(), e);
-                                handleError("Error processing image: " + e.getMessage());
-                            }
+                        sendImageToApi(requestBody);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error processing image: " + e.getMessage(), e);
+                        handleError("Error processing image: " + e.getMessage());
+                    }
 //                        }
                     progressBar = findViewById(R.id.progressBar);
                     progressBar.setVisibility(View.GONE);
@@ -671,53 +671,51 @@ public class PunchActivity extends AppCompatActivity {
 //    }
 
     private void getAddressFromLocation(final double latitude, final double longitude, final AddressCallback callback) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Geocoder geocoder = new Geocoder(PunchActivity.this, Locale.getDefault());
-                Address address = null;
-                int retryCount = 0;
-                int maxRetries = 3;
+        new Thread(() -> {
+            Geocoder geocoder = new Geocoder(PunchActivity.this, Locale.getDefault());
+            Address address = null;
+            int retryCount = 0;
+            int maxRetries = 3;
 
-                while (address == null && retryCount < maxRetries) {
+            while (address == null && retryCount < maxRetries) {
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                    if (addresses != null && !addresses.isEmpty()) {
+                        address = addresses.get(0);
+                        break; // Exit the loop if an address is found
+                    }
+                } catch (IOException e) {
+                    Log.e(TAG, "Error getting address:", e);
+                    retryCount++;
                     try {
-                        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                        if (addresses != null && !addresses.isEmpty()) {
-                            address = addresses.get(0);
-                            break; // Exit the loop if an address is found
-                        }
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error getting address:", e);
-                        retryCount++;
-                        try {
-                            Thread.sleep((long) (Math.pow(2, retryCount) * 1000));
-                        } catch (InterruptedException interruptedException) {
-                            interruptedException.printStackTrace();
-                            // You might want to handle the interruption if necessary
-                            break; // Exit the loop if interrupted
-                        }
+                        Thread.sleep((long) (Math.pow(2, retryCount) * 1000));
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                        // You might want to handle the interruption if necessary
+                        break; // Exit the loop if interrupted
                     }
                 }
-
-                final String addressResult;
-                if (address != null) {
-                    StringBuilder completeAddress = new StringBuilder();
-                    for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                        completeAddress.append(address.getAddressLine(i)).append("\n");
-                    }
-                    addressResult = completeAddress.toString();
-                } else {
-                    addressResult = "Location not found";
-                    Log.e(TAG, "No address found for location or max retries reached");
-                }
-
-                runOnUiThread(() -> {
-                    currentAddress = addressResult;
-                    callback.onAddressReceived(addressResult);
-                });
             }
+
+            final String addressResult;
+            if (address != null) {
+                StringBuilder completeAddress = new StringBuilder();
+                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                    completeAddress.append(address.getAddressLine(i)).append("\n");
+                }
+                addressResult = completeAddress.toString();
+            } else {
+                addressResult = "Location not found";
+                Log.e(TAG, "No address found for location or max retries reached");
+            }
+
+            runOnUiThread(() -> {
+                currentAddress = addressResult;
+                callback.onAddressReceived(addressResult);
+            });
         }).start();
     }
+
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
@@ -746,10 +744,6 @@ public class PunchActivity extends AppCompatActivity {
         }
     }
 
-    interface AddressCallback {
-        void onAddressReceived(String address);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -768,6 +762,10 @@ public class PunchActivity extends AppCompatActivity {
             attendanceSuccessDialog.dismiss();
         }
 
+    }
+
+    interface AddressCallback {
+        void onAddressReceived(String address);
     }
 
 }

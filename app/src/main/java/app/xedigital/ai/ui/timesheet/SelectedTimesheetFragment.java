@@ -58,7 +58,7 @@ public class SelectedTimesheetFragment extends Fragment {
         TextView nextDayTextValue = view.findViewById(R.id.nextDayTextValue);
 
         // Populate views with data from selectedDcrItem
-        dateTextView.setText("Date : "+DateTimeUtils.getDayOfWeekAndDate(selectedDcrItem.getDcrDate()));
+        dateTextView.setText("Date : " + DateTimeUtils.getDayOfWeekAndDate(selectedDcrItem.getDcrDate()));
         inTimeTextView.setText(formatTime(selectedDcrItem.getInTime()));
         outTimeTextView.setText(formatTime(selectedDcrItem.getOutTime()));
 //        reportTextValue.setText(selectedDcrItem.getTodayReport());

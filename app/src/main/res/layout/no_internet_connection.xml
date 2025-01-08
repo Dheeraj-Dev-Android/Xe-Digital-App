@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <!-- Animated background particles -->
-    <!--    <com.airbnb.lottie.LottieAnimationView-->
-    <!--        android:id="@+id/particleAnimation"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        app:lottie_autoPlay="true"-->
-    <!--        app:lottie_loop="true"-->
-    <!--        app:lottie_rawRes="@raw/particles_background" />-->
-
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/noInternetAnimation"
         android:layout_width="240dp"

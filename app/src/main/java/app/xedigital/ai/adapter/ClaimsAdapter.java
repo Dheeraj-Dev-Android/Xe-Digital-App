@@ -63,12 +63,12 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
         void onClaimClick(EmployeeClaimdataItem claim);
     }
 
-    class ClaimViewHolder extends RecyclerView.ViewHolder {
-        TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
-        TextView viewDetailsButton, actionButton;
+    static class ClaimViewHolder extends RecyclerView.ViewHolder {
         private final Context context;
         private final OnClaimClickListener listener;
         private final List<EmployeeClaimdataItem> claimList;
+        TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
+        TextView viewDetailsButton, actionButton;
 
         public ClaimViewHolder(@NonNull View itemView, Context context, OnClaimClickListener listener, List<EmployeeClaimdataItem> claimList) {
             super(itemView);
@@ -139,9 +139,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
 
             actionButton.setVisibility(View.GONE);
 
-            viewDetailsButton.setOnClickListener(v -> {
-                listener.onClaimClick(claim);
-            });
+            viewDetailsButton.setOnClickListener(v -> listener.onClaimClick(claim));
         }
 
     }

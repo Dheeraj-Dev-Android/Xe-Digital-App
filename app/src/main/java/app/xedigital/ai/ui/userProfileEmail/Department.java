@@ -2,40 +2,40 @@ package app.xedigital.ai.ui.userProfileEmail;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Department{
+public class Department {
 
-	@SerializedName("default")
-	private boolean jsonMemberDefault;
+    @SerializedName("default")
+    private boolean jsonMemberDefault;
 
-	@SerializedName("name")
-	private String name;
+    @SerializedName("name")
+    private String name;
 
-	@SerializedName("description")
-	private String description;
+    @SerializedName("description")
+    private String description;
 
-	@SerializedName("active")
-	private boolean active;
+    @SerializedName("active")
+    private boolean active;
 
-	@SerializedName("_id")
-	private String id;
+    @SerializedName("_id")
+    private String id;
 
-	public boolean isJsonMemberDefault(){
-		return jsonMemberDefault;
-	}
+    public boolean isJsonMemberDefault() {
+        return jsonMemberDefault;
+    }
 
-	public String getName(){
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDescription(){
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public boolean isActive(){
-		return active;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
-	public String getId(){
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 }

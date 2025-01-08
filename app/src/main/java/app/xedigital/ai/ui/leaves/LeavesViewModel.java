@@ -26,10 +26,10 @@ public class LeavesViewModel extends ViewModel {
     private final APIInterface apiInterface;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    public LiveData<LeavesResponse> leavesData = _leavesData;
-    private String authToken;
     private final MutableLiveData<LeaveTypeResponse> _leavesTypeData = new MutableLiveData<>();
+    public LiveData<LeavesResponse> leavesData = _leavesData;
     public LiveData<LeaveTypeResponse> leavesTypeData = _leavesTypeData;
+    private String authToken;
 
     public LeavesViewModel() {
         apiInterface = APIClient.getInstance().getLeaves();
@@ -40,19 +40,17 @@ public class LeavesViewModel extends ViewModel {
     }
 
     public void fetchLeavesData() {
-        Log.d("LeavesViewModel", "Fetching leaves data...");
+//        Log.d("LeavesViewModel", "Fetching leaves data...");
 
         if (authToken != null) {
-            Log.d("LeavesViewModel", "Auth Token: " + authToken.substring(0, 10) + "...");
             String authHeaderValue = "jwt " + authToken;
-
             apiInterface.getLeaves(authHeaderValue).enqueue(new Callback<LeavesResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<LeavesResponse> call, @NonNull Response<LeavesResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         mainHandler.post(() -> _leavesData.setValue(response.body()));
                         String responseJson = gson.toJson(response.body());
-                        Log.d("LeavesViewModel", "Leave Response:\n " + responseJson);
+//                        Log.d("LeavesViewModel", "Leave Response:\n " + responseJson);
                     } else {
                         Log.e("LeavesViewModel", "Error fetching leaves data: " + response.message());
                     }
@@ -74,11 +72,11 @@ public class LeavesViewModel extends ViewModel {
             Call<LeaveTypeResponse> leaveType = apiInterface.getLeaveTypes(authHeaderValue);
             leaveType.enqueue(new Callback<LeaveTypeResponse>() {
                 @Override
-                public void onResponse(Call<LeaveTypeResponse> call, Response<LeaveTypeResponse> response) {
+                public void onResponse(@NonNull Call<LeaveTypeResponse> call, @NonNull Response<LeaveTypeResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         _leavesTypeData.postValue(response.body());
                         String responseJson = gson.toJson(response.body());
-                        Log.d("fetchLeavesType", "Leave Response: " + responseJson);
+//                        Log.d("fetchLeavesType", "Leave Response: " + responseJson);
                     } else {
                         Log.e("fetchLeavesType", "Error fetching leaves type: " + response.message());
                     }

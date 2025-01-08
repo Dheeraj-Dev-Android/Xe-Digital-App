@@ -35,13 +35,13 @@
         android:gravity="end">
 
         <com.google.android.material.button.MaterialButton
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:textColor="@color/rejected_color"
             android:id="@+id/btnRejectDialog"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Reject" />
+            android:text="Reject"
+            android:textColor="@color/rejected_color" />
 
     </LinearLayout>
 

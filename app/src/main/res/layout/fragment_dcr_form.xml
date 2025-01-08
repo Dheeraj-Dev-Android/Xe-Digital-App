@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="@color/white"
-    android:paddingBottom="16dp"
     android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingBottom="16dp"
     tools:context=".ui.timesheet.TimesheetFormFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,9 +18,9 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
                 android:id="@+id/dcrForm"
@@ -116,12 +116,12 @@
                         android:id="@+id/highlightOfTheDay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="top"
                         android:hint="Highlight Of The Day"
                         android:inputType="textMultiLine"
                         android:maxLines="5"
-                        android:scrollbars="vertical"
-                        android:gravity="top"
-                        android:minLines="2" />
+                        android:minLines="2"
+                        android:scrollbars="vertical" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -134,12 +134,12 @@
                         android:id="@+id/outcomeOfTheDay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="top"
                         android:hint="Outcome Of The Day"
                         android:inputType="textMultiLine"
                         android:maxLines="5"
-                        android:scrollbars="vertical"
-                        android:gravity="top"
-                        android:minLines="2" />
+                        android:minLines="2"
+                        android:scrollbars="vertical" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -152,12 +152,12 @@
                         android:id="@+id/nextDayPlan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="top"
                         android:hint="Next Day Plan"
                         android:inputType="textMultiLine"
                         android:maxLines="5"
-                        android:scrollbars="vertical"
-                        android:gravity="top"
-                        android:minLines="2" />
+                        android:minLines="2"
+                        android:scrollbars="vertical" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -170,11 +170,11 @@
                         android:id="@+id/feelingOfTheDay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="top"
                         android:hint="Feeling Of The Day"
                         android:inputType="textMultiLine"
                         android:maxLines="5"
-                        android:scrollbars="vertical"
-                        android:gravity="top" />
+                        android:scrollbars="vertical" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Buttons -->

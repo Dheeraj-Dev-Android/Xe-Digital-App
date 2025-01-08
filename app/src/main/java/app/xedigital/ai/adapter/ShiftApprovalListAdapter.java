@@ -50,10 +50,10 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
     private final List<EmployeeShiftdataItem> shiftApprovalDataList;
     private final ProfileViewModel profileViewModel;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final LifecycleOwner lifecycleOwner;
     private String fName;
     private String lName;
     private String empId;
-    private final LifecycleOwner lifecycleOwner;
 
     public ShiftApprovalListAdapter(Context context, List<EmployeeShiftdataItem> shiftApprovalDataList, LifecycleOwner lifecycleOwner, ProfileViewModel profileViewModel) {
         this.context = context;

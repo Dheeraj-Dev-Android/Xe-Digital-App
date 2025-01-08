@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -61,8 +60,7 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
     }
 
     public static ViewClaimFragment newInstance(String param1, String param2) {
-        ViewClaimFragment fragment = new ViewClaimFragment();
-        return fragment;
+        return new ViewClaimFragment();
     }
 
     @Override
@@ -116,12 +114,9 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                     } else {
                         // Filter claims by date range
 //                        filterClaimsByDateRange(fromDate, toDate);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadingProgress.setVisibility(View.VISIBLE);
-                                filterClaimsByDateRange(fromDate, toDate);
-                            }
+                        new Handler().postDelayed(() -> {
+                            loadingProgress.setVisibility(View.VISIBLE);
+                            filterClaimsByDateRange(fromDate, toDate);
                         }, 300);
                     }
                 } catch (androidx.core.net.ParseException e) {
@@ -143,12 +138,9 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
-        datePickerDialog = new DatePickerDialog(requireContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, monthOfYear + 1, dayOfMonth);
-                editText.setText(selectedDate);
-            }
+        datePickerDialog = new DatePickerDialog(requireContext(), (view, year1, monthOfYear, dayOfMonth) -> {
+            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year1, monthOfYear + 1, dayOfMonth);
+            editText.setText(selectedDate);
         }, year, month, day);
 
         datePickerDialog.show();

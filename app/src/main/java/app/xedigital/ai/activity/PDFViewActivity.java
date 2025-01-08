@@ -10,8 +10,6 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import java.util.Objects;
-
 import app.xedigital.ai.R;
 
 public class PDFViewActivity extends Activity {
@@ -85,22 +83,3 @@ public class PDFViewActivity extends Activity {
         }
     }
 }
-
-
-//public class PDFViewActivity extends Activity {
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_pdfview);
-//
-//        WebView webView = findViewById(R.id.webView);
-//        webView.getSettings().setJavaScriptEnabled(true);
-//        webView.setWebViewClient(new WebViewClient());
-//
-//        String pdfUrl = getIntent().getStringExtra("pdfUrl");
-//        String googleDocsUrl = "https://docs.google.com/gview?embedded=true&url=" + pdfUrl;
-//
-//        webView.loadUrl(googleDocsUrl);
-//    }
-//}

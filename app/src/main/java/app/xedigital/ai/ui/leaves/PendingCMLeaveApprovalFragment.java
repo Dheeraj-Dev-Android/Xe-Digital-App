@@ -258,7 +258,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
 
         Button submitButton = dialogView.findViewById(R.id.submitButton);
         submitButton.setOnClickListener(v -> {
-            String comment = commentEditText.getText().toString();
+            String comment = Objects.requireNonNull(commentEditText.getText()).toString();
 
             if (action.equals("Reject")) {
                 handleReject(leaveId, comment);
@@ -274,7 +274,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
 
 
     public void handleReject(String leaveId, String comment) {
-        Log.e("CMLeaveRejected", "handleReject: " + leaveId);
+//        Log.e("CMLeaveRejected", "handleReject: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Rejected");
         requestBody.setApprovedBy(managerId);
@@ -291,7 +291,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.e("CMLeaveRejected", "onResponse: " + response.body());
+//                    Log.e("CMLeaveRejected", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingCMLeaveApprovalFragment.this).attach(PendingCMLeaveApprovalFragment.this).commit();
                     if (listener != null) {
@@ -300,7 +300,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
                     // Navigate to the destination fragment
                     Navigation.findNavController(requireView()).navigate(R.id.action_nav_pendingCMLeaveApproval_to_nav_cross_approval_leave);
                     Toast.makeText(requireContext(), "Leave Rejected Successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("CMLeaveRejected", "onResponse: " + gson.toJson(response.body()));
+//                    Log.d("CMLeaveRejected", "onResponse: " + gson.toJson(response.body()));
                 } else {
                     Log.e("CMLeaveRejected", "onResponse: " + response.errorBody());
                 }
@@ -315,7 +315,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
     }
 
     void handleCancel(String leaveId, String comment) {
-        Log.e("CMLeaveCancel", "handleCancel: " + leaveId);
+//        Log.e("CMLeaveCancel", "handleCancel: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Cancelled");
         requestBody.setApprovedBy(managerId);
@@ -332,7 +332,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.d("CMLeaveCancel", "onResponse: " + response.body());
+//                    Log.d("CMLeaveCancel", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingCMLeaveApprovalFragment.this).attach(PendingCMLeaveApprovalFragment.this).commit();
                     if (listener != null) {
@@ -357,7 +357,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
     }
 
     public void handleApprove(String leaveId) {
-        Log.e("CMLeaveApproval", "handleApprove: " + leaveId);
+//        Log.e("CMLeaveApproval", "handleApprove: " + leaveId);
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
         requestBody.setStatus("Approved");
         requestBody.setApprovedBy(managerId);
@@ -374,7 +374,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     updateUIBasedOnStatus();
-                    Log.d("CMLeaveApproval", "onResponse: " + response.body());
+//                    Log.d("CMLeaveApproval", "onResponse: " + response.body());
                     FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.detach(PendingCMLeaveApprovalFragment.this).attach(PendingCMLeaveApprovalFragment.this).commit();
                     if (listener != null) {

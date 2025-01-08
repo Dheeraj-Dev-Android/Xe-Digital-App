@@ -67,7 +67,7 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
             if (position != RecyclerView.NO_POSITION) {
                 EmployeesDcrDataItem selectedItem = dcrDataList.get(position);
                 String dcrId = selectedItem.getId();
-                if (dcrId != null && selectedItem != null) {
+                if (dcrId != null) {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(ARG_SELECTED_ITEM, selectedItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_dcr_to_nav_selected_Timesheet, bundle);

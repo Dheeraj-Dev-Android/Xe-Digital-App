@@ -61,8 +61,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
     }
 
     public static ApproveClaimFragment newInstance(String param1, String param2) {
-        ApproveClaimFragment fragment = new ApproveClaimFragment();
-        return fragment;
+        return new ApproveClaimFragment();
     }
 
     @Override
@@ -159,6 +158,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful()) {
                     ApproveClaimResponse approveClaimResponse = response.body();
+                    assert approveClaimResponse != null;
                     Data data = approveClaimResponse.getData();
                     if (data != null && data.getEmployeeClaimdata() != null) {
                         claimList = data.getEmployeeClaimdata();

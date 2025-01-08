@@ -35,8 +35,7 @@ public class ShiftAppliedFragment extends Fragment {
 
 
     public static ShiftAppliedFragment newInstance(String param1, String param2) {
-        ShiftAppliedFragment fragment = new ShiftAppliedFragment();
-        return fragment;
+        return new ShiftAppliedFragment();
     }
 
     @Override
@@ -46,7 +45,7 @@ public class ShiftAppliedFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentShiftAppliedBinding.inflate(inflater, container, false);
         View view = binding.getRoot();

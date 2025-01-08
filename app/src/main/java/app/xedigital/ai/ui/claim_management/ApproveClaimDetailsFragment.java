@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.ImageAdapter;
@@ -71,6 +72,7 @@ public class ApproveClaimDetailsFragment extends Fragment {
         if (getArguments() != null) {
             claimData = (EmployeeClaimdataItem) getArguments().getSerializable("claimData");
 
+            assert claimData != null;
             txtClaimId.setText("Claim ID: " + claimData.getClaimId());
             txtProjectName.setText("Project Name: " + claimData.getProject());
             txtMeetingType.setText("Meeting Type: " + claimData.getMeeting());
@@ -112,7 +114,7 @@ public class ApproveClaimDetailsFragment extends Fragment {
                             .setPositiveButton("Close", (dialog1, which) -> dialog1.dismiss())
                             .create();
 
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                    Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.WHITE));
                     dialog.show();
                 }
             }

@@ -7,11 +7,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import app.xedigital.ai.api.APIClient;
-import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.branch.UserBranchResponse;
-import app.xedigital.ai.model.dcrData.DcrDataResponse;
-import app.xedigital.ai.model.user.UserModelResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,7 +14,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import okhttp3.ResponseBody;
+import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.branch.UserBranchResponse;
+import app.xedigital.ai.model.dcrData.DcrDataResponse;
+import app.xedigital.ai.model.user.UserModelResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -127,6 +126,7 @@ public class TimesheetViewModel extends ViewModel {
                     }
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<UserBranchResponse> call, @NonNull Throwable throwable) {
                 Log.d("BranchData", "onFailure: " + throwable.getMessage());

@@ -2,187 +2,187 @@ package app.xedigital.ai.model.regularizeApplied;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Employee{
+public class Employee {
 
-	@SerializedName("joiningType")
-	private String joiningType;
+    @SerializedName("joiningType")
+    private String joiningType;
 
-	@SerializedName("firstname")
-	private String firstname;
+    @SerializedName("firstname")
+    private String firstname;
 
-	@SerializedName("isVerified")
-	private boolean isVerified;
+    @SerializedName("isVerified")
+    private boolean isVerified;
 
-	@SerializedName("shift")
-	private String shift;
+    @SerializedName("shift")
+    private String shift;
 
-	@SerializedName("joiningDate")
-	private String joiningDate;
+    @SerializedName("joiningDate")
+    private String joiningDate;
 
-	@SerializedName("employeeCode")
-	private String employeeCode;
+    @SerializedName("employeeCode")
+    private String employeeCode;
 
-	@SerializedName("createdAt")
-	private String createdAt;
+    @SerializedName("createdAt")
+    private String createdAt;
 
-	@SerializedName("contact")
-	private String contact;
+    @SerializedName("contact")
+    private String contact;
 
-	@SerializedName("__v")
-	private int v;
+    @SerializedName("__v")
+    private int v;
 
-	@SerializedName("isHROrAdmin")
-	private boolean isHROrAdmin;
+    @SerializedName("isHROrAdmin")
+    private boolean isHROrAdmin;
 
-	@SerializedName("company")
-	private String company;
+    @SerializedName("company")
+    private String company;
 
-	@SerializedName("department")
-	private String department;
+    @SerializedName("department")
+    private String department;
 
-	@SerializedName("profileImageUrl")
-	private String profileImageUrl;
+    @SerializedName("profileImageUrl")
+    private String profileImageUrl;
 
-	@SerializedName("email")
-	private String email;
+    @SerializedName("email")
+    private String email;
 
-	@SerializedName("updatedAt")
-	private String updatedAt;
+    @SerializedName("updatedAt")
+    private String updatedAt;
 
-	@SerializedName("reportingManager")
-	private String reportingManager;
+    @SerializedName("reportingManager")
+    private String reportingManager;
 
-	@SerializedName("level")
-	private String level;
+    @SerializedName("level")
+    private String level;
 
-	@SerializedName("active")
-	private boolean active;
+    @SerializedName("active")
+    private boolean active;
 
-	@SerializedName("dateOfBirth")
-	private String dateOfBirth;
+    @SerializedName("dateOfBirth")
+    private String dateOfBirth;
 
-	@SerializedName("lastname")
-	private String lastname;
+    @SerializedName("lastname")
+    private String lastname;
 
-	@SerializedName("employeeType")
-	private String employeeType;
+    @SerializedName("employeeType")
+    private String employeeType;
 
-	@SerializedName("partner")
-	private String partner;
+    @SerializedName("partner")
+    private String partner;
 
-	@SerializedName("grade")
-	private String grade;
+    @SerializedName("grade")
+    private String grade;
 
-	@SerializedName("_id")
-	private String id;
+    @SerializedName("_id")
+    private String id;
 
-	@SerializedName("designation")
-	private String designation;
+    @SerializedName("designation")
+    private String designation;
 
-	@SerializedName("fullname")
-	private String fullname;
+    @SerializedName("fullname")
+    private String fullname;
 
-	public String getJoiningType(){
-		return joiningType;
-	}
+    public String getJoiningType() {
+        return joiningType;
+    }
 
-	public String getFirstname(){
-		return firstname;
-	}
+    public String getFirstname() {
+        return firstname;
+    }
 
-	public boolean isIsVerified(){
-		return isVerified;
-	}
+    public boolean isIsVerified() {
+        return isVerified;
+    }
 
-	public String getShift(){
-		return shift;
-	}
+    public String getShift() {
+        return shift;
+    }
 
-	public String getJoiningDate(){
-		return joiningDate;
-	}
+    public String getJoiningDate() {
+        return joiningDate;
+    }
 
-	public String getEmployeeCode(){
-		return employeeCode;
-	}
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
 
-	public String getCreatedAt(){
-		return createdAt;
-	}
+    public String getCreatedAt() {
+        return createdAt;
+    }
 
-	public String getContact(){
-		return contact;
-	}
+    public String getContact() {
+        return contact;
+    }
 
-	public int getV(){
-		return v;
-	}
+    public int getV() {
+        return v;
+    }
 
-	public boolean isIsHROrAdmin(){
-		return isHROrAdmin;
-	}
+    public boolean isIsHROrAdmin() {
+        return isHROrAdmin;
+    }
 
-	public String getCompany(){
-		return company;
-	}
+    public String getCompany() {
+        return company;
+    }
 
-	public String getDepartment(){
-		return department;
-	}
+    public String getDepartment() {
+        return department;
+    }
 
-	public String getProfileImageUrl(){
-		return profileImageUrl;
-	}
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
 
-	public String getEmail(){
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getUpdatedAt(){
-		return updatedAt;
-	}
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
 
-	public String getReportingManager(){
-		return reportingManager;
-	}
+    public String getReportingManager() {
+        return reportingManager;
+    }
 
-	public String getLevel(){
-		return level;
-	}
+    public String getLevel() {
+        return level;
+    }
 
-	public boolean isActive(){
-		return active;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
-	public String getDateOfBirth(){
-		return dateOfBirth;
-	}
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
 
-	public String getLastname(){
-		return lastname;
-	}
+    public String getLastname() {
+        return lastname;
+    }
 
-	public String getEmployeeType(){
-		return employeeType;
-	}
+    public String getEmployeeType() {
+        return employeeType;
+    }
 
-	public String getPartner(){
-		return partner;
-	}
+    public String getPartner() {
+        return partner;
+    }
 
-	public String getGrade(){
-		return grade;
-	}
+    public String getGrade() {
+        return grade;
+    }
 
-	public String getId(){
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getDesignation(){
-		return designation;
-	}
+    public String getDesignation() {
+        return designation;
+    }
 
-	public String getFullname(){
-		return fullname;
-	}
+    public String getFullname() {
+        return fullname;
+    }
 }

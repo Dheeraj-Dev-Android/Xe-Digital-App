@@ -38,6 +38,7 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
 
     private ProgressBar loadingProgress;
     private LinearLayout emptyStateContainer;
+
     public void onFilterApplied(String startDate, String endDate) {
         dcrViewModel.fetchEmployeeDcr(startDate, endDate);
     }

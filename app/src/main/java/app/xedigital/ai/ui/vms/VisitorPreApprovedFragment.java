@@ -264,8 +264,6 @@ public class VisitorPreApprovedFragment extends Fragment {
             request.setIsPreApproved(true);
             request.setType("create");
 //            request.setIsProfileImageDetailFound(false);
-//
-//
 //            FaceData faceData = new FaceData();
 //            Face face = new Face();
 //            BoundingBox boundingBox = new BoundingBox();
@@ -274,7 +272,6 @@ public class VisitorPreApprovedFragment extends Fragment {
 //            boundingBox.setLeft(0.3498215079307556);
 //            boundingBox.setTop(0.14774657785892487);
 //            face.setBoundingBox(boundingBox);
-//
 //            request.setFaceData(faceData);
 
             APIInterface submitPreApprovedVisitor = APIClient.getInstance().getApi();
@@ -297,7 +294,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                     hideLoader();
                     button.setEnabled(true);
-
                     Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -380,7 +376,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                     if (data.has("Face") && !data.get("Face").isJsonNull()) {
                         requestBody.add("Face", data.get("Face"));
                     }
-
                     return requestBody;
                 }
             }

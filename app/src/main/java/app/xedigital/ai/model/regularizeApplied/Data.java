@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Data{
+public class Data {
 
-	@SerializedName("attendanceRegularizeApplied")
-	private List<AttendanceRegularizeAppliedItem> attendanceRegularizeApplied;
+    @SerializedName("attendanceRegularizeApplied")
+    private List<AttendanceRegularizeAppliedItem> attendanceRegularizeApplied;
 
-	public List<AttendanceRegularizeAppliedItem> getAttendanceRegularizeApplied(){
-		return attendanceRegularizeApplied;
-	}
+    public List<AttendanceRegularizeAppliedItem> getAttendanceRegularizeApplied() {
+        return attendanceRegularizeApplied;
+    }
 }

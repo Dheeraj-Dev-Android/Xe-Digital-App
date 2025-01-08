@@ -71,7 +71,7 @@ public class AppliedLeaveFragment extends Fragment {
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     appliedLeavesResponse = response.body();
-                    Log.d("AppliedLeavesResponse", gson.toJson(appliedLeavesResponse));
+//                    Log.d("AppliedLeavesResponse", gson.toJson(appliedLeavesResponse));
                     List<AppliedLeavesItem> leavesList = appliedLeavesResponse.getData().getAppliedLeaves();
 //                    AppliedLeaveAdapter adapter = new AppliedLeaveAdapter(leavesList);
 //                    recyclerView.setAdapter(adapter);
@@ -125,7 +125,7 @@ public class AppliedLeaveFragment extends Fragment {
 
     public void onChipClicked(View view) {
         // Get the ChipGroup and the clicked chip
-        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
+        ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
 
         // Check the clicked chip

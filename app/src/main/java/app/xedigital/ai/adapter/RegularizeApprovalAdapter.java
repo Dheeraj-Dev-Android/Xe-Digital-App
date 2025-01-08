@@ -82,7 +82,7 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
                 AttendanceRegularizeAppliedItem appliedAttendanceItem = items.get(position);
                 String attendanceId = appliedAttendanceItem.getId();
 
-                if (appliedAttendanceItem != null && attendanceId != null) {
+                if (attendanceId != null) {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(ARG_ATTENDANCE_ID, appliedAttendanceItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment, bundle);

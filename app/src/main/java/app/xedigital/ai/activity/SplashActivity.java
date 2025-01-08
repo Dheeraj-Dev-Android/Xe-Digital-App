@@ -24,20 +24,17 @@ import app.xedigital.ai.utills.NetworkUtils;
 
 public class SplashActivity extends AppCompatActivity {
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
-
-    private AlertDialog noInternetDialog;
     private final boolean isShowingNoInternetDialog = false;
-    private AlertDialog slowNetworkDialog;
     private final boolean isShowingSlowNetworkDialog = false;
+    private AlertDialog noInternetDialog;
+    private AlertDialog slowNetworkDialog;
     private LottieAnimationView noInternetAnimation;
-//    private LottieAnimationView particleAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         noInternetAnimation = findViewById(R.id.noInternetAnimation);
-//        particleAnimation = findViewById(R.id.particleAnimation);
 
 
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
@@ -54,7 +51,6 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(mainIntent);
                 finish();
             } else {
-//                showNoInternetAlert();
                 showNoInternetLayout();
             }
         }, 3000);
@@ -70,26 +66,21 @@ public class SplashActivity extends AppCompatActivity {
     public void showNoInternetLayout() {
         findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
         noInternetAnimation.playAnimation();
-//        particleAnimation.playAnimation();
     }
 
     public void hideNoInternetLayout() {
         findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
         noInternetAnimation.pauseAnimation();
-//        particleAnimation.pauseAnimation();
     }
 
     public void showSlowInternetLayout() {
         findViewById(R.id.slowInternetLayout).setVisibility(View.VISIBLE);
         noInternetAnimation.playAnimation();
-//        particleAnimation.playAnimation();
-
     }
 
     public void hideSlowInternetLayout() {
         findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
         noInternetAnimation.pauseAnimation();
-//        particleAnimation.pauseAnimation();
     }
 
     @Override
@@ -127,7 +118,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void onOpenSettingsButtonClicked(View view) {
-        // Code to open network settings
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 }

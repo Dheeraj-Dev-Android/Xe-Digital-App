@@ -2,44 +2,44 @@ package app.xedigital.ai.model.leaves;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LeavesItem{
+public class LeavesItem {
 
-	@SerializedName("leavetype")
-	private String leavetype;
+    @SerializedName("leavetype")
+    private String leavetype;
 
-	@SerializedName("assignDate")
-	private String assignDate;
+    @SerializedName("assignDate")
+    private String assignDate;
 
-	@SerializedName("creditLeave")
+    @SerializedName("creditLeave")
     private float creditLeave;
 
-	@SerializedName("debitLeave")
-	private float debitLeave;
+    @SerializedName("debitLeave")
+    private float debitLeave;
 
-	@SerializedName("_id")
-	private String id;
+    @SerializedName("_id")
+    private String id;
 
-	@SerializedName("usedLeave")
-	private float usedLeave;
+    @SerializedName("usedLeave")
+    private float usedLeave;
 
-	@SerializedName("openingLeave")
-	private int openingLeave;
+    @SerializedName("openingLeave")
+    private int openingLeave;
 
-	public String getLeavetype(){
-		return leavetype;
-	}
+    public String getLeavetype() {
+        return leavetype;
+    }
 
-	public String getAssignDate(){
-		return assignDate;
-	}
+    public String getAssignDate() {
+        return assignDate;
+    }
 
     public float getCreditLeave() {
-		return creditLeave;
-	}
+        return creditLeave;
+    }
 
-	public float getDebitLeave(){
-		return debitLeave;
-	}
+    public float getDebitLeave() {
+        return debitLeave;
+    }
 //	public Object getDebitLeaveAsObject() {
 //		if (debitLeave % 1 == 0) {
 //			return (int) debitLeave; // If it's a whole number, return as int
@@ -48,17 +48,17 @@ public class LeavesItem{
 //		}
 //	}
 
-	public String getId(){
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public float getUsedLeave(){
-		return usedLeave;
-	}
+    public float getUsedLeave() {
+        return usedLeave;
+    }
 
-	public int getOpeningLeave(){
-		return openingLeave;
-	}
+    public int getOpeningLeave() {
+        return openingLeave;
+    }
 
 
 }

@@ -45,7 +45,7 @@ public class CrossFMApprovalFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
     private CrossManagerLeaveApprovalAdapter crossManagerLeaveApprovalAdapter;
-    private CMLeavePendingResponse cmLeavePendingApprovalResponse; // Make this a member variable
+    private CMLeavePendingResponse cmLeavePendingApprovalResponse;
     private LinearLayout emptyStateView;
     private Button retryButton;
 
@@ -74,9 +74,8 @@ public class CrossFMApprovalFragment extends Fragment {
         userId = sharedPreferences.getString("userId", "");
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchPendingLeaves());
+        swipeRefreshLayout.setOnRefreshListener(this::fetchPendingLeaves);
         retryButton.setOnClickListener(v -> fetchPendingLeaves());
-
         fetchPendingLeaves();
 
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
@@ -113,7 +112,6 @@ public class CrossFMApprovalFragment extends Fragment {
         ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
 
-        // Check the clicked chip
         chipGroup.check(clickedChip.getId());
     }
 

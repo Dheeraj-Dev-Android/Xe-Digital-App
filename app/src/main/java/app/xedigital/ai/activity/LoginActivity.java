@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -92,13 +91,13 @@ public class LoginActivity extends AppCompatActivity {
                     if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
                         getIntent().putExtra("userId", loginResponse.getData().getUser().getId());
                         getIntent().putExtra("authToken", loginResponse.getData().getToken());
-                        getIntent().putExtra("empEmail",loginResponse.getData().getUser().getEmail());
+                        getIntent().putExtra("empEmail", loginResponse.getData().getUser().getEmail());
 
                         String userId = loginResponse.getData().getUser().getId();
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
 
-                        Log.w(TAG, "User ID: " + userId+"empEmail"+empEmail);
+//                        Log.w(TAG, "User ID: " + userId+"empEmail"+empEmail);
 
                         storeInSharedPreferences(userId, authToken, empEmail);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -125,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userId", userId);
         editor.putString("authToken", authToken);
-        editor.putString("empEmail",empEmail);
+        editor.putString("empEmail", empEmail);
         editor.apply();
 
     }

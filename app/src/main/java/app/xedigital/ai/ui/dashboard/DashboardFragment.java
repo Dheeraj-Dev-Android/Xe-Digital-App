@@ -66,6 +66,7 @@ public class DashboardFragment extends Fragment {
     private ProgressBar loader;
     private PieChart leavePieChart;
     private FragmentDashboardBinding binding;
+//    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
@@ -137,6 +138,14 @@ public class DashboardFragment extends Fragment {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+//        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
+//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                fetchData();
+//            }
+//        });
 
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -216,7 +225,6 @@ public class DashboardFragment extends Fragment {
                 empContact = employee.getContact();
                 empDesignation = employee.getDesignation();
 
-
                 binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
                 binding.tvEmployeeDesignationValue.setText(empDesignation);
 
@@ -226,7 +234,7 @@ public class DashboardFragment extends Fragment {
                 if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
                     String shiftTimeString = startTime + " - " + endTime;
                     binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
-                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
+//                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
                 } else {
                     binding.tvEmployeeShift.setText("N/A");
                 }
@@ -251,7 +259,7 @@ public class DashboardFragment extends Fragment {
 
             } else {
                 // Handle the case where employee data is null
-                Log.e("DashboardFragment", "Employee data is null");
+//                Log.e("DashboardFragment", "Employee data is null");
                 binding.tvEmployeeNameValue.setText("N/A");
                 binding.tvEmployeeDesignationValue.setText("N/A");
                 binding.tvEmployeeShiftValue.setText("N/A");
@@ -261,7 +269,7 @@ public class DashboardFragment extends Fragment {
             }
             // Check if other data is loaded as well
             if (attendanceViewModel.attendance.getValue() != null && leavesViewModel.leavesData.getValue() != null) {
-                loader.setVisibility(View.GONE); // Hide the loader when all data is loaded
+                loader.setVisibility(View.GONE);
             }
         });
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
@@ -302,26 +310,24 @@ public class DashboardFragment extends Fragment {
             }
             // Check if other data is loaded as well
             if (profileViewModel.userProfile.getValue() != null && leavesViewModel.leavesData.getValue() != null) {
-                loader.setVisibility(View.GONE); // Hide the loader when all data is loaded
+                loader.setVisibility(View.GONE);
             }
         });
 
 //        To show leave Chart here
-//        loader.setVisibility(View.VISIBLE);
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
-//            loader.setVisibility(View.GONE);
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {
 //                    binding.leavePieChart.setVisibility(View.GONE);
-                    Log.e("DashboardFragment", "No leaves data available");
+//                    Log.e("DashboardFragment", "No leaves data available");
                 } else {
                     binding.leavePieChart.setVisibility(View.VISIBLE);
                     updatePieChartData(binding.leavePieChart, leaves);
                 }
             } else {
 //                binding.leavePieChart.setVisibility(View.GONE);
-                Log.e("DashboardFragment", "No leaves data available");
+//                Log.e("DashboardFragment", "No leaves data available");
             }
             // Check if other data is loaded as well
             if (profileViewModel.userProfile.getValue() != null && attendanceViewModel.attendance.getValue() != null) {

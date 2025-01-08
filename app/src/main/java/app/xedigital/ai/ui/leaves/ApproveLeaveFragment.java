@@ -73,7 +73,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
         setHasOptionsMenu(true);
 
-
         approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
@@ -124,7 +123,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
 
-        // Check the clicked chip
         chipGroup.check(clickedChip.getId());
     }
 
@@ -224,12 +222,7 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
             filterBottomSheetDialogFragment.setFilterLeaveApprovalListener(this);
             filterBottomSheetDialogFragment.show(getParentFragmentManager(), filterBottomSheetDialogFragment.getTag());
             return true;
-//        } else if (item.getItemId() == R.id.action_cross_manager) {
-//            NavController navController = Navigation.findNavController(view);
-//            navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
-//            Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
-//            return true;
-//        }
+
         } else if (item.getItemId() == R.id.action_cross_manager) {
             NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);

@@ -2,131 +2,131 @@ package app.xedigital.ai.model.regularizeApplied;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Shift{
+public class Shift {
 
-	@SerializedName("shiftType")
-	private String shiftType;
+    @SerializedName("shiftType")
+    private String shiftType;
 
-	@SerializedName("fromHour")
-	private int fromHour;
+    @SerializedName("fromHour")
+    private int fromHour;
 
-	@SerializedName("fromMinutes")
-	private int fromMinutes;
+    @SerializedName("fromMinutes")
+    private int fromMinutes;
 
-	@SerializedName("format")
-	private int format;
+    @SerializedName("format")
+    private int format;
 
-	@SerializedName("active")
-	private boolean active;
+    @SerializedName("active")
+    private boolean active;
 
-	@SerializedName("toHour")
-	private int toHour;
+    @SerializedName("toHour")
+    private int toHour;
 
-	@SerializedName("createdAt")
-	private String createdAt;
+    @SerializedName("createdAt")
+    private String createdAt;
 
-	@SerializedName("toMinutes")
-	private int toMinutes;
+    @SerializedName("toMinutes")
+    private int toMinutes;
 
-	@SerializedName("createdBy")
-	private String createdBy;
+    @SerializedName("createdBy")
+    private String createdBy;
 
-	@SerializedName("__v")
-	private int v;
+    @SerializedName("__v")
+    private int v;
 
-	@SerializedName("name")
-	private String name;
+    @SerializedName("name")
+    private String name;
 
-	@SerializedName("startTime")
-	private String startTime;
+    @SerializedName("startTime")
+    private String startTime;
 
-	@SerializedName("comment")
-	private String comment;
+    @SerializedName("comment")
+    private String comment;
 
-	@SerializedName("company")
-	private String company;
+    @SerializedName("company")
+    private String company;
 
-	@SerializedName("_id")
-	private String id;
+    @SerializedName("_id")
+    private String id;
 
-	@SerializedName("endTime")
-	private String endTime;
+    @SerializedName("endTime")
+    private String endTime;
 
-	@SerializedName("timeWaiver")
-	private int timeWaiver;
+    @SerializedName("timeWaiver")
+    private int timeWaiver;
 
-	@SerializedName("updatedAt")
-	private String updatedAt;
+    @SerializedName("updatedAt")
+    private String updatedAt;
 
-	public String getShiftType(){
-		return shiftType;
-	}
+    public String getShiftType() {
+        return shiftType;
+    }
 
-	public int getFromHour(){
-		return fromHour;
-	}
+    public int getFromHour() {
+        return fromHour;
+    }
 
-	public int getFromMinutes(){
-		return fromMinutes;
-	}
+    public int getFromMinutes() {
+        return fromMinutes;
+    }
 
-	public int getFormat(){
-		return format;
-	}
+    public int getFormat() {
+        return format;
+    }
 
-	public boolean isActive(){
-		return active;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
-	public int getToHour(){
-		return toHour;
-	}
+    public int getToHour() {
+        return toHour;
+    }
 
-	public String getCreatedAt(){
-		return createdAt;
-	}
+    public String getCreatedAt() {
+        return createdAt;
+    }
 
-	public int getToMinutes(){
-		return toMinutes;
-	}
+    public int getToMinutes() {
+        return toMinutes;
+    }
 
-	public String getCreatedBy(){
-		return createdBy;
-	}
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-	public int getV(){
-		return v;
-	}
+    public int getV() {
+        return v;
+    }
 
-	public String getName(){
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getStartTime(){
-		return startTime;
-	}
+    public String getStartTime() {
+        return startTime;
+    }
 
-	public String getComment(){
-		return comment;
-	}
+    public String getComment() {
+        return comment;
+    }
 
-	public String getCompany(){
-		return company;
-	}
+    public String getCompany() {
+        return company;
+    }
 
-	public String getId(){
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getEndTime(){
-		return endTime;
-	}
+    public String getEndTime() {
+        return endTime;
+    }
 
-	public int getTimeWaiver(){
-		return timeWaiver;
-	}
+    public int getTimeWaiver() {
+        return timeWaiver;
+    }
 
-	public String getUpdatedAt(){
-		return updatedAt;
-	}
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
 }

@@ -16,35 +16,35 @@ public class ReportingManager {
     @SerializedName("lastname")
     private String lastname;
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
     public String getFirstname() {
         return firstname;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getLastname() {
         return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 }

@@ -1,14 +1,15 @@
 package app.xedigital.ai.model.regularizeList;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class Data{
+import java.util.List;
 
-	@SerializedName("attendanceRegularizeApplied")
-	private List<AttendanceRegularizeAppliedItem> attendanceRegularizeApplied;
+public class Data {
 
-	public List<AttendanceRegularizeAppliedItem> getAttendanceRegularizeApplied(){
-		return attendanceRegularizeApplied;
-	}
+    @SerializedName("attendanceRegularizeApplied")
+    private List<AttendanceRegularizeAppliedItem> attendanceRegularizeApplied;
+
+    public List<AttendanceRegularizeAppliedItem> getAttendanceRegularizeApplied() {
+        return attendanceRegularizeApplied;
+    }
 }

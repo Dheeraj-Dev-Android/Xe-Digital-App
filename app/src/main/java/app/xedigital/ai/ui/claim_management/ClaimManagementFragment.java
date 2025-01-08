@@ -73,11 +73,11 @@ public class ClaimManagementFragment extends Fragment {
     private static final String TAG = "LeavesFragment";
     private final List<Uri> processedFiles = new ArrayList<>();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final List<Uri> selectedFiles = new ArrayList<>();
     private FragmentClaimManagementBinding binding;
     private ClaimManagementViewModel claimManagementViewModel;
     private Calendar calendar;
     private SimpleDateFormat dateFormatter;
-    private final List<Uri> selectedFiles = new ArrayList<>();
     private ActivityResultLauncher<Intent> filePickerLauncher;
     private LinearLayout selectedFilesContainer;
     private TextView underProcessText, selectedEmpTransport;
@@ -218,9 +218,7 @@ public class ClaimManagementFragment extends Fragment {
             }
         });
 
-        binding.viewClaimChip.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_nav_claim_management_to_nav_view_claim);
-        });
+        binding.viewClaimChip.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_nav_claim_management_to_nav_view_claim));
         binding.approveClaimChip.setOnClickListener(v -> {
             Navigation.findNavController(v).navigate(R.id.action_nav_claim_management_to_nav_approve_claim);
             Toast.makeText(requireContext(), "Approve Claim", Toast.LENGTH_SHORT).show();

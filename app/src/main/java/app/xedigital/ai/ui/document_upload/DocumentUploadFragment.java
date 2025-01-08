@@ -217,7 +217,7 @@ public class DocumentUploadFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrl = dataObject.getString("imageUrl");
                                 imageKey = dataObject.getString("imageKey");
-                                Log.d("uploadDocument Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("uploadDocument Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("uploadDocument Response", "Response body is null");

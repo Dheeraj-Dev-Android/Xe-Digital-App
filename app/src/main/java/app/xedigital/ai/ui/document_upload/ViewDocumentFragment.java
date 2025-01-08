@@ -58,9 +58,7 @@ public class ViewDocumentFragment extends Fragment {
         userId = sharedPreferences.getString("userId", "");
         fetchDocuments();
 
-        binding.uploadDocumentsChip.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_nav_documents_to_nav_document_upload);
-        });
+        binding.uploadDocumentsChip.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_nav_documents_to_nav_document_upload));
 
         return root;
     }
@@ -76,7 +74,7 @@ public class ViewDocumentFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String responseBody = response.body().toString();
-                        Log.d("TAG", "onResponse: " + responseBody);
+//                        Log.d("TAG", "onResponse: " + responseBody);
                         List<DocumentsItem> documents = response.body().getData().getDocuments();
                         adapter = new DocumentListAdapter(documents);
                         recyclerView.setAdapter(adapter);

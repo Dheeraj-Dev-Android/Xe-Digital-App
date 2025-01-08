@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -96,12 +97,12 @@ public class AddAttendanceFragment extends Fragment {
 
         btSubmit.setOnClickListener(v -> {
             if (validateForm()) {
-                String date = atDate.getText().toString();
-                String punchIn = timePunchIn.getText().toString();
-                String punchOut = timePunchOut.getText().toString();
-                String punchInAddress = etPunchInAddress.getText().toString();
-                String punchOutAddress = etPunchOutAddress.getText().toString();
-                String remarks = etRemarks.getText().toString();
+                String date = Objects.requireNonNull(atDate.getText()).toString();
+                String punchIn = Objects.requireNonNull(timePunchIn.getText()).toString();
+                String punchOut = Objects.requireNonNull(timePunchOut.getText()).toString();
+                String punchInAddress = Objects.requireNonNull(etPunchInAddress.getText()).toString();
+                String punchOutAddress = Objects.requireNonNull(etPunchOutAddress.getText()).toString();
+                String remarks = Objects.requireNonNull(etRemarks.getText()).toString();
 
                 addAttendance(userId, date, punchIn, punchOut, punchInAddress, punchOutAddress, remarks);
             }
@@ -223,27 +224,27 @@ public class AddAttendanceFragment extends Fragment {
 
     private boolean validateForm() {
         boolean isValid = true;
-        if (atDate.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(atDate.getText()).toString().isEmpty()) {
             atDate.setError("Date is required");
             isValid = false;
         }
-        if (timePunchIn.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(timePunchIn.getText()).toString().isEmpty()) {
             timePunchIn.setError("Punch-in time is required");
             isValid = false;
         }
-        if (timePunchOut.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(timePunchOut.getText()).toString().isEmpty()) {
             timePunchOut.setError("Punch-out time is required");
             isValid = false;
         }
-        if (etPunchInAddress.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(etPunchInAddress.getText()).toString().isEmpty()) {
             etPunchInAddress.setError("Punch-in address is required");
             isValid = false;
         }
-        if (etPunchOutAddress.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(etPunchOutAddress.getText()).toString().isEmpty()) {
             etPunchOutAddress.setError("Punch-out address is required");
             isValid = false;
         }
-        if (etRemarks.getText().toString().isEmpty()) {
+        if (Objects.requireNonNull(etRemarks.getText()).toString().isEmpty()) {
             etRemarks.setError("Remarks is required");
             isValid = false;
         }

@@ -26,27 +26,18 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<UserProfileResponse> _userProfile = new MutableLiveData<>();
     private final APIInterface apiInterface;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-//    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     private final Gson gson;
     public LiveData<UserProfileResponse> userProfile = _userProfile;
     private String userId;
     private String authToken;
 
-    //    public LiveData<UserProfileResponse> getUserProfile(){
-//        return userProfile;
-//    }
     public ProfileViewModel() {
         apiInterface = APIClient.getInstance().getLogin();
         APIInterface apiInterface1 = APIClient.getInstance().getUser();
 
 //        // Initialize Gson with the custom deserializer
-        gson = new GsonBuilder()
-                .registerTypeAdapter(Crossmanager.class, new CrossmanagerTypeAdapter())
-                .setPrettyPrinting()
-                .create();
+        gson = new GsonBuilder().registerTypeAdapter(Crossmanager.class, new CrossmanagerTypeAdapter()).setPrettyPrinting().create();
     }
-
 
     public void storeLoginData(String userId, String authToken) {
         this.userId = userId;
@@ -54,7 +45,7 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public void fetchUserProfile() {
-        Log.d(TAG, "Fetching user profile...");
+//        Log.d(TAG, "Fetching user profile...");
         if (userId != null && authToken != null) {
             new Thread(() -> {
                 String authHeaderValue = "jwt " + authToken;
@@ -66,7 +57,7 @@ public class ProfileViewModel extends ViewModel {
                         if (response.isSuccessful()) {
                             mainHandler.post(() -> _userProfile.setValue(response.body()));
                             String responseJson = gson.toJson(response.body());
-                            Log.d(TAG, "Response JSON: " + responseJson);
+//                            Log.d(TAG, "Response JSON: " + responseJson);
                         } else {
                             Log.e("ProfileViewModel", "Error: userId or authToken is null. Cannot fetch profile.");
                             System.err.println("API Error: " + response.code());
@@ -83,6 +74,5 @@ public class ProfileViewModel extends ViewModel {
             Log.e("ProfileViewModel", "Error: userId or authToken is null. Cannot fetch profile.");
         }
     }
-
 
 }

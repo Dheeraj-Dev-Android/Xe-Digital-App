@@ -174,11 +174,6 @@ public class LeavesFragment extends Fragment {
                 crossFunctionalManagerName = employee.getCrossmanager().getFirstname();
                 crossFunctionalManagerEmail = employee.getCrossmanager().getEmail();
                 crossFunctionalManagerId = employee.getCrossmanager().getId();
-
-//
-//                Log.e(TAG, "userID: " + userId);
-                Log.e(TAG, "employee department: " + empDepartment);
-                Log.e(TAG, "employee department: " + department);
             }
         });
 
@@ -190,7 +185,6 @@ public class LeavesFragment extends Fragment {
                 for (LeavetypesItem leaveType : leaveTypesList) {
                     leaveTypeNames.add(leaveType.getLeavetypeName());
                 }
-
                 ArrayAdapter<String> leaveTypeAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, leaveTypeNames);
                 binding.spinnerLeaveType.setAdapter(leaveTypeAdapter);
 
@@ -199,16 +193,14 @@ public class LeavesFragment extends Fragment {
             }
         });
 
-        binding.btnClear.setOnClickListener(view -> {
-            clearForm();
-        });
+        binding.btnClear.setOnClickListener(view -> clearForm());
         leaveCategorySpinnerFrom.setOnItemClickListener((adapterView, view, position, id) -> {
-            Log.d(TAG, "leaveCategoryFrom selected: " + adapterView.getItemAtPosition(position));
+//            Log.d(TAG, "leaveCategoryFrom selected: " + adapterView.getItemAtPosition(position));
 //            calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
         });
 
         leaveCategorySpinnerTo.setOnItemClickListener((adapterView, view, position, id) -> {
-            Log.d(TAG, "leaveCategoryTo selected: " + adapterView.getItemAtPosition(position));
+//            Log.d(TAG, "leaveCategoryTo selected: " + adapterView.getItemAtPosition(position));
 //            calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
         });
 
@@ -223,7 +215,7 @@ public class LeavesFragment extends Fragment {
                 LeavetypesItem selectedLeaveType = leaveTypesList.get(position);
                 selectedLeaveTypeId = selectedLeaveType.getId();
                 selectedLeaveTypeName = selectedLeaveType.getLeavetypeName();
-                Log.d(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId);
+//                Log.d(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId);
 
                 SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
                 String authTokenN = sharedPreferences.getString("authToken", "");
@@ -294,12 +286,11 @@ public class LeavesFragment extends Fragment {
                     public void onResponse(@NonNull Call<EmployeeLeaveTypeResponse> call, @NonNull Response<EmployeeLeaveTypeResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             EmployeeLeaveTypeResponse employeeLeaveResponse = response.body();
-                            Log.e(TAG, "Employee Leave: " + employeeLeaveResponse);
-
+//                            Log.e(TAG, "Employee Leave: " + employeeLeaveResponse);
                             balanceLeave = employeeLeaveResponse.getData().getCreditLeave() - (employeeLeaveResponse.getData().getUsedLeave() + employeeLeaveResponse.getData().getDebitLeave());
 
-                            Log.e(TAG, "Balance Leave: " + balanceLeave);
-                            Log.e(TAG, "Selected Leave Type: " + selectedLeaveTypeName);
+//                            Log.e(TAG, "Balance Leave: " + balanceLeave);
+//                            Log.e(TAG, "Selected Leave Type: " + selectedLeaveTypeName);
                             if (!Objects.requireNonNull(binding.etFromDate.getText()).toString().isEmpty() && !binding.etToDate.getText().toString().isEmpty()) {
                                 calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
                             }
@@ -343,7 +334,7 @@ public class LeavesFragment extends Fragment {
                             boolean isRestrictedHoliday = false;
                             for (HolidaysItem holiday : holidaysItems) {
                                 if (holiday.getHolidayDate().equals(selectedDate) && holiday.isIsOptional()) {
-                                    Log.d(TAG, "Selected date is a restricted holiday");
+//                                    Log.d(TAG, "Selected date is a restricted holiday");
                                     isRestrictedHoliday = true;
                                     break;
                                 }
@@ -363,7 +354,6 @@ public class LeavesFragment extends Fragment {
                 });
             }
         });
-
 
         binding.btnSubmit.setOnClickListener(view -> {
 
@@ -386,7 +376,7 @@ public class LeavesFragment extends Fragment {
 
     private void applyLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason) {
         applyLeaveRequest = new ApplyLeaveRequest();
-        Log.d(TAG, "applyLeaveRequest: " + applyLeaveRequest);
+//        Log.d(TAG, "applyLeaveRequest: " + applyLeaveRequest);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
         String appliedDate = formatter.format(Instant.now());
 
@@ -415,16 +405,13 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setReportingManager(reportingManagerEmail);
         applyLeaveRequest.setReportingManagerName(reportingManagerName);
         applyLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
-        if (crossFunctionalManagerName == null || crossFunctionalManagerName.isEmpty() ||
-                crossFunctionalManagerEmail == null || crossFunctionalManagerEmail.isEmpty()) {
-            showAlertDialog1("No Cross-functional Manager",
-                    "No cross-functional manager available. Please contact your Admin Or HR.");
+        if (crossFunctionalManagerName == null || crossFunctionalManagerName.isEmpty() || crossFunctionalManagerEmail == null || crossFunctionalManagerEmail.isEmpty()) {
+            showAlertDialog1();
             return;
         }
         applyLeaveRequest.setCrossManager(crossFunctionalManagerId);
         applyLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
         applyLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
-
 
         Call<ResponseBody> applyLeave = APIClient.getInstance().LeavesApply().LeavesApply("jwt " + authToken, applyLeaveRequest);
 
@@ -435,14 +422,14 @@ public class LeavesFragment extends Fragment {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
-                        Log.d(TAG, "Response: " + responseBody);
+//                        Log.d(TAG, "Response: " + responseBody);
                         if (!Objects.equals(selectedLeaveTypeId, "617135e82027d64869450a79")) {
                             debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
                         }
 
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
-                        Log.d(TAG, "Message: " + message);
+//                        Log.d(TAG, "Message: " + message);
                         clearForm();
                         showAlertDialog("Leave Applied", message);
                     } else {
@@ -473,9 +460,9 @@ public class LeavesFragment extends Fragment {
 
     }
 
-    private void showAlertDialog1(String title, String message) {
+    private void showAlertDialog1() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle(title).setMessage(message).setPositiveButton("OK", (dialog, which) -> {
+        builder.setTitle("No Cross-functional Manager").setMessage("No cross-functional manager available. Please contact your Admin Or HR.").setPositiveButton("OK", (dialog, which) -> {
             clearForm();
             dialog.dismiss();
         }).show();
@@ -525,10 +512,10 @@ public class LeavesFragment extends Fragment {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
-                        Log.d(TAG, "Debit Response: " + responseBody);
+//                        Log.d(TAG, "Debit Response: " + responseBody);
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
-                        Log.d(TAG, "Message: " + message);
+//                        Log.d(TAG, "Message: " + message);
                         clearForm();
                     } else {
                         Log.e(TAG, "Debit Error: " + response.code());
@@ -544,8 +531,7 @@ public class LeavesFragment extends Fragment {
                 Log.e(TAG, "onFailure: " + throwable.getMessage());
             }
         });
-        Log.d(TAG, "debitLeaveRequest: " + debitLeaveRequest);
-
+//        Log.d(TAG, "debitLeaveRequest: " + debitLeaveRequest);
 
     }
 
@@ -577,7 +563,7 @@ public class LeavesFragment extends Fragment {
 //                    Log.d(TAG, "Response: " + responseJson);
                     String branchId = userResponse.getData().getBranch().getId();
                     callBranchApi(branchId, authToken);
-                    Log.d(TAG, "Branch ID: " + branchId);
+//                    Log.d(TAG, "Branch ID: " + branchId);
                 }
             }
 
@@ -599,7 +585,7 @@ public class LeavesFragment extends Fragment {
                         UserBranchResponse responseBranch = response.body();
                         String responseString = gson.toJson(responseBranch);
                         hrMail = responseBranch.getData().getBranch().getNotificationEmail();
-                        Log.d("BranchData", "Notification Email: " + hrMail);
+//                        Log.d("BranchData", "Notification Email: " + hrMail);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -631,7 +617,7 @@ public class LeavesFragment extends Fragment {
         String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
         String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
 
-        Log.w(TAG, "fromDate: " + fromDate + ", toDate: " + toDate + ", leaveCategoryFrom: " + leaveCategoryFrom + ", leaveCategoryTo: " + leaveCategoryTo);
+//        Log.w(TAG, "fromDate: " + fromDate + ", toDate: " + toDate + ", leaveCategoryFrom: " + leaveCategoryFrom + ", leaveCategoryTo: " + leaveCategoryTo);
 
         if (!fromDate.isEmpty() && !toDate.isEmpty() && !leaveCategoryFrom.isEmpty() && !leaveCategoryTo.isEmpty()) {
             long totalDaysInDateRange = calculateTotalDays(fromDate, toDate);
@@ -645,8 +631,7 @@ public class LeavesFragment extends Fragment {
                 totalDays = totalDaysInDateRange;
             }
             finalUsedDays(totalDays);
-            Log.d(TAG, "Calculated totalDays: " + totalDays + "balanceLeave : " + balanceLeave);
-
+//            Log.d(TAG, "Calculated totalDays: " + totalDays + "balanceLeave : " + balanceLeave);
             if (totalDays > balanceLeave && selectedLeaveTypeName != null && !selectedLeaveTypeName.equals("Loss of Pay (LOP) / Leave Without Pay (LWP)")) {
                 showLeaveLimitExceededAlert();
             }
@@ -665,7 +650,7 @@ public class LeavesFragment extends Fragment {
         } else if (leaveCategoryFrom.equals("Second Half Day") && leaveCategoryTo.equals("Second Half Day")) {
             finalUsedDays -= 0.5;
         }
-        Log.e(TAG, "finalUsedDays: " + finalUsedDays);
+//        Log.e(TAG, "finalUsedDays: " + finalUsedDays);
 
     }
 
@@ -704,6 +689,7 @@ public class LeavesFragment extends Fragment {
                 showErrorAlert("Please select correct dates.");
                 return false;
             }
+            assert fromDate != null;
             if (fromDate.after(toDate)) {
                 showErrorAlert("Please select correct dates.");
                 return false;
@@ -731,10 +717,11 @@ public class LeavesFragment extends Fragment {
                 Date toDate = dateFormat.parse(toDateText);
                 Date today = dateFormat.parse(dateFormat.format(new Date()));
                 long totalDays = calculateTotalDays(fromDateText, toDateText);
-                Log.w("LeavesFragment", "totalDays " + totalDays);
+//                Log.w("LeavesFragment", "totalDays " + totalDays);
 
                 if (selectedLeaveType.equals("Sick Leave")) {
                     // For Sick Leave, only check if fromDate is after toDate
+                    assert fromDate != null;
                     if (fromDate.after(toDate)) {
                         showErrorAlert("From date cannot be after To date.");
                     } else {
@@ -742,6 +729,7 @@ public class LeavesFragment extends Fragment {
                     }
                 } else {
                     // For other leave types, apply the usual validation
+                    assert fromDate != null;
                     if (fromDate.after(toDate) || fromDate.before(today)) {
                         showErrorAlert("From date cannot be after To date or before today.");
                     } else {
@@ -765,7 +753,7 @@ public class LeavesFragment extends Fragment {
         String selectedLeaveType = binding.spinnerLeaveType.getText().toString();
         long todayInMillis = MaterialDatePicker.todayInUtcMilliseconds();
         long oneDayBeforeInMillis = todayInMillis - (24 * 60 * 60 * 1000);
-        Log.d("LeavesFragment", "oneDayBeforeInMillis " + oneDayBeforeInMillis);
+//        Log.d("LeavesFragment", "oneDayBeforeInMillis " + oneDayBeforeInMillis);
 
 
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
