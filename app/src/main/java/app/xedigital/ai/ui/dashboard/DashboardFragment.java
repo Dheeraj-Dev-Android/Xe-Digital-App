@@ -59,6 +59,7 @@ public class DashboardFragment extends Fragment {
     private Handler handler;
     private Runnable runnable;
     private ProgressBar loader;
+    private View blurOverlay;
     private PieChart leavePieChart;
     private FragmentDashboardBinding binding;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
@@ -66,6 +67,16 @@ public class DashboardFragment extends Fragment {
     private boolean isProfileDataLoaded = false;
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
+
+    private void showLoaderWithBlur() {
+        blurOverlay.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoaderWithBlur() {
+        blurOverlay.setVisibility(View.GONE);
+        loader.setVisibility(View.GONE);
+    }
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
@@ -100,14 +111,11 @@ public class DashboardFragment extends Fragment {
             return;
         }
 
-        // Create a color map for leave types
         Map<String, Integer> leaveTypeColors = new HashMap<>();
         leaveTypeColors.put("Casual Leave", Color.BLUE);
         leaveTypeColors.put("Sick Leave", Color.RED);
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
-        // Add more leave types and colors as needed
 
-        // Create a list of colors for the pie chart slices
         List<Integer> colors = new ArrayList<>();
         for (PieEntry entry : entries) {
             String leaveType = entry.getLabel();
@@ -166,6 +174,11 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Initialize blur overlay and loader
+        blurOverlay = view.findViewById(R.id.blurOverlay);
+        loader = view.findViewById(R.id.loader);
+
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
@@ -189,8 +202,7 @@ public class DashboardFragment extends Fragment {
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesData();
 
-        loader = view.findViewById(R.id.loader);
-        loader.setVisibility(View.VISIBLE);
+        showLoaderWithBlur();
 
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
@@ -198,7 +210,7 @@ public class DashboardFragment extends Fragment {
             public void run() {
                 Date currentDate = new Date();
                 String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault()); // Added seconds here
+                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault());
                 String currentTimeString = timeFormat.format(currentDate);
                 binding.todayDate.setText(todayDateString + " - " + currentTimeString);
 
@@ -220,13 +232,11 @@ public class DashboardFragment extends Fragment {
                 binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
                 binding.tvEmployeeDesignationValue.setText(empDesignation);
 
-                // Handling shift time
                 String startTime = employee.getShift().getStartTime();
                 String endTime = employee.getShift().getEndTime();
                 if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
                     String shiftTimeString = startTime + " - " + endTime;
                     binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
-//                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
                 } else {
                     binding.tvEmployeeShift.setText("N/A");
                 }
@@ -239,29 +249,26 @@ public class DashboardFragment extends Fragment {
                     binding.tvEmployeeEmailValue.setText("");
                 }
 
-                // Load Profile image
                 Object profileImageUrl = employee.getProfileImageUrl();
                 ImageView profileImage = binding.ivEmployeeProfile;
 
                 if (profileImageUrl != null) {
-                    Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
+                    Glide.with(requireContext())
+                            .load(profileImageUrl)
+                            .circleCrop()
+                            .into(profileImage)
+                            .onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
                 } else {
                     profileImage.setImageResource(R.mipmap.ic_default_profile);
                 }
 
             } else {
-                // Handle the case where employee data is null
-//                Log.e("DashboardFragment", "Employee data is null");
                 binding.tvEmployeeNameValue.setText("N/A");
                 binding.tvEmployeeDesignationValue.setText("N/A");
                 binding.tvEmployeeShiftValue.setText("N/A");
                 binding.tvEmployeeContactValue.setText("N/A");
                 binding.tvEmployeeEmailValue.setText("N/A");
                 binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
-            }
-            // Check if other data is loaded as well
-            if (attendanceViewModel.attendance.getValue() != null && leavesViewModel.leavesData.getValue() != null) {
-                loader.setVisibility(View.GONE);
             }
 
             isProfileDataLoaded = true;
@@ -274,19 +281,19 @@ public class DashboardFragment extends Fragment {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String currentDate = dateFormat.format(new Date());
 
-                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
-                        try {
-                            SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                            Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
-                            String formattedPunchDate = dateFormat.format(punchDate);
-                            return formattedPunchDate.equals(currentDate);
-                        } catch (androidx.core.net.ParseException | ParseException e) {
-                            e.printStackTrace();
-                            return false;
-                        }
-                    }).collect(Collectors.toList());
+                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream()
+                            .filter(punchData -> {
+                                try {
+                                    SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                    Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
+                                    String formattedPunchDate = dateFormat.format(punchDate);
+                                    return formattedPunchDate.equals(currentDate);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    return false;
+                                }
+                            }).collect(Collectors.toList());
 
-                    // Update UI on the main thread
                     requireActivity().runOnUiThread(() -> {
                         if (!currentPunchData.isEmpty()) {
                             punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
@@ -303,10 +310,6 @@ public class DashboardFragment extends Fragment {
                 binding.tvPunchInTime.setText("Punch In: --:--");
                 binding.tvPunchOutTime.setText("Punch Out: --:--");
             }
-            // Check if other data is loaded as well
-            if (profileViewModel.userProfile.getValue() != null && leavesViewModel.leavesData.getValue() != null) {
-                loader.setVisibility(View.GONE);
-            }
 
             isAttendanceDataLoaded = true;
             checkAllDataLoaded();
@@ -316,28 +319,21 @@ public class DashboardFragment extends Fragment {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {
-//                    binding.leavePieChart.setVisibility(View.GONE);
                     Log.e("DashboardFragment", "No leaves data available");
-
                 } else {
                     binding.leavePieChart.setVisibility(View.VISIBLE);
                     updatePieChartData(binding.leavePieChart, leaves);
                 }
             } else {
-//                binding.leavePieChart.setVisibility(View.GONE);
                 Log.e("DashboardFragment", "No leaves data available");
             }
-            // Check if other data is loaded as well
-            if (profileViewModel.userProfile.getValue() != null && attendanceViewModel.attendance.getValue() != null) {
-                loader.setVisibility(View.GONE);
-            }
+
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
         });
     }
-
     private void fetchData() {
-        loader.setVisibility(View.VISIBLE);
+        showLoaderWithBlur();
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
         leavesViewModel.fetchLeavesData();
         swipeRefreshLayout.setRefreshing(false);
@@ -346,7 +342,7 @@ public class DashboardFragment extends Fragment {
     // Check if all data is loaded and update the loader visibility
     private void checkAllDataLoaded() {
         if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
-            loader.setVisibility(View.GONE);
+            hideLoaderWithBlur();
         }
     }
 
