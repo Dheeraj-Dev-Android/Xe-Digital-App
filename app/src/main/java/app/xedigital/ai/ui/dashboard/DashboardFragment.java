@@ -52,13 +52,8 @@ import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class DashboardFragment extends Fragment {
-    public String employeeName;
-    public String employeeEmail;
-    public String employeeLastName;
-    public String empContact;
-    public String empDesignation;
-    public String punchIn;
-    public String punchOut;
+    public String employeeName, employeeLastName, employeeEmail, empContact, empDesignation;
+    public String punchIn, punchOut;
     public AttendanceViewModel attendanceViewModel;
     public LeavesViewModel leavesViewModel;
     private Handler handler;
@@ -66,7 +61,11 @@ public class DashboardFragment extends Fragment {
     private ProgressBar loader;
     private PieChart leavePieChart;
     private FragmentDashboardBinding binding;
-//    private SwipeRefreshLayout swipeRefreshLayout;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
+    private String startDateString, endDateString;
+    private boolean isProfileDataLoaded = false;
+    private boolean isAttendanceDataLoaded = false;
+    private boolean isLeavesDataLoaded = false;
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
@@ -139,13 +138,8 @@ public class DashboardFragment extends Fragment {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-//        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
-//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                fetchData();
-//            }
-//        });
+        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this::fetchData);
 
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -165,6 +159,7 @@ public class DashboardFragment extends Fragment {
             }
             startActivity(intent);
         });
+
         return root;
     }
 
@@ -174,22 +169,21 @@ public class DashboardFragment extends Fragment {
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
-        getContext();
+
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
         String userId = sharedPreferences.getString("userId", "");
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
 
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
+
         Calendar calendar = Calendar.getInstance();
-        // Get current date for endDate
         Date endDate = calendar.getTime();
-        String endDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(endDate);
-        // Calculate startDate (30 days before endDate)
-        calendar.setTime(endDate);
+        endDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(endDate);
         calendar.add(Calendar.DAY_OF_MONTH, -30);
         Date startDate = calendar.getTime();
-        String startDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(startDate);
+        startDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(startDate);
         attendanceViewModel.storeLoginData(authToken);
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
         leavesViewModel.setUserId(authToken);
@@ -204,7 +198,7 @@ public class DashboardFragment extends Fragment {
             public void run() {
                 Date currentDate = new Date();
                 String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault()); // Added seconds here
                 String currentTimeString = timeFormat.format(currentDate);
                 binding.todayDate.setText(todayDateString + " - " + currentTimeString);
 
@@ -214,8 +208,6 @@ public class DashboardFragment extends Fragment {
         handler.post(runnable);
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-//            loader.setVisibility(View.GONE);
-            // Null check before accessing Employee object
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
 
@@ -271,9 +263,12 @@ public class DashboardFragment extends Fragment {
             if (attendanceViewModel.attendance.getValue() != null && leavesViewModel.leavesData.getValue() != null) {
                 loader.setVisibility(View.GONE);
             }
-        });
-        attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
 
+            isProfileDataLoaded = true;
+            checkAllDataLoaded();
+        });
+
+        attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
             if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
                 new Thread(() -> {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -312,35 +307,47 @@ public class DashboardFragment extends Fragment {
             if (profileViewModel.userProfile.getValue() != null && leavesViewModel.leavesData.getValue() != null) {
                 loader.setVisibility(View.GONE);
             }
+
+            isAttendanceDataLoaded = true;
+            checkAllDataLoaded();
         });
 
-//        To show leave Chart here
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {
 //                    binding.leavePieChart.setVisibility(View.GONE);
-//                    Log.e("DashboardFragment", "No leaves data available");
+                    Log.e("DashboardFragment", "No leaves data available");
+
                 } else {
                     binding.leavePieChart.setVisibility(View.VISIBLE);
                     updatePieChartData(binding.leavePieChart, leaves);
                 }
             } else {
 //                binding.leavePieChart.setVisibility(View.GONE);
-//                Log.e("DashboardFragment", "No leaves data available");
+                Log.e("DashboardFragment", "No leaves data available");
             }
             // Check if other data is loaded as well
             if (profileViewModel.userProfile.getValue() != null && attendanceViewModel.attendance.getValue() != null) {
                 loader.setVisibility(View.GONE);
             }
+            isLeavesDataLoaded = true;
+            checkAllDataLoaded();
         });
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        handler.removeCallbacks(runnable);
-        binding = null;
+    private void fetchData() {
+        loader.setVisibility(View.VISIBLE);
+        attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
+        leavesViewModel.fetchLeavesData();
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    // Check if all data is loaded and update the loader visibility
+    private void checkAllDataLoaded() {
+        if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
+            loader.setVisibility(View.GONE);
+        }
     }
 
     private String formatShiftTime(String shiftTime) {
@@ -367,5 +374,11 @@ public class DashboardFragment extends Fragment {
             }
         }
         return "";
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        handler.removeCallbacks(runnable);
     }
 }
