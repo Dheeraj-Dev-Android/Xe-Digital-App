@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:fillViewport="true"
+    tools:context=".ui.vms.VisitorsDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:layout_marginBottom="12dp"
+        android:paddingBottom="15dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardViewVisitor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp">
+
+                <!-- Centered Profile Image -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivVisitorProfile"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/circular_background"
+                    android:padding="8dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+                <!-- Visitor Name and Status -->
+                <TextView
+                    android:id="@+id/tvVisitorName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_primary"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ivVisitorProfile"
+                    tools:text="Visitor Name" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipApprovalStatus"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/status_chip_background"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvVisitorName"
+                    tools:text="Approved" />
+
+                <!-- Basic Info Section -->
+                <TextView
+                    android:id="@+id/tvSerialNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chipApprovalStatus"
+                    tools:text="Serial Number: 12345" />
+
+                <TextView
+                    android:id="@+id/tvVisitorCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvSerialNumber"
+                    tools:text="Category: Business" />
+
+                <!-- Contact Information Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/contactInfoSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:cardBackgroundColor="@color/surface_variant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvVisitorCategory">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Contact Information"
+                            android:textColor="@color/text_primary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:drawableStart="@drawable/ic_email"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="visitor@example.com" />
+
+                        <TextView
+                            android:id="@+id/tvContact"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawableStart="@drawable/ic_phone"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="+1234567890" />
+
+                        <TextView
+                            android:id="@+id/tvCompanyFrom"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Example Corp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Meeting Details Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/meetingDetailsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/surface_variant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/contactInfoSection">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Meeting Details"
+                            android:textColor="@color/text_primary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvWhomToMeet"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Meeting With: John Doe" />
+
+                        <TextView
+                            android:id="@+id/tvPurposeOfMeeting"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Purpose: Business Discussion" />
+
+                        <TextView
+                            android:id="@+id/tvMeetingOverStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Status: Completed" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Time Details Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/timeDetailsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/surface_variant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/meetingDetailsSection">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Time Details"
+                            android:textColor="@color/text_primary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvCheckinDateTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Check-in: Jan 1, 2024 09:00 AM" />
+
+                        <TextView
+                            android:id="@+id/tvCheckoutDateTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Check-out: Jan 1, 2024 05:00 PM" />
+
+                        <TextView
+                            android:id="@+id/tvMeetingOverDateTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Meeting Over: Jan 1, 2024 04:30 PM" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Pre-approval Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/preApprovalSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/surface_variant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/timeDetailsSection">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pre-approval Details"
+                            android:textColor="@color/text_primary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvPreApprovedDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawableStart="@drawable/ic_calendar"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Pre-approval Date: Jan 1, 2024" />
+
+                        <TextView
+                            android:id="@+id/tvPreApproved"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Pre-approved: Yes" />
+
+                        <TextView
+                            android:id="@+id/tvVisitorVisited"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="8dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            tools:text="Visitor Visited: Yes" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

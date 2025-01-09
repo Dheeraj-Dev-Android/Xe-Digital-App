@@ -43,6 +43,10 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentVisitorPreApprovedBinding;
+import app.xedigital.ai.model.bucket.BucketRequest;
+import app.xedigital.ai.model.bucket.BucketResponse;
+import app.xedigital.ai.model.faceAdd.AddFaceRequest;
+import app.xedigital.ai.model.faceAdd.AddFaceResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.visitorsDetails.VisitorsDetailsResponse;
 import okhttp3.MediaType;
@@ -54,7 +58,6 @@ import retrofit2.Response;
 
 public class VisitorPreApprovedFragment extends Fragment {
 
-    private static final int PICK_IMAGE_REQUEST = 1;
     private FragmentVisitorPreApprovedBinding binding;
     private VisitorPreApprovedViewModel mViewModel;
     private Uri selectedImageUri;
@@ -184,7 +187,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                 submitPreApprovedVisitor(v);
             }
         });
-
         binding.btnCheckContact.setOnClickListener(v -> {
             showLoader();
             String contact = Objects.requireNonNull(binding.etContact.getText()).toString().trim();
@@ -234,7 +236,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                 }
             });
         });
-
     }
 
     private void submitPreApprovedVisitor(View button) {
@@ -288,6 +289,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                         Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
                     }
                 }
+
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                     hideLoader();
@@ -315,6 +317,50 @@ public class VisitorPreApprovedFragment extends Fragment {
                 APIInterface callFaceRecognitionApi = APIClient.getInstance().getRecognize();
                 Call<ResponseBody> call = callFaceRecognitionApi.VmsFaceRecognitionApi("jwt " + authToken, requestBody);
                 call.enqueue(new Callback<ResponseBody>() {
+//                    @Override
+//                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+//                        if (response.isSuccessful()) {
+//                            try {
+//                                assert response.body() != null;
+//                                String faceRecognitionResponse = response.body().string();
+//                                Log.d("FaceRecognition", "Success: " + faceRecognitionResponse);
+//
+//                                // Call VisitorFaceDetailApi with the response data
+//                                JsonObject requestBody = getVisitorFaceDetailRequestBody(faceRecognitionResponse);
+//                                callVisitorFaceDetailApi(requestBody);
+//                            } catch (IOException e) {
+//                                Log.e("FaceRecognition", "IO Error on success response body: " + e.getMessage());
+//                                throw new RuntimeException(e);
+//                            }
+//                        } else {
+//                            try {
+//                                assert response.errorBody() != null;
+//                                String errorBody = response.errorBody().string();
+//                                Log.e("FaceRecognition", "Error: " + errorBody);
+//
+//                                try {
+//                                    JSONObject errorJson = new JSONObject(errorBody);
+//                                    String message = errorJson.optString("message");
+//                                    Object data = errorJson.opt("data");
+//
+//                                    if ("No face found".equals(message) && data == JSONObject.NULL) {
+//                                        addFaceAndBucket(imageUri);
+//                                    } else {
+//                                        Log.e("FaceRecognition", "Other error: " + errorBody);
+//                                        // Handle other error cases if needed
+//                                    }
+//                                } catch (JSONException e) {
+//                                    Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage());
+//                                    if (errorBody.contains("No face found")) {
+//                                        addFaceAndBucket(imageUri);
+//                                    }
+//                                }
+//                            } catch (IOException e) {
+//                                Log.e("FaceRecognition", "IO Error on error response body: " + e.getMessage());
+//                            }
+//                        }
+//                    }
+
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
@@ -322,19 +368,50 @@ public class VisitorPreApprovedFragment extends Fragment {
                                 assert response.body() != null;
                                 String faceRecognitionResponse = response.body().string();
                                 Log.d("FaceRecognition", "Success: " + faceRecognitionResponse);
+                                JSONObject jsonResponse = new JSONObject(faceRecognitionResponse);
 
-                                // Call VisitorFaceDetailApi with the response data
-                                JsonObject requestBody = getVisitorFaceDetailRequestBody(faceRecognitionResponse);
-                                callVisitorFaceDetailApi(requestBody);
+                                // Check if the response contains data
+                                if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
+                                    // Call VisitorFaceDetailApi with the response data
+                                    JsonObject requestBody = getVisitorFaceDetailRequestBody(faceRecognitionResponse);
+                                    callVisitorFaceDetailApi(requestBody);
+                                } else {
+                                    Log.d("FaceRecognition", "No face data found in successful response, calling addFaceAndBucket");
+                                    addFaceAndBucket(imageUri);
+                                }
                             } catch (IOException e) {
+                                Log.e("FaceRecognition", "IO Error on success response body: " + e.getMessage());
                                 throw new RuntimeException(e);
+                            } catch (JSONException e) {
+                                Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage());
+                                Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage() + " calling addFaceAndBucket");
+                                addFaceAndBucket(imageUri);
                             }
                         } else {
                             try {
                                 assert response.errorBody() != null;
-                                Log.e("FaceRecognition", "Error: " + response.errorBody().string());
+                                String errorBody = response.errorBody().string();
+                                Log.e("FaceRecognition", "Error: " + errorBody);
+
+                                try {
+                                    JSONObject errorJson = new JSONObject(errorBody);
+                                    String message = errorJson.optString("message");
+                                    Object data = errorJson.opt("data");
+
+                                    if ("No face found".equals(message) && data == JSONObject.NULL) {
+                                        addFaceAndBucket(imageUri);
+                                    } else {
+                                        Log.e("FaceRecognition", "Other error or data is not null: " + errorBody);
+                                        // Handle other error cases if needed
+                                    }
+                                } catch (JSONException e) {
+                                    Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage());
+                                    if (errorBody.contains("No face found")) {
+                                        addFaceAndBucket(imageUri);
+                                    }
+                                }
                             } catch (IOException e) {
-                                throw new RuntimeException(e);
+                                Log.e("FaceRecognition", "IO Error on error response body: " + e.getMessage());
                             }
                         }
                     }
@@ -348,6 +425,68 @@ public class VisitorPreApprovedFragment extends Fragment {
             } catch (IOException | JSONException e) {
                 Log.e("FaceRecognition", "Error creating request body: " + e.getMessage());
             }
+        }
+    }
+
+    private void addFaceAndBucket(Uri imageUri) {
+        try {
+            byte[] compressedImageBytes = compressImage(imageUri);
+            String imageBase64 = Base64.encodeToString(compressedImageBytes, Base64.DEFAULT);
+
+            AddFaceRequest addFaceRequest = new AddFaceRequest();
+            BucketRequest addBucketRequest = new BucketRequest();
+
+            addFaceRequest.setCollectionName("cloudffence_y8bzj");
+            addFaceRequest.setImage(imageBase64);
+
+            APIInterface apiService = APIClient.getInstance().getRecognize();
+            apiService.FaceAddApi("jwt " + authToken, addFaceRequest).enqueue(new Callback<AddFaceResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<AddFaceResponse> call, @NonNull Response<AddFaceResponse> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("AddFace", "Success: " + response.body());
+                    } else {
+                        try {
+                            assert response.errorBody() != null;
+                            Log.e("AddFace", "Error: " + response.errorBody().string());
+                        } catch (IOException e) {
+                            Log.e("AddFace", "IO Error on error response body: " + e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<AddFaceResponse> call, @NonNull Throwable t) {
+                    Log.e("AddFace", "Failure: " + t.getMessage());
+                }
+            });
+
+            APIInterface apiBucket = APIClient.getInstance().getUser();
+            addBucketRequest.setBucketName("visitors-profile-images");
+            addBucketRequest.setImage("data:image/png;base64" + imageBase64);
+
+            apiBucket.addBucket("jwt " + authToken, addBucketRequest).enqueue(new Callback<BucketResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<BucketResponse> call, @NonNull Response<BucketResponse> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("AddBucket", "Success: " + response.body());
+                    } else {
+                        try {
+                            assert response.errorBody() != null;
+                            Log.e("AddBucket", "Error: " + response.errorBody().string());
+                        } catch (IOException e) {
+                            Log.e("AddBucket", "IO Error on error response body: " + e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<BucketResponse> call, @NonNull Throwable t) {
+                    Log.e("AddBucket", "Failure: " + t.getMessage());
+                }
+            });
+        } catch (IOException e) {
+            Log.e("AddFace", "Error creating request body: " + e.getMessage());
         }
     }
 
@@ -377,10 +516,7 @@ public class VisitorPreApprovedFragment extends Fragment {
                 }
             }
         }
-
-        // Handle the case where data is null or not a JSON object
         Log.e("VisitorPreApprovedFragment", "Invalid face recognition response: " + faceRecognitionResponse);
-        // You might want to throw an exception or return an empty JsonObject here
         return new JsonObject();
     }
 

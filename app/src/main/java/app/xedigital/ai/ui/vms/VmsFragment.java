@@ -25,9 +25,11 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.adapter.VisitorClickListener;
 import app.xedigital.ai.adapter.VisitorsAdapter;
+import app.xedigital.ai.model.vms.VisitorsItem;
 
-public class VmsFragment extends Fragment {
+public class VmsFragment extends Fragment implements VisitorClickListener {
 
     private VmsViewModel mViewModel;
     private RecyclerView recyclerView;
@@ -75,7 +77,8 @@ public class VmsFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(VmsViewModel.class);
 
         // Initialize adapter and RecyclerView
-        visitorsAdapter = new VisitorsAdapter(null);
+//        visitorsAdapter = new VisitorsAdapter((List<VisitorsItem>) null, (VisitorClickListener) this);
+        visitorsAdapter = new VisitorsAdapter(null, this);
         recyclerView.setAdapter(visitorsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -118,5 +121,15 @@ public class VmsFragment extends Fragment {
             emptyStateContainer.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onVisitorClicked(VisitorsItem visitor) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("visitor", visitor);
+
+        // Navigate using NavController
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_nav_vms_to_nav_visitor_details, bundle);
     }
 }

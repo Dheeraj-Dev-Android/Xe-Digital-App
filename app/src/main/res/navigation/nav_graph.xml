@@ -415,6 +415,9 @@
         <action
             android:id="@+id/action_nav_vms_to_nav_preApproved_visitors"
             app:destination="@+id/nav_preApproved_visitors" />
+        <action
+            android:id="@+id/action_nav_vms_to_nav_visitor_details"
+            app:destination="@+id/nav_visitor_details" />
 
     </fragment>
 
@@ -427,5 +430,14 @@
             android:id="@+id/action_nav_preApproved_visitors_to_nav_vms"
             app:destination="@+id/nav_vms" />
 
+    </fragment>
+    <fragment
+        android:id="@+id/nav_visitor_details"
+        android:name="app.xedigital.ai.ui.vms.VisitorsDetailFragment"
+        android:label="Visitor Details"
+        tools:layout="@layout/fragment_visitors_detail">
+        <action
+            android:id="@+id/action_nav_visitor_details_to_nav_vms"
+            app:destination="@+id/nav_vms" />
     </fragment>
 </navigation>

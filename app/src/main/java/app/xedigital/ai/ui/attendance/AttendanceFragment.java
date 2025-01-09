@@ -95,13 +95,13 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
 
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceList -> {
             if (attendanceList != null) {
-                Log.d(TAG, "Attendance List:\n " + attendanceList);
+//                Log.d(TAG, "Attendance List:\n " + attendanceList);
                 loadingProgress.setVisibility(View.GONE);
                 List<EmployeePunchDataItem> attendance = parseAttendanceData(attendanceList);
 //                AttendanceAdapter adapter = new AttendanceAdapter(attendance, attendanceViewModel);
 //                recyclerViewAttendance.setAdapter(adapter);
                 if (attendance.isEmpty()) {
-                    showNoDataAlert();
+//                    showNoDataAlert();
                     emptyStateText.setVisibility(View.VISIBLE);
                     recyclerViewAttendance.setVisibility(View.GONE);
                 } else {
@@ -134,7 +134,6 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
     private void showNoDataAlert() {
         new AlertDialog.Builder(requireContext()).setTitle("Attendance").setMessage("No Attendance data available For this Month use Filter to get previous months attendance").setPositiveButton("OK", null).show();
     }
-
 
     private List<EmployeePunchDataItem> parseAttendanceData(EmployeeAttendanceResponse attendanceResponse) {
         List<EmployeePunchDataItem> attendanceDataList = new ArrayList<>();

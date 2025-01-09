@@ -157,4 +157,8 @@
     <color name="white_70">#B3FFFFFF</color>
     <color name="warning_bg">#FFF3E0</color>
 
+    <color name="background_color">#F5F5F5</color>
+    <color name="surface_variant">#F8F9FA</color>
+    <color name="status_chip_background">#4CAF50</color>
+
 </resources>
