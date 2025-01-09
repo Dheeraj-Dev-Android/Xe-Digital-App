@@ -2,7 +2,9 @@ package app.xedigital.ai.model.vms;
 
 import com.google.gson.annotations.SerializedName;
 
-public class WhomToMeet {
+import java.io.Serializable;
+
+public class WhomToMeet implements Serializable {
 
     @SerializedName("firstname")
     private String firstname;
