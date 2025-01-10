@@ -83,17 +83,24 @@ public class ProfileFragment extends Fragment {
                         binding.shiftTimingValue.setText(employee.getShift().getStartTime() + " - " + employee.getShift().getEndTime());
                     }
                     if (employee.getReportingManager() != null) {
-                        binding.reportingManagerTitle.setText("Name ");
+                        binding.reportingManagerTitle.setText("Name");
                         binding.reportingManagerName.setText(employee.getReportingManager().getFirstname() + " " + employee.getReportingManager().getLastname());
-                        binding.reportingManagerEmail.setText("Email ");
+                        binding.reportingManagerEmail.setText("Email");
                         binding.reportingManagerEmailValue.setText(employee.getReportingManager().getEmail());
+                    } else {
+                        binding.reportingManagerName.setText("Not Assigned");
+                        binding.reportingManagerEmailValue.setText("");
                     }
                     if (employee.getCrossmanager() != null) {
-                        binding.crossManagerTitle.setText("Name ");
+                        binding.crossManagerTitle.setText("Name");
                         binding.crossManagerName.setText(employee.getCrossmanager().getFirstname() + " " + employee.getCrossmanager().getLastname());
-                        binding.crossManagerEmail.setText("Email ");
+                        binding.crossManagerEmail.setText("Email");
                         binding.crossManagerEmailValue.setText(employee.getCrossmanager().getEmail());
+                    } else {
+                        binding.crossManagerName.setText("Not Assigned");
+                        binding.crossManagerEmailValue.setText("");
                     }
+
                 } else {
                     Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
                 }

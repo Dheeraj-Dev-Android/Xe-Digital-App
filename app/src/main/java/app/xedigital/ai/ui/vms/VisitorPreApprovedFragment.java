@@ -317,50 +317,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                 APIInterface callFaceRecognitionApi = APIClient.getInstance().getRecognize();
                 Call<ResponseBody> call = callFaceRecognitionApi.VmsFaceRecognitionApi("jwt " + authToken, requestBody);
                 call.enqueue(new Callback<ResponseBody>() {
-//                    @Override
-//                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-//                        if (response.isSuccessful()) {
-//                            try {
-//                                assert response.body() != null;
-//                                String faceRecognitionResponse = response.body().string();
-//                                Log.d("FaceRecognition", "Success: " + faceRecognitionResponse);
-//
-//                                // Call VisitorFaceDetailApi with the response data
-//                                JsonObject requestBody = getVisitorFaceDetailRequestBody(faceRecognitionResponse);
-//                                callVisitorFaceDetailApi(requestBody);
-//                            } catch (IOException e) {
-//                                Log.e("FaceRecognition", "IO Error on success response body: " + e.getMessage());
-//                                throw new RuntimeException(e);
-//                            }
-//                        } else {
-//                            try {
-//                                assert response.errorBody() != null;
-//                                String errorBody = response.errorBody().string();
-//                                Log.e("FaceRecognition", "Error: " + errorBody);
-//
-//                                try {
-//                                    JSONObject errorJson = new JSONObject(errorBody);
-//                                    String message = errorJson.optString("message");
-//                                    Object data = errorJson.opt("data");
-//
-//                                    if ("No face found".equals(message) && data == JSONObject.NULL) {
-//                                        addFaceAndBucket(imageUri);
-//                                    } else {
-//                                        Log.e("FaceRecognition", "Other error: " + errorBody);
-//                                        // Handle other error cases if needed
-//                                    }
-//                                } catch (JSONException e) {
-//                                    Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage());
-//                                    if (errorBody.contains("No face found")) {
-//                                        addFaceAndBucket(imageUri);
-//                                    }
-//                                }
-//                            } catch (IOException e) {
-//                                Log.e("FaceRecognition", "IO Error on error response body: " + e.getMessage());
-//                            }
-//                        }
-//                    }
-
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
