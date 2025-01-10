@@ -1,4 +1,4 @@
-package app.xedigital.ai.ui.userProfileEmail;
+package app.xedigital.ai.model.userProfileEmail;
 
 import com.google.gson.annotations.SerializedName;
 

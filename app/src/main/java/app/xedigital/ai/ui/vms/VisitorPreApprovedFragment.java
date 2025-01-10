@@ -25,6 +25,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -145,24 +147,12 @@ public class VisitorPreApprovedFragment extends Fragment {
 
         binding.etPreApprovedDate.setOnClickListener(v -> {
             long today = Calendar.getInstance().getTimeInMillis();
-            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select Pre-Approved Date").setSelection(today).setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR).build();
-
-            datePicker.addOnPositiveButtonClickListener(selection -> {
-                // Validate selected date (comparing date parts)
-                Calendar selectedCal = Calendar.getInstance();
-                selectedCal.setTimeInMillis(selection);
-
-                Calendar todayCal = Calendar.getInstance();
-
-                if (selectedCal.get(Calendar.YEAR) >= todayCal.get(Calendar.YEAR) && selectedCal.get(Calendar.MONTH) >= todayCal.get(Calendar.MONTH) && selectedCal.get(Calendar.DAY_OF_MONTH) >= todayCal.get(Calendar.DAY_OF_MONTH)) {
-                    binding.etPreApprovedDate.setText(datePicker.getHeaderText());
-                } else {
-                    Toast.makeText(requireContext(), "Please select a future date", Toast.LENGTH_SHORT).show();
-                }
-            });
+            CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+            constraintsBuilder.setValidator(DateValidatorPointForward.now());
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select Pre-Approved Date").setSelection(today).setCalendarConstraints(constraintsBuilder.build()).setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR).build();
+            datePicker.addOnPositiveButtonClickListener(selection -> binding.etPreApprovedDate.setText(datePicker.getHeaderText()));
             datePicker.show(getParentFragmentManager(), "datePicker");
         });
-
         binding.btnClear.setOnClickListener(v -> {
             showLoader();
             binding.etContact.setText("");
@@ -172,7 +162,6 @@ public class VisitorPreApprovedFragment extends Fragment {
             binding.etPreApprovedDate.setText("");
             binding.ivProfile.setImageDrawable(ResourcesCompat.getDrawable(getResources(), android.R.drawable.ic_menu_camera, null));
             hideLoader();
-
         });
         binding.btnSubmit.setOnClickListener(v -> {
             if (isValidInput()) {
@@ -242,7 +231,6 @@ public class VisitorPreApprovedFragment extends Fragment {
         if (isValidInput()) {
             showLoader();
             button.setEnabled(false);
-
             // Create an instance of PreApprovedVisitorRequest
             PreApprovedVisitorRequest request = new PreApprovedVisitorRequest();
             request.setName(Objects.requireNonNull(binding.etName.getText()).toString());

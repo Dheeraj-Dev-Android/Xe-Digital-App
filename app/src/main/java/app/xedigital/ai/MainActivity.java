@@ -37,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private AlertDialog noInternetDialog;
     private AlertDialog slowNetworkDialog;
+    private boolean isAttendanceSubmenuVisible = false;
+    private boolean isLeavesSubmenuVisible = false;
+    private boolean isDcrSubmenuVisible = false;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.appBarMain.toolbar);
 
         DrawerLayout drawer = binding.drawerLayout;
-        NavigationView navigationView = binding.navView;
+        navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.nav_logout).setOpenableLayout(drawer).build();
 
@@ -102,52 +106,59 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
     }
 
-    private void toggleDcrVisibility(Menu menu) {
-        MenuItem dcrItem = menu.findItem(R.id.nav_dcr_menu);
-        boolean isDcrVisible = menu.findItem(R.id.nav_dcr).isVisible();
-        // Toggle visibility of submenu items
-        menu.findItem(R.id.nav_dcr).setVisible(!isDcrVisible);
-        menu.findItem(R.id.nav_dcr_form).setVisible(!isDcrVisible);
-        // Change icon based on visibility
-        if (isDcrVisible) {
-            dcrItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);
-        } else {
-            dcrItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);
-        }
+    private void toggleAttendanceVisibility(Menu menu) {
+        MenuItem attendanceItem = menu.findItem(R.id.nav_attendance_menu);
 
+        // Toggle visibility of submenu items
+        boolean newVisibility = !isAttendanceSubmenuVisible;
+        menu.findItem(R.id.nav_attendance).setVisible(newVisibility);
+        menu.findItem(R.id.nav_addAttendanceFragment).setVisible(newVisibility);
+        menu.findItem(R.id.nav_regularizeAppliedFragment).setVisible(newVisibility);
+        menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(newVisibility);
+
+        // Change icon based on visibility
+        attendanceItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
+        isAttendanceSubmenuVisible = newVisibility;
+
+        // Refresh the navigation menu to reflect the changes
+        navigationView.invalidate();
     }
 
     private void toggleLeavesVisibility(Menu menu) {
         MenuItem leavesItem = menu.findItem(R.id.nav_leaves_menu);
-        boolean isLeavesVisible = menu.findItem(R.id.nav_leaves).isVisible();
+
         // Toggle visibility of submenu items
-        menu.findItem(R.id.nav_leaves).setVisible(!isLeavesVisible);
-        menu.findItem(R.id.nav_leaves_data).setVisible(!isLeavesVisible);
-        menu.findItem(R.id.nav_applied_leaves).setVisible(!isLeavesVisible);
-        menu.findItem(R.id.nav_approve_leaves).setVisible(!isLeavesVisible);
+        boolean newVisibility = !isLeavesSubmenuVisible;
+        menu.findItem(R.id.nav_leaves).setVisible(newVisibility);
+        menu.findItem(R.id.nav_leaves_data).setVisible(newVisibility);
+        menu.findItem(R.id.nav_applied_leaves).setVisible(newVisibility);
+        menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
+
         // Change icon based on visibility
-        if (isLeavesVisible) {
-            leavesItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);
-        } else {
-            leavesItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);
-        }
+        leavesItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
+        isLeavesSubmenuVisible = newVisibility;
+
+        // Refresh the navigation menu to reflect the changes
+        navigationView.invalidate();
     }
 
-    private void toggleAttendanceVisibility(Menu menu) {
-        MenuItem attendanceItem = menu.findItem(R.id.nav_attendance_menu);
-        boolean isAddAttendanceVisible = menu.findItem(R.id.nav_addAttendanceFragment).isVisible();
+    private void toggleDcrVisibility(Menu menu) {
+        MenuItem dcrItem = menu.findItem(R.id.nav_dcr_menu);
+
         // Toggle visibility of submenu items
-        menu.findItem(R.id.nav_attendance).setVisible(!isAddAttendanceVisible);
-        menu.findItem(R.id.nav_addAttendanceFragment).setVisible(!isAddAttendanceVisible);
-        menu.findItem(R.id.nav_regularizeAppliedFragment).setVisible(!isAddAttendanceVisible);
-        menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(!isAddAttendanceVisible);
+        boolean newVisibility = !isDcrSubmenuVisible;
+        menu.findItem(R.id.nav_dcr).setVisible(newVisibility);
+        menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
+
         // Change icon based on visibility
-        if (isAddAttendanceVisible) {
-            attendanceItem.setIcon(R.drawable.ic_dropdown_adaptive_fore);
-        } else {
-            attendanceItem.setIcon(R.drawable.ic_dropdown_up_adaptive_fore);
-        }
+        dcrItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
+        isDcrSubmenuVisible = newVisibility;
+
+        // Refresh the navigation menu to reflect the changes
+        navigationView.invalidate();
     }
+
+
 
     private void handleLogout() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);

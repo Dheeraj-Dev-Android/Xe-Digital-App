@@ -11,71 +11,95 @@
         android:id="@+id/nav_profile"
         android:title="@string/menu_profile" />
 
-    <!--Attendance start-->
-    <group android:checkableBehavior="single">
+    <!--Attendance Group-->
+    <group
+        android:id="@+id/attendance_group"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_attendance_menu"
             android:icon="@drawable/ic_dropdown_adaptive_fore"
             android:title="@string/menu_attendance" />
     </group>
-    <item
-        android:id="@+id/nav_attendance"
-        android:title="@string/view_attendance"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_addAttendanceFragment"
-        android:title="@string/menu_add_attendance"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_regularizeAppliedFragment"
-        android:title="@string/regularize_applied"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_pendingApprovalFragment"
-        android:title="@string/regularize_pending_approval"
-        android:visible="false" />
-    <!--    Attendance End-->
 
-    <!--    Leaves Start-->
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/attendance_submenu"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_attendance"
+            android:title="@string/view_attendance"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_addAttendanceFragment"
+            android:title="@string/menu_add_attendance"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_regularizeAppliedFragment"
+            android:title="@string/regularize_applied"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_pendingApprovalFragment"
+            android:title="@string/regularize_pending_approval"
+            android:visible="false" />
+    </group>
+
+    <!--Leaves Group-->
+    <group
+        android:id="@+id/leaves_group"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_leaves_menu"
             android:icon="@drawable/ic_dropdown_adaptive_fore"
             android:title="@string/menu_leaves" />
     </group>
-    <item
-        android:id="@+id/nav_leaves"
-        android:title="@string/add_leaves"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_leaves_data"
-        android:title="@string/total_leaves"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_applied_leaves"
-        android:title="@string/leaves_applied"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_approve_leaves"
-        android:title="@string/approve_leaves"
-        android:visible="false" />
-    <!--    Leaves End-->
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/leaves_submenu"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_leaves"
+            android:title="@string/add_leaves"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_leaves_data"
+            android:title="@string/total_leaves"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_applied_leaves"
+            android:title="@string/leaves_applied"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_approve_leaves"
+            android:title="@string/approve_leaves"
+            android:visible="false" />
+    </group>
+
+    <!--DCR Group-->
+    <group
+        android:id="@+id/dcr_group"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dcr_menu"
             android:icon="@drawable/ic_dropdown_adaptive_fore"
             android:title="@string/menu_dcr" />
-
     </group>
+
+    <group
+        android:id="@+id/dcr_submenu"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dcr"
+            android:title="@string/view_dcr"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_dcr_form"
+            android:title="@string/fill_dcr"
+            android:visible="false" />
+    </group>
+
     <item
-        android:id="@+id/nav_dcr"
-        android:title="@string/view_dcr"
-        android:visible="false" />
-    <item
-        android:id="@+id/nav_dcr_form"
-        android:title="@string/fill_dcr"
-        android:visible="false" />
+        android:id="@+id/nav_vms"
+        android:title="@string/vms" />
+
     <item
         android:id="@+id/nav_holidays"
         android:title="@string/menu_holidays" />
@@ -95,14 +119,11 @@
     <item
         android:id="@+id/nav_documents"
         android:title="@string/menu_documents_upload" />
-    <item
-        android:id="@+id/nav_vms"
-        android:title="@string/vms" />
 
     <item
         android:id="@+id/nav_payroll"
         android:title="Payroll (Coming Soon*)" />
-    <!--    @string/menu_payroll-->
+
     <item
         android:id="@+id/nav_logout"
         android:title="@string/logout" />

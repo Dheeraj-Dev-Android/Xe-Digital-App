@@ -160,5 +160,6 @@
     <color name="background_color">#F5F5F5</color>
     <color name="surface_variant">#F8F9FA</color>
     <color name="status_chip_background">#4CAF50</color>
+    <color name="submenu_background">#9AB8EC</color>
 
 </resources>

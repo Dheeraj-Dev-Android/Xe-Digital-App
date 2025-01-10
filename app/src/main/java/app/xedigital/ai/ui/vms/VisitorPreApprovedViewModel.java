@@ -11,7 +11,7 @@ import app.xedigital.ai.model.bucket.BucketRequest;
 import app.xedigital.ai.model.bucket.BucketResponse;
 import app.xedigital.ai.model.faceAdd.AddFaceRequest;
 import app.xedigital.ai.model.faceAdd.AddFaceResponse;
-import app.xedigital.ai.ui.userProfileEmail.UserProfileByEmailResponse;
+import app.xedigital.ai.model.userProfileEmail.UserProfileByEmailResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
