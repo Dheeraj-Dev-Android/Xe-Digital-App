@@ -92,15 +92,12 @@ public class VisitorPreApprovedFragment extends Fragment {
         authToken = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
         empEmail = sharedPreferences.getString("empEmail", "");
-        Log.w("VisitorPreApprovedFragment", "empEmail: " + empEmail);
         mViewModel.fetchUserProfile(empEmail, "jwt " + authToken);
 
         mViewModel.getUserProfileLiveData().observe(getViewLifecycleOwner(), userProfileByEmailResponse -> {
             if (userProfileByEmailResponse != null && userProfileByEmailResponse.getData() != null && userProfileByEmailResponse.getData().getEmployee() != null) {
                 // Access isActive only if all objects are not null
                 boolean isActive = userProfileByEmailResponse.getData().getEmployee().isActive();
-                Log.w("VisitorPreApprovedFragment", "isActive: " + isActive);
-
                 binding.etStatus.setText(isActive ? "Active" : "Inactive");
 
                 Log.i("UserProfile", userProfileByEmailResponse.toString());
@@ -227,67 +224,6 @@ public class VisitorPreApprovedFragment extends Fragment {
         });
     }
 
-    private void submitPreApprovedVisitor(View button) {
-        if (isValidInput()) {
-            showLoader();
-            button.setEnabled(false);
-            // Create an instance of PreApprovedVisitorRequest
-            PreApprovedVisitorRequest request = new PreApprovedVisitorRequest();
-            request.setName(Objects.requireNonNull(binding.etName.getText()).toString());
-            request.setEmail(Objects.requireNonNull(binding.etEmail.getText()).toString());
-            request.setContact(Objects.requireNonNull(binding.etContact.getText()).toString());
-            request.setCompanyFrom(Objects.requireNonNull(binding.etCompany.getText()).toString());
-            request.setPreApprovedDate(Objects.requireNonNull(binding.etPreApprovedDate.getText()).toString());
-
-            request.setWhomToMeet(userId);
-//            request.setDepartment("60e82cf36ba1893ddb00191d");
-            request.setProfileImage("");
-//            request.setProfileImagePath("https://visitors-profile-images.s3.ap-south-1.amazonaws.com/814gdko69t.jpg");
-            request.setGovernmentIdUploadedImage("");
-            request.setGovernmentIdUploadedImagePath("");
-            request.setApprovalStatus("approved");
-//            request.setApprovalDate("2025-01-06T10:41:33.159Z");
-//            request.setCompany("60b47a7c777af75d3f8346b1");
-//            request.setActive(true);
-            request.setIsPreApproved(true);
-            request.setType("create");
-//            request.setIsProfileImageDetailFound(false);
-//            FaceData faceData = new FaceData();
-//            Face face = new Face();
-//            BoundingBox boundingBox = new BoundingBox();
-//            boundingBox.setWidth(0.2820533215999603);
-//            boundingBox.setHeight(0.4170183539390564);
-//            boundingBox.setLeft(0.3498215079307556);
-//            boundingBox.setTop(0.14774657785892487);
-//            face.setBoundingBox(boundingBox);
-//            request.setFaceData(faceData);
-
-            APIInterface submitPreApprovedVisitor = APIClient.getInstance().getApi();
-            Call<ResponseBody> call = submitPreApprovedVisitor.PreApprovedVisitor("jwt " + authToken, request);
-
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                    hideLoader();
-                    button.setEnabled(true);
-
-                    if (response.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Form submitted successfully", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                    hideLoader();
-                    button.setEnabled(true);
-                    Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
-
     private void callFaceRecognitionApi(Uri imageUri) {
         if (imageUri != null) {
             try {
@@ -327,7 +263,6 @@ public class VisitorPreApprovedFragment extends Fragment {
                                 Log.e("FaceRecognition", "IO Error on success response body: " + e.getMessage());
                                 throw new RuntimeException(e);
                             } catch (JSONException e) {
-                                Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage());
                                 Log.e("FaceRecognition", "JSON Parsing error: " + e.getMessage() + " calling addFaceAndBucket");
                                 addFaceAndBucket(imageUri);
                             }
@@ -500,6 +435,67 @@ public class VisitorPreApprovedFragment extends Fragment {
 
     }
 
+    private void submitPreApprovedVisitor(View button) {
+        if (isValidInput()) {
+            showLoader();
+            button.setEnabled(false);
+            // Create an instance of PreApprovedVisitorRequest
+            PreApprovedVisitorRequest requestPreApproved = new PreApprovedVisitorRequest();
+            requestPreApproved.setName(Objects.requireNonNull(binding.etName.getText()).toString());
+            requestPreApproved.setEmail(Objects.requireNonNull(binding.etEmail.getText()).toString());
+            requestPreApproved.setContact(Objects.requireNonNull(binding.etContact.getText()).toString());
+            requestPreApproved.setCompanyFrom(Objects.requireNonNull(binding.etCompany.getText()).toString());
+            requestPreApproved.setPreApprovedDate(Objects.requireNonNull(binding.etPreApprovedDate.getText()).toString());
+
+            requestPreApproved.setWhomToMeet(userId);
+//            request.setDepartment("60e82cf36ba1893ddb00191d");
+            requestPreApproved.setProfileImage("");
+//            request.setProfileImagePath("https://visitors-profile-images.s3.ap-south-1.amazonaws.com/814gdko69t.jpg");
+            requestPreApproved.setGovernmentIdUploadedImage("");
+            requestPreApproved.setGovernmentIdUploadedImagePath("");
+            requestPreApproved.setApprovalStatus("approved");
+//            request.setApprovalDate("2025-01-06T10:41:33.159Z");
+//            request.setCompany("60b47a7c777af75d3f8346b1");
+//            request.setActive(true);
+            requestPreApproved.setIsPreApproved(true);
+            requestPreApproved.setType("create");
+//            request.setIsProfileImageDetailFound(false);
+//            FaceData faceData = new FaceData();
+//            Face face = new Face();
+//            BoundingBox boundingBox = new BoundingBox();
+//            boundingBox.setWidth(0.2820533215999603);
+//            boundingBox.setHeight(0.4170183539390564);
+//            boundingBox.setLeft(0.3498215079307556);
+//            boundingBox.setTop(0.14774657785892487);
+//            face.setBoundingBox(boundingBox);
+//            request.setFaceData(faceData);
+
+            APIInterface submitPreApprovedVisitor = APIClient.getInstance().getApi();
+            Call<ResponseBody> call = submitPreApprovedVisitor.PreApprovedVisitor("jwt " + authToken, requestPreApproved);
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                    hideLoader();
+                    button.setEnabled(true);
+
+                    if (response.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Form submitted successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                    hideLoader();
+                    button.setEnabled(true);
+                    Toast.makeText(requireContext(), "Failed to submit the form", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     // Helper function to convert image Uri to base64 string
     private String imageUriToBase64(Uri imageUri) throws IOException {
         InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
@@ -537,13 +533,11 @@ public class VisitorPreApprovedFragment extends Fragment {
         if (inputStream != null) {
             inputStream.close();
         }
-
         // 2. Compress Bitmap to a ByteArrayOutputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         if (bitmap != null) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
         }
-
         // 3. Return the compressed byte array
         return outputStream.toByteArray();
     }
