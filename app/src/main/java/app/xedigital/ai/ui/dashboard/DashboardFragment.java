@@ -68,16 +68,6 @@ public class DashboardFragment extends Fragment {
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
 
-    private void showLoaderWithBlur() {
-        blurOverlay.setVisibility(View.VISIBLE);
-        loader.setVisibility(View.VISIBLE);
-    }
-
-    private void hideLoaderWithBlur() {
-        blurOverlay.setVisibility(View.GONE);
-        loader.setVisibility(View.GONE);
-    }
-
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
         float totalBalanceLeaves = 0;
@@ -138,6 +128,16 @@ public class DashboardFragment extends Fragment {
         pieChart.animateXY(1000, 1000);
         pieChart.setDrawEntryLabels(false);
         pieChart.invalidate();
+    }
+
+    private void showLoaderWithBlur() {
+        blurOverlay.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoaderWithBlur() {
+        blurOverlay.setVisibility(View.GONE);
+        loader.setVisibility(View.GONE);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -332,6 +332,7 @@ public class DashboardFragment extends Fragment {
             checkAllDataLoaded();
         });
     }
+
     private void fetchData() {
         showLoaderWithBlur();
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);

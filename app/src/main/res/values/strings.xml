@@ -117,6 +117,8 @@
     <string name="retry">Retry</string>
     <string name="vms">Visitors</string>
     <string name="cross_manager">Cross Manager</string>
+    <string name="guest_name">Guest\n</string>
+    <string name="guest_email">xeDigital.ai\n</string>
 
 
 </resources>

@@ -23,8 +23,8 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHolder> {
 
-    private List<VisitorsItem> visitors;
     private final VisitorClickListener clickListener;
+    private List<VisitorsItem> visitors;
 
     public VisitorsAdapter(List<VisitorsItem> visitors, VisitorClickListener clickListener) {
         this.visitors = visitors != null ? visitors : new ArrayList<>();

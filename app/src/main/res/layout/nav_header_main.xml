@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="176dp"
+    android:layout_height="200dp"
     android:background="@drawable/nav_header_background"
     android:paddingStart="16dp"
     android:paddingTop="24dp"
@@ -11,9 +11,10 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/profileImageContainer"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        app:cardCornerRadius="32dp"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="50dp"
         app:cardElevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,7 +33,6 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:ellipsize="end"
         android:fontFamily="@font/quicksand_font_family"
         android:maxLines="1"
@@ -55,6 +55,7 @@
         android:text="@string/nav_header_subtitle"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
         android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView" />

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,7 +35,8 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    ActivityLoginBinding binding;
+    private ActivityLoginBinding binding;
+    private View loadingOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +44,14 @@ public class LoginActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        loadingOverlay = binding.loadingOverlay;
 
         if (isLoggedIn()) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
             return;
         }
-        Glide.with(this)
-                .load(R.mipmap.ic_launcher)
-                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                .into(binding.logoImage);
+        Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
         binding.btnSignin.setOnClickListener(v -> {
             String email, password;
             email = Objects.requireNonNull(binding.editEmail.getText()).toString();
@@ -60,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                 binding.editEmail.setError("Please Enter Your Email");
                 binding.editPassword.setError("Please Enter Your Password");
             } else {
-                callLoginApi1(email, password);
+                callLoginApi(email, password);
             }
         });
     }
@@ -80,13 +81,25 @@ public class LoginActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void callLoginApi1(String email, String password) {
+    private void showLoading(boolean show) {
+        if (show) {
+            loadingOverlay.setVisibility(View.VISIBLE);
+        } else {
+            loadingOverlay.setVisibility(View.GONE);
+        }
+    }
+
+    private void callLoginApi(String email, String password) {
+        showLoading(true);
         Call<LoginModelResponse1> call = APIClient.getInstance().getLogin().loginApi1(email, password);
         call.enqueue(new Callback<LoginModelResponse1>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse1> call, @NonNull Response<LoginModelResponse1> response) {
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
+
                     LoginModelResponse1 loginResponse = response.body();
+                    Log.w(TAG, "Response: " + gson.toJson(loginResponse));
 
                     if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
                         getIntent().putExtra("userId", loginResponse.getData().getUser().getId());
@@ -96,7 +109,6 @@ public class LoginActivity extends AppCompatActivity {
                         String userId = loginResponse.getData().getUser().getId();
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
-
 //                        Log.w(TAG, "User ID: " + userId+"empEmail"+empEmail);
 
                         storeInSharedPreferences(userId, authToken, empEmail);
@@ -113,6 +125,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<LoginModelResponse1> call, @NonNull Throwable t) {
+                showLoading(false);
                 showAlertDialog(t.getMessage());
             }
         });
