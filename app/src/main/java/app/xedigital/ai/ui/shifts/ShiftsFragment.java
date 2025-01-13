@@ -93,7 +93,7 @@ public class ShiftsFragment extends Fragment {
                         }
                     }
                     if (selectedShiftId != null) {
-                        Log.d("ShiftsFragment", "Selected shift ID: " + selectedShiftId);
+//                        Log.d("ShiftsFragment", "Selected shift ID: " + selectedShiftId);
                         shiftsViewModel.fetchShiftTimes(selectedShiftId);
                     } else {
                         Log.e("ShiftsFragment", "Selected shift type not found in shiftDataList");
@@ -121,7 +121,7 @@ public class ShiftsFragment extends Fragment {
         });
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
             if (userProfile != null) {
-                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
+//                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
                 fName = userProfile.getData().getEmployee().getFirstname();
                 lName = userProfile.getData().getEmployee().getLastname();
                 email = userProfile.getData().getEmployee().getEmail();

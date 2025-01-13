@@ -159,7 +159,7 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
                     List<AppliedLeavesApproveItem> items = leavePendingApprovalResponse.getData().getAppliedLeaves();
                     if (items.isEmpty()) {
                         emptyStateContainer.setVisibility(View.VISIBLE);
-                        Toast.makeText(getContext(), "No Data Found", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getContext(), "No Data Found", Toast.LENGTH_SHORT).show();
                         new AlertDialog.Builder(getContext()).setTitle("Approve Leaves").setMessage("No Records Found").setPositiveButton("OK", null).show();
                     } else {
                         emptyStateContainer.setVisibility(View.GONE);

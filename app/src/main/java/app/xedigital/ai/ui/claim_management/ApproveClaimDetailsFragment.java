@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +96,7 @@ public class ApproveClaimDetailsFragment extends Fragment {
             }
         }
         btnDocumentView.setOnClickListener(v -> {
-            Log.d("btnDocumentView", "btnDocumentView clicked");
+//            Log.d("btnDocumentView", "btnDocumentView clicked");
             if (claimData != null && claimData.getDocumentUrls() != null) {
                 List<String> documentUrls = claimData.getDocumentUrls();
                 if (!documentUrls.isEmpty()) {

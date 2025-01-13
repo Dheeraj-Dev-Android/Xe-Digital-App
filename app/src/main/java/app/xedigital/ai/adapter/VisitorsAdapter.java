@@ -80,7 +80,7 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         }
         // Add click listener to the card
         holder.cardViewVisitor.setOnClickListener(v -> {
-            Log.d("VisitorsAdapter", "Clicked on visitor: " + visitor.getName());
+//            Log.d("VisitorsAdapter", "Clicked on visitor: " + visitor.getName());
             if (clickListener != null) {
                 clickListener.onVisitorClicked(visitor);
             }

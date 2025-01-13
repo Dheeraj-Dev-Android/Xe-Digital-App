@@ -288,7 +288,7 @@ public class PendingLeaveApproveFragment extends Fragment {
                     // Navigate to the destination fragment
                     Navigation.findNavController(requireView()).navigate(R.id.action_nav_approve_leave_data_to_nav_approve_leaves);
                     Toast.makeText(requireContext(), "Leave Cancelled", Toast.LENGTH_SHORT).show();
-                    Log.d("LeaveCancel", "onResponse: " + gson.toJson(response.body()));
+//                    Log.d("LeaveCancel", "onResponse: " + gson.toJson(response.body()));
                 } else {
                     Log.e("LeaveCancel", "onResponse: " + response.errorBody());
                 }
@@ -330,7 +330,7 @@ public class PendingLeaveApproveFragment extends Fragment {
                     // Navigate to the destination fragment
                     Navigation.findNavController(requireView()).navigate(R.id.action_nav_approve_leave_data_to_nav_approve_leaves);
                     Toast.makeText(requireContext(), "Leave Approved Successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("LeaveApproval", "onResponse: " + gson.toJson(response.body()));
+//                    Log.d("LeaveApproval", "onResponse: " + gson.toJson(response.body()));
                 } else {
                     Log.e("LeaveApproval", "onResponse: " + response.errorBody());
                 }
@@ -370,7 +370,7 @@ public class PendingLeaveApproveFragment extends Fragment {
                     // Navigate to the destination fragment
                     Navigation.findNavController(requireView()).navigate(R.id.action_nav_approve_leave_data_to_nav_approve_leaves);
                     Toast.makeText(requireContext(), "Leave Rejected Successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("LeaveRejected", "onResponse: " + gson.toJson(response.body()));
+//                    Log.d("LeaveRejected", "onResponse: " + gson.toJson(response.body()));
                 } else {
                     Log.e("LeaveRejected", "onResponse: " + response.errorBody());
                 }

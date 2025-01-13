@@ -53,6 +53,8 @@ public class ProfileFragment extends Fragment {
                 if (employee != null) {
                     Object profileImageUrl = employee.getProfileImageUrl();
                     ImageView profileImage = binding.profileImage;
+                    binding.punchCardView.setVisibility(View.VISIBLE);
+                    binding.emptyStateText.setVisibility(View.GONE);
 
                     if (profileImageUrl != null) {
                         Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage);
@@ -104,8 +106,8 @@ public class ProfileFragment extends Fragment {
                 } else {
                     Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
                 }
-                binding.punchCardView.setVisibility(View.VISIBLE);
-                binding.emptyStateText.setVisibility(View.GONE);
+                binding.punchCardView.setVisibility(View.GONE);
+                binding.emptyStateText.setVisibility(View.VISIBLE);
             } else {
                 binding.punchCardView.setVisibility(View.GONE);
                 binding.emptyStateText.setVisibility(View.VISIBLE);

@@ -3,7 +3,6 @@ package app.xedigital.ai.ui.attendance;
 import static app.xedigital.ai.ui.regularize_attendance.RegularizeFragment.ARG_ATTENDANCE_ITEM;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +81,7 @@ public class ViewAttendanceFragment extends Fragment {
                 if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
                     String shiftTimeString = startTime + " - " + endTime;
                     shiftTime.setText(formatShiftTime(shiftTimeString));
-                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
+//                    Log.d("ShiftTime", "Shift Time: " + shiftTimeString);
                 } else {
                     shiftTime.setText("Shift time not available");
                 }

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.ImageAdapter;
@@ -95,7 +95,7 @@ public class ClaimDetailsFragment extends Fragment {
             }
         }
         btnDocumentView.setOnClickListener(v -> {
-            Log.d("btnDocumentView", "btnDocumentView clicked");
+//            Log.d("btnDocumentView", "btnDocumentView clicked");
             if (claimData != null && claimData.getDocumentUrls() != null) {
                 List<String> documentUrls = claimData.getDocumentUrls();
                 if (!documentUrls.isEmpty()) {
@@ -112,7 +112,7 @@ public class ClaimDetailsFragment extends Fragment {
                             .setPositiveButton("Close", (dialog1, which) -> dialog1.dismiss())
                             .create();
 
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                    Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.WHITE));
                     dialog.show();
                 }
             }

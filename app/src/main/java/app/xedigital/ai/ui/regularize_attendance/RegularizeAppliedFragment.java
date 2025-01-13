@@ -3,7 +3,6 @@ package app.xedigital.ai.ui.regularize_attendance;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +67,7 @@ public class RegularizeAppliedFragment extends Fragment {
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     apiResponse = response.body();
-                    Log.d("RegularizeApplied", gson.toJson(apiResponse));
+//                    Log.d("RegularizeApplied", gson.toJson(apiResponse));
                     List<AttendanceRegularizeAppliedItem> items = apiResponse.getData().getAttendanceRegularizeApplied();
                     if (items.isEmpty()) {
                         emptyStateText.setVisibility(View.VISIBLE);

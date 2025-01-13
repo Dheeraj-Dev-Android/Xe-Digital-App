@@ -63,7 +63,7 @@ public class AddAttendanceFragment extends Fragment {
         if (getArguments() != null) {
             EmployeePunchDataItem attendanceItem = (EmployeePunchDataItem) getArguments().getSerializable(ARG_ATTENDANCE_ITEM);
             if (attendanceItem != null) {
-                Log.d("AttendanceItem", attendanceItem.toString());
+//                Log.d("AttendanceItem", attendanceItem.toString());
             } else {
                 Log.d("AttendanceItem", "Attendance item is null");
             }
@@ -180,11 +180,11 @@ public class AddAttendanceFragment extends Fragment {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
-                        Log.d("AddAttendanceResponse", responseBody);
+//                        Log.d("AddAttendanceResponse", responseBody);
 
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
-                        Log.d("AddAttendanceMessage", message);
+//                        Log.d("AddAttendanceMessage", message);
 //                        clearForm();
                         showAlertDialog("Attendance Regularize Applied", message);
                     } else {

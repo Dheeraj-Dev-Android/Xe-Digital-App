@@ -117,18 +117,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.btnRegularize.setVisibility(View.GONE);
         }
 
-
-//        if (attendanceItem.getLeaveName()!=null){
-//            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
-//            holder.leaveTypeName.setVisibility(View.VISIBLE);
-//            holder.leaveTypeName.setText("Leave Name : "+attendanceItem.getLeaveName());
-//
-//        }else if (attendanceItem.getHolidayName() != null){
-//            holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
-//            holder.leaveTypeName.setVisibility(View.VISIBLE);
-//            holder.leaveTypeName.setText("Holiday Name : "+attendanceItem.getHolidayName());
-//
-//        }
     }
 
     @Override

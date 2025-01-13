@@ -55,7 +55,7 @@ public class DetailViewAddAttendanceFragment extends Fragment {
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String formattedDateTime = dateTimeFormat.format(currentDateTime);
-        Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
+//        Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
         return formattedDateTime;
 
     }
@@ -151,7 +151,7 @@ public class DetailViewAddAttendanceFragment extends Fragment {
     }
 
     private void refreshFragment() {
-        Log.w("RegularizeApprovalAdapter", "refreshFragment: ");
+//        Log.w("RegularizeApprovalAdapter", "refreshFragment: ");
         FragmentManager fragmentManager = getParentFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.detach(this);

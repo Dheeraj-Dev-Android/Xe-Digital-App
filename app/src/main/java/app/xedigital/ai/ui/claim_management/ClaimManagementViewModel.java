@@ -85,7 +85,7 @@ public class ClaimManagementViewModel extends ViewModel {
                         ClaimLengthResponse claimLengthResponse = response.body();
                         if (claimLengthResponse != null) {
                             claimLength = claimLengthResponse.getData().getCliamlength();
-                            Log.d("ClaimLength", "claimLength : " + claimLength);
+//                            Log.d("ClaimLength", "claimLength : " + claimLength);
                         } else {
                             Log.e("ClaimLength", "Response body is null");
                         }

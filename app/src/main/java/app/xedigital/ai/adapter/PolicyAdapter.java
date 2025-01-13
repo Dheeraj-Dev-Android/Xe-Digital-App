@@ -43,17 +43,6 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
         holder.policyName.setText(policy.getName());
         holder.policyDate.setText("Policy Date : " + DateTimeUtils.getDayOfWeekAndDate(policy.getUpdatedAt()));
 
-        // Convert boolean to String
-//        String status = policy.isActive() ? "Active" : "Inactive";
-//        holder.policyStatus.setText(status);
-//        if (policy.isActive()) {
-//            holder.policyStatus.setText("Active");
-//            holder.policyStatus.setChipBackgroundColorResource(R.color._000000);
-//        } else {
-//            holder.policyStatus.setText("Inactive");
-//            holder.policyStatus.setChipBackgroundColorResource(R.color.status_pending);
-//        }
-
         holder.policyViewIcon.setOnClickListener(v -> {
             PoliciesItem policy1 = policies.get(holder.getBindingAdapterPosition());
             String pdfUrl = policy1.getPolicyFileURL();

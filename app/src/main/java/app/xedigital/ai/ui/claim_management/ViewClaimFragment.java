@@ -174,7 +174,7 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                         } else {
                             claimsAdapter.updateData(claimList);
                             emptyStateContainer.setVisibility(View.GONE);
-                            Log.d("API Response", "Data fetched successfully");
+//                            Log.d("API Response", "Data fetched successfully");
                         }
                     } else {
                         emptyStateContainer.setVisibility(View.VISIBLE);

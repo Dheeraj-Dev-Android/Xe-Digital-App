@@ -3,7 +3,6 @@ package app.xedigital.ai.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +86,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
             actionButton.setVisibility(View.GONE);
 
             viewDetailsButton.setOnClickListener(v -> {
-                Log.d("ClaimViewHolder", "View Details button clicked");
+//                Log.d("ClaimViewHolder", "View Details button clicked");
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listener != null) {
                     listener.onClaimClick(claimList.get(position));

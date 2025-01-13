@@ -198,9 +198,9 @@ public class ClaimManagementFragment extends Fragment {
         });
 
         binding.saveButton.setOnClickListener(v -> {
-            Log.e("ClaimManagementFragment", "Save button clicked");
+//            Log.e("ClaimManagementFragment", "Save button clicked");
             if (validateForm()) {
-                Log.d("ClaimManagementFragment", "Form validated, saving claim data");
+//                Log.d("ClaimManagementFragment", "Form validated, saving claim data");
                 saveClaimData();
                 Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
             } else {
@@ -209,7 +209,7 @@ public class ClaimManagementFragment extends Fragment {
         });
 
         binding.submitButton.setOnClickListener(v -> {
-            Log.e("ClaimManagementFragment", "Submit button clicked");
+//            Log.e("ClaimManagementFragment", "Submit button clicked");
             if (validateForm()) {
                 submitClaimData();
                 Toast.makeText(requireContext(), "Claim submitted successfully", Toast.LENGTH_SHORT).show();
@@ -390,13 +390,13 @@ public class ClaimManagementFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 TransportModeSelected = parent.getItemAtPosition(position).toString();
-                Log.e("Selected Mode", TransportModeSelected);
+//                Log.e("Selected Mode", TransportModeSelected);
                 if (TransportModeSelected.equals("Select Mode")) {
                     return;
                 }
 
                 if (TransportModeSelected.equals("Shared")) {
-                    Log.d("Shared", "Shared");
+//                    Log.d("Shared", "Shared");
                     Toast.makeText(requireContext(), "Shared", Toast.LENGTH_SHORT).show();
                     binding.transportModeSharedLayout.setVisibility(View.VISIBLE);
                     binding.transportModeDedicatedLayout.setVisibility(View.GONE);
@@ -407,7 +407,7 @@ public class ClaimManagementFragment extends Fragment {
                         binding.transportModeSharedLayout.invalidate();
                     });
                 } else if (TransportModeSelected.equals("Dedicated")) {
-                    Log.d("Dedicated", "Dedicated");
+//                    Log.d("Dedicated", "Dedicated");
                     Toast.makeText(requireContext(), "Dedicated", Toast.LENGTH_SHORT).show();
                     binding.transportModeSharedLayout.setVisibility(View.GONE);
                     binding.transportModeDedicatedLayout.setVisibility(View.VISIBLE);
@@ -617,7 +617,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrl = dataObject.getString("imageUrl");
                                 imageKey = dataObject.getString("imageKey");
-                                Log.d("handleFile1 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile1 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile1 Response", "Response body is null");
@@ -665,7 +665,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlOne = dataObject.getString("imageUrlOne");
                                 imageKeyOne = dataObject.getString("imageKeyOne");
-                                Log.d("handleFile2 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile2 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile2 Response", "Response body is null");
@@ -714,7 +714,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlTwo = dataObject.getString("imageUrlTwo");
                                 imageKeyTwo = dataObject.getString("imageKeyTwo");
-                                Log.d("handleFile3 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile3 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile3 Response", "Response body is null");
@@ -762,7 +762,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlThree = dataObject.getString("imageUrlThree");
                                 imageKeyThree = dataObject.getString("imageKeyThree");
-                                Log.d("handleFile4 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile4 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile4 Response", "Response body is null");
@@ -811,7 +811,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlFour = dataObject.getString("imageUrlFour");
                                 imageKeyFour = dataObject.getString("imageKeyFour");
-                                Log.d("handleFile5 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile5 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile5 Response", "Response body is null");
@@ -860,7 +860,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlFive = dataObject.getString("imageUrlFive");
                                 imageKeyFive = dataObject.getString("imageKeyFive");
-                                Log.d("handleFile6 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile6 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile6 Response", "Response body is null");
@@ -908,7 +908,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlSix = dataObject.getString("imageUrlSix");
                                 imageKeySix = dataObject.getString("imageKeySix");
-                                Log.d("handleFile7 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile7 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile7 Response", "Response body is null");
@@ -957,7 +957,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlSeven = dataObject.getString("imageUrlSeven");
                                 imageKeySeven = dataObject.getString("imageKeySeven");
-                                Log.d("handleFile8 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile8 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile8 Response", "Response body is null");
@@ -1006,7 +1006,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlEight = dataObject.getString("imageUrlEight");
                                 imageKeyEight = dataObject.getString("imageKeyEight");
-                                Log.d("handleFile9 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile9 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile9 Response", "Response body is null");
@@ -1055,7 +1055,7 @@ public class ClaimManagementFragment extends Fragment {
                                 JSONObject dataObject = jsonResponse.getJSONObject("data");
                                 imageUrlNine = dataObject.getString("imageUrlNine");
                                 imageKeyNine = dataObject.getString("imageKeyNine");
-                                Log.d("handleFile10 Response", "Full Response (JSON): " + responseBodyString);
+//                                Log.d("handleFile10 Response", "Full Response (JSON): " + responseBodyString);
                                 Toast.makeText(requireContext(), "File uploaded successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("handleFile10 Response", "Response body is null");
@@ -1100,13 +1100,6 @@ public class ClaimManagementFragment extends Fragment {
         }
         return byteBuffer.toByteArray();
     }
-
-//    private void logFileInfo(Uri uri) {
-//        String fileName = getFileNameFromUri(uri);
-//        String fileType = requireContext().getContentResolver().getType(uri);
-//
-//        Log.d("FileInfo", "File Name: " + fileName + ", File Type: " + fileType + ", File URI: " + uri);
-//    }
 
     // Helper method to display the file name
     private void displayFileName(Uri uri) {

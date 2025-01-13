@@ -109,55 +109,13 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             actionButton = itemView.findViewById(R.id.actionButton);
 
             viewDetailsButton.setOnClickListener(v -> {
-                Log.d("ClaimViewHolder", "View Details button clicked");
+//                Log.d("ClaimViewHolder", "View Details button clicked");
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listener != null) {
                     listener.onClaimClick(claimList.get(position));
                 }
             });
-//            actionButton.setOnClickListener(v -> {
-//                int position = getAdapterPosition();
-//                if (position != RecyclerView.NO_POSITION) {
-//                    EmployeeClaimdataItem claim = claimList.get(position);
-//
-//                    // Create a MaterialAlertDialogBuilder
-//                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog);
-//                    builder.setTitle("Claim Action");
-//                    String message = "Choose an action for this claim:\nClaim ID: " + claim.getClaimId();
-//                    builder.setMessage(message);
-//
-//                    builder.setPositiveButton("Approve", (dialog, which) -> {
-//                        // Call API to approve the claim
-//                        updateClaimStatus(claim, "Approved");
-//                    });
-//
-//                    builder.setNeutralButton("Cancel", (dialog, which) -> {
-//                        // Dismiss the dialog (no action needed)
-//                        updateClaimStatus(claim, "Cancelled");
-//                    });
-//
-//                    builder.setNegativeButton("Reject", (dialog, which) -> {
-//                        // Call API to reject the claim
-//                        updateClaimStatus(claim, "Rejected");
-//                    });
-//
-//                    AlertDialog dialog = builder.create();
-//
-//                    // Customize button colors (optional)
-//                    dialog.setOnShowListener(dialogInterface -> {
-//                        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-//                        positiveButton.setTextColor(ContextCompat.getColor(context, R.color.status_approved));
-//
-//                        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-//                        negativeButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
-//
-//                        Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-//                        neutralButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
-//                    });
-//
-//                    dialog.show();
-//                }
-//            });
+
             actionButton.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
@@ -301,7 +259,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             String authToken = sharedPreferences.getString("authToken", "");
             String userId = sharedPreferences.getString("userId", "");
             String claimId = claim.getId();
-            Log.d("ClaimViewHolder", "Claim ID: " + claimId);
+//            Log.d("ClaimViewHolder", "Claim ID: " + claimId);
 
             ProfileViewModel profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
             profileViewModel.storeLoginData(userId, authToken);

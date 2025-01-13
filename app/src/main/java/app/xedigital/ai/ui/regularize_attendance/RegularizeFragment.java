@@ -96,7 +96,7 @@ public class RegularizeFragment extends Fragment {
         profileViewModel.storeLoginData(userId, authToken);
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
-            Log.d("RegularizeFragment", "Observer triggered");
+//            Log.d("RegularizeFragment", "Observer triggered");
             if (userProfile != null) {
                 this.userProfile = userProfile;
             } else {
@@ -105,60 +105,6 @@ public class RegularizeFragment extends Fragment {
         });
 
         profileViewModel.fetchUserProfile();
-//
-//        if (attendanceItem != null) {
-//            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//            timeFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
-//            try {
-//                Date punchDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchDate());
-//                Date punchInTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchIn());
-//                Date punchOutTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(attendanceItem.getPunchOut());
-//
-//                if (punchDate != null && punchInTime != null && punchOutTime != null) {
-//                    atDate.setText(dateFormatter.format(punchDate));
-//                    atDate.setFocusable(false);
-//                    atDate.clearFocus();
-//                    timePunchIn.setText(timeFormatter.format(punchInTime));
-//                    timePunchOut.setText(timeFormatter.format(punchOutTime));
-//                }
-//                etPunchInAddress.setText(attendanceItem.getPunchInAddress());
-//                etPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
-//
-//            } catch (ParseException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-
-//        if (attendanceItem != null) {
-//            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//            // Set timeFormatter to the desired display time zone
-//            timeFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
-//
-//            try {
-//                // Parsing with explicit UTC time zone
-//                SimpleDateFormat inputFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-//                inputFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-//
-//                Date punchDate = inputFormatter.parse(attendanceItem.getPunchDate());
-//                Date punchInTime = inputFormatter.parse(attendanceItem.getPunchIn());
-//                Date punchOutTime = inputFormatter.parse(attendanceItem.getPunchOut());
-//
-//                if (punchDate != null && punchInTime != null && punchOutTime != null) {
-//                    atDate.setText(dateFormatter.format(punchDate));
-//                    atDate.setFocusable(false);
-//                    atDate.clearFocus();
-//                    timePunchIn.setText(timeFormatter.format(punchInTime));
-//                    timePunchOut.setText(timeFormatter.format(punchOutTime));
-//                }
-//                etPunchInAddress.setText(attendanceItem.getPunchInAddress());
-//                etPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
-//            } catch (ParseException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-
         if (attendanceItem != null) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm", Locale.getDefault());
@@ -270,9 +216,9 @@ public class RegularizeFragment extends Fragment {
         apiInterface = APIClient.getInstance().RegularizeAttendance();
         if (getArguments() != null) {
             attendanceItem = (EmployeePunchDataItem) getArguments().getSerializable(ARG_ATTENDANCE_ITEM);
-            Log.d("RegularizeFragment", "Attendance Item: " + attendanceItem);
+//            Log.d("RegularizeFragment", "Attendance Item: " + attendanceItem);
             if (attendanceItem != null) {
-                Log.d("RegularizeFragment", "Attendance Item ID: " + attendanceItem.getId());
+//                Log.d("RegularizeFragment", "Attendance Item ID: " + attendanceItem.getId());
             } else {
                 Log.d("RegularizeFragment", "Attendance Item is null");
             }
@@ -385,7 +331,7 @@ public class RegularizeFragment extends Fragment {
                         String responseBodyString = response.body().string();
                         JSONObject jsonObject = new JSONObject(responseBodyString);
                         String message = jsonObject.getString("message");
-                        Log.d("AddAttendanceMessage", message);
+//                        Log.d("AddAttendanceMessage", message);
                         showAlertDialog("Attendance Regularize Applied", message);
                     } else {
                         showAlertDialog("Error", "Regularization failed");

@@ -1,6 +1,5 @@
 package app.xedigital.ai.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +57,7 @@ public class HolidayAdapter extends RecyclerView.Adapter<HolidayAdapter.HolidayV
                 String dateText = formattedDate + " (" + dayOfWeek + ")";
 
                 holder.holidayDate.setText(dateText);
-                Log.d("HolidayAdapter", "Setting holiday date: " + dateText);
+//                Log.d("HolidayAdapter", "Setting holiday date: " + dateText);
             }
 
         } catch (ParseException e) {

@@ -49,10 +49,6 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppliedLeavesApproveItem item = items.get(position);
-
-//        holder.empName.setText(item.getFirstname() + " " + item.getLastname());
-
-
         holder.empName.setText((item.getFirstname() != null ? item.getFirstname() : "") + " " + (item.getLastname() != null ? item.getLastname() : ""));
 
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());

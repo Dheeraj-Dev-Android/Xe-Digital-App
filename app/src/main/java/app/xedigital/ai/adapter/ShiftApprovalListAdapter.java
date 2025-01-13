@@ -73,7 +73,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.userProfile.observe(lifecycleOwner, userProfile -> {
             if (userProfile != null) {
-                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
+//                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
                 fName = userProfile.getData().getEmployee().getFirstname();
                 lName = userProfile.getData().getEmployee().getLastname();
                 empId = userProfile.getData().getEmployee().getId();
@@ -190,7 +190,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
                     ResponseBody responseBody = response.body();
                     if (response.isSuccessful() && responseBody != null) {
                         String responseJson = gson.toJson(response.body());
-                        Log.d("ShiftStatus", "Response JSON: " + responseJson);
+//                        Log.d("ShiftStatus", "Response JSON: " + responseJson);
                     } else {
                         // Log error response
                         assert response.errorBody() != null;

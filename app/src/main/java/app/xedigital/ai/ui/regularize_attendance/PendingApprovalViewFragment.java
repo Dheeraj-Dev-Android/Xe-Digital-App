@@ -68,7 +68,7 @@ public class PendingApprovalViewFragment extends Fragment {
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String formattedDateTime = dateTimeFormat.format(currentDateTime);
-        Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
+//        Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
         return formattedDateTime;
 
     }
@@ -186,7 +186,7 @@ public class PendingApprovalViewFragment extends Fragment {
                     String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
                     if (reportingManagerFirstName != null && reportingManagerLastName != null) {
                         reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                        Log.e("RegularizeApprovalAdapter", "reportingManager: " + reportingManager);
+//                        Log.e("RegularizeApprovalAdapter", "reportingManager: " + reportingManager);
                     }
                 }
             });
@@ -195,11 +195,11 @@ public class PendingApprovalViewFragment extends Fragment {
     }
 
     public void handleApprove(String attendanceId) {
-        Log.d("RegularizeApprovalAdapter", "handleApprove: " + attendanceId);
+//        Log.d("RegularizeApprovalAdapter", "handleApprove: " + attendanceId);
         RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
         requestBody.setStatus("Approved");
         requestBody.setApprovedByName(reportingManager);
-        Log.d("RegularizeApprovalAdapter", "handleApprove: " + reportingManager);
+//        Log.d("RegularizeApprovalAdapter", "handleApprove: " + reportingManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -216,7 +216,7 @@ public class PendingApprovalViewFragment extends Fragment {
                     if (listener != null) {
                         listener.onApprove(item);
                     }
-                    Log.d("RegularizeApprovalAdapter", "onResponse: " + gson.toJson(response.body()));
+//                    Log.d("RegularizeApprovalAdapter", "onResponse: " + gson.toJson(response.body()));
                 } else {
                     Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
                 }
@@ -234,8 +234,8 @@ public class PendingApprovalViewFragment extends Fragment {
         RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
         requestBody.setStatus("Rejected");
         requestBody.setApprovedByName(reportingManager);
-        Log.d("RegularizeApprovalAdapter", "handleReject: " + reportingManager);
-        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
+//        Log.d("RegularizeApprovalAdapter", "handleReject: " + reportingManager);
+//        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
 
@@ -252,7 +252,7 @@ public class PendingApprovalViewFragment extends Fragment {
                         listener.onApprove(item);
                     }
                 } else {
-                    Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
+//                    Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
                 }
             }
 

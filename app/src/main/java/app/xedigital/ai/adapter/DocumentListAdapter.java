@@ -48,19 +48,7 @@ public class DocumentListAdapter extends RecyclerView.Adapter<DocumentListAdapte
         holder.documentNameTextView.setText(document.getDocumentName());
         holder.employeeNameTextView.setText(document.getEmpFirstName() + " " + document.getEmpLastName());
         holder.createdAtTextView.setText(DateTimeUtils.getDayOfWeekAndDate(document.getCreatedAt()));
-//        holder.documentUrlTextView.setText(document.getDocFileURL());
-//        holder.documentIcon.setOnClickListener(v -> {
-//            // Open document using the URL
-//            Intent intent = new Intent(Intent.ACTION_VIEW);
-//            intent.setDataAndType(Uri.parse(document.getDocFileURL()), "application/*");
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//            try {
-//                holder.itemView.getContext().startActivity(intent);
-//            } catch (android.content.ActivityNotFoundException e) {
-//                Log.e("DocumentListAdapter", "Error opening document: " + e.getMessage());
-//            }
-//        });
+
         holder.documentIcon.setOnClickListener(v -> {
             // Show the image in a dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(holder.itemView.getContext());

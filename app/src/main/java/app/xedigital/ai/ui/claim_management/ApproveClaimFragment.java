@@ -170,12 +170,12 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
                         } else {
                             approveClaimAdapter.updateData(claimList);
                             emptyStateContainer.setVisibility(View.GONE);
-                            Log.d("API Response", "Data fetched successfully");
+//                            Log.d("API Response", "Data fetched successfully");
                         }
                         approveClaimAdapter = new ApproveClaimAdapter(approveClaimResponse.getData().getEmployeeClaimdata());
                         approveClaimAdapter.setOnClaimClickListener(ApproveClaimFragment.this);
                         recyclerView.setAdapter(approveClaimAdapter);
-                        Log.d("ApproveClaimFragment", "Response: " + approveClaimResponse);
+//                        Log.d("ApproveClaimFragment", "Response: " + approveClaimResponse);
                     } else {
                         emptyStateContainer.setVisibility(View.VISIBLE);
                         Log.e("ApproveClaimFragment", "Data is null or empty in response");

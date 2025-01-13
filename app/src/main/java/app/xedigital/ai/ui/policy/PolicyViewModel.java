@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.policy;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -56,7 +54,7 @@ public class PolicyViewModel extends ViewModel {
                     // Log the JSON response using Gson
                     Gson gson = new Gson();
                     String jsonResponse = gson.toJson(response.body());
-                    Log.d("PolicyViewModel", "Policies Response JSON: " + jsonResponse);
+//                    Log.d("PolicyViewModel", "Policies Response JSON: " + jsonResponse);
                 } else {
                     error.setValue(new Exception("API request failed with code " + response.code()));
                 }

@@ -224,11 +224,11 @@ public class TimesheetFormFragment extends Fragment {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
-                        Log.d(TAG, "Response: " + responseBody);
+//                        Log.d(TAG, "Response: " + responseBody);
 
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
-                        Log.d(TAG, "Message: " + message);
+//                        Log.d(TAG, "Message: " + message);
                         showAlertDialog("Timesheet Submitted", message);
                     } else {
                         showAlertDialog("Error submitting timesheet", response.message());
@@ -335,10 +335,10 @@ public class TimesheetFormFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     UserModelResponse userResponse = response.body();
                     String responseJson = gson.toJson(userResponse.getData());
-                    Log.d(TAG, "Response: " + responseJson);
+//                    Log.d(TAG, "Response: " + responseJson);
                     String branchId = userResponse.getData().getBranch().getId();
                     callBranchApi(branchId, authToken);
-                    Log.d(TAG, "Branch ID: " + branchId);
+//                    Log.d(TAG, "Branch ID: " + branchId);
                 }
             }
 
@@ -359,9 +359,9 @@ public class TimesheetFormFragment extends Fragment {
                     try {
                         UserBranchResponse responseBranch = response.body();
                         String responseString = gson.toJson(responseBranch);
-                        Log.d("BranchData", "Response: " + responseString);
+//                        Log.d("BranchData", "Response: " + responseString);
                         notificationMail = responseBranch.getData().getBranch().getNotificationEmail();
-                        Log.d("BranchData", "Notification Email: " + notificationMail);
+//                        Log.d("BranchData", "Notification Email: " + notificationMail);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.d("BranchData", "Error parsing response: " + e.getMessage());

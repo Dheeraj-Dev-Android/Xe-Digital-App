@@ -68,7 +68,7 @@ public class TimesheetViewModel extends ViewModel {
                     if (response.isSuccessful() && response.body() != null) {
                         _dcrData.postValue(response.body());
                         String responsejson = gson.toJson(response.body());
-                        Log.d("DcrDataResponse", "Response:\n " + responsejson);
+//                        Log.d("DcrDataResponse", "Response:\n " + responsejson);
                     } else {
                         Log.e("DcrDataResponse", "Error: " + response.code());
                     }
@@ -94,10 +94,10 @@ public class TimesheetViewModel extends ViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     UserModelResponse userResponse = response.body();
                     String responseJson = gson.toJson(userResponse.getData());
-                    Log.d(TAG, "Response: " + responseJson);
+//                    Log.d(TAG, "Response: " + responseJson);
                     String branchId = userResponse.getData().getBranch().getId();
                     callBranchApi(branchId, authToken);
-                    Log.d(TAG, "Branch ID: " + branchId);
+//                    Log.d(TAG, "Branch ID: " + branchId);
                 }
             }
 
@@ -118,9 +118,9 @@ public class TimesheetViewModel extends ViewModel {
                     try {
                         UserBranchResponse responseBranch = response.body();
                         String responseString = gson.toJson(responseBranch);
-                        Log.d("BranchData", "Response: " + responseString);
+//                        Log.d("BranchData", "Response: " + responseString);
                         String notificationMail = responseBranch.getData().getBranch().getNotificationEmail();
-                        Log.d("BranchData", "Notification Email: " + notificationMail);
+//                        Log.d("BranchData", "Notification Email: " + notificationMail);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
