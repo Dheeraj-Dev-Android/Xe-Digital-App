@@ -35,7 +35,7 @@ public class ProfileFragment extends Fragment {
         setHasOptionsMenu(true);
         binding.profileLoader.setVisibility(View.VISIBLE);
         binding.emptyStateText.setVisibility(View.GONE);
-        binding.punchCardView.setVisibility(View.GONE);
+        binding.profileCard.setVisibility(View.GONE);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
         String authToken = sharedPreferences.getString("authToken", null);
@@ -46,22 +46,30 @@ public class ProfileFragment extends Fragment {
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
             binding.profileLoader.setVisibility(View.GONE);
-            if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null) {
+            // Check if userProfile or its nested data is null. If so, show empty state
+            if (userProfile == null || userProfile.getData() == null || userProfile.getData().getEmployee() == null) {
+                binding.profileCard.setVisibility(View.GONE);
+                binding.emptyStateText.setVisibility(View.VISIBLE);
+                Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
+                return; // Exit early if there's no profile data.
+            }
 
-                Employee employee = userProfile.getData().getEmployee();
 
-                if (employee != null) {
-                    Object profileImageUrl = employee.getProfileImageUrl();
-                    ImageView profileImage = binding.profileImage;
-                    binding.punchCardView.setVisibility(View.VISIBLE);
+            Employee employee = userProfile.getData().getEmployee();
+
+            if (employee != null) {
+                Object profileImageUrl = employee.getProfileImageUrl();
+                ImageView profileImage = binding.profileImage;
+
+
+                if (profileImageUrl != null) {
+                    Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage);
+                    binding.profileCard.setVisibility(View.VISIBLE);
                     binding.emptyStateText.setVisibility(View.GONE);
-
-                    if (profileImageUrl != null) {
-                        Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage);
-                    } else {
-                        profileImage.setImageResource(R.mipmap.ic_default_profile);
-                    }
-
+                } else {
+                    binding.profileCard.setVisibility(View.VISIBLE);
+                    profileImage.setImageResource(R.mipmap.ic_default_profile);
+                }
                     binding.employeeCodeTitle.setText("Emp Code ");
                     binding.employeeCodeValue.setText(employee.getEmployeeCode());
                     binding.nameTitle.setText("Name ");
@@ -103,14 +111,8 @@ public class ProfileFragment extends Fragment {
                         binding.crossManagerEmailValue.setText("");
                     }
 
-                } else {
-                    Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
-                }
-                binding.punchCardView.setVisibility(View.GONE);
-                binding.emptyStateText.setVisibility(View.VISIBLE);
             } else {
-                binding.punchCardView.setVisibility(View.GONE);
-                binding.emptyStateText.setVisibility(View.VISIBLE);
+                // This block is no longer needed as we handle empty state at the top
                 Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
             }
         });

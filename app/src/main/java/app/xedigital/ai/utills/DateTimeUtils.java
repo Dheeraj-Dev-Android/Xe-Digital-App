@@ -182,4 +182,16 @@ public class DateTimeUtils {
         }
         return "N/A";
     }
+
+
+    public static String getCurrentDateInISOFormat() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
+    }
+
+    public static void main(String[] args) {
+        String currentDate = getCurrentDateInISOFormat();
+        System.out.println(currentDate);  // Output: something like "2025-01-13T10:15:30.123Z"
+    }
 }

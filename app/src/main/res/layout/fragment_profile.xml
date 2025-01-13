@@ -9,6 +9,7 @@
     tools:context=".ui.profile.ProfileFragment">
 
     <LinearLayout
+        android:id="@+id/profileCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

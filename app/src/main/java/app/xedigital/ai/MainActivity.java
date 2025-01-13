@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isLeavesSubmenuVisible = false;
     private boolean isDcrSubmenuVisible = false;
     private NavigationView navigationView;
+    private boolean isNetworkChangeReceiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -313,29 +314,33 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-
-        if (!NetworkUtils.isNetworkAvailable(this)) {
-            showNoInternetLayout();
-        } else if (!NetworkUtils.isNetworkSpeedGood(this)) {
-            showSlowInternetLayout();
-        } else {
-            hideNoInternetLayout();
-            hideSlowInternetLayout();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(networkChangeReceiver);
+        IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(networkChangeReceiver, filter);
+        isNetworkChangeReceiverRegistered = true;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(networkChangeReceiver);
-        hideNoInternetLayout();
-        hideSlowInternetLayout();
+        unregisterNetworkReceiver();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterNetworkReceiver();
+
+    }
+
+    private void unregisterNetworkReceiver() {
+        if (isNetworkChangeReceiverRegistered) {
+            try {
+                unregisterReceiver(networkChangeReceiver);
+                isNetworkChangeReceiverRegistered = false;
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Error unregistering receiver: " + e.getMessage());
+            }
+        }
     }
 }

@@ -51,6 +51,7 @@ import app.xedigital.ai.model.faceAdd.AddFaceRequest;
 import app.xedigital.ai.model.faceAdd.AddFaceResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.visitorsDetails.VisitorsDetailsResponse;
+import app.xedigital.ai.utills.DateTimeUtils;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -439,6 +440,7 @@ public class VisitorPreApprovedFragment extends Fragment {
         if (isValidInput()) {
             showLoader();
             button.setEnabled(false);
+            String currentDate = DateTimeUtils.getCurrentDateInISOFormat();
             // Create an instance of PreApprovedVisitorRequest
             PreApprovedVisitorRequest requestPreApproved = new PreApprovedVisitorRequest();
             requestPreApproved.setName(Objects.requireNonNull(binding.etName.getText()).toString());
@@ -448,27 +450,19 @@ public class VisitorPreApprovedFragment extends Fragment {
             requestPreApproved.setPreApprovedDate(Objects.requireNonNull(binding.etPreApprovedDate.getText()).toString());
 
             requestPreApproved.setWhomToMeet(userId);
-//            request.setDepartment("60e82cf36ba1893ddb00191d");
+            requestPreApproved.setDepartment("60e82cf36ba1893ddb00191d");
             requestPreApproved.setProfileImage("");
-//            request.setProfileImagePath("https://visitors-profile-images.s3.ap-south-1.amazonaws.com/814gdko69t.jpg");
+            requestPreApproved.setProfileImagePath("");
             requestPreApproved.setGovernmentIdUploadedImage("");
             requestPreApproved.setGovernmentIdUploadedImagePath("");
             requestPreApproved.setApprovalStatus("approved");
-//            request.setApprovalDate("2025-01-06T10:41:33.159Z");
-//            request.setCompany("60b47a7c777af75d3f8346b1");
-//            request.setActive(true);
+            requestPreApproved.setApprovalDate(currentDate);
+            requestPreApproved.setCompany("60b47a7c777af75d3f8346b1");
+            requestPreApproved.setActive(true);
             requestPreApproved.setIsPreApproved(true);
             requestPreApproved.setType("create");
-//            request.setIsProfileImageDetailFound(false);
-//            FaceData faceData = new FaceData();
-//            Face face = new Face();
-//            BoundingBox boundingBox = new BoundingBox();
-//            boundingBox.setWidth(0.2820533215999603);
-//            boundingBox.setHeight(0.4170183539390564);
-//            boundingBox.setLeft(0.3498215079307556);
-//            boundingBox.setTop(0.14774657785892487);
-//            face.setBoundingBox(boundingBox);
-//            request.setFaceData(faceData);
+            requestPreApproved.setIsProfileImageDetailFound(false);
+
 
             APIInterface submitPreApprovedVisitor = APIClient.getInstance().getApi();
             Call<ResponseBody> call = submitPreApprovedVisitor.PreApprovedVisitor("jwt " + authToken, requestPreApproved);
