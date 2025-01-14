@@ -151,9 +151,9 @@ public class DashboardFragment extends Fragment {
 
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-            String userId = sharedPreferences.getString("userId", null);
-            String authToken = sharedPreferences.getString("authToken", null);
-            String name = sharedPreferences.getString("name", null);
+            String userId = sharedPreferences.getString("userId", "");
+            String authToken = sharedPreferences.getString("authToken", "");
+            String name = sharedPreferences.getString("name", "");
 
             Intent intent = new Intent(requireContext(), PunchActivity.class);
             intent.putExtra("userId", userId);
@@ -161,10 +161,14 @@ public class DashboardFragment extends Fragment {
             intent.putExtra("name", name);
 
             Drawable[] drawables = binding.punchButton.getCompoundDrawablesRelative();
-            AnimatedVectorDrawable animatedVector = (AnimatedVectorDrawable) drawables[2];
-            if (animatedVector != null) {
-                animatedVector.start();
+            if (drawables != null && drawables.length > 2) {
+                Drawable drawable = drawables[2];
+                if (drawable instanceof AnimatedVectorDrawable) {
+                    AnimatedVectorDrawable animatedVector = (AnimatedVectorDrawable) drawable;
+                    animatedVector.start();
+                }
             }
+
             startActivity(intent);
         });
 

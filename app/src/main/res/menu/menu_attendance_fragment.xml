@@ -5,5 +5,6 @@
         android:id="@+id/action_filter_attendance"
         android:icon="@mipmap/ic_filter"
         android:title=""
+        android:tooltipText="Filter"
         app:showAsAction="always" />
 </menu>
