@@ -63,7 +63,7 @@ public class ProfileFragment extends Fragment {
 
 
                 if (profileImageUrl != null) {
-                    Glide.with(requireContext()).load(profileImageUrl).circleCrop().into(profileImage);
+                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
                     binding.profileCard.setVisibility(View.VISIBLE);
                     binding.emptyStateText.setVisibility(View.GONE);
                 } else {

@@ -47,18 +47,55 @@
                 android:background="@drawable/punch_card_background"
                 android:padding="16dp">
 
-                <ImageView
-                    android:id="@+id/profile_image"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:backgroundTint="?attr/colorPrimary"
-                    android:backgroundTintMode="screen"
-                    android:contentDescription="@string/user_profile_picture"
-                    android:src="@mipmap/ic_default_profile"
+                <!--                <ImageView-->
+                <!--                    android:id="@+id/profile_image"-->
+                <!--                    android:layout_width="150dp"-->
+                <!--                    android:layout_height="150dp"-->
+                <!--                    android:backgroundTint="?attr/colorPrimary"-->
+                <!--                    android:backgroundTintMode="screen"-->
+                <!--                    android:contentDescription="@string/user_profile_picture"-->
+                <!--                    android:src="@mipmap/ic_default_profile"-->
+                <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+                <!--                    app:layout_constraintStart_toStartOf="parent"-->
+                <!--                    app:layout_constraintTop_toTopOf="parent" />-->
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/profileBorderContainer"
+                    android:layout_width="175dp"
+                    android:layout_height="175dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="44dp"
+                    app:cardElevation="2dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="4dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/profileImageContainer"
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_gravity="center"
+                        app:cardCornerRadius="40dp"
+                        app:cardElevation="4dp">
+
+                        <ImageView
+                            android:id="@+id/profile_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/user_profile_picture"
+                            android:elevation="5dp"
+                            android:scaleType="centerCrop"
+                            android:src="@mipmap/ic_default_profile"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
