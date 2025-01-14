@@ -257,11 +257,7 @@ public class DashboardFragment extends Fragment {
                 ImageView profileImage = binding.ivEmployeeProfile;
 
                 if (profileImageUrl != null) {
-                    Glide.with(requireContext())
-                            .load(profileImageUrl)
-                            .circleCrop()
-                            .into(profileImage)
-                            .onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
+                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
                 } else {
                     profileImage.setImageResource(R.mipmap.ic_default_profile);
                 }
@@ -285,18 +281,17 @@ public class DashboardFragment extends Fragment {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String currentDate = dateFormat.format(new Date());
 
-                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream()
-                            .filter(punchData -> {
-                                try {
-                                    SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                                    Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
-                                    String formattedPunchDate = dateFormat.format(punchDate);
-                                    return formattedPunchDate.equals(currentDate);
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                    return false;
-                                }
-                            }).collect(Collectors.toList());
+                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
+                        try {
+                            SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
+                            String formattedPunchDate = dateFormat.format(punchDate);
+                            return formattedPunchDate.equals(currentDate);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            return false;
+                        }
+                    }).collect(Collectors.toList());
 
                     requireActivity().runOnUiThread(() -> {
                         if (!currentPunchData.isEmpty()) {
