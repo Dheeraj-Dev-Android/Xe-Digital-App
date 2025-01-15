@@ -299,6 +299,8 @@ public class ClaimManagementFragment extends Fragment {
                 selectedChip = chipGroup.findViewById(checkedId);
                 if (selectedChip != null) break;
             }
+
+            // Show/hide travel fields and Location Details
             boolean isTravelSelected = selectedChip != null && selectedChip.getId() == R.id.travelChip;
             travelCategoryDropdownLayout.setVisibility(isTravelSelected ? View.VISIBLE : View.GONE);
             transportModeDropdownLayout.setVisibility(isTravelSelected ? View.VISIBLE : View.GONE);

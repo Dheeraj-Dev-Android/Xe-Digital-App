@@ -18,7 +18,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -257,7 +256,7 @@ public class DashboardFragment extends Fragment {
                 ImageView profileImage = binding.ivEmployeeProfile;
 
                 if (profileImageUrl != null) {
-                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage).onLoadFailed(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_default_profile, null));
+                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
                 } else {
                     profileImage.setImageResource(R.mipmap.ic_default_profile);
                 }

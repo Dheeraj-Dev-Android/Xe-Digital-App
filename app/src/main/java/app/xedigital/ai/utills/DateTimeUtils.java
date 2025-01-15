@@ -38,9 +38,6 @@ public class DateTimeUtils {
     }
 
     public static String extractTime(String dateTimeString) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-//        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, formatter);
-//        return offsetDateTime.toLocalTime().toString();
         DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, formatter);
         int hour = offsetDateTime.toLocalTime().getHour();
@@ -66,17 +63,6 @@ public class DateTimeUtils {
 
                 Date shiftStart = shiftFormat.parse(shiftStartTime);
                 Date punchIn = time12Format.parse(punchIn12);
-
-//                if (punchIn != null && punchIn.after(shiftStart)) {
-//                    if (shiftStart != null) {
-//                        long lateInMillis = punchIn.getTime() - shiftStart.getTime();
-//                        long lateHours = lateInMillis / (60 * 60 * 1000);
-//                        long lateMinutes = (lateInMillis % (60 * 60 * 1000)) / (60 * 1000);
-//                        return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, lateMinutes);
-//                    }
-//                } else {
-//                    return "0 Min's";
-//                }
 
                 if (punchIn != null && punchIn.after(shiftStart)) {
                     if (shiftStart != null) {
@@ -131,7 +117,7 @@ public class DateTimeUtils {
                         return String.format(Locale.getDefault(), "%02d Min's", overtimeMinutes);
                     }
                 } else {
-                    return "0";
+                    return "0 Min's";
                 }
             }
         } catch (ParseException e) {
@@ -192,6 +178,6 @@ public class DateTimeUtils {
 
     public static void main(String[] args) {
         String currentDate = getCurrentDateInISOFormat();
-        System.out.println(currentDate);  // Output: something like "2025-01-13T10:15:30.123Z"
+        System.out.println(currentDate);
     }
 }
