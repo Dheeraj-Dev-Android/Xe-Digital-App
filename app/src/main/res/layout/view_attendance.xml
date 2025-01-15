@@ -137,7 +137,9 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/totalTimeLabel"
                         android:text="9h"
-                        android:textAppearance="?attr/textAppearanceBody2" />
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="#4CAF50"
+                        android:textStyle="bold" />
 
                 </RelativeLayout>
 
@@ -163,7 +165,9 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/overtimeLabel"
                         android:text="1h"
-                        android:textAppearance="?attr/textAppearanceBody2" />
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="#FF9800"
+                        android:textStyle="bold" />
 
                 </RelativeLayout>
 
@@ -188,7 +192,9 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/lateLabel"
                         android:text="0h"
-                        android:textAppearance="?attr/textAppearanceBody2" />
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="#F44336"
+                        android:textStyle="bold" />
                 </RelativeLayout>
 
             </LinearLayout>
