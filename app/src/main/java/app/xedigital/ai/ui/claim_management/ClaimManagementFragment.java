@@ -238,23 +238,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.meetingTypeDropdown.setAdapter(adapter);
         });
 
-//        claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
-//            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories);
-//            binding.claimCategoryDropdown.setAdapter(adapter);
-//        });
-
-//        claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
-//            // Filter the list to include only "General"
-//            List<String> filteredCategories = new ArrayList<>();
-//            for (String category : claimCategories) {
-//                if (category.equals("Select an option") || category.equals("General")) {
-//                    filteredCategories.add(category);
-//                }
-//            }
-//
-//            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, filteredCategories);
-//            binding.claimCategoryDropdown.setAdapter(adapter);
-//        });
         claimManagementViewModel.getClaimCategories().observe(getViewLifecycleOwner(), claimCategories -> {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, claimCategories);
             binding.claimCategoryDropdown.setAdapter(adapter);
@@ -316,8 +299,6 @@ public class ClaimManagementFragment extends Fragment {
                 selectedChip = chipGroup.findViewById(checkedId);
                 if (selectedChip != null) break;
             }
-
-            // Show/hide travel fields and Location Details
             boolean isTravelSelected = selectedChip != null && selectedChip.getId() == R.id.travelChip;
             travelCategoryDropdownLayout.setVisibility(isTravelSelected ? View.VISIBLE : View.GONE);
             transportModeDropdownLayout.setVisibility(isTravelSelected ? View.VISIBLE : View.GONE);
