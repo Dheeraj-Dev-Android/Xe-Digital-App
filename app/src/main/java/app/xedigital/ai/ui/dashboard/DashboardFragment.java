@@ -4,17 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -238,26 +232,26 @@ public class DashboardFragment extends Fragment {
                 empContact = employee.getContact();
                 empDesignation = employee.getDesignation();
 
-                String fullName = employeeName + " " + employeeLastName;
-                // Create a SpannableString
-                SpannableString spannableString = new SpannableString(fullName);
+//                String fullName = employeeName + " " + employeeLastName;
+//                // Create a SpannableString
+//                SpannableString spannableString = new SpannableString(fullName);
+//
+//                // Apply color to the first letter of the first name
+//                if (!employeeName.isEmpty()) {
+//                    spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                }
+//
+//                // Apply color to the first letter of the last name
+//                if (!employeeLastName.isEmpty()) {
+//                    int lastNameStartIndex = employeeName.length() + 1;
+//                    spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                }
 
-                // Apply color to the first letter of the first name
-                if (!employeeName.isEmpty()) {
-                    spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                }
-
-                // Apply color to the first letter of the last name
-                if (!employeeLastName.isEmpty()) {
-                    int lastNameStartIndex = employeeName.length() + 1;
-                    spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                }
-
-                binding.tvEmployeeNameValue.setText(spannableString);
+                binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
                 binding.tvEmployeeDesignationValue.setText(empDesignation);
 
                 String startTime = employee.getShift().getStartTime();

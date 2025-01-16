@@ -6,14 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.shifts.ShiftAppliedFragment">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
         android:paddingHorizontal="12dp"
         android:paddingVertical="12dp">
-
 
         <!-- Rest of the layout remains the same -->
         <androidx.recyclerview.widget.RecyclerView
