@@ -136,4 +136,5 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/color_white</item>
     </style>
+
 </resources>

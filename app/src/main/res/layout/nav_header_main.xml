@@ -4,10 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="220dp"
     android:background="@drawable/nav_header_background"
-    android:paddingStart="16dp"
-    android:paddingTop="24dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="16dp">
+    android:padding="16dp">
 
     <!-- Border Container -->
     <com.google.android.material.card.MaterialCardView
@@ -54,7 +51,7 @@
         android:text="@string/nav_header_title"
         android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         android:textColor="@color/white"
-        android:textStyle="bold"
+        android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/profileBorderContainer" />

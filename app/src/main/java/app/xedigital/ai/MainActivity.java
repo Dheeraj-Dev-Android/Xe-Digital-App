@@ -6,8 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -275,14 +282,36 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     UserProfileResponse userProfileResponse = response.body();
                     if (userProfileResponse.isSuccess() && userProfileResponse.getData() != null && userProfileResponse.getData().getEmployee() != null) {
-                        profileName.setText(userProfileResponse.getData().getEmployee().getFirstname() + " " + userProfileResponse.getData().getEmployee().getLastname());
+                        String firstName = userProfileResponse.getData().getEmployee().getFirstname();
+                        String lastName = userProfileResponse.getData().getEmployee().getLastname();
+
+                        String fullName = firstName + " " + lastName;
+                        // Create a SpannableString
+                        SpannableString spannableString = new SpannableString(fullName);
+
+                        // Apply color to the first letter of the first name
+                        if (!firstName.isEmpty()) {
+                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+
+                        // Apply color to the first letter of the last name
+                        if (!lastName.isEmpty()) {
+                            int lastNameStartIndex = firstName.length() + 1;
+                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        profileName.setText(spannableString);
+
+//                        profileName.setText(userProfileResponse.getData().getEmployee().getFirstname() + " " + userProfileResponse.getData().getEmployee().getLastname());
                         profileEmail.setText(userProfileResponse.getData().getEmployee().getEmail());
                         if (userProfileResponse.getData().getEmployee().getProfileImageUrl() != null && !userProfileResponse.getData().getEmployee().getProfileImageUrl().isEmpty()) {
                             Glide.with(MainActivity.this).load(userProfileResponse.getData().getEmployee().getProfileImageUrl()).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
                         } else {
                             Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
                         }
-
 
                     } else {
                         Toast.makeText(MainActivity.this, "Profile fetch failed: " + userProfileResponse.getMessage(), Toast.LENGTH_SHORT).show();
