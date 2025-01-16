@@ -204,6 +204,7 @@
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayoutPassword"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -216,6 +217,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Enter password"
                 android:inputType="textPassword"
+                android:maxLength="16"
                 android:textColor="@color/_000000" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -231,6 +233,7 @@
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayoutConfirmPassword"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -243,17 +246,48 @@
                 android:layout_height="wrap_content"
                 android:hint="Confirm your password"
                 android:inputType="textPassword"
+                android:maxLength="16"
                 android:textColor="@color/_000000" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Update Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonUpdate"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:text="Update Profile" />
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+            <!-- Clear Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clearForm"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:text="Clear Form"
+                android:textAllCaps="false"
+                android:textColor="@color/_000000"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"
+                app:strokeColor="@color/_000000"
+                app:strokeWidth="2dp" />
+
+            <!-- Update Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonUpdate"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/_000000"
+                android:text="Update Profile"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"
+                app:elevation="4dp" />
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -261,7 +295,5 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone" />
-
     </LinearLayout>
-
 </ScrollView>

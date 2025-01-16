@@ -70,46 +70,46 @@ public class ProfileFragment extends Fragment {
                     binding.profileCard.setVisibility(View.VISIBLE);
                     profileImage.setImageResource(R.mipmap.ic_default_profile);
                 }
-                    binding.employeeCodeTitle.setText("Emp Code ");
-                    binding.employeeCodeValue.setText(employee.getEmployeeCode());
-                    binding.nameTitle.setText("Name ");
-                    binding.nameValue.setText(employee.getFirstname() + " " + employee.getLastname());
-                    binding.emailTitle.setText("Email ");
-                    binding.emailValue.setText(employee.getEmail());
-                    binding.contactTitle.setText("Contact ");
-                    binding.contactValue.setText(employee.getContact());
-                    if (employee.getDepartment() != null && employee.getDesignation() != null) {
-                        binding.departmentTitle.setText("Department ");
-                        binding.departmentValue.setText(employee.getDepartment().getName());
-                        binding.designationTitle.setText("Designation ");
-                        binding.designationValue.setText(employee.getDesignation());
-                    }
-                    binding.levelGradeTitle.setText("Level / Grade ");
-                    binding.levelGradeValue.setText(employee.getLevel() + " / " + employee.getGrade());
-                    if (employee.getShift() != null) {
-                        binding.shiftTitle.setText("Shift ");
-                        binding.shiftValue.setText(employee.getShift().getName());
-                        binding.shiftTimingTitle.setText("Timing ");
-                        binding.shiftTimingValue.setText(employee.getShift().getStartTime() + " - " + employee.getShift().getEndTime());
-                    }
-                    if (employee.getReportingManager() != null) {
-                        binding.reportingManagerTitle.setText("Name");
-                        binding.reportingManagerName.setText(employee.getReportingManager().getFirstname() + " " + employee.getReportingManager().getLastname());
-                        binding.reportingManagerEmail.setText("Email");
-                        binding.reportingManagerEmailValue.setText(employee.getReportingManager().getEmail());
-                    } else {
-                        binding.reportingManagerName.setText("Not Assigned");
-                        binding.reportingManagerEmailValue.setText("");
-                    }
-                    if (employee.getCrossmanager() != null) {
-                        binding.crossManagerTitle.setText("Name");
-                        binding.crossManagerName.setText(employee.getCrossmanager().getFirstname() + " " + employee.getCrossmanager().getLastname());
-                        binding.crossManagerEmail.setText("Email");
-                        binding.crossManagerEmailValue.setText(employee.getCrossmanager().getEmail());
-                    } else {
-                        binding.crossManagerName.setText("Not Assigned");
-                        binding.crossManagerEmailValue.setText("");
-                    }
+                binding.employeeCodeTitle.setText("Emp Code ");
+                binding.employeeCodeValue.setText(employee.getEmployeeCode());
+                binding.nameTitle.setText("Name ");
+                binding.nameValue.setText(employee.getFirstname() + " " + employee.getLastname());
+                binding.emailTitle.setText("Email ");
+                binding.emailValue.setText(employee.getEmail());
+                binding.contactTitle.setText("Contact ");
+                binding.contactValue.setText(employee.getContact());
+                if (employee.getDepartment() != null && employee.getDesignation() != null) {
+                    binding.departmentTitle.setText("Department ");
+                    binding.departmentValue.setText(employee.getDepartment().getName());
+                    binding.designationTitle.setText("Designation ");
+                    binding.designationValue.setText(employee.getDesignation());
+                }
+                binding.levelGradeTitle.setText("Level / Grade ");
+                binding.levelGradeValue.setText(employee.getLevel() + " / " + employee.getGrade());
+                if (employee.getShift() != null) {
+                    binding.shiftTitle.setText("Shift ");
+                    binding.shiftValue.setText(employee.getShift().getName());
+                    binding.shiftTimingTitle.setText("Timing ");
+                    binding.shiftTimingValue.setText(employee.getShift().getStartTime() + " - " + employee.getShift().getEndTime());
+                }
+                if (employee.getReportingManager() != null) {
+                    binding.reportingManagerTitle.setText("Name");
+                    binding.reportingManagerName.setText(employee.getReportingManager().getFirstname() + " " + employee.getReportingManager().getLastname());
+                    binding.reportingManagerEmail.setText("Email");
+                    binding.reportingManagerEmailValue.setText(employee.getReportingManager().getEmail());
+                } else {
+                    binding.reportingManagerName.setText("Not Assigned");
+                    binding.reportingManagerEmailValue.setText("");
+                }
+                if (employee.getCrossmanager() != null) {
+                    binding.crossManagerTitle.setText("Name");
+                    binding.crossManagerName.setText(employee.getCrossmanager().getFirstname() + " " + employee.getCrossmanager().getLastname());
+                    binding.crossManagerEmail.setText("Email");
+                    binding.crossManagerEmailValue.setText(employee.getCrossmanager().getEmail());
+                } else {
+                    binding.crossManagerName.setText("Not Assigned");
+                    binding.crossManagerEmailValue.setText("");
+                }
 
             } else {
                 // This block is no longer needed as we handle empty state at the top

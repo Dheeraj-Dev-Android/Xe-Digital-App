@@ -3,6 +3,7 @@ package app.xedigital.ai.ui.profile;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,7 @@ public class EditProfileFragment extends Fragment {
                 updateProfile();
             }
         });
+        binding.clearForm.setOnClickListener(v -> clearForm());
         return view;
     }
 
@@ -170,13 +172,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void showEmptyDataAlert() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("No Data Found")
-                .setMessage("User data is empty. Please try again later.")
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                .show();
+        new AlertDialog.Builder(requireContext()).setTitle("No Data Found").setMessage("User data is empty. Please try again later.").setPositiveButton("OK", (dialog, which) -> dialog.dismiss()).show();
     }
-
 
     private void clearForm() {
         binding.editTextPassword.setText("");
@@ -193,29 +190,55 @@ public class EditProfileFragment extends Fragment {
         String password = Objects.requireNonNull(binding.editTextPassword.getText()).toString();
         String confirmPassword = Objects.requireNonNull(binding.editTextConfirmPassword.getText()).toString();
 
+        binding.textInputLayoutPassword.setError(null);
+        binding.textInputLayoutConfirmPassword.setError(null);
+
         if (password.isEmpty()) {
-            binding.editTextPassword.setError("Password is required");
+            binding.textInputLayoutPassword.setError("Password is required");
+            return false;
+        }
+
+        if (password.length() < 8) {
+            binding.textInputLayoutPassword.setError("Password must be at least 8 characters");
+            return false;
+        }
+
+        if (password.length() > 16) {
+            binding.textInputLayoutPassword.setError("Password cannot be more than 16 characters");
             return false;
         }
 
         if (confirmPassword.isEmpty()) {
-            binding.editTextConfirmPassword.setError("Confirm password is required");
+            binding.textInputLayoutConfirmPassword.setError("Confirm password is required");
             return false;
         }
 
-        if (!password.equals(confirmPassword)) {
-            binding.editTextConfirmPassword.setError("Passwords do not match");
+
+        if (confirmPassword.length() < 8) {
+            binding.textInputLayoutConfirmPassword.setError("Confirm password must be at least 8 characters");
             return false;
         }
+
+        if (confirmPassword.length() > 16) {
+            binding.textInputLayoutConfirmPassword.setError("Confirm password cannot be more than 16 characters");
+            return false;
+        }
+
+
+        if (!password.equals(confirmPassword)) {
+            binding.textInputLayoutConfirmPassword.setError("Passwords do not match");
+            return false;
+        }
+
         return true;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.editTextPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)});
+        binding.editTextConfirmPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)});
 
-        // Access UI elements using binding
-        binding.editTextFirstName.setText("");
     }
 
     @Override
