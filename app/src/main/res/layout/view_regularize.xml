@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="4dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -12,93 +13,120 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
-
-            <!-- Header Section -->
-            <TextView
-                android:id="@+id/empName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@android:color/black"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/empPunchDate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/empName" />
-
-            <TextView
-                android:id="@+id/empEmail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="#757575"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/empPunchDate" />
-
-            <View
-                android:id="@+id/divider1"
+            android:padding="20dp">
+            <!-- Employee Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/empInfoCard"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:background="#E0E0E0"
-                app:layout_constraintTop_toBottomOf="@id/empEmail" />
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/color_white"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/material_on_surface_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/empName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/quicksand_medium"
+                        android:letterSpacing="0.01"
+                        android:textColor="@color/primary_text"
+                        android:textSize="24sp"
+                        android:textStyle="italic" />
+
+                    <TextView
+                        android:id="@+id/empPunchDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp"
+                        android:textStyle="italic" />
+
+                    <TextView
+                        android:id="@+id/empEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:textColor="@color/primary_text"
+                        android:textSize="14sp"
+                        android:textStyle="italic" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Shift Information -->
             <TextView
                 android:id="@+id/shiftLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/quicksand_medium"
                 android:text="Shift"
-                android:textColor="#494949"
-                android:textSize="12sp"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider1" />
+                app:layout_constraintTop_toBottomOf="@id/empInfoCard" />
+
+            <!-- Original Punch Information Card -->
 
             <TextView
                 android:id="@+id/empShift"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
+                android:layout_marginStart="15dp"
+                android:fontFamily="@font/quicksand_medium"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/punchInfoCard"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/shiftLabel" />
+                app:layout_constraintHorizontal_bias="0.894"
+                app:layout_constraintStart_toEndOf="@+id/shiftLabel"
+                app:layout_constraintTop_toBottomOf="@+id/empInfoCard"
+                app:layout_constraintVertical_bias="0.476" />
 
-            <!-- Punch Information Section -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/punchInfoCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="#F5F5F5"
-                app:cardCornerRadius="8dp"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="@color/color_white"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/empShift">
+                app:layout_constraintTop_toBottomOf="@id/shiftLabel"
+                app:strokeColor="@color/material_on_surface_stroke"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/quicksand_medium"
+                        android:text="Original Punch Details"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:baselineAligned="false"
                         android:orientation="horizontal">
 
                         <LinearLayout
@@ -110,18 +138,19 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
                                 android:text="Punch In"
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/empPunchIn"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:textColor="@color/primary_text"
+                                android:textSize="18sp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -133,73 +162,21 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
                                 android:text="Punch Out"
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/empPunchOut"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:textColor="@color/primary_text"
+                                android:textSize="18sp" />
                         </LinearLayout>
                     </LinearLayout>
-
-                    <!--                    <LinearLayout-->
-                    <!--                        android:layout_width="match_parent"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:layout_marginTop="16dp"-->
-                    <!--                        android:orientation="horizontal">-->
-
-                    <!--                        <LinearLayout-->
-                    <!--                            android:layout_width="0dp"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_weight="1"-->
-                    <!--                            android:orientation="vertical">-->
-
-                    <!--                            <TextView-->
-                    <!--                                android:layout_width="wrap_content"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:text="Total Time"-->
-                    <!--                                android:textColor="#616161"-->
-                    <!--                                android:textSize="12sp" />-->
-
-                    <!--                            <TextView-->
-                    <!--                                android:id="@+id/empTotalTime"-->
-                    <!--                                android:layout_width="wrap_content"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:layout_marginTop="4dp"-->
-                    <!--                                android:textColor="@android:color/black"-->
-                    <!--                                android:textSize="16sp"-->
-                    <!--                                android:textStyle="bold" />-->
-                    <!--                        </LinearLayout>-->
-
-                    <!--                        <LinearLayout-->
-                    <!--                            android:layout_width="0dp"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_weight="1"-->
-                    <!--                            android:orientation="vertical">-->
-
-                    <!--                            <TextView-->
-                    <!--                                android:layout_width="wrap_content"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:text="Late Time"-->
-                    <!--                                android:textColor="#616161"-->
-                    <!--                                android:textSize="12sp" />-->
-
-                    <!--                            <TextView-->
-                    <!--                                android:id="@+id/empLateTime"-->
-                    <!--                                android:layout_width="wrap_content"-->
-                    <!--                                android:layout_height="wrap_content"-->
-                    <!--                                android:layout_marginTop="4dp"-->
-                    <!--                                android:textColor="#F44336"-->
-                    <!--                                android:textSize="16sp"-->
-                    <!--                                android:textStyle="bold" />-->
-                    <!--                        </LinearLayout>-->
-                    <!--                    </LinearLayout>-->
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -208,10 +185,11 @@
                 android:id="@+id/locationTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/quicksand_medium"
                 android:text="Location Details"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/punchInfoCard" />
@@ -220,48 +198,54 @@
                 android:id="@+id/locationCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="#F5F5F5"
-                app:cardCornerRadius="8dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/color_white"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/locationTitle">
+                app:layout_constraintTop_toBottomOf="@id/locationTitle"
+                app:strokeColor="@color/material_on_surface_stroke"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/quicksand_regular"
                         android:text="Punch In Location"
-                        android:textColor="#323131"
-                        android:textSize="12sp" />
+                        android:textColor="@color/primary_text"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/empPunchInAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/quicksand_regular"
                         android:text="Punch Out Location"
-                        android:textColor="#494949"
-                        android:textSize="12sp" />
+                        android:textColor="@color/primary_text"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/empPunchOutAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -270,10 +254,11 @@
                 android:id="@+id/updatedPunchTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/quicksand_medium"
                 android:text="Updated Punch Information"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/locationCard" />
@@ -282,23 +267,24 @@
                 android:id="@+id/updatedPunchCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="#F5F5F5"
-                app:cardCornerRadius="8dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/color_white"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/updatedPunchTitle">
+                app:layout_constraintTop_toBottomOf="@id/updatedPunchTitle"
+                app:strokeColor="@color/material_on_surface_stroke"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
-
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:baselineAligned="false"
                         android:orientation="horizontal">
 
                         <LinearLayout
@@ -310,17 +296,19 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
                                 android:text="Updated Date"
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/appliedStatusUpdateDate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/holo_blue_dark"
-                                android:textSize="14sp" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="16sp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -332,17 +320,19 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Updated Punch In"
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:fontFamily="@font/quicksand_regular"
+                                android:text="Punch In"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/appliedPunchIn"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/holo_blue_dark"
-                                android:textSize="14sp" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="16sp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -354,62 +344,70 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Updated Punch Out"
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:fontFamily="@font/quicksand_regular"
+                                android:text="Punch Out"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/appliedPunchOut"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/holo_blue_dark"
-                                android:textSize="14sp" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="16sp" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Updated Punch In Location"
-                        android:textColor="#494949"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:text="Punch In Location"
+                        android:textColor="@color/primary_text"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/appliedPunchInAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Updated Punch Out Location"
-                        android:textColor="#494949"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:text="Punch Out Location"
+                        android:textColor="@color/primary_text"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/appliedPunchOutAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/quicksand_regular"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Status Section -->
+
+            <!-- Status Information -->
             <TextView
                 android:id="@+id/statusTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/quicksand_medium"
                 android:text="Status Information"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/updatedPunchCard" />
@@ -418,22 +416,25 @@
                 android:id="@+id/statusCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="#F5F5F5"
-                app:cardCornerRadius="8dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/color_white"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/statusTitle">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/statusTitle"
+                app:strokeColor="@color/material_on_surface_stroke"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:baselineAligned="false"
                         android:orientation="horizontal">
 
                         <LinearLayout
@@ -445,17 +446,19 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Applied Date  "
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:fontFamily="@font/quicksand_regular"
+                                android:text="Applied Date"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/appliedDate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/holo_blue_dark"
-                                android:textSize="14sp" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="16sp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -467,17 +470,19 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Updated By "
-                                android:textColor="#494949"
-                                android:textSize="12sp" />
+                                android:fontFamily="@font/quicksand_regular"
+                                android:text="Updated By"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/appliedStatusUpdateBy"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="@android:color/holo_blue_dark"
-                                android:textSize="14sp" />
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="16sp" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -485,16 +490,17 @@
                         android:id="@+id/appliedStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:text="Approved"
+                        android:textColor="@color/white"
                         app:chipBackgroundColor="@color/design_default_color_secondary"
                         app:chipIcon="@drawable/ic_check_circle"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/appliedDate"
-                        app:textEndPadding="8dp"
-                        app:textStartPadding="8dp" />
+                        app:chipIconTint="@color/white"
+                        app:textEndPadding="12dp"
+                        app:textStartPadding="12dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

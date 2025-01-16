@@ -117,11 +117,9 @@
     <color name="warning_color">#FFC107</color>
 
     <!-- Neutral Colors -->
-    <color name="divider_color">#BDBDBD</color>
     <color name="icon_color">#757575</color>
     <color name="_000000">#448AFF</color>
     <color name="_0000">#3F996D</color>
-
     <color name="card_stroke">#E0E0E0</color>
 
     <!-- Status Colors -->
@@ -143,6 +141,7 @@
     <color name="approved_color">#4CAF50</color>
     <color name="pending_color">#FFC107</color>
     <color name="rejected_color">#F44336</color>
+    <color name="divider_color">#56abe3</color>
 
     <color name="chip_background">#FFFFFF</color>
     <color name="color_background">#F5F5F5</color>
