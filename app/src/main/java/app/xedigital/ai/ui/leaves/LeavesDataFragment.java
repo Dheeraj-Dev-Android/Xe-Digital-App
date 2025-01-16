@@ -151,8 +151,8 @@ public class LeavesDataFragment extends Fragment {
 
         // Create a color map for leave types
         Map<String, Integer> leaveTypeColors = new HashMap<>();
-        leaveTypeColors.put("Casual Leave", Color.BLUE);
-        leaveTypeColors.put("Sick Leave", Color.RED);
+        leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
+        leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
 
         // Create a list of colors for the pie chart slices

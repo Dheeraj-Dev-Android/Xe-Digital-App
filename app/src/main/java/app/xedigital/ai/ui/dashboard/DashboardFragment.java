@@ -101,8 +101,8 @@ public class DashboardFragment extends Fragment {
         }
 
         Map<String, Integer> leaveTypeColors = new HashMap<>();
-        leaveTypeColors.put("Casual Leave", Color.BLUE);
-        leaveTypeColors.put("Sick Leave", Color.RED);
+        leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
+        leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
 
         List<Integer> colors = new ArrayList<>();

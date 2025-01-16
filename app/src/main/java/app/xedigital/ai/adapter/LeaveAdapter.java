@@ -1,5 +1,7 @@
 package app.xedigital.ai.adapter;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,60 +57,15 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
             float progressPercentage = Math.min((usedLeaves * 100 / creditedLeaves), 100);
             holder.leaveProgress.setProgress((int) progressPercentage);
             holder.progressText.setText(String.format("%.1f%%", progressPercentage));
+
+            int color = Color.rgb(161, 52, 141);
+            holder.leaveProgress.setProgressTintList(ColorStateList.valueOf(color));
         } else {
             holder.leaveProgress.setProgress(0);
             holder.progressText.setText("0%");
         }
-
-        // Setup Pie Chart
-//        setupPieChart(holder.pieChart, creditedLeaves, usedLeaves, balanceLeaves,debitedLeaves);
     }
 
-//    private void setupPieChart(PieChart pieChart, float creditedLeaves, float usedLeaves, float balanceLeaves,float debitedLeaves) {
-//        // Prepare chart entries
-//        List<PieEntry> entries = new ArrayList<>();
-//        List<Integer> colors = new ArrayList<>();
-//
-//        // Add Used Leaves
-//        if (usedLeaves > 0) {
-//            entries.add(new PieEntry(usedLeaves, "Used"));
-//            colors.add(Color.RED);
-//        }
-//        // Add Balance Leaves
-//        if (balanceLeaves > 0) {
-//            entries.add(new PieEntry(balanceLeaves, "Balance"));
-//            colors.add(Color.GREEN);
-//        }
-//        // Add Credited Leaves
-//        if (creditedLeaves > 0) {
-//            entries.add(new PieEntry(creditedLeaves, "Credited"));
-//            colors.add(Color.BLUE);
-//        }
-//        // Add Debited Leaves
-//        if (debitedLeaves > 0) {
-//            entries.add(new PieEntry(debitedLeaves, "Debited"));
-//            colors.add(Color.CYAN);
-//        }
-//
-//        // Create dataset
-//        PieDataSet dataSet = new PieDataSet(entries, "");
-//        dataSet.setColors(colors);
-//        dataSet.setValueTextColor(Color.WHITE);
-//        dataSet.setValueTextSize(8f);
-//
-//
-//        // Create pie data object
-//        PieData pieData = new PieData(dataSet);
-//
-//        // Customize chart
-//        pieChart.setData(pieData);
-//        pieChart.getDescription().setEnabled(false);
-//        pieChart.setDrawHoleEnabled(true);
-//        pieChart.setHoleRadius(35f);
-//        pieChart.setTransparentCircleRadius(45f);
-//        pieChart.animateXY(1000, 1000);
-//        pieChart.invalidate();
-//    }
 
     @Override
     public int getItemCount() {
