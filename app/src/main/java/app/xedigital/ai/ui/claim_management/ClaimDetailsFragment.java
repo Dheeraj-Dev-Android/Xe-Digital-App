@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,7 +31,7 @@ import app.xedigital.ai.model.employeeClaim.EmployeeClaimdataItem;
 
 public class ClaimDetailsFragment extends Fragment {
     private TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtComment, txtTravelCategory, txtModeOfTransport, txtFromTo, txtDistance, txtTotalAmount, txtAppliedDate, txtStatus, txtStatusDetails;
-    private ImageButton btnDocumentView;
+    private ImageButton btnDocumentView, btnPrintClaim;
     private EmployeeClaimdataItem claimData;
 
     public ClaimDetailsFragment() {
@@ -60,6 +61,7 @@ public class ClaimDetailsFragment extends Fragment {
         txtStatus = view.findViewById(R.id.txtStatus);
         txtStatusDetails = view.findViewById(R.id.txtStatusDetails);
         btnDocumentView = view.findViewById(R.id.btnDocumentView);
+        btnPrintClaim = view.findViewById(R.id.btnPrintClaim);
 
         return view;
     }
@@ -117,5 +119,15 @@ public class ClaimDetailsFragment extends Fragment {
                 }
             }
         });
+        btnPrintClaim.setOnClickListener(v -> {
+            if (claimData != null) {
+//                printClaimDetails();
+                Toast.makeText(requireContext(), "This Feature coming soon.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), "No claim data available to print.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
 }
