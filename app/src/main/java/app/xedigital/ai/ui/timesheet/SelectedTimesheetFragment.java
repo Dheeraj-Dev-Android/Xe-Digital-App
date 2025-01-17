@@ -40,8 +40,7 @@ public class SelectedTimesheetFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.dcr_list, container, false);
     }
 
@@ -56,6 +55,7 @@ public class SelectedTimesheetFragment extends Fragment {
         TextView reportTextValue = view.findViewById(R.id.reportTextValue);
         TextView reportOutcomeTextValue = view.findViewById(R.id.reportOutcomeTextValue);
         TextView nextDayTextValue = view.findViewById(R.id.nextDayTextValue);
+        TextView feelingOfTheday = view.findViewById(R.id.feelingOfDayTextValue);
 
         // Populate views with data from selectedDcrItem
         dateTextView.setText("Date : " + DateTimeUtils.getDayOfWeekAndDate(selectedDcrItem.getDcrDate()));
@@ -68,6 +68,7 @@ public class SelectedTimesheetFragment extends Fragment {
         reportTextValue.setText(Html.fromHtml(selectedDcrItem.getTodayReport(), Html.FROM_HTML_MODE_LEGACY));
         reportOutcomeTextValue.setText(Html.fromHtml(selectedDcrItem.getOutcome(), Html.FROM_HTML_MODE_LEGACY));
         nextDayTextValue.setText(Html.fromHtml(selectedDcrItem.getTommarowPlan(), Html.FROM_HTML_MODE_LEGACY));
+        feelingOfTheday.setText(Html.fromHtml(selectedDcrItem.getTodayFeeling(), Html.FROM_HTML_MODE_LEGACY));
     }
 
     public String formatTime(String timeString) {

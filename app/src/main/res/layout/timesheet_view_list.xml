@@ -9,7 +9,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/card_background"
+    app:cardBackgroundColor="@color/color_white"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
     app:strokeColor="@color/stroke_color">
@@ -41,6 +41,8 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_calendar"
+            app:drawableTint="@color/colorPrimaryDark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_viewTimesheet"
             app:layout_constraintTop_toTopOf="parent"
@@ -69,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:text="Punch In"
                     android:textAllCaps="true"
-                    android:textColor="#9C9B9B"
+                    android:textColor="@color/colorAccent"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
@@ -95,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:text="Punch Out"
                     android:textAllCaps="true"
-                    android:textColor="#9C9B9B"
+                    android:textColor="@color/colorAccent"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
