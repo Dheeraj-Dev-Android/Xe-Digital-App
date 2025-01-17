@@ -9,6 +9,9 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +32,8 @@ public class SplashActivity extends AppCompatActivity {
     private AlertDialog noInternetDialog;
     private AlertDialog slowNetworkDialog;
     private LottieAnimationView noInternetAnimation;
+    private FrameLayout slowInternetContainer;
+    private TextView tvSpeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,16 @@ public class SplashActivity extends AppCompatActivity {
 
         // Create the slow network alert dialog
         slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
-
+        slowInternetContainer = findViewById(R.id.slowInternetContainer);
+        View slowInternetLayout = findViewById(R.id.slowInternetLayout);
+        tvSpeed = findViewById(R.id.tvSpeed);
+        ImageButton dismissButton = findViewById(R.id.btnDismiss);
+        if (dismissButton != null) {
+            dismissButton.setOnClickListener(v -> {
+                slowInternetLayout.setVisibility(View.GONE);
+                Toast.makeText(SplashActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
+            });
+        }
         new Handler().postDelayed(() -> {
             // Check network status before starting LoginActivity
             if (NetworkUtils.isNetworkAvailable(this)) {
@@ -72,8 +86,10 @@ public class SplashActivity extends AppCompatActivity {
         noInternetAnimation.pauseAnimation();
     }
 
-    public void showSlowInternetLayout() {
+    public void showSlowInternetLayout(double speed) {
         findViewById(R.id.slowInternetLayout).setVisibility(View.VISIBLE);
+        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
+        tvSpeed.setText(speedText);
         noInternetAnimation.playAnimation();
     }
 
@@ -89,12 +105,14 @@ public class SplashActivity extends AppCompatActivity {
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
             showNoInternetLayout();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !NetworkUtils.isNetworkSpeedGood(this)) {
-            showSlowInternetLayout();
         } else {
             hideNoInternetLayout();
-            hideSlowInternetLayout();
-
+            NetworkUtils.NetworkSpeed networkSpeed = NetworkUtils.getNetworkSpeed(this);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && networkSpeed.downSpeedKbps < 80) {
+                showSlowInternetLayout(networkSpeed.downSpeedKbps);
+            } else {
+                hideSlowInternetLayout();
+            }
         }
     }
 

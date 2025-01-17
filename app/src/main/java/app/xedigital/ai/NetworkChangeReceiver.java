@@ -11,8 +11,9 @@ import app.xedigital.ai.utills.NetworkUtils;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
+    public static final String EXTRA_SPEED = "extra_speed";
     private static final int SLOW_NETWORK_THRESHOLD_KBPS = 80;
-    private static final int MINIMUM_SPEED_KBPS = 80; // Minimum speed (in Kbps) to show a slow internet warning
+    private static final int MINIMUM_SPEED_KBPS = 80;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -27,11 +28,11 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         boolean isSpeedGood = isNetworkAvailable && networkSpeed.downSpeedKbps >= SLOW_NETWORK_THRESHOLD_KBPS;
 
         // Handle the network state change based on the availability and speed
-        handleNetworkStateChange(context, isNetworkAvailable, isSpeedGood);
+        handleNetworkStateChange(context, isNetworkAvailable, isSpeedGood, networkSpeed.downSpeedKbps);
 
         // If network is available and the speed is below the minimum speed threshold, show slow internet UI
         if (isNetworkAvailable && networkSpeed.downSpeedKbps < MINIMUM_SPEED_KBPS) {
-            showSlowInternetLayout(context);
+            showSlowInternetLayout(context, networkSpeed.downSpeedKbps);
         } else if (isNetworkAvailable) {
             // If network is available and speed is good, hide slow internet UI
             hideSlowInternetLayout(context);
@@ -43,13 +44,13 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
      *
      * @param context the application context
      */
-    private void showSlowInternetLayout(Context context) {
+    private void showSlowInternetLayout(Context context, double speed) {
         if (context instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) context;
-            mainActivity.showSlowInternetLayout();
+            mainActivity.showSlowInternetLayout(speed);
         } else if (context instanceof SplashActivity) {
             SplashActivity splashActivity = (SplashActivity) context;
-            splashActivity.showSlowInternetLayout();
+            splashActivity.showSlowInternetLayout(speed);
         }
     }
 
@@ -75,7 +76,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
      * @param isNetworkAvailable indicates whether the network is available
      * @param isSpeedGood        indicates whether the network speed is good
      */
-    private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood) {
+    private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood, double speed) {
         if (context instanceof SplashActivity) {
             SplashActivity splashActivity = (SplashActivity) context;
             if (!isNetworkAvailable) {
@@ -83,7 +84,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             } else {
                 splashActivity.hideNoInternetLayout();
                 if (!isSpeedGood) {
-                    splashActivity.showSlowInternetLayout();
+                    splashActivity.showSlowInternetLayout(speed);
                 } else {
                     splashActivity.hideSlowInternetLayout();
                 }
@@ -95,7 +96,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             } else {
                 mainActivity.hideNoInternetLayout();
                 if (!isSpeedGood) {
-                    mainActivity.showSlowInternetLayout();
+                    mainActivity.showSlowInternetLayout(speed);
                 } else {
                     mainActivity.hideSlowInternetLayout();
                 }

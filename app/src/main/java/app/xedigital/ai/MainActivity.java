@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isDcrSubmenuVisible = false;
     private NavigationView navigationView;
     private boolean isNetworkChangeReceiverRegistered = false;
+    private FrameLayout slowInternetContainer;
+    private TextView tvSpeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Create the slow network alert dialog
         slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
+        slowInternetContainer = findViewById(R.id.slowInternetContainer);
+        View slowInternetLayout = findViewById(R.id.slowInternetLayout);
+        tvSpeed = findViewById(R.id.tvSpeed);
+        ImageButton dismissButton = findViewById(R.id.btnDismiss);
+        if (dismissButton != null) {
+            dismissButton.setOnClickListener(v -> {
+                slowInternetLayout.setVisibility(View.GONE);
+                Toast.makeText(MainActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
+            });
+        }
+
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -123,8 +138,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
     }
 
-    public void showSlowInternetLayout() {
-        findViewById(R.id.slowInternetLayout).setVisibility(View.VISIBLE);
+    public void showSlowInternetLayout(double speed) {
+        slowInternetContainer.setVisibility(View.VISIBLE);
+        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
+        tvSpeed.setText(speedText);
     }
 
     public void hideSlowInternetLayout() {
