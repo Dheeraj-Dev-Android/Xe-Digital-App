@@ -58,10 +58,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:drawablePadding="5dp"
                 android:text="September 15, 2023"
-                android:textColor="#1E1E1E"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_calendar"
+                app:drawableTint="@color/colorPrimaryDark" />
             <!-- Leave Name (Initially hidden) -->
             <TextView
                 android:id="@+id/leaveNameTextView"
@@ -91,8 +94,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Punch In"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
+                        android:textColor="#514D4D"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/punchInTextView"
@@ -115,8 +119,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Punch Out"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
+                        android:textColor="#514D4D"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/punchOutTextView"
@@ -154,8 +159,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Total Time"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
+                        android:textColor="#514D4D"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/totalTimeTextView"
@@ -178,8 +184,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Over Time"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
+                        android:textColor="#514D4D"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/overTimeTextView"
@@ -202,8 +209,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Late Time"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
+                        android:textColor="#514D4D"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/lateTimeTextView"
@@ -215,9 +223,6 @@
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
-
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>
