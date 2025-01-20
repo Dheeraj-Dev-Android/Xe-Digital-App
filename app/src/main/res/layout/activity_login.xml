@@ -13,6 +13,8 @@
         android:background="@color/white"
         tools:context=".activity.LoginActivity">
 
+        <!-- Previous views remain the same until the card content -->
+
         <View
             android:id="@+id/backgroundPattern"
             android:layout_width="match_parent"
@@ -22,7 +24,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- App Logo -->
         <ImageView
             android:id="@+id/logoImage"
             android:layout_width="180dp"
@@ -37,7 +38,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.3" />
 
-        <!-- Main Card Container -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardView"
             android:layout_width="match_parent"
@@ -63,7 +63,6 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Sign In Text -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -74,7 +73,6 @@
                     android:textSize="32sp"
                     android:textStyle="bold" />
 
-                <!-- Email Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -96,7 +94,6 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Password Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -120,7 +117,6 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Sign In Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_signin"
                     android:layout_width="match_parent"
@@ -129,6 +125,20 @@
                     android:textSize="16sp"
                     app:cornerRadius="28dp"
                     app:elevation="4dp" />
+
+                <!-- Modified Biometric Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/bioMetricButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Login with Biometrics"
+                    android:textColor="#5D49CF"
+                    android:visibility="visible"
+                    app:cornerRadius="28dp"
+                    app:strokeColor="#5D49CF"
+                    app:strokeWidth="2dp" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -147,6 +157,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <!-- Loading overlay content remains the same -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -181,7 +192,6 @@
 
         </FrameLayout>
 
-        <!-- Footer Text -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

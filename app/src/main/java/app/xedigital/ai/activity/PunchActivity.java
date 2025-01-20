@@ -310,7 +310,6 @@ public class PunchActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    // Get more detailed error information from the response
                     String errorBody = "";
                     try {
                         if (response.errorBody() != null) {
@@ -320,7 +319,6 @@ public class PunchActivity extends AppCompatActivity {
                         Log.e(TAG, "Error reading error body: " + e.getMessage(), e);
                     }
                     Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
-                    // Handle the error based on the response code and error body
                     handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
             }
@@ -328,7 +326,6 @@ public class PunchActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "Recognize Error: " + throwable.getMessage(), throwable);
-                // Handle network or other errors
                 handleError("Network Error: " + throwable.getMessage());
             }
         });
@@ -339,7 +336,6 @@ public class PunchActivity extends AppCompatActivity {
             if (isFinishing() || isDestroyed()) {
                 return;
             }
-
             AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(errorMessage.contains("There are no faces in the image") ? "No faces detected in the image. Please try again with a clear image showing your face." : errorMessage).setPositiveButton("Retry", null).setNegativeButton("Cancel", (dialog, which) -> {
                 dialog.dismiss();
                 setResult(Activity.RESULT_CANCELED);
@@ -352,10 +348,6 @@ public class PunchActivity extends AppCompatActivity {
                     }
                     finish();
                 }
-//                        NavController navController = Navigation.findNavController(PunchActivity.this, R.id.nav_host_fragment_content_main);
-//                        if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-//                            navController.navigate(R.id.nav_dashboard);
-//                        }
             }).create();
 
             alertDialog.setOnShowListener(dialog -> {
