@@ -27,7 +27,7 @@ import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
 import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.leaves.LeavesResponse;
-import app.xedigital.ai.model.login.LoginModelResponse1;
+import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.model.policy.PolicyResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.profile.UserProfileResponse;
@@ -64,7 +64,7 @@ public interface APIInterface {
 
     @FormUrlEncoded
     @POST("authentication/login")
-    retrofit2.Call<LoginModelResponse1> loginApi1(@Field("email") String email, @Field("password") String password);
+    retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
 
     //GET APIs
     @GET("users/profile/{userId}")

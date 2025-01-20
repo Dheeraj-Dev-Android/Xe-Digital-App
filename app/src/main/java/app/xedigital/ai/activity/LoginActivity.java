@@ -26,7 +26,7 @@ import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
-import app.xedigital.ai.model.login.LoginModelResponse1;
+import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -91,14 +91,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void callLoginApi(String email, String password) {
         showLoading(true);
-        Call<LoginModelResponse1> call = APIClient.getInstance().getLogin().loginApi1(email, password);
-        call.enqueue(new Callback<LoginModelResponse1>() {
+        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password);
+        call.enqueue(new Callback<LoginModelResponse>() {
             @Override
-            public void onResponse(@NonNull Call<LoginModelResponse1> call, @NonNull Response<LoginModelResponse1> response) {
+            public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
 
-                    LoginModelResponse1 loginResponse = response.body();
+                    LoginModelResponse loginResponse = response.body();
                     Log.w(TAG, "Response: " + gson.toJson(loginResponse));
 
                     if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<LoginModelResponse1> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<LoginModelResponse> call, @NonNull Throwable t) {
                 showLoading(false);
                 showAlertDialog(t.getMessage());
             }

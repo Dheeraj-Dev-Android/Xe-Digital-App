@@ -2,7 +2,7 @@ package app.xedigital.ai.model.login;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LoginModelResponse1 {
+public class LoginModelResponse {
 
     @SerializedName("data")
     private Data data;
