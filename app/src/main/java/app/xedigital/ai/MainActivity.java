@@ -138,10 +138,20 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
     }
 
+//    public void showSlowInternetLayout(double speed) {
+//        slowInternetContainer.setVisibility(View.VISIBLE);
+//        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
+//        tvSpeed.setText(speedText);
+//    }
+
     public void showSlowInternetLayout(double speed) {
-        slowInternetContainer.setVisibility(View.VISIBLE);
-        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
-        tvSpeed.setText(speedText);
+        if (slowInternetContainer != null && tvSpeed != null) {
+            slowInternetContainer.setVisibility(View.VISIBLE);
+            String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
+            tvSpeed.setText(speedText);
+        } else {
+            Log.e("MainActivity", "One or more views are null: slowInternetContainer or tvSpeed");
+        }
     }
 
     public void hideSlowInternetLayout() {

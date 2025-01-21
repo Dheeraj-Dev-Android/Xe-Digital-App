@@ -44,6 +44,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
@@ -75,6 +76,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.utills.BioMetric;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -82,8 +84,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PunchActivity extends AppCompatActivity {
+public class PunchActivity extends AppCompatActivity implements BioMetric.BiometricAuthListener {
     private static final String TAG = "PunchActivity";
+    private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
     private final String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION};
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Preview preview;
@@ -95,6 +98,8 @@ public class PunchActivity extends AppCompatActivity {
     private AlertDialog attendanceSuccessDialog;
     private MaterialCardView progressBar;
     private LocationCallback locationCallback;
+    private BioMetric bioMetric;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +107,7 @@ public class PunchActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_punch);
         progressBar = findViewById(R.id.loadingPanel);
+        bioMetric = new BioMetric((Context) this, (FragmentActivity) this, (BioMetric.BiometricAuthListener) this);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -207,6 +213,9 @@ public class PunchActivity extends AppCompatActivity {
             dialog.dismiss();
             setResult(Activity.RESULT_CANCELED);
             finish();
+//        }).setNeutralButton("Use Biometric", (dialog, which) -> {
+//            dialog.dismiss();
+//            usePhoneBiometric();
         }).show();
     }
 
@@ -449,7 +458,6 @@ public class PunchActivity extends AppCompatActivity {
                 requestBody.put("punchTime", currentTime);
 
                 String requestBodyString = requestBody.toString();
-//                Log.d(TAG, "Request Body: " + requestBodyString);
                 RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
 
                 APIInterface attendanceApiService = APIClient.getInstance().getAttendance();
@@ -561,6 +569,9 @@ public class PunchActivity extends AppCompatActivity {
                 dialog.dismiss();
                 setResult(Activity.RESULT_CANCELED);
                 finish();
+            }).setNeutralButton("Use Biometric", (dialog, id) -> {
+                dialog.dismiss();
+                usePhoneBiometric();
             }).create().show();
 
         });
@@ -657,6 +668,46 @@ public class PunchActivity extends AppCompatActivity {
         return mediaDir;
     }
 
+    private void usePhoneBiometric() {
+        Log.d(TAG, "Use Phone Biometric");
+        progressBar.setVisibility(View.VISIBLE);
+        bioMetric.authenticate();
+    }
+
+    @Override
+    public void onAuthenticationSucceeded() {
+        Log.d(TAG, "AuthenticationSucceeded");
+        // Call your attendance API here
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String employeeId = sharedPreferences.getString("userId", "");
+        String employeeName = sharedPreferences.getString("empFirstName", "");
+        progressBar.setVisibility(View.GONE);
+        callAttendanceApi(employeeId, employeeName);
+        //callAttendanceApi();
+//        Toast.makeText(this, "Authentication Successful", Toast.LENGTH_SHORT).show();
+//        showSuccessAlert();
+    }
+
+//    private void showSuccessAlert() {
+//        new AlertDialog.Builder(this).setTitle("Attendance Punch Successful").setCancelable(true).setPositiveButton("OK", null).show();
+//    }
+
+    @Override
+    public void onAuthenticationError(int errorCode, CharSequence errString) {
+        Log.d(TAG, "onAuthenticationError");
+        progressBar.setVisibility(View.GONE);
+        showAttendanceFailedAlert("Biometric Error:" + errString);
+        Toast.makeText(this, "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAuthenticationFailed() {
+        Log.d(TAG, "onAuthenticationFailed");
+        progressBar.setVisibility(View.GONE);
+        showAttendanceFailedAlert("Biometric Failed");
+        Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -666,7 +717,11 @@ public class PunchActivity extends AppCompatActivity {
                 startCamera();
             }
         }
+        if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE) {
+            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
+        }
     }
+
 
     @Override
     protected void onDestroy() {

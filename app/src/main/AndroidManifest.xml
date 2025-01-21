@@ -43,6 +43,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
             </intent-filter>
         </receiver>
         <activity
@@ -62,7 +63,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true"

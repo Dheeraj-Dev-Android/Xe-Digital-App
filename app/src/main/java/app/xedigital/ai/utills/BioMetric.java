@@ -51,7 +51,6 @@ public class BioMetric {
                 if (biometricAuthListener != null) {
                     biometricAuthListener.onAuthenticationSucceeded();
                 }
-
             }
 
             @Override
@@ -64,7 +63,7 @@ public class BioMetric {
             }
         });
 
-        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric").setSubtitle("Log in using your biometric credential").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric").setSubtitle("Use Your Biometric Credentials to Punch Attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
     }
 
     public void authenticate() {

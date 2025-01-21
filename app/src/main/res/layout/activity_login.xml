@@ -127,18 +127,18 @@
                     app:elevation="4dp" />
 
                 <!-- Modified Biometric Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/bioMetricButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Login with Biometrics"
-                    android:textColor="#5D49CF"
-                    android:visibility="visible"
-                    app:cornerRadius="28dp"
-                    app:strokeColor="#5D49CF"
-                    app:strokeWidth="2dp" />
+                <!--                <com.google.android.material.button.MaterialButton-->
+                <!--                    android:id="@+id/bioMetricButton"-->
+                <!--                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="56dp"-->
+                <!--                    android:layout_marginTop="16dp"-->
+                <!--                    android:text="Login with Biometrics"-->
+                <!--                    android:textColor="#5D49CF"-->
+                <!--                    android:visibility="visible"-->
+                <!--                    app:cornerRadius="28dp"-->
+                <!--                    app:strokeColor="#5D49CF"-->
+                <!--                    app:strokeWidth="2dp" />-->
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
