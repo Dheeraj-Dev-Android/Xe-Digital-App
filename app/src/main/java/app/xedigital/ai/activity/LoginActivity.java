@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         biometricManager = BiometricManager.from(this);
 
         // Check if biometric is supported and if user is logged in
-        boolean isBiometricSupported = false;
+        boolean isBiometricSupported;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS;
         } else {
@@ -83,11 +83,11 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         } else {
-            // User is not logged in, show the login screen
             showLoginScreen();
         }
 
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
+
         binding.btnSignin.setOnClickListener(v -> {
             String email, password;
             email = Objects.requireNonNull(binding.editEmail.getText()).toString();
@@ -146,7 +146,6 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_LONG).show();
                     clearSharedPreferences();
-                    // Show login screen
                     showLoginScreen();
                 });
             }
@@ -168,7 +167,6 @@ public class LoginActivity extends AppCompatActivity {
         binding.editPassword.setVisibility(View.VISIBLE);
         binding.btnSignin.setVisibility(View.VISIBLE);
         binding.logoImage.setVisibility(View.VISIBLE);
-        // Assuming you want to clear text on startup
         binding.editEmail.setText("");
         binding.editPassword.setText("");
     }
@@ -218,7 +216,6 @@ public class LoginActivity extends AppCompatActivity {
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
                         String empFirstName = loginResponse.getData().getUser().getFirstname();
-//                        Log.w(TAG, "User ID: " + userId+"empEmail"+empEmail);
 
                         storeInSharedPreferences(userId, authToken, empEmail, empFirstName);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -240,7 +237,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-
     private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -249,7 +245,6 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("empEmail", empEmail);
         editor.putString("empFirstName", empFirstName);
         editor.apply();
-
     }
 
     private void storeInViewModel(String userId, String authToken) {

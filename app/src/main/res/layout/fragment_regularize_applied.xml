@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:backgroundTint="@color/color_white"
+    android:orientation="vertical"
     tools:context=".ui.regularize_attendance.RegularizeAppliedFragment">
     <!-- Chips Filter Section -->
     <HorizontalScrollView

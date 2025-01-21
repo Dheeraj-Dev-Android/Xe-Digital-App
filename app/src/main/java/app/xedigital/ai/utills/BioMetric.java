@@ -17,12 +17,12 @@ import java.util.concurrent.Executor;
 public class BioMetric {
 
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
+    private final Context context;
+    private final FragmentActivity activity;
+    private final BiometricAuthListener biometricAuthListener;
     private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
-    private Context context;
-    private FragmentActivity activity;
-    private BiometricAuthListener biometricAuthListener;
 
     public BioMetric(Context context, FragmentActivity activity, BiometricAuthListener listener) {
         this.context = context;

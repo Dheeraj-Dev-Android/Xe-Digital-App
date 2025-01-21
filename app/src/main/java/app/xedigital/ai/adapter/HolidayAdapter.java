@@ -67,7 +67,7 @@ public class HolidayAdapter extends RecyclerView.Adapter<HolidayAdapter.HolidayV
         // Set restricted holiday text
         if (holiday.isIsOptional()) {
             holder.restrictedHoliday.setText(R.string.restricted);
-            holder.restrictedHoliday.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
+//            holder.restrictedHoliday.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
             holder.restrictedHoliday.setVisibility(View.VISIBLE);
         } else {
             holder.restrictedHoliday.setVisibility(View.GONE);

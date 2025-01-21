@@ -44,7 +44,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
@@ -107,7 +106,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_punch);
         progressBar = findViewById(R.id.loadingPanel);
-        bioMetric = new BioMetric((Context) this, (FragmentActivity) this, (BioMetric.BiometricAuthListener) this);
+        bioMetric = new BioMetric(this, this, this);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
