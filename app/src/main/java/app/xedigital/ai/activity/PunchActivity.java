@@ -582,7 +582,7 @@ public class PunchActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         runOnUiThread(() -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
-            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> startCamera()) // Removed dismiss()
+            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> startCamera())
                     .setNegativeButton("Cancel", (dialog, id) -> {
                         setResult(Activity.RESULT_CANCELED);
                         finish();
