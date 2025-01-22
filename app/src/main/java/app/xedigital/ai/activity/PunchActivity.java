@@ -96,6 +96,7 @@ public class PunchActivity extends AppCompatActivity {
     private AlertDialog attendanceSuccessDialog;
     private MaterialCardView progressBar;
     private LocationCallback locationCallback;
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,11 +129,11 @@ public class PunchActivity extends AppCompatActivity {
         preview = new Preview.Builder().build();
         cameraSelector = new CameraSelector.Builder().build();
 
-//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-//            new AlertDialog.Builder(this).setTitle("Camera Permission Required").setMessage("This app needs access to the camera to capture your punch.").setPositiveButton("OK", (dialog, which) -> requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS)).setNegativeButton("Cancel", null).show();
-//        } else {
-//            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
-//        }
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            new AlertDialog.Builder(this).setTitle("Camera Permission Required").setMessage("This app needs access to the camera to capture your punch.").setPositiveButton("OK", (dialog, which) -> requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS)).setNegativeButton("Cancel", null).show();
+        } else {
+            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
+        }
     }
 
     private boolean allPermissionsGranted() {
@@ -198,7 +199,6 @@ public class PunchActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
     }
-
 
     private void showRetryAlert() {
         new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
@@ -502,6 +502,25 @@ public class PunchActivity extends AppCompatActivity {
         });
     }
 
+//    private void showAttendanceFailedAlert(String message) {
+//        progressBar.setVisibility(View.GONE);
+//        runOnUiThread(() -> {
+//            if (isFinishing() || isDestroyed()) {
+//                return;
+//            }
+//            AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
+//            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
+//                dialog.dismiss();
+//                startCamera();
+//            }).setNegativeButton("Cancel", (dialog, id) -> {
+//                dialog.dismiss();
+//                setResult(Activity.RESULT_CANCELED);
+//                finish();
+//            }).create().show();
+//
+//        });
+//    }
+
     private void showAttendanceSuccessAlert(String responseBody) {
         progressBar.setVisibility(View.GONE);
         try {
@@ -557,21 +576,18 @@ public class PunchActivity extends AppCompatActivity {
     }
 
     private void showAttendanceFailedAlert(String message) {
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
         progressBar.setVisibility(View.GONE);
         runOnUiThread(() -> {
-            if (isFinishing() || isDestroyed()) {
-                return;
-            }
             AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
-            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> {
-                dialog.dismiss();
-                startCamera();
-            }).setNegativeButton("Cancel", (dialog, id) -> {
-                dialog.dismiss();
-                setResult(Activity.RESULT_CANCELED);
-                finish();
-            }).create().show();
-
+            builder.setTitle("Attendance Failed").setMessage(message).setPositiveButton("Retry", (dialog, id) -> startCamera()) // Removed dismiss()
+                    .setNegativeButton("Cancel", (dialog, id) -> {
+                        setResult(Activity.RESULT_CANCELED);
+                        finish();
+                    })
+                    .create().show();
         });
     }
 
@@ -647,7 +663,7 @@ public class PunchActivity extends AppCompatActivity {
             int retryCount = 0;
             int maxRetries = 3;
 
-            while (address == null && retryCount < maxRetries) {
+            while (retryCount < maxRetries) {
                 try {
                     List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                     if (addresses != null && !addresses.isEmpty()) {
@@ -732,6 +748,15 @@ public class PunchActivity extends AppCompatActivity {
             attendanceSuccessDialog.dismiss();
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+        dialog = null;
     }
 
     interface AddressCallback {
