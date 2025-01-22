@@ -11,95 +11,88 @@ import app.xedigital.ai.utills.NetworkUtils;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
-    public static final String EXTRA_SPEED = "extra_speed";
+    private static final String TAG = "NetworkChangeReceiver";
     private static final int SLOW_NETWORK_THRESHOLD_KBPS = 80;
-    private static final int MINIMUM_SPEED_KBPS = 80;
+    private static final int MINIMUM_SPEED_KBPS = 50;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-            Log.e("NetworkChangeReceiver", "Received unexpected intent action: " + intent.getAction());
+            Log.e(TAG, "Received unexpected intent action: " + intent.getAction());
             return;
         }
 
-        // Check if the network is available and if the network speed is above the slow network threshold
+        // Check if network is available and retrieve network speed
         boolean isNetworkAvailable = NetworkUtils.isNetworkAvailable(context);
         NetworkUtils.NetworkSpeed networkSpeed = NetworkUtils.getNetworkSpeed(context);
+
+        // Determine if the network speed is above the slow network threshold
         boolean isSpeedGood = isNetworkAvailable && networkSpeed.downSpeedKbps >= SLOW_NETWORK_THRESHOLD_KBPS;
 
-        // Handle the network state change based on the availability and speed
+        Log.d(TAG, "Network available: " + isNetworkAvailable + ", Speed: " + networkSpeed.downSpeedKbps + " Kbps, Is speed good: " + isSpeedGood);
+
+        // Handle network state change
         handleNetworkStateChange(context, isNetworkAvailable, isSpeedGood, networkSpeed.downSpeedKbps);
-
-        // If network is available and the speed is below the minimum speed threshold, show slow internet UI
-        if (isNetworkAvailable && networkSpeed.downSpeedKbps < MINIMUM_SPEED_KBPS) {
-            showSlowInternetLayout(context, networkSpeed.downSpeedKbps);
-        } else if (isNetworkAvailable) {
-            // If network is available and speed is good, hide slow internet UI
-            hideSlowInternetLayout(context);
-        }
     }
 
     /**
-     * Shows slow internet layout based on the context (either MainActivity or SplashActivity).
-     *
-     * @param context the application context
-     */
-    private void showSlowInternetLayout(Context context, double speed) {
-        if (context instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) context;
-            mainActivity.showSlowInternetLayout(speed);
-        } else if (context instanceof SplashActivity) {
-            SplashActivity splashActivity = (SplashActivity) context;
-            splashActivity.showSlowInternetLayout(speed);
-        }
-    }
-
-    /**
-     * Hides slow internet layout based on the context (either MainActivity or SplashActivity).
-     *
-     * @param context the application context
-     */
-    private void hideSlowInternetLayout(Context context) {
-        if (context instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) context;
-            mainActivity.hideSlowInternetLayout();
-        } else if (context instanceof SplashActivity) {
-            SplashActivity splashActivity = (SplashActivity) context;
-            splashActivity.hideSlowInternetLayout();
-        }
-    }
-
-    /**
-     * Handles the network state change and updates UI based on the network status.
+     * Handles the network state change and updates the UI accordingly.
      *
      * @param context            the application context
      * @param isNetworkAvailable indicates whether the network is available
      * @param isSpeedGood        indicates whether the network speed is good
+     * @param speed              the current network speed in Kbps
      */
-    private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood, double speed) {
-        if (context instanceof SplashActivity) {
-            SplashActivity splashActivity = (SplashActivity) context;
-            if (!isNetworkAvailable) {
-                splashActivity.showNoInternetLayout();
-            } else {
-                splashActivity.hideNoInternetLayout();
-                if (!isSpeedGood) {
-                    splashActivity.showSlowInternetLayout(speed);
-                } else {
-                    splashActivity.hideSlowInternetLayout();
-                }
-            }
-        } else if (context instanceof MainActivity) {
+    private void handleNetworkStateChange(Context context, boolean isNetworkAvailable, boolean isSpeedGood, int speed) {
+        if (context instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) context;
-            if (!isNetworkAvailable) {
-                mainActivity.showNoInternetLayout();
+            updateMainActivityUI(mainActivity, isNetworkAvailable, isSpeedGood, speed);
+        } else if (context instanceof SplashActivity) {
+            SplashActivity splashActivity = (SplashActivity) context;
+            updateSplashActivityUI(splashActivity, isNetworkAvailable, isSpeedGood, speed);
+        } else {
+            Log.w(TAG, "Context is not an instance of MainActivity or SplashActivity.");
+        }
+    }
+
+    /**
+     * Updates the UI in MainActivity based on the network state.
+     *
+     * @param mainActivity       the MainActivity instance
+     * @param isNetworkAvailable indicates whether the network is available
+     * @param isSpeedGood        indicates whether the network speed is good
+     * @param speed              the current network speed in Kbps
+     */
+    private void updateMainActivityUI(MainActivity mainActivity, boolean isNetworkAvailable, boolean isSpeedGood, int speed) {
+        if (!isNetworkAvailable) {
+            mainActivity.showNoInternetLayout();
+        } else {
+            mainActivity.hideNoInternetLayout();
+            if (speed < MINIMUM_SPEED_KBPS) {
+                mainActivity.showSlowInternetLayout(speed);
             } else {
-                mainActivity.hideNoInternetLayout();
-                if (!isSpeedGood) {
-                    mainActivity.showSlowInternetLayout(speed);
-                } else {
-                    mainActivity.hideSlowInternetLayout();
-                }
+                mainActivity.hideSlowInternetLayout();
+            }
+        }
+    }
+
+    /**
+     * Updates the UI in SplashActivity based on the network state.
+     *
+     * @param splashActivity     the SplashActivity instance
+     * @param isNetworkAvailable indicates whether the network is available
+     * @param isSpeedGood        indicates whether the network speed is good
+     * @param speed              the current network speed in Kbps
+     */
+    private void updateSplashActivityUI(SplashActivity splashActivity, boolean isNetworkAvailable, boolean isSpeedGood, int speed) {
+        if (!isNetworkAvailable) {
+            splashActivity.showNoInternetLayout();
+        } else {
+            splashActivity.hideNoInternetLayout();
+            if (speed < MINIMUM_SPEED_KBPS) {
+                splashActivity.showSlowInternetLayout(speed);
+            } else {
+                splashActivity.hideSlowInternetLayout();
             }
         }
     }

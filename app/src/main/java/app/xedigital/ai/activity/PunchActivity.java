@@ -12,6 +12,7 @@ import android.hardware.camera2.CameraManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -580,8 +581,33 @@ public class PunchActivity extends AppCompatActivity {
         return dateFormat.format(new Date());
     }
 
+    //    private void getCurrentLocation(AddressCallback callback) {
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
+//            locationCallback = new LocationCallback() {
+//                @Override
+//                public void onLocationResult(@NonNull LocationResult locationResult) {
+//                    Location location = locationResult.getLastLocation();
+//                    if (location != null) {
+//                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
+//                    } else {
+//                        Log.e(TAG, "Location is null in onLocationResult");
+//                        callback.onAddressReceived("Location not found");
+//                    }
+//                }
+//            };
+//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+//        } else {
+//            Log.e(TAG, "Location permission not granted");
+//            callback.onAddressReceived("Location not found");
+//        }
+//    }
     private void getCurrentLocation(AddressCallback callback) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
+            // Location permission granted and location services enabled
             LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
             locationCallback = new LocationCallback() {
                 @Override
@@ -597,8 +623,20 @@ public class PunchActivity extends AppCompatActivity {
             };
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
         } else {
-            Log.e(TAG, "Location permission not granted");
-            callback.onAddressReceived("Location not found");
+            // Location permission or location services not enabled
+            if (!isLocationEnabled) {
+                // Show alert to enable location services
+                new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to use this feature.").setPositiveButton("Ok", (dialog, which) -> {
+//                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+//                }).setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                    setResult(Activity.RESULT_CANCELED);
+                    finish();
+                }).show();
+            } else {
+                Log.e(TAG, "Location permission not granted");
+                callback.onAddressReceived("Location not found");
+            }
         }
     }
 

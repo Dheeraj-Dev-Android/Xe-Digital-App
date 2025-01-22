@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isNetworkChangeReceiverRegistered = false;
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
+    private View slowInternetLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the slow network alert dialog
         slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
-        View slowInternetLayout = findViewById(R.id.slowInternetLayout);
+        slowInternetLayout = findViewById(R.id.slowInternetLayout);
         tvSpeed = findViewById(R.id.tvSpeed);
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
         if (dismissButton != null) {
@@ -138,11 +139,22 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
     }
 
+//    public void showSlowInternetLayout(double speed) {
+//        slowInternetContainer.setVisibility(View.VISIBLE);
+//        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
+//        tvSpeed.setText(speedText);
+//    }
+
     public void showSlowInternetLayout(double speed) {
-        slowInternetContainer.setVisibility(View.VISIBLE);
-        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
-        tvSpeed.setText(speedText);
+        if (slowInternetLayout != null) {
+            slowInternetLayout.setVisibility(View.VISIBLE);
+            String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
+            tvSpeed.setText(speedText);
+        } else {
+            Log.e("MainActivity", "FrameLayout for slow internet is null.");
+        }
     }
+
 
     public void hideSlowInternetLayout() {
         findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
@@ -357,26 +369,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
-        registerReceiver(networkChangeReceiver, filter);
-        isNetworkChangeReceiverRegistered = true;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterNetworkReceiver();
-    }
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterNetworkReceiver();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isNetworkChangeReceiverRegistered) {
+            IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+            registerReceiver(networkChangeReceiver, filter);
+            isNetworkChangeReceiverRegistered = true;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterNetworkReceiver();
     }
 
     private void unregisterNetworkReceiver() {
@@ -389,4 +403,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }

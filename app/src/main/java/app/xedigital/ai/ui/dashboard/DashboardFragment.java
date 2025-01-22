@@ -27,6 +27,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,11 +95,28 @@ public class DashboardFragment extends Fragment {
                 entries.add(new PieEntry(entry.getValue(), entry.getKey()));
             }
         }
+        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+        // If all entries have 0 balance, show a single "0 leaves" slice
+        if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
+            entries.clear();
+            entries.add(new PieEntry(1f, "0 leaves"));
 
-        if (entries.isEmpty()) {
-            pieChart.setVisibility(View.GONE);
-            return;
+            // Set the custom ValueFormatter to hide the value
+            dataSet.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return "";
+                }
+            });
+        } else {
+            // Use default PercentFormatter for other cases
+            dataSet.setValueFormatter(new PercentFormatter(pieChart));
         }
+
+//        if (entries.isEmpty()) {
+//            pieChart.setVisibility(View.GONE);
+//            return;
+//        }
 
         Map<String, Integer> leaveTypeColors = new HashMap<>();
         leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
@@ -112,9 +130,9 @@ public class DashboardFragment extends Fragment {
             colors.add(color);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+//        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
         dataSet.setColors(colors);
-        dataSet.setValueFormatter(new PercentFormatter(pieChart));
+//        dataSet.setValueFormatter(new PercentFormatter(pieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
 

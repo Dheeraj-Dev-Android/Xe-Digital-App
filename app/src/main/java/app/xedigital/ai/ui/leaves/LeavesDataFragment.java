@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +65,7 @@ public class LeavesDataFragment extends Fragment {
         recyclerViewLeaves = view.findViewById(R.id.recyclerViewLeaves);
         leavePieChart = view.findViewById(R.id.leavePieChart);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
+        emptyStateText = view.findViewById(R.id.emptyStateText);
         loadingProgress = view.findViewById(R.id.loadingProgress);
 
         leaveAdapter = new LeaveAdapter(leaveList);
@@ -142,10 +145,31 @@ public class LeavesDataFragment extends Fragment {
                 entries.add(new PieEntry(entry.getValue(), entry.getKey()));
             }
         }
+        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+        // If all entries have 0 balance, show a single "0 leaves" slice
+        if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
+            entries.clear();
+            entries.add(new PieEntry(1f, "0 leaves"));
+
+            // Set the custom ValueFormatter to hide the value
+            dataSet.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return "";
+                }
+            });
+        } else {
+            // Use default PercentFormatter for other cases
+            dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
+        }
         if (entries.isEmpty()) {
-//            leavePieChart.setVisibility(View.VISIBLE);
-            emptyStateContainer.setVisibility(View.VISIBLE);
-            emptyStateText.setText("No balance leaves data available");
+            if (emptyStateText != null) {
+                emptyStateContainer.setVisibility(View.VISIBLE);
+                emptyStateText.setText("No balance leaves data available");
+            } else {
+                // Handle the case where emptyStateText is still null, maybe log an error
+                Log.e("LeavesDataFragment", "emptyStateText is null!");
+            }
             return;
         }
 
@@ -163,9 +187,9 @@ public class LeavesDataFragment extends Fragment {
             colors.add(color);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+//        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
         dataSet.setColors(colors);
-        dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
+//        dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
 
@@ -177,9 +201,6 @@ public class LeavesDataFragment extends Fragment {
         leavePieChart.setTransparentCircleRadius(45f);
         leavePieChart.animateXY(1000, 1000);
         leavePieChart.setDrawEntryLabels(false);
-
-//        leavePieChart.setCenterText("Balance Leaves: " + totalBalanceLeaves);
-//        leavePieChart.setCenterTextSize(14f);
 
         leavePieChart.invalidate();
     }
