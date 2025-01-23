@@ -20,7 +20,6 @@ public class BioMetric {
     private final Context context;
     private final FragmentActivity activity;
     private final BiometricAuthListener biometricAuthListener;
-    private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
 
@@ -32,7 +31,7 @@ public class BioMetric {
     }
 
     private void initialize() {
-        executor = ContextCompat.getMainExecutor(context);
+        Executor executor = ContextCompat.getMainExecutor(context);
 
         biometricPrompt = new BiometricPrompt(activity, executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
