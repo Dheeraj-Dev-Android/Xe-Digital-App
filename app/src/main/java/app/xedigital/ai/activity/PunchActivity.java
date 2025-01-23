@@ -448,9 +448,9 @@ public class PunchActivity extends AppCompatActivity {
                 authToken = intent.getStringExtra("authToken");
             }
             String token = "jwt " + authToken;
-            if (token.length() >= 10) {
-                Log.d("token", "token" + token.substring(0, 10) + "...");
-            }
+//            if (token.length() >= 10) {
+//                Log.d("token", "token" + token.substring(0, 10) + "...");
+//            }
 
             getCurrentLocation(address -> {
                 currentAddress = address;
