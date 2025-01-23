@@ -79,7 +79,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/CaptureText"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/quicksand_font_family"
             android:paddingHorizontal="16dp"

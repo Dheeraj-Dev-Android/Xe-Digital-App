@@ -393,6 +393,11 @@ public class PunchActivity extends AppCompatActivity {
                         JSONObject jsonResponse = new JSONObject(responseBody);
 
                         // Check if "data" key exists and is not null before proceeding
+                        if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
+                            Log.e(TAG, "Face data not found in response.");
+                            showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
+                            return;
+                        }
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
                             JSONObject employeeObject = dataObject.getJSONObject("employee");
@@ -435,71 +440,77 @@ public class PunchActivity extends AppCompatActivity {
     }
 
     private void callAttendanceApi(String employeeId, String employeeName) {
-        Log.d(TAG, "Attendance API Called");
-        Intent intent = getIntent();
-        if (intent != null) {
-            authToken = intent.getStringExtra("authToken");
-        }
-        String token = "jwt " + authToken;
-        if (token.length() >= 10) {
-            Log.d("token", "token" + token.substring(0, 10) + "...");
-        }
+        if (userId != null && userId.equals(employeeId)) {
 
-        getCurrentLocation(address -> {
-            currentAddress = address;
-            Log.d(TAG, "Current Address (Received): " + currentAddress);
+            Log.d(TAG, "Attendance API Called");
+            Intent intent = getIntent();
+            if (intent != null) {
+                authToken = intent.getStringExtra("authToken");
+            }
+            String token = "jwt " + authToken;
+            if (token.length() >= 10) {
+                Log.d("token", "token" + token.substring(0, 10) + "...");
+            }
 
-            String currentTime = getCurrentTime();
-            try {
-                JSONObject requestBody = new JSONObject();
-                requestBody.put("employee", employeeId);
-                requestBody.put("employeeName", employeeName);
-                requestBody.put("address", currentAddress);
-                requestBody.put("punchTime", currentTime);
+            getCurrentLocation(address -> {
+                currentAddress = address;
+                Log.d(TAG, "Current Address (Received): " + currentAddress);
 
-                String requestBodyString = requestBody.toString();
+                String currentTime = getCurrentTime();
+                try {
+                    JSONObject requestBody = new JSONObject();
+                    requestBody.put("employee", employeeId);
+                    requestBody.put("employeeName", employeeName);
+                    requestBody.put("address", currentAddress);
+                    requestBody.put("punchTime", currentTime);
+
+                    String requestBodyString = requestBody.toString();
 //                Log.d(TAG, "Request Body: " + requestBodyString);
-                RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
+                    RequestBody requestBodyAttendance = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
 
-                APIInterface attendanceApiService = APIClient.getInstance().getAttendance();
-                Call<ResponseBody> attendance = attendanceApiService.AttendanceApi(token, requestBodyAttendance);
+                    APIInterface attendanceApiService = APIClient.getInstance().getAttendance();
+                    Call<ResponseBody> attendance = attendanceApiService.AttendanceApi(token, requestBodyAttendance);
 
-                attendance.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                        ProgressBar progressBar = findViewById(R.id.progressBar);
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                String responseBody = response.body().string();
-                                JSONObject responseJson = new JSONObject(responseBody);
-                                String message = responseJson.getString("message");
-                                Log.d(TAG, "Attendance Response Message: " + message);
-                                showAttendanceSuccessAlert(responseBody);
-                                progressBar.setVisibility(View.GONE);
+                    attendance.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                            ProgressBar progressBar = findViewById(R.id.progressBar);
+                            if (response.isSuccessful() && response.body() != null) {
+                                try {
+                                    String responseBody = response.body().string();
+                                    JSONObject responseJson = new JSONObject(responseBody);
+                                    String message = responseJson.getString("message");
+                                    Log.d(TAG, "Attendance Response Message: " + message);
+                                    showAttendanceSuccessAlert(responseBody);
+                                    progressBar.setVisibility(View.GONE);
 
-                                String responseJsonn = gson.toJson(responseBody);
-                                Log.d(TAG, "Attendance Response Body:\n" + responseJsonn);
-                            } catch (IOException | JSONException e) {
-                                progressBar.setVisibility(View.GONE);
-                                Log.e(TAG, "Error reading response body: " + e.getMessage(), e);
-                                throw new RuntimeException(e);
+                                    String responseJsonn = gson.toJson(responseBody);
+                                    Log.d(TAG, "Attendance Response Body:\n" + responseJsonn);
+                                } catch (IOException | JSONException e) {
+                                    progressBar.setVisibility(View.GONE);
+                                    Log.e(TAG, "Error reading response body: " + e.getMessage(), e);
+                                    throw new RuntimeException(e);
+                                }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                        Log.e(TAG, "Attendance Error: " + throwable.getMessage(), throwable);
-                        progressBar.setVisibility(View.GONE);
-                        throw new RuntimeException(throwable);
-                    }
-                });
-            } catch (JSONException e) {
-                Log.e(TAG, "Error creating request body: " + e.getMessage(), e);
-                progressBar.setVisibility(View.GONE);
-                throw new RuntimeException(e);
-            }
-        });
+                        @Override
+                        public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                            Log.e(TAG, "Attendance Error: " + throwable.getMessage(), throwable);
+                            progressBar.setVisibility(View.GONE);
+                            throw new RuntimeException(throwable);
+                        }
+                    });
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error creating request body: " + e.getMessage(), e);
+                    progressBar.setVisibility(View.GONE);
+                    throw new RuntimeException(e);
+                }
+            });
+        } else {
+            Log.e(TAG, "User Id Mismatch");
+            showAttendanceFailedAlert("Attendance failed: User Id Mismatch.");
+        }
     }
 
     private void showAttendanceSuccessAlert(String responseBody) {
@@ -645,9 +656,9 @@ public class PunchActivity extends AppCompatActivity {
             Geocoder geocoder = new Geocoder(PunchActivity.this, Locale.getDefault());
             Address address = null;
             int retryCount = 0;
-            int maxRetries = 3;
+            int maxRetries = 2;
 
-            while (address == null && retryCount < maxRetries) {
+            while (retryCount < maxRetries) {
                 try {
                     List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                     if (addresses != null && !addresses.isEmpty()) {
