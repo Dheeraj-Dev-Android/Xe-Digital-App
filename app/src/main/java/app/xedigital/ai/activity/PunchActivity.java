@@ -670,7 +670,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private void usePhoneBiometric() {
         Log.d(TAG, "Use Phone Biometric");
         progressBar.setVisibility(View.VISIBLE);
-        bioMetric.authenticate();
+        bioMetric.authenticate(false);
     }
 
     @Override
@@ -717,7 +717,8 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         }
         if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE) {
-            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
+//            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
+            bioMetric.handlePermissionResult(requestCode, permissions, grantResults, true);
         }
     }
 

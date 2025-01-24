@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -154,6 +155,7 @@ public class LeavesDataFragment extends Fragment {
         leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
         leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
+        leaveTypeColors.put("Restricted Holidays", Color.rgb(199, 0, 57));
 
         // Create a list of colors for the pie chart slices
         List<Integer> colors = new ArrayList<>();
@@ -168,6 +170,14 @@ public class LeavesDataFragment extends Fragment {
         dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
+
+        Legend legend = leavePieChart.getLegend();
+        legend.setEnabled(true);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setWordWrapEnabled(true);
+        legend.setTextSize(8f);
 
         PieData data = new PieData(dataSet);
         leavePieChart.setData(data);

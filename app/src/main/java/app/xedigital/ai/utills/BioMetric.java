@@ -21,7 +21,8 @@ public class BioMetric {
     private final FragmentActivity activity;
     private final BiometricAuthListener biometricAuthListener;
     private BiometricPrompt biometricPrompt;
-    private BiometricPrompt.PromptInfo promptInfo;
+    private BiometricPrompt.PromptInfo promptInfoLogin;
+    private BiometricPrompt.PromptInfo promptInfoAttendance;
 
     public BioMetric(Context context, FragmentActivity activity, BiometricAuthListener listener) {
         this.context = context;
@@ -62,10 +63,13 @@ public class BioMetric {
             }
         });
 
-        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric").setSubtitle("Use Your Biometric Credentials to Punch Attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+//        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric").setSubtitle("Use Your Biometric Credentials to Punch Attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+        promptInfoLogin = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Login").setSubtitle("Use your biometric credentials to login").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+
+        promptInfoAttendance = new BiometricPrompt.PromptInfo.Builder().setTitle("Punch Attendance").setSubtitle("Use your biometric credentials to punch attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
     }
 
-    public void authenticate() {
+    public void authenticate(boolean forLogin) {
         if (!hasBiometricPermission()) {
             requestBiometricPermission();
             return;
@@ -75,7 +79,8 @@ public class BioMetric {
 
         if (result == BiometricManager.BIOMETRIC_SUCCESS) {
             Log.d("MY_APP_TAG", "App can authenticate using biometrics.");
-            biometricPrompt.authenticate(promptInfo);
+//            biometricPrompt.authenticate(promptInfo);
+            biometricPrompt.authenticate(forLogin ? promptInfoLogin : promptInfoAttendance);
         } else if (result == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE) {
             Log.e("MY_APP_TAG", "No biometric features available on this device.");
             Toast.makeText(context, "No biometric features available on this device.", Toast.LENGTH_LONG).show();
@@ -105,18 +110,47 @@ public class BioMetric {
         ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.USE_BIOMETRIC}, BIOMETRIC_PERMISSION_REQUEST_CODE);
     }
 
-    public void handlePermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+//    public void handlePermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+//        if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                // Biometric permission granted, proceed with authentication
+//                authenticate();
+//            } else {
+//                // Biometric permission denied, handle accordingly
+//                Log.e("Biometric", "Biometric permission denied");
+//                Toast.makeText(context, "Biometric permission denied", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//
+//    }
+
+    public void handlePermissionResult(int requestCode, String[] permissions, int[] grantResults, boolean forLogin) {
         if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Biometric permission granted, proceed with authentication
-                authenticate();
+                authenticateAfterPermission(forLogin);
             } else {
                 // Biometric permission denied, handle accordingly
                 Log.e("Biometric", "Biometric permission denied");
                 Toast.makeText(context, "Biometric permission denied", Toast.LENGTH_SHORT).show();
+                // You might want to add further handling here (e.g., navigate to login screen)
             }
         }
+    }
 
+    private void authenticateAfterPermission(boolean forLogin) {
+        BiometricManager biometricManager = BiometricManager.from(context);
+        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+
+        if (result == BiometricManager.BIOMETRIC_SUCCESS) {
+            Log.d("MY_APP_TAG", "App can authenticate using biometrics.");
+            biometricPrompt.authenticate(forLogin ? promptInfoLogin : promptInfoAttendance);
+        } else {
+            // Handle errors as before
+//            handleError(result);
+            Log.e("Biometric", "Biometric permission denied");
+            Toast.makeText(context, "Biometric permission denied", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public interface BiometricAuthListener {

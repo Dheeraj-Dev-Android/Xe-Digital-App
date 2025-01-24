@@ -34,6 +34,9 @@ public class SplashActivity extends AppCompatActivity {
     private LottieAnimationView noInternetAnimation;
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
+//    private BiometricManager biometricManager;
+//    private BioMetric bioMetric;
+//    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +60,16 @@ public class SplashActivity extends AppCompatActivity {
                 Toast.makeText(SplashActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
             });
         }
+
+//        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+//        biometricManager = BiometricManager.from(this);
         new Handler().postDelayed(() -> {
             // Check network status before starting LoginActivity
             if (NetworkUtils.isNetworkAvailable(this)) {
                 Intent mainIntent = new Intent(SplashActivity.this, LoginActivity.class);
                 startActivity(mainIntent);
                 finish();
+//                attemptBiometricLogin();
             } else {
                 showNoInternetLayout();
             }
@@ -75,6 +82,62 @@ public class SplashActivity extends AppCompatActivity {
             finish();
         });
     }
+
+//    private void attemptBiometricLogin() {
+//        boolean isBiometricSupported = isBiometricSupported();
+//        boolean isLoggedIn = isLoggedIn();
+//        if (isLoggedIn && isBiometricSupported) {
+//            initiateBiometricAuthentication();
+//        } else {
+//            navigateToLoginActivity();
+//        }
+//    }
+
+//    private boolean isBiometricSupported() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS;
+//        } else {
+//            return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+//        }
+//    }
+
+//    private boolean isLoggedIn() {
+////        return sharedPreferences.getBoolean("isLoggedIn", false);
+//        String authToken = sharedPreferences.getString("authToken", null);
+//        return authToken != null;
+//    }
+
+//    private void initiateBiometricAuthentication() {
+//        bioMetric = new BioMetric(this, this, new BioMetric.BiometricAuthListener() {
+//            @Override
+//            public void onAuthenticationSucceeded() {
+//                navigateToMainActivity();
+//            }
+//
+//            @Override
+//            public void onAuthenticationError(int errorCode, CharSequence errString) {
+//                navigateToLoginActivity();
+//            }
+//
+//            @Override
+//            public void onAuthenticationFailed() {
+//                navigateToLoginActivity();
+//            }
+//        });
+//        bioMetric.authenticate(true);
+//    }
+
+//    private void navigateToMainActivity() {
+//        Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+//        startActivity(mainIntent);
+//        finish();
+//    }
+//
+//    private void navigateToLoginActivity() {
+//        Intent loginIntent = new Intent(SplashActivity.this, LoginActivity.class);
+//        startActivity(loginIntent);
+//        finish();
+//    }
 
     public void showNoInternetLayout() {
         findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
@@ -115,6 +178,14 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
     }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (bioMetric != null) {
+//            // Pass the 'forLogin' flag here (true for login)
+//            bioMetric.handlePermissionResult(requestCode, permissions, grantResults, true);
+//        }
+//    }
 
     @Override
     protected void onPause() {

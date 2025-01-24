@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
-        bioMetric.authenticate();
+        bioMetric.authenticate(true);
     }
 
 
@@ -164,7 +164,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (bioMetric != null) {
-            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
+//            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
+            bioMetric.handlePermissionResult(requestCode, permissions, grantResults, true);
         }
     }
 
