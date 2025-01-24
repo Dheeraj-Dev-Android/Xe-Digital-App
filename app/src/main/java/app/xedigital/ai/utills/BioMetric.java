@@ -71,7 +71,7 @@ public class BioMetric {
             return;
         }
         BiometricManager biometricManager = BiometricManager.from(context);
-        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG);
+        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
 
         if (result == BiometricManager.BIOMETRIC_SUCCESS) {
             Log.d("MY_APP_TAG", "App can authenticate using biometrics.");
