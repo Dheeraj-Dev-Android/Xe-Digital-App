@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -113,15 +114,11 @@ public class DashboardFragment extends Fragment {
             dataSet.setValueFormatter(new PercentFormatter(pieChart));
         }
 
-//        if (entries.isEmpty()) {
-//            pieChart.setVisibility(View.GONE);
-//            return;
-//        }
-
         Map<String, Integer> leaveTypeColors = new HashMap<>();
         leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
         leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
+        leaveTypeColors.put("Restricted Holidays", Color.rgb(199, 0, 57));
 
         List<Integer> colors = new ArrayList<>();
         for (PieEntry entry : entries) {
@@ -135,6 +132,14 @@ public class DashboardFragment extends Fragment {
 //        dataSet.setValueFormatter(new PercentFormatter(pieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
+
+        Legend legend = pieChart.getLegend();
+        legend.setEnabled(true);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setWordWrapEnabled(true);
+        legend.setTextSize(8f);
 
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
