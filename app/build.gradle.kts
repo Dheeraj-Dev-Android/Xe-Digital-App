@@ -97,4 +97,5 @@ dependencies {
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.airbnb.android:lottie:5.2.0")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
 }
