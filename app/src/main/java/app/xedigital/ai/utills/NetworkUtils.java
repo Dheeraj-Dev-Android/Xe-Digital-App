@@ -43,6 +43,7 @@ public class NetworkUtils {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
     }
+
     /**
      * Returns the network speed (downstream and upstream) in Kbps.
      *
@@ -78,7 +79,7 @@ public class NetworkUtils {
     /**
      * Checks if the current network speed meets the threshold for being considered "good."
      *
-     * @param context the application context.
+     * @param context       the application context.
      * @param thresholdKbps the minimum speed threshold in Kbps (default: 80 Kbps).
      * @return true if the network speed is good, false otherwise.
      */

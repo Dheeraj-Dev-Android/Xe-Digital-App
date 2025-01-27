@@ -161,8 +161,8 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Next Day Plan"
                     android:layout_marginTop="15dp"
+                    android:text="Next Day Plan"
                     android:textAppearance="?attr/textAppearanceSubtitle1"
                     android:textColor="@color/colorPrimaryVariant"
                     android:textStyle="bold" />
