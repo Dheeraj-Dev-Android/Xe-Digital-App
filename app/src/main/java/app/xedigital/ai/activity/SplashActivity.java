@@ -3,6 +3,7 @@ package app.xedigital.ai.activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
@@ -23,6 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import app.xedigital.ai.NetworkChangeReceiver;
 import app.xedigital.ai.R;
+import app.xedigital.ai.utills.BioMetric;
 import app.xedigital.ai.utills.NetworkUtils;
 
 public class SplashActivity extends AppCompatActivity {
@@ -30,13 +33,11 @@ public class SplashActivity extends AppCompatActivity {
     private final boolean isShowingNoInternetDialog = false;
     private final boolean isShowingSlowNetworkDialog = false;
     private AlertDialog noInternetDialog;
-    private AlertDialog slowNetworkDialog;
     private LottieAnimationView noInternetAnimation;
-    private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
-//    private BiometricManager biometricManager;
-//    private BioMetric bioMetric;
-//    private SharedPreferences sharedPreferences;
+    private BiometricManager biometricManager;
+    private BioMetric bioMetric;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,8 @@ public class SplashActivity extends AppCompatActivity {
         noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
 
         // Create the slow network alert dialog
-        slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
-        slowInternetContainer = findViewById(R.id.slowInternetContainer);
+        AlertDialog slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
+        FrameLayout slowInternetContainer = findViewById(R.id.slowInternetContainer);
         View slowInternetLayout = findViewById(R.id.slowInternetLayout);
         tvSpeed = findViewById(R.id.tvSpeed);
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
@@ -60,7 +61,7 @@ public class SplashActivity extends AppCompatActivity {
                 Toast.makeText(SplashActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
             });
         }
-
+//
 //        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 //        biometricManager = BiometricManager.from(this);
         new Handler().postDelayed(() -> {
@@ -80,6 +81,7 @@ public class SplashActivity extends AppCompatActivity {
             Intent mainIntent = new Intent(SplashActivity.this, LoginActivity.class);
             startActivity(mainIntent);
             finish();
+//            attemptBiometricLogin();
         });
     }
 
@@ -106,7 +108,7 @@ public class SplashActivity extends AppCompatActivity {
 //        String authToken = sharedPreferences.getString("authToken", null);
 //        return authToken != null;
 //    }
-
+//
 //    private void initiateBiometricAuthentication() {
 //        bioMetric = new BioMetric(this, this, new BioMetric.BiometricAuthListener() {
 //            @Override
@@ -178,6 +180,7 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
     }
+
 //    @Override
 //    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
