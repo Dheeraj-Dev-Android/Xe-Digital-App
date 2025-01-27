@@ -200,7 +200,7 @@ public class LeavesFragment extends Fragment {
                     if ("Loss of Pay (LOP) / Leave Without Pay (LWP)".equals(leaveType.getLeavetypeName())) {
                         lossOfPayId = leaveType.getId();
                         Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
-                        break; // Exit loop once found
+                        break;
                     }
                 }
 
@@ -317,18 +317,18 @@ public class LeavesFragment extends Fragment {
 
 //                            Log.e(TAG, "Balance Leave: " + balanceLeave);
 //                            Log.e(TAG, "Selected Leave Type: " + selectedLeaveTypeName);
-                            if (!Objects.requireNonNull(binding.etFromDate.getText()).toString().isEmpty() && !binding.etToDate.getText().toString().isEmpty()) {
+                            if (!Objects.requireNonNull(binding.etFromDate.getText()).toString().isEmpty() && !Objects.requireNonNull(binding.etToDate.getText()).toString().isEmpty()) {
                                 calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
                             }
 //                            if (selectedLeaveTypeId.equals(restrictedHolidayId)) {
 //                                String selectedDate = binding.etFromDate.getText().toString();
 //                                checkRestrictedHoliday(selectedDate);
 //                            }
-//                            if (selectedLeaveTypeName.equals(restrictedHolidayId)) {
-//                                String fromDate = binding.etFromDate.getText().toString();
-//                                String toDate = binding.etToDate.getText().toString();
-//                                checkRestrictedHoliday(fromDate, toDate);
-//                            }
+                            if (selectedLeaveTypeName.equals(restrictedHolidayId)) {
+                                String fromDate = binding.etFromDate.getText().toString();
+                                String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
+                                checkRestrictedHoliday(fromDate, toDate);
+                            }
                             // --- Update UI on the main thread ---
                             requireActivity().runOnUiThread(() -> {
 
