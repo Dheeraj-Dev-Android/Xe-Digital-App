@@ -455,14 +455,14 @@ public class LeavesFragment extends Fragment {
         binding.btnSubmit.setOnClickListener(view -> {
 
             if (validateForm()) {
-                String fromDate = binding.etFromDate.getText().toString();
-                String toDate = binding.etToDate.getText().toString();
+                String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
+                String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
                 String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
                 String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
                 String leavingStation = binding.spinnerLeavingStation.getText().toString();
-                String leaveStationAdd = binding.etLeaveStationAddress.getText().toString();
-                String contactNumber = binding.etContactNumber.getText().toString();
-                String reason = binding.etReason.getText().toString();
+                String leaveStationAdd = Objects.requireNonNull(binding.etLeaveStationAddress.getText()).toString();
+                String contactNumber = Objects.requireNonNull(binding.etContactNumber.getText()).toString();
+                String reason = Objects.requireNonNull(binding.etReason.getText()).toString();
 
                 applyLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
             }
