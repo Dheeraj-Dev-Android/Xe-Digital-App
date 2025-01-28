@@ -3,13 +3,11 @@ package app.xedigital.ai.activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -56,8 +54,8 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         // Handle "Get Started" button
-        Button btnGetStarted = findViewById(R.id.btn_get_started);
-        btnGetStarted.setOnClickListener(v -> navigateToLogin());
+//        Button btnGetStarted = findViewById(R.id.btn_get_started);
+//        btnGetStarted.setOnClickListener(v -> navigateToLogin());
 
         // No internet dialog
         noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
@@ -74,7 +72,7 @@ public class SplashActivity extends AppCompatActivity {
             // Check for slow internet
             NetworkUtils.NetworkSpeed networkSpeed = NetworkUtils.getNetworkSpeed(this);
             Log.d("SplashActivity", "Download Speed: " + networkSpeed.downSpeedKbps + " Kbps");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && networkSpeed.downSpeedKbps < 80) {
+            if (networkSpeed.downSpeedKbps < 80) {
                 showSlowInternetLayout(networkSpeed.downSpeedKbps);
             } else {
                 navigateToLogin();

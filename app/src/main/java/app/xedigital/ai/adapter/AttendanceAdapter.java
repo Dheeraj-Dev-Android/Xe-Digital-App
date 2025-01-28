@@ -106,7 +106,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             //  No leave, holiday, or punch data - show LOP/LWP
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.leaveTypeName.setVisibility(View.VISIBLE);
-            holder.leaveTypeName.setText("Loss of Pay (LOP) / Leave Without Pay (LWP)");
+            holder.leaveTypeName.setText("Leave Name : Loss of Pay (LOP) / Leave Without Pay (LWP)");
 
             holder.punchInTextView.setVisibility(View.GONE);
             holder.punchOutTextView.setVisibility(View.GONE);

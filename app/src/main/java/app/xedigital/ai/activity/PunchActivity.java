@@ -677,7 +677,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         Thread.sleep((long) (Math.pow(2, retryCount) * 1000));
                     } catch (InterruptedException interruptedException) {
                         interruptedException.printStackTrace();
-                        // You might want to handle the interruption if necessary
                         break; // Exit the loop if interrupted
                     }
                 }
