@@ -173,6 +173,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         Log.e(TAG, "Camera is null");
                         showRetryAlert();
                         return;
+
                     }
 
                     CameraInfo cameraInfo = camera.getCameraInfo();
