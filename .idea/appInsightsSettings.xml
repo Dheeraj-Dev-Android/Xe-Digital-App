@@ -6,6 +6,14 @@
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="app.xedigital.ai" />
+                  <option name="mobileSdkAppId" value="1:1026884675633:android:8599ffe587a67f19910d10" />
+                  <option name="projectId" value="xe-digital-7087b" />
+                  <option name="projectNumber" value="1026884675633" />
+                </ConnectionSetting>
+              </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />

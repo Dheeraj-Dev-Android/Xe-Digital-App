@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -67,6 +68,7 @@ dependencies {
     implementation(libs.impress)
     implementation(libs.engage.core)
     implementation(libs.car.ui.lib)
+    implementation(libs.firebase.analytics)
 //    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

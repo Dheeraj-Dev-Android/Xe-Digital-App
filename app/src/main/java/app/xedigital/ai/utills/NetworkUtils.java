@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 public class NetworkUtils {
-
     private static final String TAG = "NetworkUtils";
 
     /**
@@ -25,13 +24,11 @@ public class NetworkUtils {
             Log.e(TAG, "ConnectivityManager is null.");
             return false;
         }
-
         Network activeNetwork = connectivityManager.getActiveNetwork();
         if (activeNetwork == null) {
             Log.e(TAG, "No active network.");
             return false;
         }
-
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
         if (networkCapabilities == null) {
             Log.e(TAG, "Network capabilities are null.");
@@ -39,9 +36,7 @@ public class NetworkUtils {
         }
 
         // Simplified network validation using hasTransport
-        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
+        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
     }
 
     /**

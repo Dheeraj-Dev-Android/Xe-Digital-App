@@ -277,8 +277,6 @@ public class LeavesFragment extends Fragment {
 
                     }
                 });
-
-
             }
 
             private void fetchLeaveTypeDetails(String selectedLeaveTypeId, String authToken) {
@@ -356,7 +354,7 @@ public class LeavesFragment extends Fragment {
                 });
             }
 
-            //            private void checkRestrictedHoliday(String selectedDate) {
+            //             private void checkRestrictedHoliday(String selectedDate) {
 //                holidaysViewModel = new ViewModelProvider(requireActivity()).get(HolidaysViewModel.class);
 //                holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), new Observer<List<HolidaysItem>>() {
 //                    @Override

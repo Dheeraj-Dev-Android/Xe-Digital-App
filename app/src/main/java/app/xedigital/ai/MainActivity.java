@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import app.xedigital.ai.activity.LoginActivity;
 import app.xedigital.ai.activity.PunchActivity;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
     private final boolean isShowingNoInternetDialog = false;
     private final boolean isShowingSlowNetworkDialog = false;
+    private FirebaseAnalytics mFirebaseAnalytics;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
     private AlertDialog noInternetDialog;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
 
