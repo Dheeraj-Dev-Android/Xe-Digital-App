@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private View loadingOverlay;
     private BioMetric bioMetric;
-    private BiometricManager biometricManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
 //        }
 
         // Initialize BiometricManager
-        biometricManager = BiometricManager.from(this);
+        BiometricManager biometricManager = BiometricManager.from(this);
 
         // Check if biometric is supported and if user is logged in
         boolean isBiometricSupported;
