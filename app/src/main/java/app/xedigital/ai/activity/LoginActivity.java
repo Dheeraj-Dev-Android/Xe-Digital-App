@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -42,12 +43,14 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private View loadingOverlay;
     private BioMetric bioMetric;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
 

@@ -52,7 +52,6 @@ public class SplashActivity extends AppCompatActivity {
                 Toast.makeText(SplashActivity.this, "Slow internet message dismissed", Toast.LENGTH_SHORT).show();
             });
         }
-
         // Handle "Get Started" button
 //        Button btnGetStarted = findViewById(R.id.btn_get_started);
 //        btnGetStarted.setOnClickListener(v -> navigateToLogin());

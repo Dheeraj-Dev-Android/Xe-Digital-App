@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -68,6 +69,7 @@ public class DashboardFragment extends Fragment {
     private boolean isProfileDataLoaded = false;
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
+    private Button crashButton;
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
@@ -171,6 +173,12 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
 
+        // Creates a button that mimics a crash when pressed
+
+//        binding.crashButton.setOnClickListener(v -> {
+//            throw new RuntimeException("Test Crash"); // Force a crash
+//        });
+
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String userId = sharedPreferences.getString("userId", "");
@@ -190,7 +198,6 @@ public class DashboardFragment extends Fragment {
                     animatedVector.start();
                 }
             }
-
             startActivity(intent);
         });
 

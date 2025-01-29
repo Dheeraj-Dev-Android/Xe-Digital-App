@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -19,6 +20,15 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
+    signingConfigs {
+        create("release") {
+            //Replace path, password and alias with your credentials
+            storeFile = file("C:\\Users\\Dheeraj.t\\AndroidStudioProjects\\Xe Digital\\key.jks")
+            storePassword = "xedigital"
+            keyAlias = "key"
+            keyPassword = "xedigital"
+        }
+    }
 
     buildTypes {
         release {
@@ -26,6 +36,7 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -69,6 +80,7 @@ dependencies {
     implementation(libs.engage.core)
     implementation(libs.car.ui.lib)
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 //    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -99,4 +111,6 @@ dependencies {
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.airbnb.android:lottie:5.2.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }

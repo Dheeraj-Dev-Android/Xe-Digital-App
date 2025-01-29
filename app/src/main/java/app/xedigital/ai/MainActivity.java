@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, "Navigation view is null, cannot fetch user profile");
         }
+
     }
 
     public void showNoInternetLayout() {
