@@ -96,6 +96,7 @@ public class DashboardFragment extends Fragment {
     private ImageView ivEmployeeProfile;
     private TextView tvPunchInTime;
     private TextView tvPunchOutTime;
+
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
         float totalBalanceLeaves = 0;
@@ -444,6 +445,7 @@ public class DashboardFragment extends Fragment {
         tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
         leavePieChart = root.findViewById(R.id.leavePieChart);
     }
+
     private String formatShiftTime(String shiftTime) {
         if (shiftTime == null || shiftTime.isEmpty()) {
             return "";
