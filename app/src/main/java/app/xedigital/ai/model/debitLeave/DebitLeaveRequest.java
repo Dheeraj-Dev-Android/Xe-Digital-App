@@ -32,7 +32,7 @@ public class DebitLeaveRequest {
     private String empEmail;
 
     @SerializedName("tDays")
-    private int tDays;
+    private double tDays;
 
     @SerializedName("appliedDate")
     private String appliedDate;
@@ -56,7 +56,7 @@ public class DebitLeaveRequest {
     private String vacationAddress;
 
     @SerializedName("fUsedDays")
-    private int fUsedDays;
+    private double fUsedDays;
 
     @SerializedName("reportingManagerLastName")
     private String reportingManagerLastName;
@@ -145,11 +145,11 @@ public class DebitLeaveRequest {
         this.empEmail = empEmail;
     }
 
-    public int getTDays() {
+    public double getTDays() {
         return tDays;
     }
 
-    public void setTDays(int tDays) {
+    public void setTDays(double tDays) {
         this.tDays = tDays;
     }
 
@@ -209,11 +209,11 @@ public class DebitLeaveRequest {
         this.vacationAddress = vacationAddress;
     }
 
-    public int getFUsedDays() {
+    public double getFUsedDays() {
         return fUsedDays;
     }
 
-    public void setFUsedDays(int fUsedDays) {
+    public void setFUsedDays(double fUsedDays) {
         this.fUsedDays = fUsedDays;
     }
 

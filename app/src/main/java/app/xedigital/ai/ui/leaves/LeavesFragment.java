@@ -595,9 +595,10 @@ public class LeavesFragment extends Fragment {
         debitLeaveRequest.setReportingManager(reportingManagerEmail);
         debitLeaveRequest.setReportingManagerName(reportingManagerName);
         debitLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
+//        Log.e("debit API", "totalDays: " + totalDays + "finalUsedDays: " + finalUsedDays);
+        debitLeaveRequest.setTDays(totalDays);
+        debitLeaveRequest.setFUsedDays(finalUsedDays);
 
-        debitLeaveRequest.setTDays((int) totalDays);
-        debitLeaveRequest.setFUsedDays((int) finalUsedDays);
 
         Call<ResponseBody> debitLeave = APIClient.getInstance().debitLeave().LeavesUsedDebit("jwt " + authToken, debitLeaveRequest);
 
@@ -704,12 +705,12 @@ public class LeavesFragment extends Fragment {
     }
 
     private void calculateTotalDaysAndCheckLeaveLimit(String selectedLeaveTypeName) {
-        String fromDate = binding.etFromDate.getText().toString();
-        String toDate = binding.etToDate.getText().toString();
+        String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
+        String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
         String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
         String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
 
-//        Log.w(TAG, "fromDate: " + fromDate + ", toDate: " + toDate + ", leaveCategoryFrom: " + leaveCategoryFrom + ", leaveCategoryTo: " + leaveCategoryTo);
+        Log.w(TAG, "fromDate: " + fromDate + ", toDate: " + toDate + ", leaveCategoryFrom: " + leaveCategoryFrom + ", leaveCategoryTo: " + leaveCategoryTo);
 
         if (!fromDate.isEmpty() && !toDate.isEmpty() && !leaveCategoryFrom.isEmpty() && !leaveCategoryTo.isEmpty()) {
             long totalDaysInDateRange = calculateTotalDays(fromDate, toDate);
@@ -722,8 +723,9 @@ public class LeavesFragment extends Fragment {
             } else {
                 totalDays = totalDaysInDateRange;
             }
+//            Log.w(TAG,"totalDays: " + totalDays);
             finalUsedDays(totalDays);
-//            Log.d(TAG, "Calculated totalDays: " + totalDays + "balanceLeave : " + balanceLeave);
+            Log.d(TAG, "Calculated totalDays: " + totalDays + "balanceLeave : " + balanceLeave);
             if (totalDays > balanceLeave && selectedLeaveTypeName != null && !selectedLeaveTypeName.equals("Loss of Pay (LOP) / Leave Without Pay (LWP)")) {
                 showLeaveLimitExceededAlert();
             }
@@ -736,13 +738,15 @@ public class LeavesFragment extends Fragment {
         finalUsedDays = totalDays;
 
         if (leaveCategoryFrom.equals("First Half Day") && leaveCategoryTo.equals("First Half Day")) {
-            finalUsedDays -= 0.5;
+            finalUsedDays = 0.5;
+//            finalUsedDays -= 0.5;
         } else if (leaveCategoryFrom.equals("First Half Day") && leaveCategoryTo.equals("Second Half Day")) {
             // No adjustment needed for full day
         } else if (leaveCategoryFrom.equals("Second Half Day") && leaveCategoryTo.equals("Second Half Day")) {
-            finalUsedDays -= 0.5;
+            finalUsedDays = 0.5;
+//            finalUsedDays -= 0.5;
         }
-//        Log.e(TAG, "finalUsedDays: " + finalUsedDays);
+//        Log.e(TAG, "finalUsedDays:  " + finalUsedDays);
 
     }
 
