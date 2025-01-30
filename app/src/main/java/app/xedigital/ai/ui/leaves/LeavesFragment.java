@@ -194,13 +194,13 @@ public class LeavesFragment extends Fragment {
                 for (LeavetypesItem leaveType : leaveTypes) {
                     if ("Restricted holiday".equals(leaveType.getLeavetypeName())) {
                         restrictedHolidayId = leaveType.getId();
-                        Log.w(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
+                        // Log.w(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
                         break; // Exit loop once found
                     }
                     if ("Loss of Pay (LOP) / Leave Without Pay (LWP)".equals(leaveType.getLeavetypeName())) {
                         lossOfPayId = leaveType.getId();
                         Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
-                        break;
+                        break; // Exit Loop Once Found
                     }
                 }
 
