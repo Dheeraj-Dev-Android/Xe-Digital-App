@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
     private final boolean isShowingNoInternetDialog = false;
     private final boolean isShowingSlowNetworkDialog = false;
-    private FirebaseAnalytics mFirebaseAnalytics;
+    FirebaseAnalytics mFirebaseAnalytics;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
     private AlertDialog noInternetDialog;
@@ -365,8 +365,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
                 Toast.makeText(MainActivity.this, "Profile fetch failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                profileName.setText(getString(R.string.guest_name));
-                profileEmail.setText(getString(R.string.guest_email));
+//                profileName.setText(getString(R.string.guest_name));
+//                profileEmail.setText(getString(R.string.guest_email));
                 Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
             }
         });
