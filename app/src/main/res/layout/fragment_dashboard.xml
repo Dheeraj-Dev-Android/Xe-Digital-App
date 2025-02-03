@@ -44,20 +44,19 @@
                         android:padding="16dp">
 
                         <View
-                            android:layout_width="match_parent"
+                            android:layout_width="120dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center"
                             android:background="#DDDDDD" />
 
                         <View
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
+                            android:layout_height="48dp"
                             android:layout_marginTop="16dp"
                             android:background="#DDDDDD" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
-            <!--            Shimmer End-->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/punchCardView"
@@ -129,8 +128,8 @@
             <!-- Shimmer for Employee card-->
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/employeeCardShimmer"
-                android:layout_width="380dp"
-                android:layout_height="338dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -139,9 +138,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
                     app:strokeColor="#40C4FF"
                     app:strokeWidth="2dp">
 
@@ -161,79 +159,67 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <View
-                            android:id="@+id/shimmerName"
-                            android:layout_width="0dp"
-                            android:layout_height="18dp"
-                            android:layout_marginTop="8dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/shimmerProfile" />
-
-                        <View
-                            android:id="@+id/shimmerEmail"
-                            android:layout_width="0dp"
-                            android:layout_height="16dp"
-                            android:layout_marginTop="4dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/shimmerName" />
-
-                        <View
-                            android:id="@+id/shimmerContact"
-                            android:layout_width="0dp"
-                            android:layout_height="16dp"
-                            android:layout_marginTop="4dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/shimmerEmail" />
-
-                        <View
-                            android:id="@+id/shimmerDesignation"
-                            android:layout_width="0dp"
-                            android:layout_height="16dp"
-                            android:layout_marginTop="4dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/shimmerContact" />
-
-                        <View
-                            android:id="@+id/shimmerShift"
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/shimmerDesignation" />
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            app:layout_constraintTop_toBottomOf="@id/shimmerProfile">
 
-                        <TextView
-                            android:id="@+id/shimmerPunchInTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.045"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/shimmerShift" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="8dp"
+                                android:background="#DDDDDD" />
 
-                        <TextView
-                            android:id="@+id/shimmerPunchOutTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="30dp"
-                            android:background="#DDDDDD"
-                            app:layout_constraintStart_toEndOf="@id/shimmerPunchInTime"
-                            app:layout_constraintTop_toTopOf="@id/shimmerPunchInTime" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginTop="12dp"
+                                android:background="#DDDDDD" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginTop="12dp"
+                                android:background="#DDDDDD" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginTop="12dp"
+                                android:background="#DDDDDD" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginTop="12dp"
+                                android:background="#DDDDDD" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="1"
+                                    android:background="#DDDDDD" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_weight="1"
+                                    android:background="#DDDDDD" />
+                            </LinearLayout>
+                        </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
-            <!--            Shimmer End-->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/employeeCard"
@@ -399,7 +385,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
-                        android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="Software Engineer : Software Engineer "
                         android:textColor="@color/black"
@@ -463,7 +448,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- shimmer for leave chart-->
+            <!-- Shimmer for leave chart-->
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/leavePieChartShimmer"
                 android:layout_width="0dp"
@@ -476,9 +461,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
                     app:strokeColor="#40C4FF"
                     app:strokeWidth="2dp">
 
@@ -490,14 +474,14 @@
                         android:padding="10dp">
 
                         <View
-                            android:layout_width="match_parent"
+                            android:layout_width="200dp"
                             android:layout_height="20dp"
                             android:background="#DDDDDD" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="16dp"
                             android:background="#DDDDDD" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

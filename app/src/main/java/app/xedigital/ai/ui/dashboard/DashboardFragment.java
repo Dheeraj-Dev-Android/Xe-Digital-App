@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -73,7 +72,6 @@ public class DashboardFragment extends Fragment {
     private boolean isProfileDataLoaded = false;
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
-    private Button crashButton;
 
     // Shimmer layouts
     private ShimmerFrameLayout punchCardShimmer;
@@ -85,9 +83,8 @@ public class DashboardFragment extends Fragment {
     private MaterialCardView employeeCard;
     private MaterialCardView leavePieChartContainer;
 
-    //Real layouts values
+    // Real layouts values
     private TextView todayDate;
-    private Button punchButton;
     private TextView tvEmployeeNameValue;
     private TextView tvEmployeeDesignationValue;
     private TextView tvEmployeeShiftValue;
@@ -155,9 +152,7 @@ public class DashboardFragment extends Fragment {
             colors.add(color);
         }
 
-//        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
         dataSet.setColors(colors);
-//        dataSet.setValueFormatter(new PercentFormatter(pieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
 
@@ -191,8 +186,6 @@ public class DashboardFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        new ViewModelProvider(this).get(DashboardViewModel.class);
-
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -200,12 +193,6 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
 
         initializeViews(root);
-
-        // Creates a button that mimics a crash when pressed
-
-//        binding.crashButton.setOnClickListener(v -> {
-//            throw new RuntimeException("Test Crash"); // Force a crash
-//        });
 
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -236,7 +223,6 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize blur overlay and loader
         blurOverlay = view.findViewById(R.id.blurOverlay);
         loader = view.findViewById(R.id.loader);
 
@@ -401,9 +387,9 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    // Check if all data is loaded and update the loader visibility
     private void checkAllDataLoaded() {
         if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
+            Log.d("DashboardFragment", "All data loaded. Stopping shimmer.");
             stopShimmerAnimations();
             hideLoaderWithBlur();
         }
@@ -417,8 +403,13 @@ public class DashboardFragment extends Fragment {
 
     private void stopShimmerAnimations() {
         punchCardShimmer.stopShimmer();
+        punchCardShimmer.setVisibility(View.GONE);
+
         employeeCardShimmer.stopShimmer();
+        employeeCardShimmer.setVisibility(View.GONE);
+
         leavePieChartShimmer.stopShimmer();
+        leavePieChartShimmer.setVisibility(View.GONE);
     }
 
     private void initializeViews(View root) {
@@ -434,7 +425,6 @@ public class DashboardFragment extends Fragment {
 
         // Real layouts values
         todayDate = root.findViewById(R.id.todayDate);
-//        punchButton = root.findViewById(R.id.punchButton);
         tvEmployeeNameValue = root.findViewById(R.id.tvEmployeeNameValue);
         tvEmployeeDesignationValue = root.findViewById(R.id.tvEmployeeDesignationValue);
         tvEmployeeShiftValue = root.findViewById(R.id.tvEmployeeShiftValue);
@@ -443,8 +433,8 @@ public class DashboardFragment extends Fragment {
         ivEmployeeProfile = root.findViewById(R.id.ivEmployeeProfile);
         tvPunchInTime = root.findViewById(R.id.tvPunchInTime);
         tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
-        leavePieChart = root.findViewById(R.id.leavePieChart);
     }
+
 
     private String formatShiftTime(String shiftTime) {
         if (shiftTime == null || shiftTime.isEmpty()) {
