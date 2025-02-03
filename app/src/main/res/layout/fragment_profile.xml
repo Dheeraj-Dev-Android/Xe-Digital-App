@@ -46,19 +46,6 @@
                 android:background="@drawable/punch_card_background"
                 android:padding="16dp">
 
-                <!--                <ImageView-->
-                <!--                    android:id="@+id/profile_image"-->
-                <!--                    android:layout_width="150dp"-->
-                <!--                    android:layout_height="150dp"-->
-                <!--                    android:backgroundTint="?attr/colorPrimary"-->
-                <!--                    android:backgroundTintMode="screen"-->
-                <!--                    android:contentDescription="@string/user_profile_picture"-->
-                <!--                    android:src="@mipmap/ic_default_profile"-->
-                <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
-                <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toTopOf="parent" />-->
-
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/profileBorderContainer"
                     android:layout_width="175dp"
@@ -486,11 +473,7 @@
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/cross_manager_email" />
 
-
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </com.google.android.material.card.MaterialCardView>
-
     </LinearLayout>
-
 </ScrollView>
