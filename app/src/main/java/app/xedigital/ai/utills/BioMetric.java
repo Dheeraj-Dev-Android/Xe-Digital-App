@@ -60,12 +60,13 @@ public class BioMetric {
                 }
             }
         });
+//        promptFor Login
         promptInfoLogin = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Login").setSubtitle("Use your biometric credentials to login").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
-
+//promptInfoAttendance
         promptInfoAttendance = new BiometricPrompt.PromptInfo.Builder().setTitle("Punch Attendance").setSubtitle("Use your biometric credentials to punch attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
-
     }
 
+    //    Added forLogin to differentiate between login and attendance
     public void authenticate(boolean forLogin) {
         if (!hasBiometricPermission()) {
             Log.e("Biometric", "Biometric permission not granted");

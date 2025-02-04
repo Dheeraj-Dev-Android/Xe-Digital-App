@@ -22,7 +22,7 @@ public class PDFViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdfview);
 
-        // Prevent screenshots and screen recordings
+        // Prevent screenshots and screen recordings and Sharing on the other Websites
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_SECURE,
                 WindowManager.LayoutParams.FLAG_SECURE
@@ -75,7 +75,6 @@ public class PDFViewActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        // Handle back navigation within the WebView
         if (webView.canGoBack()) {
             webView.goBack();
         } else {

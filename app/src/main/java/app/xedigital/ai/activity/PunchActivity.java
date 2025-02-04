@@ -779,6 +779,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
         if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE) {
 //            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
+//            Added forLogin to differentiate the login prompt from the attendance
             bioMetric.handlePermissionResult(requestCode, permissions, grantResults, false);
         }
     }
