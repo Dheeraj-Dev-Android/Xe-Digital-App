@@ -630,6 +630,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                     Location location = locationResult.getLastLocation();
                     if (location != null) {
                         getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
+                        Log.d(TAG, "Location: " + location.getLatitude() + ", " + location.getLongitude());
                     } else {
                         Log.e(TAG, "Location is null in onLocationResult");
                         callback.onAddressReceived("Location not found");
@@ -691,6 +692,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             } else {
                 addressResult = "Location not found";
                 Log.e(TAG, "No address found for location or max retries reached");
+                Toast.makeText(PunchActivity.this, "No address found for location", Toast.LENGTH_SHORT).show();
             }
 
             runOnUiThread(() -> {

@@ -270,6 +270,7 @@ public class DashboardFragment extends Fragment {
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
+                Log.d("DashboardFragment", "Employee: " + employee.toString());
 
                 employeeName = employee.getFirstname();
                 employeeEmail = employee.getEmail();
