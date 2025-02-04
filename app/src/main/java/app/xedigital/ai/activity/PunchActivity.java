@@ -623,7 +623,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
             // Location permission granted and location services enabled
-//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
             LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(false).setMaxUpdateDelayMillis(15000).build();
             locationCallback = new LocationCallback() {
                 @Override
