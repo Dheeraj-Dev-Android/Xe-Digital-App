@@ -4,41 +4,39 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 public class NetworkUtils {
-
     private static final String TAG = "NetworkUtils";
 
     /**
      * Checks if network is available and has internet connectivity.
      *
      * @param context the application context.
-     * @return true if network is available, false otherwise.
+     * @return true if network is available and validated, false otherwise.
      */
-    public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean isNetworkAvailable(@NonNull Context context) {
+        ConnectivityManager connectivityManager = ContextCompat.getSystemService(context, ConnectivityManager.class);
         if (connectivityManager == null) {
             Log.e(TAG, "ConnectivityManager is null.");
             return false;
         }
-
         Network activeNetwork = connectivityManager.getActiveNetwork();
         if (activeNetwork == null) {
             Log.e(TAG, "No active network.");
             return false;
         }
-
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
         if (networkCapabilities == null) {
             Log.e(TAG, "Network capabilities are null.");
             return false;
         }
 
-        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        // Simplified network validation using hasTransport
+        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
     }
 
     /**
@@ -47,55 +45,47 @@ public class NetworkUtils {
      * @param context the application context.
      * @return a NetworkSpeed object containing downstream and upstream speeds in Kbps.
      */
-    public static NetworkSpeed getNetworkSpeed(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static NetworkSpeed getNetworkSpeed(@NonNull Context context) {
+        ConnectivityManager connectivityManager = ContextCompat.getSystemService(context, ConnectivityManager.class);
         if (connectivityManager == null) {
             Log.e(TAG, "ConnectivityManager is null.");
             return new NetworkSpeed(0, 0);
         }
 
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+        Network activeNetwork = connectivityManager.getActiveNetwork();
+        if (activeNetwork == null) {
+            Log.e(TAG, "No active network.");
+            return new NetworkSpeed(0, 0);
+        }
+
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
         if (networkCapabilities != null) {
             int downSpeedKbps = networkCapabilities.getLinkDownstreamBandwidthKbps();
             int upSpeedKbps = networkCapabilities.getLinkUpstreamBandwidthKbps();
+
             Log.d(TAG, "Down Speed: " + downSpeedKbps + " Kbps, Up Speed: " + upSpeedKbps + " Kbps");
             return new NetworkSpeed(downSpeedKbps, upSpeedKbps);
         } else {
-            Log.d(TAG, "Network capabilities are null");
+            Log.e(TAG, "Network capabilities are null.");
             return new NetworkSpeed(0, 0);
         }
     }
 
     /**
-     * Checks if the current network speed is good.
-     * A network is considered good if its download speed is greater than the defined threshold.
+     * Checks if the current network speed meets the threshold for being considered "good."
      *
-     * @param context the application context.
+     * @param context       the application context.
+     * @param thresholdKbps the minimum speed threshold in Kbps (default: 80 Kbps).
      * @return true if the network speed is good, false otherwise.
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public static boolean isNetworkSpeedGood(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager == null) {
-            Log.e(TAG, "ConnectivityManager is null.");
-            return false;
-        }
+    public static boolean isNetworkSpeedGood(Context context, int thresholdKbps) {
+        NetworkSpeed networkSpeed = getNetworkSpeed(context);
 
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-        if (networkCapabilities != null) {
-            int downSpeedKbps = networkCapabilities.getLinkDownstreamBandwidthKbps();
-            // Define your threshold for good network speed (in Kbps)
-            int goodSpeedThresholdKbps = 80; // Example: 1 Mbps = 1000 Kbps
-
-            boolean isGoodSpeed = downSpeedKbps >= goodSpeedThresholdKbps;
-            if (!isGoodSpeed) {
-                Log.d(TAG, "Network speed too slow: " + downSpeedKbps + " Kbps");
-            }
-            return isGoodSpeed;
-        } else {
-            Log.e(TAG, "Network capabilities are null.");
-            return false; // Assume slow network if capabilities are null
+        boolean isGoodSpeed = networkSpeed.downSpeedKbps >= thresholdKbps;
+        if (!isGoodSpeed) {
+            Log.w(TAG, "Network speed is below threshold: " + networkSpeed.downSpeedKbps + " Kbps (Threshold: " + thresholdKbps + " Kbps)");
         }
+        return isGoodSpeed;
     }
 
     /**
@@ -105,7 +95,7 @@ public class NetworkUtils {
      * @return the speed in Mbps.
      */
     private static double convertKbpsToMbps(int kbps) {
-        return kbps / 1024.0;  // Convert Kbps to Mbps
+        return kbps / 1024.0;
     }
 
     /**
@@ -121,12 +111,19 @@ public class NetworkUtils {
         }
 
         /**
-         * Convert the speeds to Mbps for easier display.
+         * Converts the download speed to Mbps for easier display.
+         *
+         * @return download speed in Mbps as a formatted string.
          */
         public String getDownSpeedInMbps() {
             return String.format("%.2f Mbps", convertKbpsToMbps(downSpeedKbps));
         }
 
+        /**
+         * Converts the upload speed to Mbps for easier display.
+         *
+         * @return upload speed in Mbps as a formatted string.
+         */
         public String getUpSpeedInMbps() {
             return String.format("%.2f Mbps", convertKbpsToMbps(upSpeedKbps));
         }

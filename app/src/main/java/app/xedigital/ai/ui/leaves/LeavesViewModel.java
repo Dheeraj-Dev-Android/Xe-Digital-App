@@ -12,9 +12,12 @@ import androidx.lifecycle.ViewModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.List;
+
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
+import app.xedigital.ai.model.leaveType.LeavetypesItem;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +33,7 @@ public class LeavesViewModel extends ViewModel {
     public LiveData<LeavesResponse> leavesData = _leavesData;
     public LiveData<LeaveTypeResponse> leavesTypeData = _leavesTypeData;
     private String authToken;
+    private String restrictedHolidayId;
 
     public LeavesViewModel() {
         apiInterface = APIClient.getInstance().getLeaves();
@@ -76,6 +80,14 @@ public class LeavesViewModel extends ViewModel {
                     if (response.isSuccessful() && response.body() != null) {
                         _leavesTypeData.postValue(response.body());
                         String responseJson = gson.toJson(response.body());
+                        // Extract Restricted holiday ID
+                        List<LeavetypesItem> leaveTypes = response.body().getData().getLeavetypes();
+                        for (LeavetypesItem leaveType : leaveTypes) {
+                            if ("Restricted holiday".equals(leaveType.getLeavetypeName())) {
+                                restrictedHolidayId = leaveType.getId();
+                                break; // Exit loop once found
+                            }
+                        }
 //                        Log.d("fetchLeavesType", "Leave Response: " + responseJson);
                     } else {
                         Log.e("fetchLeavesType", "Error fetching leaves type: " + response.message());

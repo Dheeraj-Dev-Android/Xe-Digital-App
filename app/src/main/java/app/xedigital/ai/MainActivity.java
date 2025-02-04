@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import app.xedigital.ai.activity.LoginActivity;
 import app.xedigital.ai.activity.PunchActivity;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
     private final boolean isShowingNoInternetDialog = false;
     private final boolean isShowingSlowNetworkDialog = false;
+    FirebaseAnalytics mFirebaseAnalytics;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
     private AlertDialog noInternetDialog;
@@ -66,18 +68,20 @@ public class MainActivity extends AppCompatActivity {
     private boolean isNetworkChangeReceiverRegistered = false;
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
+    private View slowInternetLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
 
         // Create the slow network alert dialog
         slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
-        View slowInternetLayout = findViewById(R.id.slowInternetLayout);
+        slowInternetLayout = findViewById(R.id.slowInternetLayout);
         tvSpeed = findViewById(R.id.tvSpeed);
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
         if (dismissButton != null) {
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, "Navigation view is null, cannot fetch user profile");
         }
+
     }
 
     public void showNoInternetLayout() {
@@ -145,14 +150,15 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     public void showSlowInternetLayout(double speed) {
-        if (slowInternetContainer != null && tvSpeed != null) {
-            slowInternetContainer.setVisibility(View.VISIBLE);
+        if (slowInternetLayout != null) {
+            slowInternetLayout.setVisibility(View.VISIBLE);
             String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
             tvSpeed.setText(speedText);
         } else {
-            Log.e("MainActivity", "One or more views are null: slowInternetContainer or tvSpeed");
+            Log.e("MainActivity", "FrameLayout for slow internet is null.");
         }
     }
+
 
     public void hideSlowInternetLayout() {
         findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
@@ -359,26 +365,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
                 Toast.makeText(MainActivity.this, "Profile fetch failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                profileName.setText(getString(R.string.guest_name));
-                profileEmail.setText(getString(R.string.guest_email));
+//                profileName.setText(getString(R.string.guest_name));
+//                profileEmail.setText(getString(R.string.guest_email));
                 Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
             }
         });
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
-        registerReceiver(networkChangeReceiver, filter);
-        isNetworkChangeReceiverRegistered = true;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterNetworkReceiver();
     }
 
 
@@ -387,6 +379,22 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         unregisterNetworkReceiver();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isNetworkChangeReceiverRegistered) {
+            IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+            registerReceiver(networkChangeReceiver, filter);
+            isNetworkChangeReceiverRegistered = true;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterNetworkReceiver();
     }
 
     private void unregisterNetworkReceiver() {
@@ -399,4 +407,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }

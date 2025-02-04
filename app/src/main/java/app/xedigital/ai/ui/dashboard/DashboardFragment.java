@@ -15,19 +15,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -62,11 +67,32 @@ public class DashboardFragment extends Fragment {
     private View blurOverlay;
     private PieChart leavePieChart;
     private FragmentDashboardBinding binding;
-    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private String startDateString, endDateString;
     private boolean isProfileDataLoaded = false;
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
+
+    // Shimmer layouts
+    private ShimmerFrameLayout punchCardShimmer;
+    private ShimmerFrameLayout employeeCardShimmer;
+    private ShimmerFrameLayout leavePieChartShimmer;
+
+    // Real layouts
+    private MaterialCardView punchCardView;
+    private MaterialCardView employeeCard;
+    private MaterialCardView leavePieChartContainer;
+
+    // Real layouts values
+    private TextView todayDate;
+    private TextView tvEmployeeNameValue;
+    private TextView tvEmployeeDesignationValue;
+    private TextView tvEmployeeShiftValue;
+    private TextView tvEmployeeContactValue;
+    private TextView tvEmployeeEmailValue;
+    private ImageView ivEmployeeProfile;
+    private TextView tvPunchInTime;
+    private TextView tvPunchOutTime;
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
@@ -95,10 +121,22 @@ public class DashboardFragment extends Fragment {
                 entries.add(new PieEntry(entry.getValue(), entry.getKey()));
             }
         }
+        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+        // If all entries have 0 balance, show a single "0 leaves" slice
+        if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
+            entries.clear();
+            entries.add(new PieEntry(1f, "0 leaves"));
 
-        if (entries.isEmpty()) {
-            pieChart.setVisibility(View.GONE);
-            return;
+            // Set the custom ValueFormatter to hide the value
+            dataSet.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return "";
+                }
+            });
+        } else {
+            // Use default PercentFormatter for other cases
+            dataSet.setValueFormatter(new PercentFormatter(pieChart));
         }
 
         Map<String, Integer> leaveTypeColors = new HashMap<>();
@@ -114,9 +152,7 @@ public class DashboardFragment extends Fragment {
             colors.add(color);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
         dataSet.setColors(colors);
-        dataSet.setValueFormatter(new PercentFormatter(pieChart));
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
 
@@ -150,13 +186,13 @@ public class DashboardFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        new ViewModelProvider(this).get(DashboardViewModel.class);
-
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
+
+        initializeViews(root);
 
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -177,7 +213,6 @@ public class DashboardFragment extends Fragment {
                     animatedVector.start();
                 }
             }
-
             startActivity(intent);
         });
 
@@ -188,7 +223,6 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize blur overlay and loader
         blurOverlay = view.findViewById(R.id.blurOverlay);
         loader = view.findViewById(R.id.loader);
 
@@ -216,6 +250,7 @@ public class DashboardFragment extends Fragment {
         leavesViewModel.fetchLeavesData();
 
         showLoaderWithBlur();
+        startShimmerAnimations();
 
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
@@ -241,26 +276,6 @@ public class DashboardFragment extends Fragment {
                 employeeLastName = employee.getLastname();
                 empContact = employee.getContact();
                 empDesignation = employee.getDesignation();
-
-//                String fullName = employeeName + " " + employeeLastName;
-//                // Create a SpannableString
-//                SpannableString spannableString = new SpannableString(fullName);
-//
-//                // Apply color to the first letter of the first name
-//                if (!employeeName.isEmpty()) {
-//                    spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                    spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                }
-//
-//                // Apply color to the first letter of the last name
-//                if (!employeeLastName.isEmpty()) {
-//                    int lastNameStartIndex = employeeName.length() + 1;
-//                    spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                    spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                }
-
                 binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
                 binding.tvEmployeeDesignationValue.setText(empDesignation);
 
@@ -336,8 +351,10 @@ public class DashboardFragment extends Fragment {
             } else {
                 binding.tvPunchInTime.setText("Punch In: --:--");
                 binding.tvPunchOutTime.setText("Punch Out: --:--");
+                punchCardView.setVisibility(View.VISIBLE);
             }
-
+            punchCardShimmer.stopShimmer();
+            punchCardShimmer.setVisibility(View.GONE);
             isAttendanceDataLoaded = true;
             checkAllDataLoaded();
         });
@@ -357,6 +374,9 @@ public class DashboardFragment extends Fragment {
 
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
+            employeeCardShimmer.stopShimmer();
+            employeeCardShimmer.setVisibility(View.GONE);
+            employeeCard.setVisibility(View.VISIBLE);
         });
     }
 
@@ -367,12 +387,54 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    // Check if all data is loaded and update the loader visibility
     private void checkAllDataLoaded() {
         if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
+            Log.d("DashboardFragment", "All data loaded. Stopping shimmer.");
+            stopShimmerAnimations();
             hideLoaderWithBlur();
         }
     }
+
+    private void startShimmerAnimations() {
+        punchCardShimmer.startShimmer();
+        employeeCardShimmer.startShimmer();
+        leavePieChartShimmer.startShimmer();
+    }
+
+    private void stopShimmerAnimations() {
+        punchCardShimmer.stopShimmer();
+        punchCardShimmer.setVisibility(View.GONE);
+
+        employeeCardShimmer.stopShimmer();
+        employeeCardShimmer.setVisibility(View.GONE);
+
+        leavePieChartShimmer.stopShimmer();
+        leavePieChartShimmer.setVisibility(View.GONE);
+    }
+
+    private void initializeViews(View root) {
+        // Shimmer layouts
+        punchCardShimmer = root.findViewById(R.id.punchCardShimmer);
+        employeeCardShimmer = root.findViewById(R.id.employeeCardShimmer);
+        leavePieChartShimmer = root.findViewById(R.id.leavePieChartShimmer);
+
+        // Real layouts
+        punchCardView = root.findViewById(R.id.punchCardView);
+        employeeCard = root.findViewById(R.id.employeeCard);
+        leavePieChartContainer = root.findViewById(R.id.leavePieChartContainer);
+
+        // Real layouts values
+        todayDate = root.findViewById(R.id.todayDate);
+        tvEmployeeNameValue = root.findViewById(R.id.tvEmployeeNameValue);
+        tvEmployeeDesignationValue = root.findViewById(R.id.tvEmployeeDesignationValue);
+        tvEmployeeShiftValue = root.findViewById(R.id.tvEmployeeShiftValue);
+        tvEmployeeContactValue = root.findViewById(R.id.tvEmployeeContactValue);
+        tvEmployeeEmailValue = root.findViewById(R.id.tvEmployeeEmailValue);
+        ivEmployeeProfile = root.findViewById(R.id.ivEmployeeProfile);
+        tvPunchInTime = root.findViewById(R.id.tvPunchInTime);
+        tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
+    }
+
 
     private String formatShiftTime(String shiftTime) {
         if (shiftTime == null || shiftTime.isEmpty()) {

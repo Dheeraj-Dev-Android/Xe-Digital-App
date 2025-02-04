@@ -13,8 +13,6 @@
         android:background="@color/white"
         tools:context=".activity.LoginActivity">
 
-        <!-- Previous views remain the same until the card content -->
-
         <View
             android:id="@+id/backgroundPattern"
             android:layout_width="match_parent"
@@ -24,6 +22,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- App Logo -->
         <ImageView
             android:id="@+id/logoImage"
             android:layout_width="180dp"
@@ -38,6 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.3" />
 
+        <!-- Main Card Container -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardView"
             android:layout_width="match_parent"
@@ -63,6 +63,7 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <!-- Sign In Text -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -73,6 +74,7 @@
                     android:textSize="32sp"
                     android:textStyle="bold" />
 
+                <!-- Email Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -94,6 +96,7 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Password Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -117,6 +120,7 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Sign In Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_signin"
                     android:layout_width="match_parent"
@@ -126,28 +130,14 @@
                     app:cornerRadius="28dp"
                     app:elevation="4dp" />
 
-                <!-- Modified Biometric Button -->
-                <!--                <com.google.android.material.button.MaterialButton-->
-                <!--                    android:id="@+id/bioMetricButton"-->
-                <!--                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="56dp"-->
-                <!--                    android:layout_marginTop="16dp"-->
-                <!--                    android:text="Login with Biometrics"-->
-                <!--                    android:textColor="#5D49CF"-->
-                <!--                    android:visibility="visible"-->
-                <!--                    app:cornerRadius="28dp"-->
-                <!--                    app:strokeColor="#5D49CF"-->
-                <!--                    app:strokeWidth="2dp" />-->
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <FrameLayout
             android:id="@+id/loadingOverlay"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#80000000"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99000000"
             android:clickable="true"
             android:elevation="16dp"
             android:focusable="true"
@@ -157,41 +147,53 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Loading overlay content remains the same -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
+                android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                app:cardBackgroundColor="#E6FFFFFF"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="12dp"
                 app:cardPreventCornerOverlap="true">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="32dp">
 
                     <ProgressBar
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
                         android:indeterminateTint="#5D49CF" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"
                         android:text="Signing in..."
                         android:textColor="#5D49CF"
-                        android:textSize="16sp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="Please wait while we verify your credentials"
+                        android:textColor="#757575"
+                        android:textSize="14sp" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
         </FrameLayout>
-
+        <!-- Footer Text -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

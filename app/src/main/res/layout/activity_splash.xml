@@ -29,7 +29,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:text="@string/welcome_title"
             android:textColor="@color/primary_text"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView
@@ -41,19 +41,19 @@
             android:gravity="center"
             android:text="@string/welcome_message"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_get_started"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_primary_background"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:text="@string/get_started"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+        <!--        <androidx.appcompat.widget.AppCompatButton-->
+        <!--            android:id="@+id/btn_get_started"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:background="@drawable/button_primary_background"-->
+        <!--            android:paddingTop="16dp"-->
+        <!--            android:paddingBottom="16dp"-->
+        <!--            android:text="@string/get_started"-->
+        <!--            android:textAllCaps="false"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="14sp" />-->
 
     </LinearLayout>
 
@@ -64,10 +64,17 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <include
-        android:id="@+id/slowInternetLayout"
-        layout="@layout/slow_internet_connection"
+    <FrameLayout
+        android:id="@+id/slowInternetContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone" />
+        android:visibility="gone">
+        <!-- Add additional UI elements here, if needed -->
+        <include
+            android:id="@+id/slowInternetLayout"
+            layout="@layout/slow_internet_connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </FrameLayout>
 </RelativeLayout>

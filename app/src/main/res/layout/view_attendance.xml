@@ -18,7 +18,7 @@
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="30dp"
             android:background="#FFFFFF"
             android:padding="16dp">
 
@@ -98,7 +98,6 @@
                     app:layout_constraintTop_toBottomOf="@id/punchOutLabel" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -196,7 +195,6 @@
                         android:textColor="#F44336"
                         android:textStyle="bold" />
                 </RelativeLayout>
-
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -285,7 +283,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="San Francisco, CA"
+                    android:text=" Punch In Address Details"
                     android:textAppearance="?attr/textAppearanceBody2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@id/punchInAddressLabel"
@@ -319,7 +317,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="San Francisco, CA"
+                    android:text="Punch Out Address Details"
                     android:textAppearance="?attr/textAppearanceBody2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@id/punchOutAddressLabel"

@@ -99,6 +99,8 @@ public class LeavesFragment extends Fragment {
     private String crossFunctionalManagerId;
     private String authToken;
     private double finalUsedDays;
+    private String restrictedHolidayId;
+    private String lossOfPayId;
 
 
     @Override
@@ -188,6 +190,20 @@ public class LeavesFragment extends Fragment {
                 ArrayAdapter<String> leaveTypeAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, leaveTypeNames);
                 binding.spinnerLeaveType.setAdapter(leaveTypeAdapter);
 
+                List<LeavetypesItem> leaveTypes = leaveTypeResponse.getData().getLeavetypes();
+                for (LeavetypesItem leaveType : leaveTypes) {
+                    if ("Restricted holiday".equals(leaveType.getLeavetypeName())) {
+                        restrictedHolidayId = leaveType.getId();
+                        // Log.w(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
+                        break; // Exit loop once found
+                    }
+                    if ("Loss of Pay (LOP) / Leave Without Pay (LWP)".equals(leaveType.getLeavetypeName())) {
+                        lossOfPayId = leaveType.getId();
+                        Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
+                        break; // Exit Loop Once Found
+                    }
+                }
+
             } else {
                 Log.e("LeavesFragment", "Error fetching leaves type data");
             }
@@ -216,6 +232,16 @@ public class LeavesFragment extends Fragment {
                 selectedLeaveTypeId = selectedLeaveType.getId();
                 selectedLeaveTypeName = selectedLeaveType.getLeavetypeName();
 //                Log.d(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId);
+
+//                if (selectedLeaveTypeId.equals("617135e82027d64869450a79")) {
+//                    String selectedDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
+//                    checkRestrictedHoliday(selectedDate);
+//                }
+                if (selectedLeaveTypeName.equals(restrictedHolidayId)) {
+                    String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
+                    String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
+                    checkRestrictedHoliday(fromDate, toDate);
+                }
 
                 SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
                 String authTokenN = sharedPreferences.getString("authToken", "");
@@ -251,8 +277,6 @@ public class LeavesFragment extends Fragment {
 
                     }
                 });
-
-
             }
 
             private void fetchLeaveTypeDetails(String selectedLeaveTypeId, String authToken) {
@@ -291,12 +315,17 @@ public class LeavesFragment extends Fragment {
 
 //                            Log.e(TAG, "Balance Leave: " + balanceLeave);
 //                            Log.e(TAG, "Selected Leave Type: " + selectedLeaveTypeName);
-                            if (!Objects.requireNonNull(binding.etFromDate.getText()).toString().isEmpty() && !binding.etToDate.getText().toString().isEmpty()) {
+                            if (!Objects.requireNonNull(binding.etFromDate.getText()).toString().isEmpty() && !Objects.requireNonNull(binding.etToDate.getText()).toString().isEmpty()) {
                                 calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
                             }
-                            if (selectedLeaveTypeId.equals("617135e82027d64869450a79")) {
-                                String selectedDate = binding.etFromDate.getText().toString();
-                                checkRestrictedHoliday(selectedDate);
+//                            if (selectedLeaveTypeId.equals(restrictedHolidayId)) {
+//                                String selectedDate = binding.etFromDate.getText().toString();
+//                                checkRestrictedHoliday(selectedDate);
+//                            }
+                            if (selectedLeaveTypeName.equals(restrictedHolidayId)) {
+                                String fromDate = binding.etFromDate.getText().toString();
+                                String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
+                                checkRestrictedHoliday(fromDate, toDate);
                             }
                             // --- Update UI on the main thread ---
                             requireActivity().runOnUiThread(() -> {
@@ -325,50 +354,115 @@ public class LeavesFragment extends Fragment {
                 });
             }
 
-            private void checkRestrictedHoliday(String selectedDate) {
-                holidaysViewModel = new ViewModelProvider(requireActivity()).get(HolidaysViewModel.class);
+            //             private void checkRestrictedHoliday(String selectedDate) {
+//                holidaysViewModel = new ViewModelProvider(requireActivity()).get(HolidaysViewModel.class);
+//                holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), new Observer<List<HolidaysItem>>() {
+//                    @Override
+//                    public void onChanged(List<HolidaysItem> holidaysItems) {
+//                        if (holidaysItems != null) {
+//                            boolean isRestrictedHoliday = false;
+//                            for (HolidaysItem holiday : holidaysItems) {
+//                                if (holiday.getHolidayDate().equals(selectedDate) && holiday.isIsOptional()) {
+////                                    Log.d(TAG, "Selected date is a restricted holiday");
+//                                    isRestrictedHoliday = true;
+//                                    break;
+//                                }
+//                            }
+//                            if (!isRestrictedHoliday) {
+//                                new AlertDialog.Builder(requireContext()).setTitle("Error").setMessage("Selected date is not a restricted holiday").setPositiveButton("OK", (dialog, which) -> {
+//                                    dialog.dismiss();
+//                                    clearForm();
+//                                }).show();
+//                            }
+//                            holidaysViewModel.getHolidaysList().removeObserver(this);
+//                        } else {
+//                            Toast.makeText(getContext(), "Holiday data not available", Toast.LENGTH_LONG).show();
+//                            Log.e(TAG, "Holiday data not available");
+//                        }
+//                    }
+//                });
+//            }
+            private void checkRestrictedHoliday(String fromDate, String toDate) {
                 holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), new Observer<List<HolidaysItem>>() {
                     @Override
                     public void onChanged(List<HolidaysItem> holidaysItems) {
                         if (holidaysItems != null) {
-                            boolean isRestrictedHoliday = false;
-                            for (HolidaysItem holiday : holidaysItems) {
-                                if (holiday.getHolidayDate().equals(selectedDate) && holiday.isIsOptional()) {
-//                                    Log.d(TAG, "Selected date is a restricted holiday");
-                                    isRestrictedHoliday = true;
+                            boolean isValidDateRange = true;
+
+                            List<String> dateRange = getDatesBetween(fromDate, toDate);
+
+                            for (String date : dateRange) {
+                                boolean isRestrictedHoliday = false;
+                                for (HolidaysItem holiday : holidaysItems) {
+                                    if (holiday.getHolidayDate().equals(date) && holiday.isIsOptional()) {
+                                        Log.d(TAG, "Selected date is a restricted holiday");
+                                        isRestrictedHoliday = true;
+                                        break;
+                                    }
+                                }
+                                if (!isRestrictedHoliday) {
+                                    Log.d(TAG, "Selected date is not a restricted holiday");
+                                    binding.balanceLeaveTextView.setText("Selected Date is not Restricted Holiday " + " Balance Leave: " + balanceLeave);
+                                    isValidDateRange = false;
                                     break;
                                 }
                             }
-                            if (!isRestrictedHoliday) {
-                                new AlertDialog.Builder(requireContext()).setTitle("Error").setMessage("Selected date is not a restricted holiday").setPositiveButton("OK", (dialog, which) -> {
+
+                            if (!isValidDateRange) {
+                                // Show alert and clear form
+                                new AlertDialog.Builder(requireContext()).setTitle("Error").setMessage("Selected date range contains non-restricted holidays.").setPositiveButton("OK", (dialog, which) -> {
                                     dialog.dismiss();
                                     clearForm();
                                 }).show();
+                            } else {
+                                Log.d(TAG, "Selected date range is valid");
                             }
+
                             holidaysViewModel.getHolidaysList().removeObserver(this);
                         } else {
-                            Toast.makeText(getContext(), "Holiday data not available", Toast.LENGTH_LONG).show();
                             Log.e(TAG, "Holiday data not available");
+                            Toast.makeText(getContext(), "Holiday data not available", Toast.LENGTH_LONG).show();
+                            clearForm();
                         }
                     }
                 });
+            }
+
+            // Helper function to get all dates between two dates
+            private List<String> getDatesBetween(String startDate, String endDate) {
+                List<String> dates = new ArrayList<>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                try {
+                    Calendar startCalendar = Calendar.getInstance();
+                    startCalendar.setTime(sdf.parse(startDate));
+                    Calendar endCalendar = Calendar.getInstance();
+                    endCalendar.setTime(sdf.parse(endDate));
+
+                    while (startCalendar.before(endCalendar) || startCalendar.equals(endCalendar)) {
+                        dates.add(sdf.format(startCalendar.getTime()));
+                        startCalendar.add(Calendar.DAY_OF_MONTH, 1);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                return dates;
             }
         });
 
         binding.btnSubmit.setOnClickListener(view -> {
 
             if (validateForm()) {
-                String fromDate = binding.etFromDate.getText().toString();
-                String toDate = binding.etToDate.getText().toString();
+                String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
+                String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
                 String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
                 String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
                 String leavingStation = binding.spinnerLeavingStation.getText().toString();
-                String leaveStationAdd = binding.etLeaveStationAddress.getText().toString();
-                String contactNumber = binding.etContactNumber.getText().toString();
-                String reason = binding.etReason.getText().toString();
+                String leaveStationAdd = Objects.requireNonNull(binding.etLeaveStationAddress.getText()).toString();
+                String contactNumber = Objects.requireNonNull(binding.etContactNumber.getText()).toString();
+                String reason = Objects.requireNonNull(binding.etReason.getText()).toString();
 
                 applyLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
-//                debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
             }
         });
         return root;
@@ -423,7 +517,8 @@ public class LeavesFragment extends Fragment {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
 //                        Log.d(TAG, "Response: " + responseBody);
-                        if (!Objects.equals(selectedLeaveTypeId, "617135e82027d64869450a79")) {
+//                        Condition to not deduct leave if its LOP
+                        if (!Objects.equals(selectedLeaveTypeId, lossOfPayId)) {
                             debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
                         }
 
@@ -500,9 +595,10 @@ public class LeavesFragment extends Fragment {
         debitLeaveRequest.setReportingManager(reportingManagerEmail);
         debitLeaveRequest.setReportingManagerName(reportingManagerName);
         debitLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
+//        Log.e("debit API", "totalDays: " + totalDays + "finalUsedDays: " + finalUsedDays);
+        debitLeaveRequest.setTDays(totalDays);
+        debitLeaveRequest.setFUsedDays(finalUsedDays);
 
-        debitLeaveRequest.setTDays((int) totalDays);
-        debitLeaveRequest.setFUsedDays((int) finalUsedDays);
 
         Call<ResponseBody> debitLeave = APIClient.getInstance().debitLeave().LeavesUsedDebit("jwt " + authToken, debitLeaveRequest);
 
@@ -512,10 +608,8 @@ public class LeavesFragment extends Fragment {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
-//                        Log.d(TAG, "Debit Response: " + responseBody);
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
-//                        Log.d(TAG, "Message: " + message);
                         clearForm();
                     } else {
                         Log.e(TAG, "Debit Error: " + response.code());
@@ -531,7 +625,6 @@ public class LeavesFragment extends Fragment {
                 Log.e(TAG, "onFailure: " + throwable.getMessage());
             }
         });
-//        Log.d(TAG, "debitLeaveRequest: " + debitLeaveRequest);
 
     }
 
@@ -612,12 +705,12 @@ public class LeavesFragment extends Fragment {
     }
 
     private void calculateTotalDaysAndCheckLeaveLimit(String selectedLeaveTypeName) {
-        String fromDate = binding.etFromDate.getText().toString();
-        String toDate = binding.etToDate.getText().toString();
+        String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
+        String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
         String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
         String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
 
-//        Log.w(TAG, "fromDate: " + fromDate + ", toDate: " + toDate + ", leaveCategoryFrom: " + leaveCategoryFrom + ", leaveCategoryTo: " + leaveCategoryTo);
+        Log.w(TAG, "fromDate: " + fromDate + ", toDate: " + toDate + ", leaveCategoryFrom: " + leaveCategoryFrom + ", leaveCategoryTo: " + leaveCategoryTo);
 
         if (!fromDate.isEmpty() && !toDate.isEmpty() && !leaveCategoryFrom.isEmpty() && !leaveCategoryTo.isEmpty()) {
             long totalDaysInDateRange = calculateTotalDays(fromDate, toDate);
@@ -630,8 +723,9 @@ public class LeavesFragment extends Fragment {
             } else {
                 totalDays = totalDaysInDateRange;
             }
+//            Log.w(TAG,"totalDays: " + totalDays);
             finalUsedDays(totalDays);
-//            Log.d(TAG, "Calculated totalDays: " + totalDays + "balanceLeave : " + balanceLeave);
+            Log.d(TAG, "Calculated totalDays: " + totalDays + "balanceLeave : " + balanceLeave);
             if (totalDays > balanceLeave && selectedLeaveTypeName != null && !selectedLeaveTypeName.equals("Loss of Pay (LOP) / Leave Without Pay (LWP)")) {
                 showLeaveLimitExceededAlert();
             }
@@ -644,13 +738,15 @@ public class LeavesFragment extends Fragment {
         finalUsedDays = totalDays;
 
         if (leaveCategoryFrom.equals("First Half Day") && leaveCategoryTo.equals("First Half Day")) {
-            finalUsedDays -= 0.5;
+            finalUsedDays = 0.5;
+//            finalUsedDays -= 0.5;
         } else if (leaveCategoryFrom.equals("First Half Day") && leaveCategoryTo.equals("Second Half Day")) {
             // No adjustment needed for full day
         } else if (leaveCategoryFrom.equals("Second Half Day") && leaveCategoryTo.equals("Second Half Day")) {
-            finalUsedDays -= 0.5;
+            finalUsedDays = 0.5;
+//            finalUsedDays -= 0.5;
         }
-//        Log.e(TAG, "finalUsedDays: " + finalUsedDays);
+//        Log.e(TAG, "finalUsedDays:  " + finalUsedDays);
 
     }
 

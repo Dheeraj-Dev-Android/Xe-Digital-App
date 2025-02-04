@@ -33,50 +33,49 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onChipClicked"
                 android:text="All"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#9E9E9E" />
+            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipApproved"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onChipClicked"
                 android:text="Approved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#4CAF50" />
+            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUnapproved"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onChipClicked"
                 android:text="Unapproved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#FF9800" />
+            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipRejected"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onChipClicked"
                 android:text="Rejected"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-
+            <!--            android:onClick="onChipClicked"-->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipCancelled"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onChipClicked"
                 android:text="Cancelled"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
+            <!--            android:onClick="onChipClicked"-->
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 

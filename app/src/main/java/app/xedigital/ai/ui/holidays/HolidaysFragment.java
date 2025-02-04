@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -75,11 +74,6 @@ public class HolidaysFragment extends Fragment {
                 binding.recyclerViewHolidays.setVisibility(View.VISIBLE);
                 emptyStateView.setVisibility(View.GONE);
                 List<HolidaysItem> sortedHolidays = sortHolidaysByMonth(holidays);
-                Gson gson = new Gson();
-                String sortedHolidaysJsonString = gson.toJson(sortedHolidays);
-
-                // Log the JSON string
-                Log.d("SortedHolidays", "Sorted Holidays (JSON): " + sortedHolidaysJsonString);
                 holidayAdapter.updateHolidays(sortedHolidays);
             }
             progressBar.setVisibility(View.GONE);

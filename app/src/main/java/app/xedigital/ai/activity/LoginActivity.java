@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -42,13 +43,14 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private View loadingOverlay;
     private BioMetric bioMetric;
-    private BiometricManager biometricManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
 
@@ -59,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
 //        }
 
         // Initialize BiometricManager
-        biometricManager = BiometricManager.from(this);
+        BiometricManager biometricManager = BiometricManager.from(this);
 
         // Check if biometric is supported and if user is logged in
         boolean isBiometricSupported;
@@ -85,9 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             showLoginScreen();
         }
-
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
-
         binding.btnSignin.setOnClickListener(v -> {
             String email, password;
             email = Objects.requireNonNull(binding.editEmail.getText()).toString();
@@ -244,6 +244,16 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void clearSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("userId");
+        editor.remove("authToken");
+        editor.remove("empEmail");
+        editor.remove("empFirstName");
+        editor.apply();
+    }
+
     private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -258,15 +268,5 @@ public class LoginActivity extends AppCompatActivity {
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.storeLoginData(userId, authToken);
 
-    }
-
-    private void clearSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("userId");
-        editor.remove("authToken");
-        editor.remove("empEmail");
-        editor.remove("empFirstName");
-        editor.apply();
     }
 }

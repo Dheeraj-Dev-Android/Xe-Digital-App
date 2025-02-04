@@ -32,7 +32,12 @@ firebaseVertexai = "16.0.2"
 impress = "0.0.1"
 engageCore = "1.5.6"
 carUiLib = "2.6.0"
-biometric = "1.1.0"
+googleGmsGoogleServices = "4.4.2"
+firebaseAnalytics = "22.2.0"
+firebaseCrashlytics = "19.4.0"
+googleFirebaseCrashlytics = "3.0.2"
+firebasePerf = "21.0.4"
+googleFirebaseFirebasePerf = "1.4.2"
 
 [libraries]
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
@@ -76,8 +81,13 @@ firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai",
 impress = { group = "com.google.ar", name = "impress", version.ref = "impress" }
 engage-core = { group = "com.google.android.engage", name = "engage-core", version.ref = "engageCore" }
 car-ui-lib = { group = "com.android.car.ui", name = "car-ui-lib", version.ref = "carUiLib" }
-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-perf = { group = "com.google.firebase", name = "firebase-perf", version.ref = "firebasePerf" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
+google-firebase-firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "googleFirebaseFirebasePerf" }

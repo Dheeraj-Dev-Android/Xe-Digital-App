@@ -120,6 +120,8 @@
     <string name="guest_name">Guest\n</string>
     <string name="guest_email">xeDigital.ai\n</string>
     <string name="xedigital_ai">XeDigital.ai</string>
+    <string name="captured">Captured</string>
+    <string name="leave_details">Leave Details</string>
 
 
 </resources>

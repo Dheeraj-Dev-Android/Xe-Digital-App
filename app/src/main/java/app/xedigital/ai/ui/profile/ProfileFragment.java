@@ -112,7 +112,6 @@ public class ProfileFragment extends Fragment {
                 }
 
             } else {
-                // This block is no longer needed as we handle empty state at the top
                 Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
             }
         });
