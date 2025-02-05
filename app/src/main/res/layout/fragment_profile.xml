@@ -136,7 +136,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -161,7 +161,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/name_title" />
@@ -186,7 +186,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/email_title" />
@@ -211,7 +211,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/contact_title" />
@@ -238,7 +238,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/department_title" />
@@ -263,7 +263,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/designation_title" />
@@ -290,7 +290,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/level_grade_title" />
@@ -315,7 +315,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/shift_title" />
@@ -340,7 +340,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/shift_timing_title" />
@@ -378,7 +378,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/reporting_manager_title" />
@@ -403,7 +403,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/reporting_manager_email" />
@@ -443,7 +443,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/cross_manager_title" />
@@ -468,7 +468,7 @@
                     android:autoSizeTextType="uniform"
                     android:text="-"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/guideline_middle"
                     app:layout_constraintTop_toTopOf="@id/cross_manager_email" />

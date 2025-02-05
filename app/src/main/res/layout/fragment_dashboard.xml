@@ -337,7 +337,7 @@
                         android:autoSizeTextType="uniform"
                         android:text="employee.t@consultEdge.global"
                         android:textColor="@color/black"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guideline_middle"
                         app:layout_constraintTop_toTopOf="@id/tvEmployeeEmail" />
@@ -362,7 +362,7 @@
                         android:autoSizeTextType="uniform"
                         android:text="123-456-7890"
                         android:textColor="@color/black"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guideline_middle"
                         app:layout_constraintTop_toTopOf="@id/tvEmployeeContact" />
@@ -388,7 +388,7 @@
                         android:autoSizeTextType="uniform"
                         android:text="Software Engineer : Software Engineer "
                         android:textColor="@color/black"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guideline_middle"
                         app:layout_constraintTop_toTopOf="@id/tvEmployeeDesignation" />
@@ -413,7 +413,7 @@
                         android:autoSizeTextType="uniform"
                         android:text="9:00 AM - 5:00 PM"
                         android:textColor="@color/black"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guideline_middle"
                         app:layout_constraintTop_toTopOf="@id/tvEmployeeShift" />
