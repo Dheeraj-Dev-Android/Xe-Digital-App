@@ -43,19 +43,31 @@
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_get_started"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_primary_background"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:text="@string/get_started"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+        <!--        <androidx.appcompat.widget.AppCompatButton-->
+        <!--            android:id="@+id/btn_get_started"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:background="@drawable/button_primary_background"-->
+        <!--            android:paddingTop="16dp"-->
+        <!--            android:paddingBottom="16dp"-->
+        <!--            android:text="@string/get_started"-->
+        <!--            android:textAllCaps="false"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="14sp" />-->
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btn_get_started"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="35dp"
+        android:background="@drawable/button_primary_background"
+        android:contentDescription="@string/get_started"
+        android:elevation="5dp"
+        android:src="@drawable/ic_arrow_forward" />
 
     <include
         android:id="@+id/noInternetLayout"

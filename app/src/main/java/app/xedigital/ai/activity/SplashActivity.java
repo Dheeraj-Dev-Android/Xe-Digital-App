@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -54,7 +53,7 @@ public class SplashActivity extends AppCompatActivity {
             });
         }
         // Handle "Get Started" button
-        Button btnGetStarted = findViewById(R.id.btn_get_started);
+        ImageButton btnGetStarted = findViewById(R.id.btn_get_started);
         btnGetStarted.setOnClickListener(v -> navigateToLogin());
 
         // No internet dialog
