@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -53,8 +54,8 @@ public class SplashActivity extends AppCompatActivity {
             });
         }
         // Handle "Get Started" button
-//        Button btnGetStarted = findViewById(R.id.btn_get_started);
-//        btnGetStarted.setOnClickListener(v -> navigateToLogin());
+        Button btnGetStarted = findViewById(R.id.btn_get_started);
+        btnGetStarted.setOnClickListener(v -> navigateToLogin());
 
         // No internet dialog
         noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
