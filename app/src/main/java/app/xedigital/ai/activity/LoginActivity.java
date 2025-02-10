@@ -64,11 +64,17 @@ public class LoginActivity extends AppCompatActivity {
         BiometricManager biometricManager = BiometricManager.from(this);
 
         // Check if biometric is supported and if user is logged in
+//        boolean isBiometricSupported;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS;
+//        } else {
+//            isBiometricSupported = biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+//        }
         boolean isBiometricSupported;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS;
         } else {
-            isBiometricSupported = biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+            isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS;
         }
         boolean isLoggedIn = isLoggedIn();
 

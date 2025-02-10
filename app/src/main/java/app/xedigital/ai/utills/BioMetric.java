@@ -2,6 +2,7 @@ package app.xedigital.ai.utills;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -60,20 +61,54 @@ public class BioMetric {
                 }
             }
         });
-        promptInfoLogin = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Login").setSubtitle("Use your biometric credentials to login").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
-
-        promptInfoAttendance = new BiometricPrompt.PromptInfo.Builder().setTitle("Punch Attendance").setSubtitle("Use your biometric credentials to punch attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+//        promptInfoLogin = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Login").setSubtitle("Use your biometric credentials to login").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+//
+//        promptInfoAttendance = new BiometricPrompt.PromptInfo.Builder().setTitle("Punch Attendance").setSubtitle("Use your biometric credentials to punch attendance").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL).build();
+        // Initialize PromptInfo with proper authenticator settings
+        promptInfoLogin = createPromptInfo("Biometric Login", "Use your biometric credentials to login");
+        promptInfoAttendance = createPromptInfo("Punch Attendance", "Use your biometric credentials to punch attendance");
 
     }
 
+    private BiometricPrompt.PromptInfo createPromptInfo(String title, String subtitle) {
+        BiometricPrompt.PromptInfo.Builder builder = new BiometricPrompt.PromptInfo.Builder().setTitle(title).setSubtitle(subtitle);
+
+        // Set authenticators based on API level
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // API 30+ supports BIOMETRIC_STRONG | DEVICE_CREDENTIAL
+            builder.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+        } else {
+            // Before API 30, only device credential or biometric can be used, not both at the same time
+            builder.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+            builder.setDeviceCredentialAllowed(true);
+            builder.setNegativeButtonText("Cancel");
+
+        }
+        return builder.build();
+    }
+
     public void authenticate(boolean forLogin) {
+//        if (!hasBiometricPermission()) {
+//            Log.e("Biometric", "Biometric permission not granted");
+//            requestBiometricPermission();
+//        }
+//        BiometricManager biometricManager = BiometricManager.from(context);
+//        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+
         if (!hasBiometricPermission()) {
             Log.e("Biometric", "Biometric permission not granted");
             requestBiometricPermission();
+            return;
         }
-        BiometricManager biometricManager = BiometricManager.from(context);
-        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
 
+        BiometricManager biometricManager = BiometricManager.from(context);
+        int result;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+        } else {
+            result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+        }
         if (result == BiometricManager.BIOMETRIC_SUCCESS) {
             Log.d("MY_APP_TAG", "App can authenticate using biometrics");
 //            if(forLogin){
@@ -122,9 +157,26 @@ public class BioMetric {
         }
     }
 
+//    private void authenticateAfterPermission(boolean forLogin) {
+//        BiometricManager biometricManager = BiometricManager.from(context);
+//        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+//        if (result == BiometricManager.BIOMETRIC_SUCCESS) {
+//            biometricPrompt.authenticate(forLogin ? promptInfoLogin : promptInfoAttendance);
+//        } else {
+//            Log.e("Biometric", "Biometric authentication not available");
+//            Toast.makeText(context, "Biometric authentication not available", Toast.LENGTH_LONG).show();
+//        }
+//    }
+
     private void authenticateAfterPermission(boolean forLogin) {
         BiometricManager biometricManager = BiometricManager.from(context);
-        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+        int result;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+        } else {
+            result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+        }
+
         if (result == BiometricManager.BIOMETRIC_SUCCESS) {
             biometricPrompt.authenticate(forLogin ? promptInfoLogin : promptInfoAttendance);
         } else {
@@ -132,6 +184,7 @@ public class BioMetric {
             Toast.makeText(context, "Biometric authentication not available", Toast.LENGTH_LONG).show();
         }
     }
+
 
     public interface BiometricAuthListener {
         void onAuthenticationSucceeded();
