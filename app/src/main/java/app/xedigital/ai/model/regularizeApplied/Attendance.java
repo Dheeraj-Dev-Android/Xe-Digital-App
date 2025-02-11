@@ -2,7 +2,9 @@ package app.xedigital.ai.model.regularizeApplied;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Attendance {
+import java.io.Serializable;
+
+public class Attendance implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

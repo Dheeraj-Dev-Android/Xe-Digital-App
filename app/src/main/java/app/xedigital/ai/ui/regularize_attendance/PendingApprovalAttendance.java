@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
     private APIInterface apiInterface;
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     private RegularizeApprovalResponse regularizeApprovalResponse;
 
 
@@ -60,7 +62,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
 
         approvalRecyclerView = view.findViewById(R.id.approval_recycler_view);
         loadingProgress = view.findViewById(R.id.loadingProgress);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         loadingProgress.setVisibility(View.VISIBLE);
         apiInterface = APIClient.getInstance().getRegularizeListApproval();
@@ -99,7 +101,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
 
     public void onChipClicked(View view) {
         // Get the ChipGroup and the clicked chip
-        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
+        ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
 
         // Check the clicked chip
@@ -135,7 +137,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
                     List<AttendanceRegularizeAppliedItem> items = regularizeApprovalResponse.getData().getAttendanceRegularizeApplied();
 
                     if (items.isEmpty()) {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        emptyStateContainer.setVisibility(View.VISIBLE);
                         Toast.makeText(getContext(), "No data found", Toast.LENGTH_SHORT).show();
                         new AlertDialog.Builder(getContext())
                                 .setTitle("Attendance Regularization Approval List")
@@ -143,7 +145,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
                                 .setPositiveButton("OK", null)
                                 .show();
                     } else {
-                        emptyStateText.setVisibility(View.GONE);
+                        emptyStateContainer.setVisibility(View.GONE);
                         adapter = new RegularizeApprovalAdapter(items, authToken, userId, PendingApprovalAttendance.this, getContext());
                         approvalRecyclerView.setAdapter(adapter);
 //                        Log.d("Approval pending List", gson.toJson(response.body()));
