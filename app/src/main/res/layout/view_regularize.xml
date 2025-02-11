@@ -39,8 +39,8 @@
                         android:fontFamily="@font/quicksand_medium"
                         android:letterSpacing="0.01"
                         android:textColor="@color/primary_text"
-                        android:textSize="24sp"
-                        android:textStyle="italic" />
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/empPunchDate"
@@ -50,7 +50,7 @@
                         android:fontFamily="@font/quicksand_regular"
                         android:textColor="@color/primary_text"
                         android:textSize="16sp"
-                        android:textStyle="italic" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/empEmail"
@@ -59,8 +59,7 @@
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/quicksand_regular"
                         android:textColor="@color/primary_text"
-                        android:textSize="14sp"
-                        android:textStyle="italic" />
+                        android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -141,7 +140,8 @@
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Punch In"
                                 android:textColor="@color/primary_text"
-                                android:textSize="14sp" />
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/empPunchIn"
@@ -164,6 +164,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Punch Out"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_text"
                                 android:textSize="14sp" />
 
@@ -217,6 +218,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/quicksand_regular"
                         android:text="Punch In Location"
+                        android:textStyle="bold"
                         android:textColor="@color/primary_text"
                         android:textSize="14sp" />
 
@@ -235,6 +237,7 @@
                         android:layout_marginTop="20dp"
                         android:fontFamily="@font/quicksand_regular"
                         android:text="Punch Out Location"
+                        android:textStyle="bold"
                         android:textColor="@color/primary_text"
                         android:textSize="14sp" />
 
@@ -298,6 +301,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Updated Date"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_text"
                                 android:textSize="14sp" />
 
@@ -322,6 +326,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Punch In"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_text"
                                 android:textSize="14sp" />
 
@@ -346,6 +351,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Punch Out"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_text"
                                 android:textSize="14sp" />
 
@@ -366,6 +372,7 @@
                         android:layout_marginTop="20dp"
                         android:fontFamily="@font/quicksand_regular"
                         android:text="Punch In Location"
+                        android:textStyle="bold"
                         android:textColor="@color/primary_text"
                         android:textSize="14sp" />
 
@@ -384,6 +391,7 @@
                         android:layout_marginTop="20dp"
                         android:fontFamily="@font/quicksand_regular"
                         android:text="Punch Out Location"
+                        android:textStyle="bold"
                         android:textColor="@color/primary_text"
                         android:textSize="14sp" />
 
@@ -448,6 +456,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Applied Date"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_text"
                                 android:textSize="14sp" />
 
@@ -472,6 +481,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/quicksand_regular"
                                 android:text="Updated By"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_text"
                                 android:textSize="14sp" />
 
