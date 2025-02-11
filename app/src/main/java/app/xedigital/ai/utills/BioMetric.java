@@ -79,9 +79,9 @@ public class BioMetric {
             builder.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
         } else {
             // Before API 30, only device credential or biometric can be used, not both at the same time
-            builder.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+            builder.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
             builder.setDeviceCredentialAllowed(true);
-            builder.setNegativeButtonText("Cancel");
+//            builder.setNegativeButtonText("Cancel");
 
         }
         return builder.build();
