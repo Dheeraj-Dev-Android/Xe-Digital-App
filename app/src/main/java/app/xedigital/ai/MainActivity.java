@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
     private View slowInternetLayout;
+    private ImageView profileImage;
+    private TextView profileName;
+    private TextView profileEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +130,14 @@ public class MainActivity extends AppCompatActivity {
             toggleDcrVisibility(navigationView.getMenu());
             return true;
         });
+
+
+        // Initialize header view elements
+        View headerView = navigationView.getHeaderView(0);
+        profileImage = headerView.findViewById(R.id.imageView);
+        profileName = headerView.findViewById(R.id.textView);
+        profileEmail = headerView.findViewById(R.id.subtitleText);
+
         if (navigationView != null) {
             fetchUserProfileData();
         } else {
@@ -143,12 +154,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
     }
 
-//    public void showSlowInternetLayout(double speed) {
-//        slowInternetContainer.setVisibility(View.VISIBLE);
-//        String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
-//        tvSpeed.setText(speedText);
-//    }
-
     public void showSlowInternetLayout(double speed) {
         if (slowInternetLayout != null) {
             slowInternetLayout.setVisibility(View.VISIBLE);
@@ -158,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", "FrameLayout for slow internet is null.");
         }
     }
-
 
     public void hideSlowInternetLayout() {
         findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
@@ -284,10 +288,6 @@ public class MainActivity extends AppCompatActivity {
         String authToken = sharedPreferences.getString("authToken", "");
         // Make API call to fetch user profile data using userId and authToken
         // Update the UI with the fetched data
-        View headerView = navigationView.getHeaderView(0);
-        ImageView profileImage = findViewById(R.id.imageView);
-        TextView profileName = findViewById(R.id.textView);
-        TextView profileEmail = findViewById(R.id.subtitleText);
         fetchUserProfile(userId, authToken, profileImage, profileName, profileEmail);
     }
 
@@ -309,14 +309,15 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                ImageView profileImage = headerView.findViewById(R.id.imageView);
-                TextView profileName = headerView.findViewById(R.id.textView);
-                TextView profileEmail = headerView.findViewById(R.id.subtitleText);
+//                profileImage = headerView.findViewById(R.id.imageView);
+//                TextView profileName = headerView.findViewById(R.id.textView);
+//                TextView profileEmail = headerView.findViewById(R.id.subtitleText);
                 if (response.isSuccessful() && response.body() != null) {
                     UserProfileResponse userProfileResponse = response.body();
                     if (userProfileResponse.isSuccess() && userProfileResponse.getData() != null && userProfileResponse.getData().getEmployee() != null) {
                         String firstName = userProfileResponse.getData().getEmployee().getFirstname();
                         String lastName = userProfileResponse.getData().getEmployee().getLastname();
+                        String profileImageUrl = userProfileResponse.getData().getEmployee().getProfileImageUrl();
 
                         String fullName = firstName + " " + lastName;
                         // Create a SpannableString
@@ -327,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
                             spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            profileName.setText(spannableString);
                         }
 
                         // Apply color to the first letter of the last name
@@ -335,12 +337,12 @@ public class MainActivity extends AppCompatActivity {
                             spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            profileEmail.setText(userProfileResponse.getData().getEmployee().getEmail());
                         }
-                        profileName.setText(spannableString);
 
 //                        profileName.setText(userProfileResponse.getData().getEmployee().getFirstname() + " " + userProfileResponse.getData().getEmployee().getLastname());
-                        profileEmail.setText(userProfileResponse.getData().getEmployee().getEmail());
-                        if (userProfileResponse.getData().getEmployee().getProfileImageUrl() != null && !userProfileResponse.getData().getEmployee().getProfileImageUrl().isEmpty()) {
+
+                        if (profileImageUrl != null && !userProfileResponse.getData().getEmployee().getProfileImageUrl().isEmpty()) {
                             Glide.with(MainActivity.this).load(userProfileResponse.getData().getEmployee().getProfileImageUrl()).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
                         } else {
                             Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
@@ -365,9 +367,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
                 Toast.makeText(MainActivity.this, "Profile fetch failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-//                profileName.setText(getString(R.string.guest_name));
-//                profileEmail.setText(getString(R.string.guest_email));
-                Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                if (navigationView != null && navigationView.getHeaderView(0) != null && profileImage != null) {
+                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                } else {
+                    Log.e(TAG, "Cannot load default image, profileImage is null");
+                }
             }
         });
 
