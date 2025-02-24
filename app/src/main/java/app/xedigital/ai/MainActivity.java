@@ -228,7 +228,11 @@ public class MainActivity extends AppCompatActivity {
 //        editor.putBoolean("isLoggedIn", false);
         editor.apply();
 
-        Intent intent = new Intent(this, LoginActivity.class);
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        startActivity(intent);
+//        finish();
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
@@ -281,16 +285,122 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 
+    //    private void fetchUserProfileData() {
+//        // Code to fetch user profile data
+//        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+//        String userId = sharedPreferences.getString("userId", "");
+//        String authToken = sharedPreferences.getString("authToken", "");
+//        // Make API call to fetch user profile data using userId and authToken
+//        // Update the UI with the fetched data
+//        fetchUserProfile(userId, authToken, profileImage, profileName, profileEmail);
+//    }
     private void fetchUserProfileData() {
-        // Code to fetch user profile data
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", "");
-        String authToken = sharedPreferences.getString("authToken", "");
-        // Make API call to fetch user profile data using userId and authToken
-        // Update the UI with the fetched data
+        String userId = sharedPreferences.getString("userId", null);
+        String authToken = sharedPreferences.getString("authToken", null);
+
+        if (userId == null || authToken == null) {
+            Log.e(TAG, "User ID or Auth Token not found in SharedPreferences");
+            handleProfileFetchFailure("User ID or Auth Token not found", profileImage, profileName, profileEmail);
+            return;
+        }
+        if (profileImage == null || profileName == null || profileEmail == null) {
+            Log.e(TAG, "profileImage or profileName or profileEmail is  null");
+            View headerView = navigationView.getHeaderView(0);
+            profileImage = headerView.findViewById(R.id.imageView);
+            profileName = headerView.findViewById(R.id.textView);
+            profileEmail = headerView.findViewById(R.id.subtitleText);
+        }
+
         fetchUserProfile(userId, authToken, profileImage, profileName, profileEmail);
     }
 
+    //    private void fetchUserProfile(String userId, String authToken, ImageView profileImage, TextView profileName, TextView profileEmail) {
+//        String authHeaderValue = "jwt " + authToken;
+//
+//        Call<UserProfileResponse> call = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
+//        call.enqueue(new Callback<UserProfileResponse>() {
+//            @Override
+//            public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
+//                if (navigationView == null) {
+//                    Log.e(TAG, "Navigation view is null, cannot update user profile");
+//                    return;
+//                }
+//                View headerView = navigationView.getHeaderView(0);
+//
+//                if (headerView == null) {
+//                    Log.e(TAG, "Header view is null, cannot update user profile");
+//                    return;
+//                }
+//
+////                profileImage = headerView.findViewById(R.id.imageView);
+////                TextView profileName = headerView.findViewById(R.id.textView);
+////                TextView profileEmail = headerView.findViewById(R.id.subtitleText);
+//                if (response.isSuccessful() && response.body() != null) {
+//                    UserProfileResponse userProfileResponse = response.body();
+//                    if (userProfileResponse.isSuccess() && userProfileResponse.getData() != null && userProfileResponse.getData().getEmployee() != null) {
+//                        String firstName = userProfileResponse.getData().getEmployee().getFirstname();
+//                        String lastName = userProfileResponse.getData().getEmployee().getLastname();
+//                        String profileImageUrl = userProfileResponse.getData().getEmployee().getProfileImageUrl();
+//
+//                        String fullName = firstName + " " + lastName;
+//                        // Create a SpannableString
+//                        SpannableString spannableString = new SpannableString(fullName);
+//
+//                        // Apply color to the first letter of the first name
+//                        if (!firstName.isEmpty()) {
+//                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            profileName.setText(spannableString);
+//                        }
+//
+//                        // Apply color to the first letter of the last name
+//                        if (!lastName.isEmpty()) {
+//                            int lastNameStartIndex = firstName.length() + 1;
+//                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            profileEmail.setText(userProfileResponse.getData().getEmployee().getEmail());
+//                        }
+//
+////                        profileName.setText(userProfileResponse.getData().getEmployee().getFirstname() + " " + userProfileResponse.getData().getEmployee().getLastname());
+//
+//                        if (profileImageUrl != null && !userProfileResponse.getData().getEmployee().getProfileImageUrl().isEmpty()) {
+//                            Glide.with(MainActivity.this).load(userProfileResponse.getData().getEmployee().getProfileImageUrl()).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+//                        } else {
+//                            Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+//                        }
+//
+//                    } else {
+//                        Toast.makeText(MainActivity.this, "Profile fetch failed: " + userProfileResponse.getMessage(), Toast.LENGTH_SHORT).show();
+//                        profileName.setText(getString(R.string.guest_name));
+//                        profileEmail.setText(getString(R.string.guest_email));
+//                        Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+//                    }
+//
+//                } else {
+//                    Toast.makeText(MainActivity.this, "Profile fetch failed: " + response.code(), Toast.LENGTH_SHORT).show();
+//                    profileName.setText(getString(R.string.guest_name));
+//                    profileEmail.setText(getString(R.string.guest_email));
+//                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
+//                Toast.makeText(MainActivity.this, "Profile fetch failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//                if (navigationView != null && navigationView.getHeaderView(0) != null && profileImage != null) {
+//                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+//                } else {
+//                    Log.e(TAG, "Cannot load default image, profileImage is null");
+//                }
+//            }
+//        });
+//
+//    }
+//
     private void fetchUserProfile(String userId, String authToken, ImageView profileImage, TextView profileName, TextView profileEmail) {
         String authHeaderValue = "jwt " + authToken;
 
@@ -298,67 +408,46 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<UserProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
-                if (navigationView == null) {
-                    Log.e(TAG, "Navigation view is null, cannot update user profile");
-                    return;
-                }
-                View headerView = navigationView.getHeaderView(0);
-
-                if (headerView == null) {
-                    Log.e(TAG, "Header view is null, cannot update user profile");
+                if (!response.isSuccessful() || response.body() == null) {
+                    handleProfileFetchFailure("Profile fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()), profileImage, profileName, profileEmail);
                     return;
                 }
 
-//                profileImage = headerView.findViewById(R.id.imageView);
-//                TextView profileName = headerView.findViewById(R.id.textView);
-//                TextView profileEmail = headerView.findViewById(R.id.subtitleText);
-                if (response.isSuccessful() && response.body() != null) {
-                    UserProfileResponse userProfileResponse = response.body();
-                    if (userProfileResponse.isSuccess() && userProfileResponse.getData() != null && userProfileResponse.getData().getEmployee() != null) {
-                        String firstName = userProfileResponse.getData().getEmployee().getFirstname();
-                        String lastName = userProfileResponse.getData().getEmployee().getLastname();
-                        String profileImageUrl = userProfileResponse.getData().getEmployee().getProfileImageUrl();
+                UserProfileResponse userProfileResponse = response.body();
+                if (!userProfileResponse.isSuccess() || userProfileResponse.getData() == null || userProfileResponse.getData().getEmployee() == null) {
+                    handleProfileFetchFailure("Profile fetch failed: " + userProfileResponse.getMessage(), profileImage, profileName, profileEmail);
+                    return;
+                }
 
-                        String fullName = firstName + " " + lastName;
-                        // Create a SpannableString
-                        SpannableString spannableString = new SpannableString(fullName);
+                String firstName = userProfileResponse.getData().getEmployee().getFirstname();
+                String lastName = userProfileResponse.getData().getEmployee().getLastname();
+                String profileImageUrl = userProfileResponse.getData().getEmployee().getProfileImageUrl();
+                String email = userProfileResponse.getData().getEmployee().getEmail();
 
-                        // Apply color to the first letter of the first name
-                        if (!firstName.isEmpty()) {
-                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            profileName.setText(spannableString);
-                        }
+                String fullName = firstName + " " + lastName;
+                SpannableString spannableString = new SpannableString(fullName);
 
-                        // Apply color to the first letter of the last name
-                        if (!lastName.isEmpty()) {
-                            int lastNameStartIndex = firstName.length() + 1;
-                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            profileEmail.setText(userProfileResponse.getData().getEmployee().getEmail());
-                        }
+                // Apply formatting to first letter of first name
+                if (!firstName.isEmpty()) {
+                    spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
 
-//                        profileName.setText(userProfileResponse.getData().getEmployee().getFirstname() + " " + userProfileResponse.getData().getEmployee().getLastname());
+                // Apply formatting to first letter of last name
+                if (!lastName.isEmpty()) {
+                    int lastNameStartIndex = firstName.length() + 1;
+                    spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                profileName.setText(spannableString);
+                profileEmail.setText(email);
 
-                        if (profileImageUrl != null && !userProfileResponse.getData().getEmployee().getProfileImageUrl().isEmpty()) {
-                            Glide.with(MainActivity.this).load(userProfileResponse.getData().getEmployee().getProfileImageUrl()).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-                        } else {
-                            Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-                        }
-
-                    } else {
-                        Toast.makeText(MainActivity.this, "Profile fetch failed: " + userProfileResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        profileName.setText(getString(R.string.guest_name));
-                        profileEmail.setText(getString(R.string.guest_email));
-                        Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-                    }
-
+                // Load profile image, or default if not available
+                if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                    Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
                 } else {
-                    Toast.makeText(MainActivity.this, "Profile fetch failed: " + response.code(), Toast.LENGTH_SHORT).show();
-                    profileName.setText(getString(R.string.guest_name));
-                    profileEmail.setText(getString(R.string.guest_email));
                     Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
                 }
 
@@ -366,23 +455,63 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
-                Toast.makeText(MainActivity.this, "Profile fetch failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                if (navigationView != null && navigationView.getHeaderView(0) != null && profileImage != null) {
-                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-                } else {
-                    Log.e(TAG, "Cannot load default image, profileImage is null");
-                }
+                handleProfileFetchFailure("Profile fetch failed: " + t.getMessage(), profileImage, profileName, profileEmail);
             }
         });
-
     }
 
+    private void handleProfileFetchFailure(String message, ImageView profileImage, TextView profileName, TextView profileEmail) {
+        Log.e(TAG, message);
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
 
+        profileName.setText(getString(R.string.guest_name));
+        profileEmail.setText(getString(R.string.guest_email));
+
+        if (profileImage != null) {
+            Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+        } else {
+            Log.e(TAG, "Cannot load default image, profileImage is null");
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!isNetworkChangeReceiverRegistered) {
+            IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+            registerReceiver(networkChangeReceiver, filter);
+            isNetworkChangeReceiverRegistered = true;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isNetworkChangeReceiverRegistered) {
+            try {
+                unregisterReceiver(networkChangeReceiver);
+                isNetworkChangeReceiverRegistered = false;
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Error unregistering NetworkChangeReceiver", e);
+            }
+        }
+    }
+
+    //    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        unregisterNetworkReceiver();
+//
+//    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterNetworkReceiver();
-
+        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+            noInternetDialog.dismiss();
+        }
+        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
+            slowNetworkDialog.dismiss();
+        }
     }
 
     @Override
