@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat;
 
 public class NetworkUtils {
     private static final String TAG = "NetworkUtils";
-
     /**
      * Checks if network is available and has internet connectivity.
      *
@@ -34,7 +33,6 @@ public class NetworkUtils {
             Log.e(TAG, "Network capabilities are null.");
             return false;
         }
-
         // Simplified network validation using hasTransport
         return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
     }
@@ -70,7 +68,6 @@ public class NetworkUtils {
             return new NetworkSpeed(0, 0);
         }
     }
-
     /**
      * Checks if the current network speed meets the threshold for being considered "good."
      *
@@ -109,7 +106,6 @@ public class NetworkUtils {
             this.downSpeedKbps = downSpeedKbps;
             this.upSpeedKbps = upSpeedKbps;
         }
-
         /**
          * Converts the download speed to Mbps for easier display.
          *
@@ -118,7 +114,6 @@ public class NetworkUtils {
         public String getDownSpeedInMbps() {
             return String.format("%.2f Mbps", convertKbpsToMbps(downSpeedKbps));
         }
-
         /**
          * Converts the upload speed to Mbps for easier display.
          *
