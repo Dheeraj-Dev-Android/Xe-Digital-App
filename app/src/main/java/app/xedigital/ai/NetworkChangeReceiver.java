@@ -29,8 +29,10 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         // Handle network state change
         handleNetworkStateChange(context, isNetworkAvailable, isSpeedGood, networkSpeed.downSpeedKbps);
     }
+
     /**
      * Handles the network state change and updates the UI accordingly.
+     *
      * @param context            the application context
      * @param isNetworkAvailable indicates whether the network is available
      * @param isSpeedGood        indicates whether the network speed is good
@@ -47,8 +49,10 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             Log.w(TAG, "Context is not an instance of MainActivity or SplashActivity.");
         }
     }
+
     /**
      * Updates the UI in MainActivity based on the network state.
+     *
      * @param mainActivity       the MainActivity instance
      * @param isNetworkAvailable indicates whether the network is available
      * @param isSpeedGood        indicates whether the network speed is good
@@ -66,8 +70,10 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             }
         }
     }
+
     /**
      * Updates the UI in SplashActivity based on the network state.
+     *
      * @param splashActivity     the SplashActivity instance
      * @param isNetworkAvailable indicates whether the network is available
      * @param isSpeedGood        indicates whether the network speed is good
