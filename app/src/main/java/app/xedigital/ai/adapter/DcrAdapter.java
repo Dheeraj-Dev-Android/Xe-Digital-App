@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.time.LocalTime;
@@ -63,22 +64,42 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
         holder.outTimeTextView.setText(formattedOutTime);
 
 
-        holder.btn_viewTimesheet.setOnClickListener(v -> {
-            if (position != RecyclerView.NO_POSITION) {
-                EmployeesDcrDataItem selectedItem = dcrDataList.get(position);
-                String dcrId = selectedItem.getId();
-                if (dcrId != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_SELECTED_ITEM, selectedItem);
-                    Navigation.findNavController(v).navigate(R.id.action_nav_dcr_to_nav_selected_Timesheet, bundle);
-                } else {
-                    Toast.makeText(v.getContext(), "Selected item or dcrId is null", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(v.getContext(), "Invalid position", Toast.LENGTH_SHORT).show();
-            }
+//        holder.btn_viewTimesheet.setOnClickListener(v -> {
+//            if (position != RecyclerView.NO_POSITION) {
+//                EmployeesDcrDataItem selectedItem = dcrDataList.get(position);
+//                String dcrId = selectedItem.getId();
+//                if (dcrId != null) {
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable(ARG_SELECTED_ITEM, selectedItem);
+//                    Navigation.findNavController(v).navigate(R.id.action_nav_dcr_to_nav_selected_Timesheet, bundle);
+//                } else {
+//                    Toast.makeText(v.getContext(), "Selected item or dcrId is null", Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                Toast.makeText(v.getContext(), "Invalid position", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        });
+        // Set the click listener on the card itself.
+        holder.cardView.setOnClickListener(v -> navigateToSelectedTimesheet(v, position));
 
-        });
+        holder.btn_viewTimesheet.setOnClickListener(v -> navigateToSelectedTimesheet(v, position));
+    }
+
+    private void navigateToSelectedTimesheet(View v, int position) {
+        if (position != RecyclerView.NO_POSITION) {
+            EmployeesDcrDataItem selectedItem = dcrDataList.get(position);
+            String dcrId = selectedItem.getId();
+            if (dcrId != null) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(ARG_SELECTED_ITEM, selectedItem);
+                Navigation.findNavController(v).navigate(R.id.action_nav_dcr_to_nav_selected_Timesheet, bundle);
+            } else {
+                Toast.makeText(v.getContext(), "Selected item or dcrId is null", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(v.getContext(), "Invalid position", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -110,6 +131,7 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
         public TextView inTimeTextView;
         public TextView outTimeTextView;
         public ShapeableImageView btn_viewTimesheet;
+        public MaterialCardView cardView;
 
         public DcrViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -117,6 +139,7 @@ public class DcrAdapter extends RecyclerView.Adapter<DcrAdapter.DcrViewHolder> {
             inTimeTextView = itemView.findViewById(R.id.punchInView);
             outTimeTextView = itemView.findViewById(R.id.punchOutView);
             btn_viewTimesheet = itemView.findViewById(R.id.btn_viewTimesheet);
+            cardView = itemView.findViewById(R.id.dcrCardView);
 
         }
     }

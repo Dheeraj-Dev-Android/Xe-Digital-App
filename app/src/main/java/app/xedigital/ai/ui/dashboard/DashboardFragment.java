@@ -72,17 +72,14 @@ public class DashboardFragment extends Fragment {
     private boolean isProfileDataLoaded = false;
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
-
     // Shimmer layouts
     private ShimmerFrameLayout punchCardShimmer;
     private ShimmerFrameLayout employeeCardShimmer;
     private ShimmerFrameLayout leavePieChartShimmer;
-
     // Real layouts
     private MaterialCardView punchCardView;
     private MaterialCardView employeeCard;
     private MaterialCardView leavePieChartContainer;
-
     // Real layouts values
     private TextView todayDate;
     private TextView tvEmployeeNameValue;
@@ -105,17 +102,13 @@ public class DashboardFragment extends Fragment {
                 float creditedLeaves = leave.getCreditLeave();
                 float usedLeaves = leave.getUsedLeave();
                 float debitedLeaves = leave.getDebitLeave();
-
                 float balanceLeaves = creditedLeaves - usedLeaves - debitedLeaves;
-
                 leaveData.put(leaveType, balanceLeaves);
                 totalBalanceLeaves += balanceLeaves;
                 totalLeaves += creditedLeaves;
             }
         }
-
         List<PieEntry> entries = new ArrayList<>();
-
         for (Map.Entry<String, Float> entry : leaveData.entrySet()) {
             if (entry.getValue() > 0) {
                 entries.add(new PieEntry(entry.getValue(), entry.getKey()));
@@ -126,7 +119,6 @@ public class DashboardFragment extends Fragment {
         if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
             entries.clear();
             entries.add(new PieEntry(1f, "0 leaves"));
-
             // Set the custom ValueFormatter to hide the value
             dataSet.setValueFormatter(new ValueFormatter() {
                 @Override
@@ -138,24 +130,20 @@ public class DashboardFragment extends Fragment {
             // Use default PercentFormatter for other cases
             dataSet.setValueFormatter(new PercentFormatter(pieChart));
         }
-
         Map<String, Integer> leaveTypeColors = new HashMap<>();
         leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
         leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
         leaveTypeColors.put("Restricted Holidays", Color.rgb(199, 0, 57));
-
         List<Integer> colors = new ArrayList<>();
         for (PieEntry entry : entries) {
             String leaveType = entry.getLabel();
             int color = leaveTypeColors.getOrDefault(leaveType, Color.GRAY);
             colors.add(color);
         }
-
         dataSet.setColors(colors);
         dataSet.setValueTextSize(16f);
         dataSet.setValueTextColor(Color.WHITE);
-
         Legend legend = pieChart.getLegend();
         legend.setEnabled(true);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -163,7 +151,6 @@ public class DashboardFragment extends Fragment {
         legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         legend.setWordWrapEnabled(true);
         legend.setTextSize(8f);
-
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
         pieChart.getDescription().setEnabled(false);
@@ -188,23 +175,18 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
-
         initializeViews(root);
-
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String userId = sharedPreferences.getString("userId", "");
             String authToken = sharedPreferences.getString("authToken", "");
             String name = sharedPreferences.getString("name", "");
-
             Intent intent = new Intent(requireContext(), PunchActivity.class);
             intent.putExtra("userId", userId);
             intent.putExtra("authToken", authToken);
             intent.putExtra("name", name);
-
             Drawable[] drawables = binding.punchButton.getCompoundDrawablesRelative();
             if (drawables != null && drawables.length > 2) {
                 Drawable drawable = drawables[2];
@@ -215,29 +197,23 @@ public class DashboardFragment extends Fragment {
             }
             startActivity(intent);
         });
-
         return root;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         blurOverlay = view.findViewById(R.id.blurOverlay);
         loader = view.findViewById(R.id.loader);
-
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
-
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
         String userId = sharedPreferences.getString("userId", "");
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
-
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
-
         Calendar calendar = Calendar.getInstance();
         Date endDate = calendar.getTime();
         endDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(endDate);
@@ -248,7 +224,6 @@ public class DashboardFragment extends Fragment {
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesData();
-
         showLoaderWithBlur();
         startShimmerAnimations();
 
@@ -261,7 +236,6 @@ public class DashboardFragment extends Fragment {
                 SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault());
                 String currentTimeString = timeFormat.format(currentDate);
                 binding.todayDate.setText(todayDateString + " - " + currentTimeString);
-
                 handler.postDelayed(this, 1000);
             }
         };
@@ -270,7 +244,6 @@ public class DashboardFragment extends Fragment {
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
-
                 employeeName = employee.getFirstname();
                 employeeEmail = employee.getEmail();
                 employeeLastName = employee.getLastname();
@@ -278,7 +251,6 @@ public class DashboardFragment extends Fragment {
                 empDesignation = employee.getDesignation();
                 binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
                 binding.tvEmployeeDesignationValue.setText(empDesignation);
-
                 String startTime = employee.getShift().getStartTime();
                 String endTime = employee.getShift().getEndTime();
                 if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
@@ -287,7 +259,6 @@ public class DashboardFragment extends Fragment {
                 } else {
                     binding.tvEmployeeShift.setText("N/A");
                 }
-
                 if (empContact != null && employeeEmail != null) {
                     binding.tvEmployeeContactValue.setText(empContact);
                     binding.tvEmployeeEmailValue.setText(employeeEmail);
@@ -295,16 +266,13 @@ public class DashboardFragment extends Fragment {
                     binding.tvEmployeeContactValue.setText("");
                     binding.tvEmployeeEmailValue.setText("");
                 }
-
                 Object profileImageUrl = employee.getProfileImageUrl();
                 ImageView profileImage = binding.ivEmployeeProfile;
-
                 if (profileImageUrl != null) {
                     Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
                 } else {
                     profileImage.setImageResource(R.mipmap.ic_default_profile);
                 }
-
             } else {
                 binding.tvEmployeeNameValue.setText("N/A");
                 binding.tvEmployeeDesignationValue.setText("N/A");
@@ -313,7 +281,6 @@ public class DashboardFragment extends Fragment {
                 binding.tvEmployeeEmailValue.setText("N/A");
                 binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
             }
-
             isProfileDataLoaded = true;
             checkAllDataLoaded();
         });
@@ -323,7 +290,6 @@ public class DashboardFragment extends Fragment {
                 new Thread(() -> {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String currentDate = dateFormat.format(new Date());
-
                     List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
                         try {
                             SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -371,7 +337,6 @@ public class DashboardFragment extends Fragment {
             } else {
                 Log.e("DashboardFragment", "No leaves data available");
             }
-
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
             employeeCardShimmer.stopShimmer();
@@ -387,20 +352,52 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(false);
     }
 
+    //    private void checkAllDataLoaded() {
+//        if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
+//            Log.d("DashboardFragment", "All data loaded. Stopping shimmer.");
+//            stopShimmerAnimations();
+//            hideLoaderWithBlur();
+//        }
+//    }
     private void checkAllDataLoaded() {
         if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
-            Log.d("DashboardFragment", "All data loaded. Stopping shimmer.");
+            Log.d("DashboardFragment", "All data loaded. Stopping shimmer and showing views.");
             stopShimmerAnimations();
             hideLoaderWithBlur();
         }
     }
 
+
+    //    private void startShimmerAnimations() {
+//        punchCardShimmer.startShimmer();
+//        employeeCardShimmer.startShimmer();
+//        leavePieChartShimmer.startShimmer();
+//    }
     private void startShimmerAnimations() {
+        punchCardShimmer.setVisibility(View.VISIBLE);
         punchCardShimmer.startShimmer();
+
+        employeeCardShimmer.setVisibility(View.VISIBLE);
         employeeCardShimmer.startShimmer();
+
+        leavePieChartShimmer.setVisibility(View.VISIBLE);
         leavePieChartShimmer.startShimmer();
+
+        // Hide actual views until data is loaded
+        punchCardView.setVisibility(View.GONE);
+        employeeCard.setVisibility(View.GONE);
+        leavePieChartContainer.setVisibility(View.GONE);
     }
 
+
+    //    private void stopShimmerAnimations() {
+//        punchCardShimmer.stopShimmer();
+//        punchCardShimmer.setVisibility(View.GONE);
+//        employeeCardShimmer.stopShimmer();
+//        employeeCardShimmer.setVisibility(View.GONE);
+//        leavePieChartShimmer.stopShimmer();
+//        leavePieChartShimmer.setVisibility(View.GONE);
+//    }
     private void stopShimmerAnimations() {
         punchCardShimmer.stopShimmer();
         punchCardShimmer.setVisibility(View.GONE);
@@ -410,19 +407,23 @@ public class DashboardFragment extends Fragment {
 
         leavePieChartShimmer.stopShimmer();
         leavePieChartShimmer.setVisibility(View.GONE);
+
+        // Show actual views after data is loaded
+        punchCardView.setVisibility(View.VISIBLE);
+        employeeCard.setVisibility(View.VISIBLE);
+        leavePieChartContainer.setVisibility(View.VISIBLE);
     }
+
 
     private void initializeViews(View root) {
         // Shimmer layouts
         punchCardShimmer = root.findViewById(R.id.punchCardShimmer);
         employeeCardShimmer = root.findViewById(R.id.employeeCardShimmer);
         leavePieChartShimmer = root.findViewById(R.id.leavePieChartShimmer);
-
         // Real layouts
         punchCardView = root.findViewById(R.id.punchCardView);
         employeeCard = root.findViewById(R.id.employeeCard);
         leavePieChartContainer = root.findViewById(R.id.leavePieChartContainer);
-
         // Real layouts values
         todayDate = root.findViewById(R.id.todayDate);
         tvEmployeeNameValue = root.findViewById(R.id.tvEmployeeNameValue);
@@ -435,7 +436,6 @@ public class DashboardFragment extends Fragment {
         tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
     }
 
-
     private String formatShiftTime(String shiftTime) {
         if (shiftTime == null || shiftTime.isEmpty()) {
             return "";
@@ -446,17 +446,13 @@ public class DashboardFragment extends Fragment {
             try {
                 SimpleDateFormat inputFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 SimpleDateFormat outputFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-
                 Date startTime = inputFormatter.parse(parts[0].trim());
                 Date endTime = inputFormatter.parse(parts[1].trim());
-
                 return outputFormatter.format(startTime) + " - " + outputFormatter.format(endTime);
-
             } catch (ParseException e) {
                 e.printStackTrace();
                 Log.e("DashboardFragment", "Error formatting shift time", e);
                 return "";
-
             }
         }
         return "";
@@ -465,6 +461,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        binding = null;
         handler.removeCallbacks(runnable);
     }
 }

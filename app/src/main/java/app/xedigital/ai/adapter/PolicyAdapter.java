@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -32,8 +33,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
     @NonNull
     @Override
     public PolicyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.policy_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.policy_item, parent, false);
         return new PolicyViewHolder(view);
     }
 
@@ -44,6 +44,14 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
         holder.policyDate.setText("Policy Date : " + DateTimeUtils.getDayOfWeekAndDate(policy.getUpdatedAt()));
 
         holder.policyViewIcon.setOnClickListener(v -> {
+            PoliciesItem policy1 = policies.get(holder.getBindingAdapterPosition());
+            String pdfUrl = policy1.getPolicyFileURL();
+
+            Intent intent = new Intent(context, PDFViewActivity.class);
+            intent.putExtra("pdfUrl", pdfUrl);
+            context.startActivity(intent);
+        });
+        holder.policyCard.setOnClickListener(v -> {
             PoliciesItem policy1 = policies.get(holder.getBindingAdapterPosition());
             String pdfUrl = policy1.getPolicyFileURL();
 
@@ -62,6 +70,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
         public ShapeableImageView policyViewIcon;
         public TextView policyName;
         public TextView policyDate;
+        public MaterialCardView policyCard;
 //        public Chip policyStatus;
 
 
@@ -70,6 +79,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.PolicyView
             policyViewIcon = itemView.findViewById(R.id.btn_policyIcon);
             policyName = itemView.findViewById(R.id.tv_policy_name);
             policyDate = itemView.findViewById(R.id.tv_policy_date);
+            policyCard = itemView.findViewById(R.id.policyCard);
 //            policyStatus = itemView.findViewById(R.id.tv_policy_status);
 
         }

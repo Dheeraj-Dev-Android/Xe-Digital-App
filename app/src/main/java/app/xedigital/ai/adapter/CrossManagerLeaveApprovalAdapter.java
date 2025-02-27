@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -68,6 +69,22 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
             statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
         }
         statusChip.setChipBackgroundColor(ColorStateList.valueOf(statusColor));
+        holder.CMLeaveApprovalCard.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                AppliedLeavesItem appliedLeavesItem = leaves.get(position);
+                String leaveId = appliedLeavesItem.getId();
+
+                if (leaveId != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_LEAVE_ID, appliedLeavesItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_cross_approval_leave_to_nav_pendingCMLeaveApproval, bundle);
+                } else {
+                    Toast.makeText(context, "Leave ID is null", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, "Invalid position", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         holder.btnViewDetailLeave.setOnClickListener(v -> {
             if (position != RecyclerView.NO_POSITION) {
@@ -104,6 +121,7 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
         TextView appliedDate;
         Chip leaveStatusChip;
         ShapeableImageView btnViewDetailLeave;
+        MaterialCardView CMLeaveApprovalCard;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -113,6 +131,7 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
             appliedDate = itemView.findViewById(R.id.appliedDate);
             leaveStatusChip = itemView.findViewById(R.id.leaveStatusChip);
             btnViewDetailLeave = itemView.findViewById(R.id.btn_viewDetailLeave);
+            CMLeaveApprovalCard = itemView.findViewById(R.id.CMLeaveApprovalCard);
         }
     }
 }

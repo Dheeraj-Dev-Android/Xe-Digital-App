@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -87,6 +88,22 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
                 Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
+        holder.appliedLeaveCard.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
+                String leaveId = appliedLeaveItem.getId();
+                if (leaveId != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
+
+                } else {
+                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -108,6 +125,7 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
         public TextView appliedDate;
         public Chip statusChip;
         public ShapeableImageView btn_viewAppliedLeave;
+        public MaterialCardView appliedLeaveCard;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -117,6 +135,7 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
             appliedDate = itemView.findViewById(R.id.appliedDate);
             btn_viewAppliedLeave = itemView.findViewById(R.id.btn_viewAppliedLeave);
             statusChip = itemView.findViewById(R.id.statusChip);
+            appliedLeaveCard = itemView.findViewById(R.id.appliedLeaveCard);
 
         }
     }

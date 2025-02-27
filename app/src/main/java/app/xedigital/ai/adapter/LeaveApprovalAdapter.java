@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -96,6 +97,22 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
                 Toast.makeText(context, "Invalid position", Toast.LENGTH_SHORT).show();
             }
         });
+        holder.leaveApprovalCard.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                AppliedLeavesApproveItem appliedLeavesApproveItem = items.get(position);
+                String leaveId = appliedLeavesApproveItem.getId();
+
+                if (leaveId != null && appliedLeavesApproveItem != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_LEAVE_ID, appliedLeavesApproveItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_approve_leaves_to_nav_approve_leave_data, bundle);
+                } else {
+                    Toast.makeText(context, "Leave ID is null", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, "Invalid position", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -118,6 +135,7 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         TextView appliedDate;
         Chip statusChip;
         ShapeableImageView btnViewDetailLeave;
+        MaterialCardView leaveApprovalCard;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -127,6 +145,7 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
             appliedDate = itemView.findViewById(R.id.appliedDateTextView);
             statusChip = itemView.findViewById(R.id.approveLeaveStatusChip);
             btnViewDetailLeave = itemView.findViewById(R.id.viewDetailButton);
+            leaveApprovalCard = itemView.findViewById(R.id.leaveApprovalCard);
         }
     }
 }

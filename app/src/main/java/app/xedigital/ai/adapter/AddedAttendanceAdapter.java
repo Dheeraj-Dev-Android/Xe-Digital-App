@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -55,6 +56,21 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
         } else if (attendanceData.getStatus().equalsIgnoreCase("Cancelled")) {
             holder.statusChip.setChipBackgroundColorResource(R.color.status_rejected);
         }
+        holder.addedAttendanceCard.setOnClickListener(v -> {
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                AddAttendanceRegularizeAppliedItem addAttendanceAppliedItem = attendanceDataList.get(adapterPosition);
+                if (addAttendanceAppliedItem != null && addAttendanceAppliedItem.getId() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_REGULARIZE_APPLIED_ITEM, addAttendanceAppliedItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_View_add_attendance_fragment_to_nav_detail_view_added_attendanceFragment, bundle);
+                } else {
+                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         holder.btnAppliedAddAttendance.setOnClickListener(v -> {
             int adapterPosition = holder.getBindingAdapterPosition();
@@ -89,6 +105,7 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
         TextView appliedDate;
         TextView empPunchDate;
         Chip statusChip;
+        MaterialCardView addedAttendanceCard;
 
         public AttendanceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -97,6 +114,7 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
             empPunchDate = itemView.findViewById(R.id.empPunchDate);
             statusChip = itemView.findViewById(R.id.statusChip);
             btnAppliedAddAttendance = itemView.findViewById(R.id.btn_viewAppliedAddAttendance);
+            addedAttendanceCard = itemView.findViewById(R.id.addedAttendanceCard);
         }
     }
 }

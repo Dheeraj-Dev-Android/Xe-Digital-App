@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -73,6 +74,30 @@ public class DocumentListAdapter extends RecyclerView.Adapter<DocumentListAdapte
             AlertDialog dialog = builder.create();
             dialog.show();
         });
+        holder.documentListCard.setOnClickListener(v -> {
+            // Show the image in a dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(holder.itemView.getContext());
+            LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
+            View dialogView = inflater.inflate(R.layout.image_viewer_dialog, null);
+            builder.setView(dialogView);
+
+            ImageView imageView = dialogView.findViewById(R.id.imageView);
+
+            Glide.with(holder.itemView.getContext()).load(document.getDocFileURL()).into(new CustomTarget<Drawable>() {
+                @Override
+                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                    imageView.setImageDrawable(resource);
+                }
+
+                @Override
+                public void onLoadCleared(@Nullable Drawable placeholder) {
+                    // Handle if the image load is cleared
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        });
     }
 
     private String formatDate(String dateString) {
@@ -98,6 +123,7 @@ public class DocumentListAdapter extends RecyclerView.Adapter<DocumentListAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final MaterialCardView documentListCard;
         public TextView documentNameTextView;
         public TextView employeeNameTextView;
         public TextView createdAtTextView;
@@ -111,6 +137,7 @@ public class DocumentListAdapter extends RecyclerView.Adapter<DocumentListAdapte
             createdAtTextView = itemView.findViewById(R.id.createdAtTextView);
 //            documentUrlTextView = itemView.findViewById(R.id.documentUrlTextView);
             documentIcon = itemView.findViewById(R.id.documentIcon);
+            documentListCard = itemView.findViewById(R.id.documentListCard);
         }
     }
 }

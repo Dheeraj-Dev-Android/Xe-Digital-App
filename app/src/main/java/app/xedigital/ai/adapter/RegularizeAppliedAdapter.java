@@ -4,6 +4,7 @@ import static app.xedigital.ai.ui.regularize_attendance.RegularizeViewFragment.A
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -87,11 +89,27 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
                 Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
+        holder.regularizeAppliedCard.setOnClickListener(v -> {
+            if (position != RecyclerView.NO_POSITION) {
+                AttendanceRegularizeAppliedItem regularizeAppliedItem = items.get(position);
+                if (regularizeAppliedItem != null && regularizeAppliedItem.getId() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_REGULARIZE_APPLIED_ITEM, regularizeAppliedItem);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment, bundle);
+                } else {
+                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        int size = (items != null) ? items.size() : 0;
+        Log.d("RegularizeAdapter", "getItemCount called. Items size: " + size);
+        return size;
     }
 
     public void updateList(List<AttendanceRegularizeAppliedItem> filteredList) {
@@ -105,6 +123,7 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
         //        public TextView appliedStatus;
         public Chip statusChip;
         public ShapeableImageView btnViewRegularize;
+        public MaterialCardView regularizeAppliedCard;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -113,6 +132,7 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
 //            appliedStatus = itemView.findViewById(R.id.appliedStatus);
             btnViewRegularize = itemView.findViewById(R.id.btn_viewRegularize);
             statusChip = itemView.findViewById(R.id.statusChip);
+            regularizeAppliedCard = itemView.findViewById(R.id.regularizeAppliedCard);
         }
 
     }
