@@ -42,6 +42,13 @@
             app:shapeAppearanceOverlay="@style/CircularImageView"
             app:tint="@color/icon_tint" />
 
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="right"
+            app:constraint_referenced_ids="statusChip,btn_viewAppliedLeave" />
+
         <LinearLayout
             android:id="@+id/linearLayout4"
             android:layout_width="0dp"
@@ -77,9 +84,9 @@
                     style="@style/TextAppearance.Material3.BodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_calendar"
                     android:drawablePadding="8dp"
                     android:textColor="@color/text_secondary"
+                    app:drawableStartCompat="@drawable/ic_calendar"
                     tools:text="01 Jan" />
 
                 <TextView
@@ -88,9 +95,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:drawableStart="@drawable/ic_calendar"
                     android:drawablePadding="8dp"
                     android:textColor="@color/text_secondary"
+                    app:drawableStartCompat="@drawable/ic_calendar"
                     tools:text="05 Jan" />
             </LinearLayout>
 
@@ -99,11 +106,11 @@
                 style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_clock"
                 android:drawablePadding="8dp"
-                android:text="Applied on"
+                android:text="@string/applied_on"
                 android:textColor="@color/text_tertiary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_clock" />
 
             <TextView
                 android:id="@+id/appliedDate"

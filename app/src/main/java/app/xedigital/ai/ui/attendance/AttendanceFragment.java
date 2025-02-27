@@ -45,6 +45,8 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
     private RecyclerView recyclerViewAttendance;
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
+    private String currentStartDate = "";
+    private String currentEndDate = "";
 
     public static String getDayOfWeek(String dateString) {
         if (dateString == null || dateString.equals("1900-01-01T00:00:00.000Z")) {
@@ -60,15 +62,21 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
                 return dayOfWeekFormat.format(date);
             }
         } catch (ParseException e) {
-
             e.printStackTrace();
         }
 
         return "N/A";
     }
 
+    //    @Override
+//    public void onFilterApplied(String startDate, String endDate) {
+//        attendanceViewModel.fetchAttendance(startDate, endDate);
+//    }
     @Override
     public void onFilterApplied(String startDate, String endDate) {
+        // Update the current filter dates when the filter is applied
+        currentStartDate = startDate;
+        currentEndDate = endDate;
         attendanceViewModel.fetchAttendance(startDate, endDate);
     }
 
@@ -83,9 +91,16 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         String authToken = sharedPreferences.getString("authToken", null);
         attendanceViewModel.storeLoginData(authToken);
 
-        String startDate = "";
-        String endDate = "";
-        attendanceViewModel.fetchAttendance(startDate, endDate);
+//        String startDate = "";
+//        String endDate = "";
+//        attendanceViewModel.fetchAttendance(startDate, endDate);
+        // Check if we have any filter data from the previous filter
+        if (currentStartDate.isEmpty() && currentEndDate.isEmpty()) {
+            attendanceViewModel.fetchAttendance("", "");
+        } else {
+            attendanceViewModel.fetchAttendance(currentStartDate, currentEndDate);
+        }
+
 
         recyclerViewAttendance = binding.recyclerViewAttendance;
         recyclerViewAttendance.setLayoutManager(new LinearLayoutManager(requireContext()));

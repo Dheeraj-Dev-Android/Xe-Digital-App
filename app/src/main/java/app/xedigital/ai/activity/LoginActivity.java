@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
             showLoginScreen();
         }
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
-        binding.btnSignin.setOnClickListener(v -> {
+        binding.btnSignIn.setOnClickListener(v -> {
             String email, password;
             email = Objects.requireNonNull(binding.editEmail.getText()).toString();
             password = Objects.requireNonNull(binding.editPassword.getText()).toString();
@@ -178,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
     private void showLoginScreen() {
         binding.editEmail.setVisibility(View.VISIBLE);
         binding.editPassword.setVisibility(View.VISIBLE);
-        binding.btnSignin.setVisibility(View.VISIBLE);
+        binding.btnSignIn.setVisibility(View.VISIBLE);
         binding.logoImage.setVisibility(View.VISIBLE);
         binding.editEmail.setText("");
         binding.editPassword.setText("");

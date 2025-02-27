@@ -126,6 +126,7 @@
     <string name="end_date">End Date</string>
     <string name="start_date">Start Date</string>
     <string name="filter_by_date">Filter by Date</string>
+    <string name="applied_on">Applied on</string>
 
 
 </resources>

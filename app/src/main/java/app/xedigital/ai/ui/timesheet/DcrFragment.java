@@ -35,11 +35,19 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
     private TimesheetViewModel dcrViewModel;
     private RecyclerView recyclerViewDcr;
     private DcrAdapter dcrAdapter;
-
     private ProgressBar loadingProgress;
     private LinearLayout emptyStateContainer;
+    private String currentStartDate = "";
+    private String currentEndDate = "";
 
+//    public void onFilterApplied(String startDate, String endDate) {
+//        dcrViewModel.fetchEmployeeDcr(startDate, endDate);
+//    }
+
+    @Override
     public void onFilterApplied(String startDate, String endDate) {
+        currentStartDate = startDate;
+        currentEndDate = endDate;
         dcrViewModel.fetchEmployeeDcr(startDate, endDate);
     }
 
@@ -65,9 +73,14 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
 
         dcrViewModel.storeLoginData(authToken);
 
-        String startDate = "";
-        String endDate = "";
-        dcrViewModel.fetchEmployeeDcr(startDate, endDate);
+//        String startDate = "";
+//        String endDate = "";
+//        dcrViewModel.fetchEmployeeDcr(startDate, endDate);
+        if (currentStartDate.isEmpty() && currentEndDate.isEmpty()) {
+            dcrViewModel.fetchEmployeeDcr("", "");
+        } else {
+            dcrViewModel.fetchEmployeeDcr(currentStartDate, currentEndDate);
+        }
         dcrViewModel.callUserApi(userId, authToken);
 
         recyclerViewDcr = binding.recyclerViewDcr;
