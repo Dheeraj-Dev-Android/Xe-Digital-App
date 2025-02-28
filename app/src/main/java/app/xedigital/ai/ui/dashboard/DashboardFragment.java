@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -329,13 +330,15 @@ public class DashboardFragment extends Fragment {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves.isEmpty()) {
-                    Log.e("DashboardFragment", "No leaves data available");
+//                    Log.e("DashboardFragment", "No leaves data available");
+                    Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
                 } else {
                     binding.leavePieChart.setVisibility(View.VISIBLE);
                     updatePieChartData(binding.leavePieChart, leaves);
                 }
             } else {
-                Log.e("DashboardFragment", "No leaves data available");
+                Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
+//                Log.e("DashboardFragment", "No leaves data available");
             }
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
@@ -352,27 +355,13 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    //    private void checkAllDataLoaded() {
-//        if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
-//            Log.d("DashboardFragment", "All data loaded. Stopping shimmer.");
-//            stopShimmerAnimations();
-//            hideLoaderWithBlur();
-//        }
-//    }
     private void checkAllDataLoaded() {
         if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
-            Log.d("DashboardFragment", "All data loaded. Stopping shimmer and showing views.");
             stopShimmerAnimations();
             hideLoaderWithBlur();
         }
     }
 
-
-    //    private void startShimmerAnimations() {
-//        punchCardShimmer.startShimmer();
-//        employeeCardShimmer.startShimmer();
-//        leavePieChartShimmer.startShimmer();
-//    }
     private void startShimmerAnimations() {
         punchCardShimmer.setVisibility(View.VISIBLE);
         punchCardShimmer.startShimmer();
@@ -389,15 +378,6 @@ public class DashboardFragment extends Fragment {
         leavePieChartContainer.setVisibility(View.GONE);
     }
 
-
-    //    private void stopShimmerAnimations() {
-//        punchCardShimmer.stopShimmer();
-//        punchCardShimmer.setVisibility(View.GONE);
-//        employeeCardShimmer.stopShimmer();
-//        employeeCardShimmer.setVisibility(View.GONE);
-//        leavePieChartShimmer.stopShimmer();
-//        leavePieChartShimmer.setVisibility(View.GONE);
-//    }
     private void stopShimmerAnimations() {
         punchCardShimmer.stopShimmer();
         punchCardShimmer.setVisibility(View.GONE);
