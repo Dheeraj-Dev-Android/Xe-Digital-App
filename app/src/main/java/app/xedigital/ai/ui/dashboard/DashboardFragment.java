@@ -58,6 +58,11 @@ import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class DashboardFragment extends Fragment {
+    private static final SimpleDateFormat DATE_FORMAT_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private static final SimpleDateFormat DATE_FORMAT_DD_MMMM_YYYY = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault());
+    private static final SimpleDateFormat TIME_FORMAT_HH_MM_SS_A = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault());
+    private static final SimpleDateFormat INPUT_SHIFT_FORMAT = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private static final SimpleDateFormat OUTPUT_SHIFT_FORMAT = new SimpleDateFormat("hh:mm a", Locale.getDefault());
     public String employeeName, employeeLastName, employeeEmail, empContact, empDesignation;
     public String punchIn, punchOut;
     public AttendanceViewModel attendanceViewModel;
@@ -216,11 +221,16 @@ public class DashboardFragment extends Fragment {
         profileViewModel.fetchUserProfile();
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
         Calendar calendar = Calendar.getInstance();
+//        Date endDate = calendar.getTime();
+//        endDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(endDate);
+//        calendar.add(Calendar.DAY_OF_MONTH, -30);
+//        Date startDate = calendar.getTime();
+//        startDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(startDate);
         Date endDate = calendar.getTime();
-        endDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(endDate);
+        endDateString = DATE_FORMAT_YYYY_MM_DD.format(endDate);
         calendar.add(Calendar.DAY_OF_MONTH, -30);
         Date startDate = calendar.getTime();
-        startDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(startDate);
+        startDateString = DATE_FORMAT_YYYY_MM_DD.format(startDate);
         attendanceViewModel.storeLoginData(authToken);
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
         leavesViewModel.setUserId(authToken);
@@ -229,13 +239,23 @@ public class DashboardFragment extends Fragment {
         startShimmerAnimations();
 
         handler = new Handler(Looper.getMainLooper());
+//        runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Date currentDate = new Date();
+//                String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
+//                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault());
+//                String currentTimeString = timeFormat.format(currentDate);
+//                binding.todayDate.setText(todayDateString + " - " + currentTimeString);
+//                handler.postDelayed(this, 1000);
+//            }
+//        };
         runnable = new Runnable() {
             @Override
             public void run() {
                 Date currentDate = new Date();
-                String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault());
-                String currentTimeString = timeFormat.format(currentDate);
+                String todayDateString = DATE_FORMAT_DD_MMMM_YYYY.format(currentDate);
+                String currentTimeString = TIME_FORMAT_HH_MM_SS_A.format(currentDate);
                 binding.todayDate.setText(todayDateString + " - " + currentTimeString);
                 handler.postDelayed(this, 1000);
             }
@@ -254,11 +274,18 @@ public class DashboardFragment extends Fragment {
                 binding.tvEmployeeDesignationValue.setText(empDesignation);
                 String startTime = employee.getShift().getStartTime();
                 String endTime = employee.getShift().getEndTime();
+//                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+//                    String shiftTimeString = startTime + " - " + endTime;
+//                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
+//                } else {
+//                    binding.tvEmployeeShift.setText("N/A");
+//                }
+                StringBuilder shiftTimeString = new StringBuilder();
                 if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-                    String shiftTimeString = startTime + " - " + endTime;
-                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
+                    shiftTimeString.append(startTime).append(" - ").append(endTime);
+                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString.toString()));
                 } else {
-                    binding.tvEmployeeShift.setText("N/A");
+                    binding.tvEmployeeShiftValue.setText("N/A");
                 }
                 if (empContact != null && employeeEmail != null) {
                     binding.tvEmployeeContactValue.setText(empContact);
@@ -291,11 +318,21 @@ public class DashboardFragment extends Fragment {
                 new Thread(() -> {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String currentDate = dateFormat.format(new Date());
+//                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
+//                        try {
+//                            SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//                            Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
+//                            String formattedPunchDate = dateFormat.format(punchDate);
+//                            return formattedPunchDate.equals(currentDate);
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                            return false;
+//                        }
+//                    }).collect(Collectors.toList());
                     List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
                         try {
-                            SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                            Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
-                            String formattedPunchDate = dateFormat.format(punchDate);
+                            Date punchDate = DATE_FORMAT_YYYY_MM_DD.parse(punchData.getPunchDateFormat());
+                            String formattedPunchDate = DATE_FORMAT_YYYY_MM_DD.format(punchDate);
                             return formattedPunchDate.equals(currentDate);
                         } catch (ParseException e) {
                             e.printStackTrace();
@@ -416,6 +453,27 @@ public class DashboardFragment extends Fragment {
         tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
     }
 
+    //    private String formatShiftTime(String shiftTime) {
+//        if (shiftTime == null || shiftTime.isEmpty()) {
+//            return "";
+//        }
+//
+//        String[] parts = shiftTime.split("-");
+//        if (parts.length == 2) {
+//            try {
+//                SimpleDateFormat inputFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+//                SimpleDateFormat outputFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//                Date startTime = inputFormatter.parse(parts[0].trim());
+//                Date endTime = inputFormatter.parse(parts[1].trim());
+//                return outputFormatter.format(startTime) + " - " + outputFormatter.format(endTime);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//                Log.e("DashboardFragment", "Error formatting shift time", e);
+//                return "";
+//            }
+//        }
+//        return "";
+//    }
     private String formatShiftTime(String shiftTime) {
         if (shiftTime == null || shiftTime.isEmpty()) {
             return "";
@@ -424,11 +482,9 @@ public class DashboardFragment extends Fragment {
         String[] parts = shiftTime.split("-");
         if (parts.length == 2) {
             try {
-                SimpleDateFormat inputFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                SimpleDateFormat outputFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-                Date startTime = inputFormatter.parse(parts[0].trim());
-                Date endTime = inputFormatter.parse(parts[1].trim());
-                return outputFormatter.format(startTime) + " - " + outputFormatter.format(endTime);
+                Date startTime = INPUT_SHIFT_FORMAT.parse(parts[0].trim());
+                Date endTime = INPUT_SHIFT_FORMAT.parse(parts[1].trim());
+                return OUTPUT_SHIFT_FORMAT.format(startTime) + " - " + OUTPUT_SHIFT_FORMAT.format(endTime);
             } catch (ParseException e) {
                 e.printStackTrace();
                 Log.e("DashboardFragment", "Error formatting shift time", e);
@@ -437,6 +493,7 @@ public class DashboardFragment extends Fragment {
         }
         return "";
     }
+
 
     @Override
     public void onDestroyView() {
