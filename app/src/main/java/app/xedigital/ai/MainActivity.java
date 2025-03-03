@@ -427,14 +427,14 @@ public class MainActivity extends AppCompatActivity {
                 String fullName = firstName + " " + lastName;
                 SpannableString spannableString = new SpannableString(fullName);
 
-                // Apply formatting to first letter of first name
+                // Apply formatting to first letter of first name // Apply formatting to first letter of last name
                 if (!firstName.isEmpty()) {
                     spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
 
-                // Apply formatting to first letter of last name
+
                 if (!lastName.isEmpty()) {
                     int lastNameStartIndex = firstName.length() + 1;
                     spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
