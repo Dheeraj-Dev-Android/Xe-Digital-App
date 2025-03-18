@@ -34,6 +34,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -59,7 +60,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    implementation(libs.legacy.support.v4)
+//    implementation(libs.legacy.support.v4)
     implementation(libs.activity)
     implementation(libs.filament.android)
     implementation(libs.tracing.perfetto.handshake)
@@ -105,7 +106,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
-    implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
