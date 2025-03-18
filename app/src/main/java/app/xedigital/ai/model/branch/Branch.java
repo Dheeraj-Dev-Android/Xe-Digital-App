@@ -2,7 +2,9 @@ package app.xedigital.ai.model.branch;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Branch {
+import java.io.Serializable;
+
+public class Branch implements Serializable {
 
     @SerializedName("city")
     private String city;

@@ -2,7 +2,9 @@ package app.xedigital.ai.model.regularizeList;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Employee {
+import java.io.Serializable;
+
+public class Employee implements Serializable {
 
     @SerializedName("joiningType")
     private String joiningType;
