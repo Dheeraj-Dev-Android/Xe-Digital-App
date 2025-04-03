@@ -95,23 +95,23 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
                 Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
-        holder.approveButton.setOnClickListener(v -> {
-            if (position != RecyclerView.NO_POSITION) {
-                AttendanceRegularizeAppliedItem appliedAttendanceItem = items.get(position);
-                String attendanceId = appliedAttendanceItem.getId();
-
-                if (attendanceId != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_ATTENDANCE_ID, appliedAttendanceItem);
-                    Navigation.findNavController(v).navigate(R.id.action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment, bundle);
-
-                } else {
-                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        holder.approveButton.setOnClickListener(v -> {
+//            if (position != RecyclerView.NO_POSITION) {
+//                AttendanceRegularizeAppliedItem appliedAttendanceItem = items.get(position);
+//                String attendanceId = appliedAttendanceItem.getId();
+//
+//                if (attendanceId != null) {
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable(ARG_ATTENDANCE_ID, appliedAttendanceItem);
+//                    Navigation.findNavController(v).navigate(R.id.action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment, bundle);
+//
+//                } else {
+//                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
     }
 

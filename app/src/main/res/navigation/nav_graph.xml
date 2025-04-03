@@ -111,6 +111,26 @@
         android:label="Regularize View">
 
     </fragment>
+    <fragment
+        android:id="@+id/nav_cross_approval_attendance"
+        android:name="app.xedigital.ai.ui.regularize_attendance.CrossFMAttendanceApprovalFragment"
+        android:label="Cross FM Attendance Approval">
+        <action
+            android:id="@+id/action_nav_cross_approval_attendance_to_nav_pendingApprovalFragment"
+            app:destination="@id/nav_pendingApprovalFragment" />
+        <action
+            android:id="@+id/action_nav_cross_approval_attendance_to_nav_pendingCFMAttendanceApprovalFragment"
+            app:destination="@id/nav_pendingCFMAttendanceApprovalFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_pendingCFMAttendanceApprovalFragment"
+        android:name="app.xedigital.ai.ui.regularize_attendance.PendingCMFAttendanceApproveFragment"
+        android:label="Pending CM Attendance Approval">
+        <action
+            android:id="@+id/action_nav_pendingCFMAttendanceApprovalFragment_to_nav_cross_approval_attendance"
+            app:destination="@id/nav_cross_approval_attendance" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/nav_pendingApprovalFragment"
@@ -120,6 +140,9 @@
         <action
             android:id="@+id/action_nav_pendingApprovalFragment_to_nav_pendingApprovalViewFragment"
             app:destination="@id/nav_pendingApprovalViewFragment" />
+        <action
+            android:id="@+id/action_nav_pendingApprovalFragment_to_nav_cross_approval_attendance"
+            app:destination="@id/nav_cross_approval_attendance" />
     </fragment>
     <fragment
         android:id="@+id/nav_pendingApprovalViewFragment"

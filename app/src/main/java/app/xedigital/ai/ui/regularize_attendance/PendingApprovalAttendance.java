@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -16,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,7 +64,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pending_approval_attendance, container, false);
-
+        setHasOptionsMenu(true);
         approvalRecyclerView = view.findViewById(R.id.approval_recycler_view);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
@@ -139,11 +144,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
                     if (items.isEmpty()) {
                         emptyStateContainer.setVisibility(View.VISIBLE);
                         Toast.makeText(getContext(), "No data found", Toast.LENGTH_SHORT).show();
-                        new AlertDialog.Builder(getContext())
-                                .setTitle("Attendance Regularization Approval List")
-                                .setMessage("No Records Found.")
-                                .setPositiveButton("OK", null)
-                                .show();
+                        new AlertDialog.Builder(getContext()).setTitle("Attendance Regularization Approval List").setMessage("No Records Found.").setPositiveButton("OK", null).show();
                     } else {
                         emptyStateContainer.setVisibility(View.GONE);
                         adapter = new RegularizeApprovalAdapter(items, authToken, userId, PendingApprovalAttendance.this, getContext());
@@ -190,5 +191,28 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
             pendingApprovalViewFragment.handleReject(item.getId());
         }
         getRegularizeApproval();
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_regularize_attendance, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_cross_manager_attendance) {
+            //Correct way to get the navController in a Fragment.
+            NavHostFragment navHostFragment = (NavHostFragment) requireActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+            if (navHostFragment != null) {
+                NavController navController = navHostFragment.getNavController();
+                navController.navigate(R.id.action_nav_pendingApprovalFragment_to_nav_cross_approval_attendance);
+                Toast.makeText(getContext(), "Cross Approval", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -493,7 +493,7 @@ public class DashboardFragment extends Fragment {
         }
         return "";
     }
-    
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

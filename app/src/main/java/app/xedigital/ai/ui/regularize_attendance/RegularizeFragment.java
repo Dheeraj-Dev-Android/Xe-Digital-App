@@ -315,11 +315,15 @@ public class RegularizeFragment extends Fragment {
             String reportingManagerEmail = userProfile.getData().getEmployee().getReportingManager().getEmail();
             String reportingManagerFirstName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
             String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
+            String crossManager = String.valueOf(userProfile.getData().getEmployee().getCrossmanager().getId());
+            Log.d("RegularizeFragment", "Cross Manager Manager ID: " + crossManager);
 
             requestBody.setReportingManager(reportingManagerId);
             requestBody.setReportingManagerEmail(reportingManagerEmail);
             requestBody.setReportingManagerFirstName(reportingManagerFirstName);
             requestBody.setReportingManagerLastName(reportingManagerLastName);
+            requestBody.setCrossManager(crossManager);
+
         }
 
         Call<ResponseBody> call = apiInterface.RegularizeApi("jwt " + token, attendanceId, requestBody);

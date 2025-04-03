@@ -10,6 +10,7 @@ import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.bucket.BucketRequest;
 import app.xedigital.ai.model.bucket.BucketResponse;
+import app.xedigital.ai.model.cfRegularizeApproval.CfRegularizeApprovalResponse;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
@@ -265,5 +266,9 @@ public interface APIInterface {
     @PUT("users/profile/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<ResponseBody> editUserProfile(@Path("userId") String id, @Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @GET("employees/attendance/regularize/{userId}")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<CfRegularizeApprovalResponse> getCFMRegularize(@Header("Authorization") String authToken, @Path("userId") String id);
 
 }

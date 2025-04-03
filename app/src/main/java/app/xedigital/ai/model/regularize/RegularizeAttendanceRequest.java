@@ -69,6 +69,8 @@ public class RegularizeAttendanceRequest {
 
     @SerializedName("hrEmail")
     private String hrEmail;
+    @SerializedName("crossManager")
+    private String crossManager;
 
     public void setReportingManager(String reportingManager) {
         this.reportingManager = reportingManager;
@@ -104,6 +106,10 @@ public class RegularizeAttendanceRequest {
 
     public void setPunchIn(String punchIn) {
         this.punchIn = punchIn;
+    }
+
+    public void setCrossManager(String crossManager) {
+        this.crossManager = crossManager;
     }
 
     public void setPunchOutUpdate(String punchOutUpdate) {
@@ -157,4 +163,6 @@ public class RegularizeAttendanceRequest {
     public void setHrEmail(String hrEmail) {
         this.hrEmail = hrEmail;
     }
+
+
 }
