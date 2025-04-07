@@ -52,6 +52,7 @@ import app.xedigital.ai.databinding.FragmentDashboardBinding;
 import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import app.xedigital.ai.model.leaves.LeavesItem;
 import app.xedigital.ai.model.profile.Employee;
+import app.xedigital.ai.model.profile.Shift;
 import app.xedigital.ai.ui.attendance.AttendanceViewModel;
 import app.xedigital.ai.ui.leaves.LeavesViewModel;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
@@ -262,46 +263,108 @@ public class DashboardFragment extends Fragment {
         };
         handler.post(runnable);
 
+//        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
+//            if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
+//                Employee employee = userprofileResponse.getData().getEmployee();
+//                employeeName = employee.getFirstname();
+//                employeeEmail = employee.getEmail();
+//                employeeLastName = employee.getLastname();
+//                empContact = employee.getContact();
+//                empDesignation = employee.getDesignation();
+//                binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
+//                binding.tvEmployeeDesignationValue.setText(empDesignation);
+//                String startTime = employee.getShift().getStartTime();
+//                String endTime = employee.getShift().getEndTime();
+////                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+////                    String shiftTimeString = startTime + " - " + endTime;
+////                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
+////                } else {
+////                    binding.tvEmployeeShift.setText("N/A");
+////                }
+//                StringBuilder shiftTimeString = new StringBuilder();
+//                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+//                    shiftTimeString.append(startTime).append(" - ").append(endTime);
+//                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString.toString()));
+//                } else {
+//                    binding.tvEmployeeShiftValue.setText("N/A");
+//                }
+//                if (empContact != null && employeeEmail != null) {
+//                    binding.tvEmployeeContactValue.setText(empContact);
+//                    binding.tvEmployeeEmailValue.setText(employeeEmail);
+//                } else {
+//                    binding.tvEmployeeContactValue.setText("");
+//                    binding.tvEmployeeEmailValue.setText("");
+//                }
+//                Object profileImageUrl = employee.getProfileImageUrl();
+//                ImageView profileImage = binding.ivEmployeeProfile;
+//                if (profileImageUrl != null) {
+//                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
+//                } else {
+//                    profileImage.setImageResource(R.mipmap.ic_default_profile);
+//                }
+//            } else {
+//                binding.tvEmployeeNameValue.setText("N/A");
+//                binding.tvEmployeeDesignationValue.setText("N/A");
+//                binding.tvEmployeeShiftValue.setText("N/A");
+//                binding.tvEmployeeContactValue.setText("N/A");
+//                binding.tvEmployeeEmailValue.setText("N/A");
+//                binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
+//            }
+//            isProfileDataLoaded = true;
+//            checkAllDataLoaded();
+//        });
+
+
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
-                employeeName = employee.getFirstname();
-                employeeEmail = employee.getEmail();
-                employeeLastName = employee.getLastname();
-                empContact = employee.getContact();
-                empDesignation = employee.getDesignation();
-                binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
-                binding.tvEmployeeDesignationValue.setText(empDesignation);
-                String startTime = employee.getShift().getStartTime();
-                String endTime = employee.getShift().getEndTime();
-//                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-//                    String shiftTimeString = startTime + " - " + endTime;
-//                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
-//                } else {
-//                    binding.tvEmployeeShift.setText("N/A");
-//                }
-                StringBuilder shiftTimeString = new StringBuilder();
-                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-                    shiftTimeString.append(startTime).append(" - ").append(endTime);
-                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString.toString()));
+                if (employee != null) {
+                    // Extract employee details, handling nulls
+                    String employeeName = employee.getFirstname() != null ? employee.getFirstname() : "";
+                    String employeeLastName = employee.getLastname() != null ? employee.getLastname() : "";
+                    String employeeEmail = employee.getEmail() != null ? employee.getEmail() : "";
+                    String empContact = employee.getContact() != null ? employee.getContact() : "";
+                    String empDesignation = employee.getDesignation() != null ? employee.getDesignation() : "";
+
+                    // Update UI with employee details
+                    binding.tvEmployeeNameValue.setText((!employeeName.isEmpty() || !employeeLastName.isEmpty()) ? employeeName + " " + employeeLastName : "N/A");
+                    binding.tvEmployeeDesignationValue.setText(!empDesignation.isEmpty() ? empDesignation : "N/A");
+
+                    // Handle shift time
+                    Shift shift = employee.getShift();
+                    String startTime = shift != null && shift.getStartTime() != null ? shift.getStartTime() : "";
+                    String endTime = shift != null && shift.getEndTime() != null ? shift.getEndTime() : "";
+
+                    if (!startTime.isEmpty() && !endTime.isEmpty()) {
+                        String shiftTimeString = startTime + " - " + endTime;
+                        binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
+                    } else {
+                        binding.tvEmployeeShiftValue.setText("N/A");
+                    }
+
+                    // Handle contact and email
+                    binding.tvEmployeeContactValue.setText(!empContact.isEmpty() ? empContact : "N/A");
+                    binding.tvEmployeeEmailValue.setText(!employeeEmail.isEmpty() ? employeeEmail : "N/A");
+
+                    // Handle profile image
+                    Object profileImageUrl = employee.getProfileImageUrl();
+                    ImageView profileImage = binding.ivEmployeeProfile;
+                    if (profileImageUrl != null) {
+                        Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
+                    } else {
+                        profileImage.setImageResource(R.mipmap.ic_default_profile);
+                    }
                 } else {
+                    // Handle case where employee data is null
+                    binding.tvEmployeeNameValue.setText("N/A");
+                    binding.tvEmployeeDesignationValue.setText("N/A");
                     binding.tvEmployeeShiftValue.setText("N/A");
-                }
-                if (empContact != null && employeeEmail != null) {
-                    binding.tvEmployeeContactValue.setText(empContact);
-                    binding.tvEmployeeEmailValue.setText(employeeEmail);
-                } else {
-                    binding.tvEmployeeContactValue.setText("");
-                    binding.tvEmployeeEmailValue.setText("");
-                }
-                Object profileImageUrl = employee.getProfileImageUrl();
-                ImageView profileImage = binding.ivEmployeeProfile;
-                if (profileImageUrl != null) {
-                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
-                } else {
-                    profileImage.setImageResource(R.mipmap.ic_default_profile);
+                    binding.tvEmployeeContactValue.setText("N/A");
+                    binding.tvEmployeeEmailValue.setText("N/A");
+                    binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
                 }
             } else {
+                // Handle case where userProfileResponse or data is null
                 binding.tvEmployeeNameValue.setText("N/A");
                 binding.tvEmployeeDesignationValue.setText("N/A");
                 binding.tvEmployeeShiftValue.setText("N/A");
