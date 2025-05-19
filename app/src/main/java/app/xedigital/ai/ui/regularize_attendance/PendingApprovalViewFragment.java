@@ -20,6 +20,9 @@ import androidx.lifecycle.ViewTreeLifecycleOwner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -89,6 +92,22 @@ public class PendingApprovalViewFragment extends Fragment {
         String authToken = sharedPreferences.getString("authToken", "");
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
+        if (requireContext() instanceof FragmentActivity) {
+            profileViewModel = new ViewModelProvider((FragmentActivity) requireContext()).get(ProfileViewModel.class);
+        }
+
+        if (ViewTreeLifecycleOwner.get(binding.getRoot()) != null) {
+            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(binding.getRoot())), userProfile -> {
+                if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee().getReportingManager() != null) {
+                    String reportingManagerFirstName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
+                    String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
+                    if (reportingManagerFirstName != null && reportingManagerLastName != null) {
+                        reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
+                        Log.e("reportingManager", reportingManager);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -172,22 +191,6 @@ public class PendingApprovalViewFragment extends Fragment {
             binding.actionButtonsCard.setVisibility(View.GONE);
         }
 
-
-        if (requireContext() instanceof FragmentActivity) {
-            profileViewModel = new ViewModelProvider((FragmentActivity) requireContext()).get(ProfileViewModel.class);
-        }
-
-        if (ViewTreeLifecycleOwner.get(binding.getRoot()) != null) {
-            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(binding.getRoot())), userProfile -> {
-                if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee().getReportingManager() != null) {
-                    String reportingManagerFirstName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
-                    String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
-                    if (reportingManagerFirstName != null && reportingManagerLastName != null) {
-                        reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                    }
-                }
-            });
-        }
         return view;
     }
 
@@ -196,6 +199,7 @@ public class PendingApprovalViewFragment extends Fragment {
         requestBody.setStatus("Approved");
         requestBody.setApprovedByName(reportingManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
+
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
 
@@ -203,16 +207,58 @@ public class PendingApprovalViewFragment extends Fragment {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(requireContext(), "Attendance Approved", Toast.LENGTH_SHORT).show();
+//
+//
+//                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+//                    ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
+//                    if (listener != null) {
+//                        listener.onApprove(item);
+//                    }
+//                } else {
+//                    Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
+//                }
                 if (response.isSuccessful()) {
-                    Toast.makeText(requireContext(), "Attendance Approved", Toast.LENGTH_SHORT).show();
+                    // Log the response in JSON format
+                    try {
+                        String responseBody = response.body() != null ? response.body().string() : "{}";
+                        JSONObject jsonObject = new JSONObject(responseBody);
+                        Log.d("RegularizeApprovalAdapter", "Response JSON: " + jsonObject.toString(4));
+                        Toast.makeText(requireContext(), "Attendance Approved", Toast.LENGTH_SHORT).show();
 
-                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
-                    if (listener != null) {
-                        listener.onApprove(item);
+                        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                        ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
+                        if (listener != null) {
+                            listener.onApprove(item);
+                        }
+                    } catch (JSONException e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
+                        try {
+                            Log.e("RegularizeApprovalAdapter", "Response String: " + response.body().string());
+                        } catch (Exception e2) {
+                            Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e2.getMessage());
+
+                        }
+                    } catch (Exception e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
                     }
                 } else {
-                    Log.d("RegularizeApprovalAdapter", "onResponse: " + response.errorBody());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "{}";
+                        JSONObject jsonObject = new JSONObject(errorBody);
+                        Log.e("RegularizeApprovalAdapter", "Error Response JSON: " + jsonObject.toString(4));
+                    } catch (JSONException e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
+                        try {
+                            Log.e("RegularizeApprovalAdapter", "Error String: " + response.errorBody().string());
+                        } catch (Exception e2) {
+                            Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e2.getMessage());
+
+                        }
+                    } catch (Exception e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
+                    }
                 }
             }
 
@@ -235,13 +281,55 @@ public class PendingApprovalViewFragment extends Fragment {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(requireContext(), "Attendance Rejected", Toast.LENGTH_SHORT).show();
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(requireContext(), "Attendance Rejected", Toast.LENGTH_SHORT).show();
+//
+//                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+//                    ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
+//                    if (listener != null) {
+//                        listener.onApprove(item);
+//                    }
 
-                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
-                    if (listener != null) {
-                        listener.onApprove(item);
+//                }
+                if (response.isSuccessful()) {
+                    // Log the response in JSON format
+                    try {
+                        String responseBody = response.body() != null ? response.body().string() : "{}";
+                        JSONObject jsonObject = new JSONObject(responseBody);
+                        Log.d("RegularizeApprovalAdapter", "Response JSON: " + jsonObject.toString(4));
+                        Toast.makeText(requireContext(), "Attendance Rejected", Toast.LENGTH_SHORT).show();
+
+                        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                        ft.detach(PendingApprovalViewFragment.this).attach(PendingApprovalViewFragment.this).commit();
+                        if (listener != null) {
+                            listener.onReject(item);
+                        }
+                    } catch (JSONException e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
+                        try {
+                            Log.e("RegularizeApprovalAdapter", "Response String: " + response.body().string());
+                        } catch (Exception e2) {
+                            Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e2.getMessage());
+
+                        }
+                    } catch (Exception e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
+                    }
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "{}";
+                        JSONObject jsonObject = new JSONObject(errorBody);
+                        Log.e("RegularizeApprovalAdapter", "Error Response JSON: " + jsonObject.toString(4));
+                    } catch (JSONException e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
+                        try {
+                            Log.e("RegularizeApprovalAdapter", "Error String: " + response.errorBody().string());
+                        } catch (Exception e2) {
+                            Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e2.getMessage());
+
+                        }
+                    } catch (Exception e) {
+                        Log.e("RegularizeApprovalAdapter", "Error parsing JSON: " + e.getMessage());
                     }
                 }
             }

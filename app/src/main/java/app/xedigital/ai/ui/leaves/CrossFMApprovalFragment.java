@@ -109,7 +109,7 @@ public class CrossFMApprovalFragment extends Fragment {
 
     public void onChipClicked(View view) {
         // Get the ChipGroup and the clicked chip
-        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
+        ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
 
         chipGroup.check(clickedChip.getId());

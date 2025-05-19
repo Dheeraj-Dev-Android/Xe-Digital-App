@@ -160,7 +160,7 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
                             if (items.isEmpty()) {
                                 emptyStateContainer.setVisibility(View.VISIBLE);
                                 Toast.makeText(getContext(), "No data found", Toast.LENGTH_SHORT).show();
-                                new AlertDialog.Builder(getContext()).setTitle("Attendance Regularization Approval List").setMessage("No Records Found.").setPositiveButton("OK", null).show();
+                                new AlertDialog.Builder(requireContext()).setTitle("Attendance Regularization Approval List").setMessage("No Records Found.").setPositiveButton("OK", null).show();
                             } else {
                                 emptyStateContainer.setVisibility(View.GONE);
                                 adapter = new CFregularizeAdapter(items, authToken, userId, getContext());

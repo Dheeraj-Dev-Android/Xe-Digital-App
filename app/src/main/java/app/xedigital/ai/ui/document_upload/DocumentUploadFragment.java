@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -176,7 +177,7 @@ public class DocumentUploadFragment extends Fragment {
     private void convertFileToBase64(Uri uri) {
         try {
             InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
-            byte[] fileBytes = getBytes(inputStream);
+            byte[] fileBytes = getBytes(Objects.requireNonNull(inputStream));
             String base64String = Base64.encodeToString(fileBytes, Base64.DEFAULT);
 
             uploadDocument(base64String);

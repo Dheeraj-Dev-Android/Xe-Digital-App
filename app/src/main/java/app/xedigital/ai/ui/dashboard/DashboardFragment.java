@@ -35,6 +35,7 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.material.card.MaterialCardView;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -142,10 +143,11 @@ public class DashboardFragment extends Fragment {
         leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
         leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
         leaveTypeColors.put("Restricted Holidays", Color.rgb(199, 0, 57));
+        leaveTypeColors.put("Occasional Leave", Color.rgb(161, 16, 76));
         List<Integer> colors = new ArrayList<>();
         for (PieEntry entry : entries) {
             String leaveType = entry.getLabel();
-            int color = leaveTypeColors.getOrDefault(leaveType, Color.GRAY);
+            int color = leaveTypeColors.getOrDefault(leaveType, Color.rgb(102, 0, 102));
             colors.add(color);
         }
         dataSet.setColors(colors);
@@ -166,6 +168,14 @@ public class DashboardFragment extends Fragment {
         pieChart.setTransparentCircleRadius(45f);
         pieChart.animateXY(1000, 1000);
         pieChart.setDrawEntryLabels(false);
+        // Format totalBalanceLeaves to display in the center
+        DecimalFormat decimalFormat = new DecimalFormat("#.##"); // Use this format to show two decimal places
+        String formattedTotalBalanceLeaves = decimalFormat.format(totalBalanceLeaves);
+
+        // Set the center text with the total balance
+        pieChart.setCenterText("Balance:\n" + formattedTotalBalanceLeaves);
+        pieChart.setCenterTextColor(Color.rgb(161, 16, 7));
+        pieChart.setCenterTextSize(9f);
         pieChart.invalidate();
     }
 
@@ -263,58 +273,6 @@ public class DashboardFragment extends Fragment {
         };
         handler.post(runnable);
 
-//        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-//            if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
-//                Employee employee = userprofileResponse.getData().getEmployee();
-//                employeeName = employee.getFirstname();
-//                employeeEmail = employee.getEmail();
-//                employeeLastName = employee.getLastname();
-//                empContact = employee.getContact();
-//                empDesignation = employee.getDesignation();
-//                binding.tvEmployeeNameValue.setText(employeeName + " " + employeeLastName);
-//                binding.tvEmployeeDesignationValue.setText(empDesignation);
-//                String startTime = employee.getShift().getStartTime();
-//                String endTime = employee.getShift().getEndTime();
-////                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-////                    String shiftTimeString = startTime + " - " + endTime;
-////                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString));
-////                } else {
-////                    binding.tvEmployeeShift.setText("N/A");
-////                }
-//                StringBuilder shiftTimeString = new StringBuilder();
-//                if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
-//                    shiftTimeString.append(startTime).append(" - ").append(endTime);
-//                    binding.tvEmployeeShiftValue.setText(formatShiftTime(shiftTimeString.toString()));
-//                } else {
-//                    binding.tvEmployeeShiftValue.setText("N/A");
-//                }
-//                if (empContact != null && employeeEmail != null) {
-//                    binding.tvEmployeeContactValue.setText(empContact);
-//                    binding.tvEmployeeEmailValue.setText(employeeEmail);
-//                } else {
-//                    binding.tvEmployeeContactValue.setText("");
-//                    binding.tvEmployeeEmailValue.setText("");
-//                }
-//                Object profileImageUrl = employee.getProfileImageUrl();
-//                ImageView profileImage = binding.ivEmployeeProfile;
-//                if (profileImageUrl != null) {
-//                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
-//                } else {
-//                    profileImage.setImageResource(R.mipmap.ic_default_profile);
-//                }
-//            } else {
-//                binding.tvEmployeeNameValue.setText("N/A");
-//                binding.tvEmployeeDesignationValue.setText("N/A");
-//                binding.tvEmployeeShiftValue.setText("N/A");
-//                binding.tvEmployeeContactValue.setText("N/A");
-//                binding.tvEmployeeEmailValue.setText("N/A");
-//                binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
-//            }
-//            isProfileDataLoaded = true;
-//            checkAllDataLoaded();
-//        });
-
-
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
@@ -381,17 +339,6 @@ public class DashboardFragment extends Fragment {
                 new Thread(() -> {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String currentDate = dateFormat.format(new Date());
-//                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
-//                        try {
-//                            SimpleDateFormat punchDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//                            Date punchDate = punchDateFormat.parse(punchData.getPunchDateFormat());
-//                            String formattedPunchDate = dateFormat.format(punchDate);
-//                            return formattedPunchDate.equals(currentDate);
-//                        } catch (ParseException e) {
-//                            e.printStackTrace();
-//                            return false;
-//                        }
-//                    }).collect(Collectors.toList());
                     List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
                         try {
                             Date punchDate = DATE_FORMAT_YYYY_MM_DD.parse(punchData.getPunchDateFormat());
@@ -516,27 +463,6 @@ public class DashboardFragment extends Fragment {
         tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
     }
 
-    //    private String formatShiftTime(String shiftTime) {
-//        if (shiftTime == null || shiftTime.isEmpty()) {
-//            return "";
-//        }
-//
-//        String[] parts = shiftTime.split("-");
-//        if (parts.length == 2) {
-//            try {
-//                SimpleDateFormat inputFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
-//                SimpleDateFormat outputFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//                Date startTime = inputFormatter.parse(parts[0].trim());
-//                Date endTime = inputFormatter.parse(parts[1].trim());
-//                return outputFormatter.format(startTime) + " - " + outputFormatter.format(endTime);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//                Log.e("DashboardFragment", "Error formatting shift time", e);
-//                return "";
-//            }
-//        }
-//        return "";
-//    }
     private String formatShiftTime(String shiftTime) {
         if (shiftTime == null || shiftTime.isEmpty()) {
             return "";

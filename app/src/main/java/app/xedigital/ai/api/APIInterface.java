@@ -32,6 +32,7 @@ import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.model.policy.PolicyResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.profile.UserProfileResponse;
+import app.xedigital.ai.model.radius.GetRadiusResponse;
 import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
 import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
 import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
@@ -71,6 +72,10 @@ public interface APIInterface {
     @GET("users/profile/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<UserModelResponse> getUserData(@Path("userId") String id, @Header("Authorization") String authToken);
+
+    @GET("employees/getRadious")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<GetRadiusResponse> getRadious(@Header("Authorization") String authToken);
 
     @GET("branches/profile/{branchId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})

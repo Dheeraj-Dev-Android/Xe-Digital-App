@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,16 +107,11 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                     Date fromDateObj = dateFormat.parse(fromDate);
                     Date toDateObj = dateFormat.parse(toDate);
 
-                    if (toDateObj.before(fromDateObj)) {
+                    // Filter claims by date range
+                    //                        filterClaimsByDateRange(fromDate, toDate);
+                    if (toDateObj != null && toDateObj.before(fromDateObj)) {
 
                         Toast.makeText(requireContext(), "To date cannot be before from date", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Filter claims by date range
-//                        filterClaimsByDateRange(fromDate, toDate);
-                        new Handler().postDelayed(() -> {
-                            loadingProgress.setVisibility(View.VISIBLE);
-                            filterClaimsByDateRange(fromDate, toDate);
-                        }, 300);
                     }
                 } catch (androidx.core.net.ParseException e) {
                     e.printStackTrace();

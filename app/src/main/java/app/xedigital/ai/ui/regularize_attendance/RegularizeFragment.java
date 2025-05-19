@@ -32,6 +32,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -260,6 +262,21 @@ public class RegularizeFragment extends Fragment {
 
     }
 
+    private LocalTime parseTime(String timeString) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendOptional(DateTimeFormatter.ofPattern("HH:mm"))
+                .appendOptional(DateTimeFormatter.ofPattern("H:m"))
+                .toFormatter(Locale.getDefault());
+
+        try {
+            return LocalTime.parse(timeString, formatter);
+        } catch (DateTimeParseException e) {
+            // Handle the parsing error appropriately, like logging or returning null.
+            Log.e("RegularizeFragment", "Error parsing time: " + timeString + ", error: " + e.getMessage());
+            return null;
+        }
+    }
+
     private void regularize(String token, String id, String date, String punchIn, String punchOut, String punchInAddress, String punchOutAddress, String remarks) {
 
         String attendanceId = attendanceItem != null ? String.valueOf(attendanceItem.getId()) : "";
@@ -294,9 +311,19 @@ public class RegularizeFragment extends Fragment {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:mm");
         ZoneId inputTimeZone = ZoneId.of("Asia/Kolkata");
         // --- punchIn ---
-        LocalTime localPunchInTime = LocalTime.parse(punchIn, timeFormatter);
+//        LocalTime localPunchInTime = LocalTime.parse(punchIn, timeFormatter);
+        LocalTime localPunchInTime = parseTime(punchIn);
+        if (localPunchInTime == null) {
+            showAlertDialog1("Error", "Invalid Punch In Time format");
+            return;
+        }
         // Convert local time to UTC
-        ZonedDateTime zonedPunchInTime = ZonedDateTime.of(punchDate, localPunchInTime, inputTimeZone);
+//        ZonedDateTime zonedPunchInTime = ZonedDateTime.of(punchDate, localPunchInTime, inputTimeZone);
+//        OffsetDateTime utcPunchInTime = zonedPunchInTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//        String punchInUpdate = utcPunchInTime.format(formatter);
+//        requestBody.setPunchInUpdate(punchInUpdate);
+        ZonedDateTime zonedPunchInTime = ZonedDateTime.of(punchDate, localPunchInTime, ZoneId.of("Asia/Kolkata"));
         OffsetDateTime utcPunchInTime = zonedPunchInTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String punchInUpdate = utcPunchInTime.format(formatter);
@@ -358,5 +385,13 @@ public class RegularizeFragment extends Fragment {
                 }).show();
             }
         });
+    }
+
+    private void showAlertDialog1(String error, String invalidPunchInTimeFormat) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(error).setMessage(invalidPunchInTimeFormat).setPositiveButton("OK", (dialog, which) -> {
+            clearForm();
+            dialog.dismiss();
+        }).show();
     }
 }

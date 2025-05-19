@@ -79,6 +79,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.utills.BioMetric;
+import app.xedigital.ai.utills.RadiusMapping;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -596,55 +597,57 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return dateFormat.format(new Date());
     }
 
-    //    private void getCurrentLocation(AddressCallback callback) {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
-//            locationCallback = new LocationCallback() {
-//                @Override
-//                public void onLocationResult(@NonNull LocationResult locationResult) {
-//                    Location location = locationResult.getLastLocation();
-//                    if (location != null) {
-//                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
-//                    } else {
-//                        Log.e(TAG, "Location is null in onLocationResult");
-//                        callback.onAddressReceived("Location not found");
-//                    }
-//                }
-//            };
-//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-//        } else {
-//            Log.e(TAG, "Location permission not granted");
-//            callback.onAddressReceived("Location not found");
-//        }
-//    }
     private void getCurrentLocation(AddressCallback callback) {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
-            // Location permission granted and location services enabled
-//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
+
             LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(false).setMaxUpdateDelayMillis(15000).build();
+
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
                     Location location = locationResult.getLastLocation();
                     if (location != null) {
-                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+
+                        // Radius check with full details
+                        RadiusMapping radiusMapping = new RadiusMapping(PunchActivity.this);
+                        radiusMapping.checkIfWithinAnyRadius(latitude, longitude, isInside -> {
+                            runOnUiThread(() -> {
+                                if (isInside) {
+                                    // Proceed to punch attendance
+                                    runOnUiThread(() -> {
+                                        // Call your attendance punch method here`
+                                        getAddressFromLocation(latitude, longitude, callback);
+                                    });
+                                } else {
+                                    if (isFinishing() || isDestroyed()) return;
+
+                                    String message = "❌ You are outside the allowed punch radius ❌\n";
+                                    new AlertDialog.Builder(PunchActivity.this).setTitle("Outside Allowed Area").setMessage(message).setPositiveButton("Retry", (dialog, id) -> dialog.dismiss()).setNegativeButton("Cancel", (dialog, id) -> {
+                                        dialog.dismiss();
+                                        finish();
+                                    }).show();
+                                }
+                            });
+                        });
+
                     } else {
+                        fusedLocationClient.removeLocationUpdates(locationCallback);
                         Log.e(TAG, "Location is null in onLocationResult");
                         callback.onAddressReceived("Location not found");
                     }
                 }
             };
+
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+
         } else {
-            // Location permission or location services not enabled
             if (!isLocationEnabled) {
-                // Show alert to enable location services
                 new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to use this feature.").setPositiveButton("Ok", (dialog, which) -> {
-//                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-//                }).setNegativeButton("Cancel", (dialog, which) -> {
                     dialog.dismiss();
                     setResult(Activity.RESULT_CANCELED);
                     finish();
@@ -655,6 +658,77 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         }
     }
+
+//    private void getCurrentLocation(AddressCallback callback) {
+//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        boolean isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
+//            // Location permission granted and location services enabled
+////            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
+//            LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(false).setMaxUpdateDelayMillis(15000).build();
+//            locationCallback = new LocationCallback() {
+//                @Override
+//                public void onLocationResult(@NonNull LocationResult locationResult) {
+//                    Location location = locationResult.getLastLocation();
+//                    if (location != null) {
+//                        double latitude = location.getLatitude();
+//                        double longitude = location.getLongitude();
+//
+//                        // Radius check with callback
+//                        RadiusMapping radiusMapping = new RadiusMapping(PunchActivity.this);
+//                        radiusMapping.checkIfWithinAnyRadius(latitude, longitude, isInside -> {
+//                            if (isInside) {
+//                                // Proceed to punch attendance
+//                                runOnUiThread(() -> {
+//                                    // Call your attendance punch method here`
+//                                    getAddressFromLocation(latitude, longitude, callback);
+//                                });
+//                            } else {
+//                                runOnUiThread(() -> {
+//                                    if (isFinishing() || isDestroyed()) {
+//                                        return;
+//                                    }
+//                                    AlertDialog.Builder builder = new AlertDialog.Builder(PunchActivity.this);
+//                                    builder.setTitle("Outside Allowed Area");
+//                                    builder.setMessage("You are not within the allowed punch radius.");
+//                                    builder.setPositiveButton("Retry", (dialog, id) -> {
+//                                        dialog.dismiss();
+//                                    });
+//                                    builder.setNegativeButton("Cancel", (dialog, id) -> {
+//                                        dialog.dismiss();
+//                                        finish(); // Finishes PunchActivity
+//                                    });
+//                                    AlertDialog dialog = builder.create();
+//                                    dialog.show();
+//                                });
+//                            }
+//                        });
+//                    } else {
+//                        fusedLocationClient.removeLocationUpdates(locationCallback);
+//                        Log.e(TAG, "Location is null in onLocationResult");
+//                        callback.onAddressReceived("Location not found");
+//                    }
+//                }
+//            };
+//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+//        } else {
+//            // Location permission or location services not enabled
+//            if (!isLocationEnabled) {
+//                // Show alert to enable location services
+//                new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to use this feature.").setPositiveButton("Ok", (dialog, which) -> {
+////                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+////                }).setNegativeButton("Cancel", (dialog, which) -> {
+//                    dialog.dismiss();
+//                    setResult(Activity.RESULT_CANCELED);
+//                    finish();
+//                }).show();
+//            } else {
+//                Log.e(TAG, "Location permission not granted");
+//                callback.onAddressReceived("Location not found");
+//            }
+//        }
+//    }
 
     private void getAddressFromLocation(final double latitude, final double longitude, final AddressCallback callback) {
         new Thread(() -> {

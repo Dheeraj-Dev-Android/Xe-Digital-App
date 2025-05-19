@@ -247,7 +247,7 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         Button submitButton = dialogView.findViewById(R.id.submitButton);
         submitButton.setOnClickListener(v -> {
-            String comment = commentEditText.getText().toString();
+            String comment = Objects.requireNonNull(commentEditText.getText()).toString();
 
             if (action.equals("Reject")) {
                 handleReject(leaveId, comment);

@@ -25,6 +25,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -215,13 +216,13 @@ public class ShiftsFragment extends Fragment {
 
         submitButton.setOnClickListener(view -> {
             if (validateForm()) {
-                String firstName = firstNameEditText.getText().toString();
-                String lastName = lastNameEditText.getText().toString();
-                String email = emailEditText.getText().toString();
-                String contact = contactEditText.getText().toString();
+                String firstName = Objects.requireNonNull(firstNameEditText.getText()).toString();
+                String lastName = Objects.requireNonNull(lastNameEditText.getText()).toString();
+                String email = Objects.requireNonNull(emailEditText.getText()).toString();
+                String contact = Objects.requireNonNull(contactEditText.getText()).toString();
                 String shiftType = shiftTypeSpinner.getText().toString();
                 String shiftTime = shiftTimeSpinner.getText().toString();
-                String hrEmail = hrEmailEditText.getText().toString();
+                String hrEmail = Objects.requireNonNull(hrEmailEditText.getText()).toString();
 
                 // Assuming ShiftsItem is the data class corresponding to the shift type
                 ShiftsItem selectedShiftItem = null;

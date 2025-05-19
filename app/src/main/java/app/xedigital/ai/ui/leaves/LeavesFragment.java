@@ -764,7 +764,7 @@ public class LeavesFragment extends Fragment {
         String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
         String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
         String leavingStation = binding.spinnerLeavingStation.getText().toString();
-        String leaveStationAddress = binding.etLeaveStationAddress.getText().toString();
+        String leaveStationAddress = Objects.requireNonNull(binding.etLeaveStationAddress.getText()).toString();
 
         if (fromDateText.isEmpty() || toDateText.isEmpty() || leaveType.isEmpty() || leaveCategoryFrom.isEmpty() || leaveCategoryTo.isEmpty() || leavingStation.isEmpty()) {
             showErrorAlert("Please fill in all required fields.");
@@ -781,7 +781,7 @@ public class LeavesFragment extends Fragment {
             Date toDate = dateFormat.parse(toDateText);
             Date today = dateFormat.parse(dateFormat.format(new Date()));
             // Check if it's Sick Leave and allow previous dates
-            if (!leaveType.equals("Sick Leave") && fromDate.before(today)) {
+            if (fromDate != null && !leaveType.equals("Sick Leave") && fromDate.before(today)) {
                 showErrorAlert("Please select correct dates.");
                 return false;
             }

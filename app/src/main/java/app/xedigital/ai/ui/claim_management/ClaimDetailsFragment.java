@@ -73,7 +73,7 @@ public class ClaimDetailsFragment extends Fragment {
         if (getArguments() != null) {
             claimData = (EmployeeClaimdataItem) getArguments().getSerializable("claimData");
 
-            txtClaimId.setText("Claim ID: " + claimData.getClaimId());
+            txtClaimId.setText("Claim ID: " + Objects.requireNonNull(claimData).getClaimId());
             txtProjectName.setText("Project Name: " + claimData.getProject());
             txtMeetingType.setText("Meeting Type: " + claimData.getMeeting());
             txtPurposeOfMeeting.setText("Purpose: " + claimData.getPerposeofmeet());

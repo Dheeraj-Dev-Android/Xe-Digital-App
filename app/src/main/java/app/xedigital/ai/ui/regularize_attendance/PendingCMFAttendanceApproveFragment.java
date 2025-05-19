@@ -177,13 +177,13 @@ public class PendingCMFAttendanceApproveFragment extends Fragment {
         String status = attendanceRegItem.getStatus();
         if (status != null) {
             if (status.equalsIgnoreCase("unapproved")) {
-                appliedStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.pending_status_color));
+                appliedStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.pending_status_color));
             } else if (status.equalsIgnoreCase("Approved")) {
-                appliedStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.status_approved));
+                appliedStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_approved));
             } else if (status.equalsIgnoreCase("Rejected")) {
-                appliedStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.status_rejected));
+                appliedStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_rejected));
             } else {
-                appliedStatus.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+                appliedStatus.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
             }
 
         }
