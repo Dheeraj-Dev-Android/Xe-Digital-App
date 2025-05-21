@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.adminActivity.AdminPunchActivity;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
@@ -59,6 +60,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
+        });
+        punchInButton.setOnClickListener(v -> {
+            // Navigate to punch in screen
+            Intent intent = new Intent(AdminDashboardActivity.this, AdminPunchActivity.class);
+            startActivity(intent);
         });
 
 

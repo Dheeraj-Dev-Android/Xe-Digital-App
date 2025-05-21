@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private View loadingOverlay;
     private BioMetric bioMetric;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private boolean isEmployee = true;
+    private final boolean isEmployee = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

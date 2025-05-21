@@ -1,45 +1,45 @@
 <resources>
-    <!--    &lt;!&ndash; Base application theme. &ndash;&gt;-->
-    <!--    <style name="Theme.XEDigital" parent="Theme.MaterialComponents.DayNight.DarkActionBar">-->
-    <!--        &lt;!&ndash; Primary brand color. &ndash;&gt;-->
-    <!--        <item name="colorPrimary">@color/purple_500</item>-->
-    <!--        <item name="colorPrimaryVariant">@color/purple_700</item>-->
-    <!--        <item name="colorOnPrimary">@color/white</item>-->
-    <!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
-    <!--        <item name="colorSecondary">@color/teal_200</item>-->
-    <!--        <item name="colorSecondaryVariant">@color/teal_700</item>-->
-    <!--        <item name="colorOnSecondary">@color/black</item>-->
-    <!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
-    <!--        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>-->
-    <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-    <!--        <item name="fontFamily">@font/quicksand_font_family</item>-->
-    <!--    </style>-->
 
+    <!-- ✅ Main App Theme -->
     <style name="Theme.XEDigital" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary Colors -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Secondary Colors -->
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
         <item name="colorOnSecondary">@color/black</item>
+
+        <!-- System UI Colors -->
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowBackground">@color/background</item>
+
+        <!-- Menu Styling -->
         <item name="subMenuArrow">@drawable/ic_dropdown_adaptive_fore</item>
         <item name="android:groupIndicator">@drawable/ic_dropdown_adaptive_fore</item>
         <item name="android:itemBackground">@color/submenu_background</item>
+
+        <!-- Global Font -->
+        <item name="android:fontFamily">@font/quicksand_font_family</item>
+        <item name="fontFamily">@font/quicksand_font_family</item>
     </style>
 
+    <!-- ✅ No ActionBar Theme -->
     <style name="Theme.XEDigital.NoActionBar">
-
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="fontFamily">@font/quicksand_font_family</item>
     </style>
 
+    <!-- ✅ App Bar Overlay (optional for Toolbars) -->
     <style name="Theme.XEDigital.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+    <!-- ✅ Popup Overlay (used in dialogs/menus) -->
     <style name="Theme.XEDigital.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!-- ✅ Bottom Sheet Dialog Theme -->
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
     </style>
@@ -48,7 +48,7 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-
+    <!-- ✅ Optional Theme Example for Material 3 -->
     <style name="Theme.YourApp" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorPrimaryDark">@color/colorSecondaryDark</item>
