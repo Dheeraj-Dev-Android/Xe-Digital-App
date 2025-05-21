@@ -66,7 +66,9 @@ public class AdminPunchActivity extends AppCompatActivity {
                 cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-                CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
+                CameraSelector cameraSelector = new CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                        .build();
 
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
@@ -119,10 +121,15 @@ public class AdminPunchActivity extends AppCompatActivity {
                 cameraProvider.unbindAll();
             }
 
-            new AlertDialog.Builder(AdminPunchActivity.this).setTitle(title).setMessage(message).setCancelable(false).setPositiveButton("OK", (dialog, which) -> {
-                dialog.dismiss();
-                navigateToDashboard();
-            }).show();
+            new AlertDialog.Builder(AdminPunchActivity.this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        dialog.dismiss();
+                        navigateToDashboard();
+                    })
+                    .show();
         });
     }
 
@@ -136,7 +143,12 @@ public class AdminPunchActivity extends AppCompatActivity {
     private void showPermissionDeniedDialog() {
         if (isFinishing() || isDestroyed()) return;
 
-        new AlertDialog.Builder(this).setTitle("Camera Permission Needed").setMessage("Camera permission is required to use this feature.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).show();
+        new AlertDialog.Builder(this)
+                .setTitle("Camera Permission Needed")
+                .setMessage("Camera permission is required to use this feature.")
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     @Override
