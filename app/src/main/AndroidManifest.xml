@@ -54,6 +54,7 @@
             android:name=".activity.PunchActivity"
             android:exported="true" />
         <!-- Launcher Activity -->
+
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true"
@@ -67,6 +68,21 @@
             android:name=".activity.LoginActivity"
             android:exported="true"
             android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+        <activity
+            android:name=".activity.LoginSelectionActivity"
+            android:enableOnBackInvokedCallback="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+        <activity
+            android:name=".activity.AdminLoginActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+        <activity
+            android:name=".activity.AdminDashboardActivity"
+            android:exported="true"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
         <activity
             android:name=".MainActivity"

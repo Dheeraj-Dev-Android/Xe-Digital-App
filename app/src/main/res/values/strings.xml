@@ -122,6 +122,10 @@
     <string name="xedigital_ai">XeDigital.ai</string>
     <string name="captured">Captured</string>
     <string name="leave_details">Leave Details</string>
+    <string name="admin_email">Admin Email</string>
+    <string name="admin_sign_in">Admin Sign In</string>
+    <string name="consultedge_global">ConsultEdge Global</string>
+    <string name="punch_in">Punch In</string>
 
 
 </resources>

@@ -16,7 +16,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -185,6 +187,20 @@ public class DashboardFragment extends Fragment {
         loader.setVisibility(View.GONE);
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Toast.makeText(requireContext(), "Back pressed! : Logged Out", Toast.LENGTH_SHORT).show();
+                requireActivity().finishAffinity();// Closes all activities and exits app
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+    }
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -251,6 +267,7 @@ public class DashboardFragment extends Fragment {
 
         showLoaderWithBlur();
         startShimmerAnimations();
+
 
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
