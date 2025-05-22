@@ -40,11 +40,11 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final boolean isEmployee = true;
     private ActivityLoginBinding binding;
     private View loadingOverlay;
     private BioMetric bioMetric;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private final boolean isEmployee = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

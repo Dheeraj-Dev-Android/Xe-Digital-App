@@ -201,6 +201,7 @@ public class DashboardFragment extends Fragment {
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
