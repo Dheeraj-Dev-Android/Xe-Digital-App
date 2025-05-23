@@ -125,9 +125,11 @@
     <string name="admin_email">Admin Email</string>
     <string name="admin_sign_in">Admin Sign In</string>
     <string name="consultedge_global">ConsultEdge Global</string>
-    <string name="punch_in">Punch In</string>
+    <string name="punch_in">Check In</string>
     <string name="wait_while_we_are_getting_details">Wait While We are Getting Details...</string>
     <string name="capturing_image">Capturing Image...</string>
+    <string name="manual_check_in">Manual Check In</string>
+    <string name="punch_out">Check Out</string>
 
 
 </resources>

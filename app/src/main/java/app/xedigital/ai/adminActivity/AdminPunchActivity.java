@@ -220,9 +220,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                         bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
 
                         base64Image = convertImageToBase64(bitmap.get());
-//                        if (base64Image.length() >= 10) {
-//                            Log.e("AdminPunchActivity", "Base64 Image: " + base64Image.substring(0, 10) + "...");
-//                        }
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("collection_name", CollectionName);
                         jsonObject.put("image", base64Image);
@@ -335,19 +332,11 @@ public class AdminPunchActivity extends AppCompatActivity {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
 
-                        boolean success = jsonResponse.optBoolean("success", false);
                         int statusCode = jsonResponse.optInt("statusCode", 0);
                         String message = jsonResponse.optString("message", "");
 
-                        // Check if "data" key exists and is not null before proceeding
-//                        if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
-//                            Log.e("AdminPunchActivity", "Face data not found in response.");
-//                            showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
-//                            return;
-//                        }
-
                         // Check for specific message and null data
-                        if ((statusCode == 200) && (("No face found".equalsIgnoreCase(message) || "No data found!!!".equalsIgnoreCase(message))) && jsonResponse.isNull("data")) {
+                        if (jsonResponse.has("data") && jsonResponse.isNull("data")) {
                             Log.d("AdminPunchActivity", "Face not found or data missing, calling Visitor Face API...");
                             callVisitorFace(FaceDetails);
                             return;

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="admin_login_background">#03a9f4</color>
+    <color name="punch_out_background">#FFFFFF</color>
 </resources>
