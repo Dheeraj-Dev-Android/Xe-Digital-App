@@ -438,7 +438,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "Face Detail Error: " + throwable.getMessage(), throwable);
-                showAttendanceFailedAlert("Attendance failed: Network or API error.");
+                showAttendanceFailedAlert("Attendance failed: Network  error.");
             }
         });
     }

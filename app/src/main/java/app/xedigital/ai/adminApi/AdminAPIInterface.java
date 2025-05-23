@@ -1,6 +1,7 @@
 package app.xedigital.ai.adminApi;
 
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
+import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -36,6 +37,12 @@ public interface AdminAPIInterface {
 
     @POST("visitors/face")
     retrofit2.Call<ResponseBody> FaceDetailsVisitor(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket")
+    retrofit2.Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body AddBucketRequest addBucketRequest);
+
+    @POST("otp/tinyurl")
+    retrofit2.Call<ResponseBody> getTinyUrl(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
 
 }
