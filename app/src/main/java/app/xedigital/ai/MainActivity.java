@@ -40,7 +40,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import app.xedigital.ai.activity.LoginActivity;
+import app.xedigital.ai.activity.LoginSelectionActivity;
 import app.xedigital.ai.activity.PunchActivity;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityMainBinding;
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 //        editor.putBoolean("isLoggedIn", false);
         editor.apply();
 
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, LoginSelectionActivity.class);
         startActivity(intent);
         finish();
     }

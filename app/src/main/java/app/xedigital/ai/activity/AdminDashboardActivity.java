@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.adminActivity.AdminCheckOutActivity;
 import app.xedigital.ai.adminActivity.AdminPunchActivity;
 
 public class AdminDashboardActivity extends AppCompatActivity {
@@ -25,6 +26,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private View headerCard;
     private View punchInButton;
     private View logoutButton;
+    private View checkOutButton;
+    private View ManualCheckInButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,11 +41,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
         loadingAnimation = findViewById(R.id.loading_animation);
         headerCard = findViewById(R.id.header_card);
         punchInButton = findViewById(R.id.punch_in_button);
+        ManualCheckInButton = findViewById(R.id.manual_checkIn_button);
+        checkOutButton = findViewById(R.id.punch_out_button);
         logoutButton = findViewById(R.id.logout_button);
 
         // Hide content initially
         headerCard.setVisibility(View.INVISIBLE);
         punchInButton.setVisibility(View.INVISIBLE);
+        ManualCheckInButton.setVisibility(View.INVISIBLE);
+        checkOutButton.setVisibility(View.INVISIBLE);
         logoutButton.setVisibility(View.INVISIBLE);
 
         // Show loading animation
@@ -64,6 +71,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
         punchInButton.setOnClickListener(v -> {
             // Navigate to punch in screen
             Intent intent = new Intent(AdminDashboardActivity.this, AdminPunchActivity.class);
+            startActivity(intent);
+        });
+        checkOutButton.setOnClickListener(v -> {
+            // Navigate to punch in screen
+            Intent intent = new Intent(AdminDashboardActivity.this, AdminCheckOutActivity.class);
             startActivity(intent);
         });
 
@@ -109,7 +121,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void animateButtons() {
-        animateButton(punchInButton, 0);
+        animateButton(checkOutButton, 0);
+        animateButton(punchInButton, 50);
+        animateButton(ManualCheckInButton, 100);
         animateButton(logoutButton, 150);
     }
 

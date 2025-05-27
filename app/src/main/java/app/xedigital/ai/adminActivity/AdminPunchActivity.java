@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.Html;
@@ -82,6 +83,7 @@ import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
+import app.xedigital.ai.model.Admin.visitorFace.VisitorFaceResponse;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -94,8 +96,8 @@ public class AdminPunchActivity extends AppCompatActivity {
     private final Handler handler = new Handler();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION};
+    private final String CollectionName = "cloudfencedemo_wr8c2p";
     private PreviewView previewView;
-    private String CollectionName = "cloudfencedemo_wr8c2p";
     private TextView captureOverlay;
     private ProcessCameraProvider cameraProvider;
     private ImageCapture imageCapture;
@@ -110,6 +112,7 @@ public class AdminPunchActivity extends AppCompatActivity {
     private String base64Image;
     private String faceId, imageId;
     private MaterialCardView progressBar;
+    private CountDownTimer qrCountDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +185,20 @@ public class AdminPunchActivity extends AppCompatActivity {
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
                 cameraProvider.unbindAll();
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
-
+//                try {
+//                    camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+//                    if (camera == null) {
+//                        Log.e("AdminPunchActivity", "Camera is null");
+//                        showRetryAlert();
+//                    } else {
+//                        showCapturingOverlay();
+//                        handler.postDelayed(captureRunnable, 3000);
+//                    }
+//
+//                } catch (IllegalArgumentException e) {
+//                    Log.e("AdminPunchActivity", "Error binding camera: " + e.getMessage(), e);
+//                    showRetryAlert();
+//                }
                 showCapturingOverlay();
                 handler.postDelayed(captureRunnable, 3000);
 
@@ -191,6 +207,18 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
     }
+
+    private void showRetryAlert() {
+        new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
+            dialog.dismiss();
+            startCamera();
+        }).setNegativeButton("Cancel", (dialog, which) -> {
+            dialog.dismiss();
+            setResult(Activity.RESULT_CANCELED);
+            finish();
+        }).show();
+    }
+
 
     private void captureImage() {
         File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + "_photo.jpg");
@@ -209,6 +237,12 @@ public class AdminPunchActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
 
                 String savedImagePath = photoFile.getAbsolutePath();
+                try {
+                    ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(AdminPunchActivity.this).get();
+                    cameraProvider.unbindAll();
+                } catch (ExecutionException | InterruptedException e) {
+                    Log.e("AdminPunchActivity", "Error unbinding camera preview: " + e.getMessage(), e);
+                }
 
                 try {
                     AtomicReference<Bitmap> bitmap;
@@ -227,7 +261,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                         String requestBodyJson = jsonObject.toString();
                         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
 //                   API CALL
-
                         sendToAPI(requestBody);
                     } catch (Exception e) {
                         Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
@@ -286,7 +319,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         } else {
                             Log.e("AdminPunchActivity", "Null or missing 'data' in API response: " + responseBody);
                             Toast.makeText(AdminPunchActivity.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
-//                            handleError("No face found.");
+                            handleError("No face found.");
                         }
                     } catch (JSONException | IOException e) {
                         throw new RuntimeException(e);
@@ -341,7 +374,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                             callVisitorFace(FaceDetails);
                             return;
                         }
-
 
                         // Proceed normally if data exists
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
@@ -442,16 +474,21 @@ public class AdminPunchActivity extends AppCompatActivity {
         Log.d("AdminPunchActivity", "Visitor Face API Called");
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
-        retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetailsVisitor(authToken, requestBodyFacee);
+        retrofit2.Call<VisitorFaceResponse> faceDetails = faceApiService.FaceDetailsVisitor(authToken, requestBodyFacee);
 
-        faceDetails.enqueue(new Callback<ResponseBody>() {
+        faceDetails.enqueue(new Callback<VisitorFaceResponse>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<VisitorFaceResponse> call, @NonNull Response<VisitorFaceResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
-                        String responseBody = response.body().string();
-                        JSONObject jsonResponse = new JSONObject(responseBody);
+                        VisitorFaceResponse responseBody = response.body();
+//                        JSONObject jsonResponse = new JSONObject(String.valueOf(responseBody));
 
+                        // Convert POJO to JSON string
+                        String responseJson = gson.toJson(responseBody);
+
+                        // Parse that string to a JSONObject
+                        JSONObject jsonResponse = new JSONObject(responseJson);
                         // Check if "data" key exists and is not null before proceeding
                         if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
                             Log.e("AdminPunchActivity", "Face data not found in response.");
@@ -461,7 +498,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
 
-                            String responseJson = gson.toJson(responseBody);
+//                            String responseJson = gson.toJson(responseBody);
 //                            matchVisitor();
                             Log.d("AdminPunchActivity", "Face Detail Response Body:\n" + responseJson);
 
@@ -469,7 +506,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         } else {
                             Log.e("AdminPunchActivity", "Face data not found in response.");
                         }
-                    } catch (IOException | JSONException e) {
+                    } catch (JSONException e) {
                         Log.e("AdminPunchActivity", "Error processing face detail response: " + e.getMessage(), e);
                     }
                 } else {
@@ -478,7 +515,7 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+            public void onFailure(@NonNull Call<VisitorFaceResponse> call, @NonNull Throwable throwable) {
                 Log.e("AdminPunchActivity", "Face Detail Error: " + throwable.getMessage(), throwable);
             }
         });
@@ -491,7 +528,7 @@ public class AdminPunchActivity extends AppCompatActivity {
         AddBucketRequest request = new AddBucketRequest(base64Image, "visitors-profile-images", "");
         String authToken = "jwt " + token;
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-        Call<ResponseBody> call = apiService.addBucket(authToken, request);
+        retrofit2.Call<ResponseBody> call = apiService.addBucket(authToken, request);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -522,7 +559,7 @@ public class AdminPunchActivity extends AppCompatActivity {
 
                         // Convert JSON to pretty printed string for better readability
                         String prettyJson = jsonResponse.toString(4); // 4 = number of spaces for indent
-                        showAlert("API Response", prettyJson);
+//                        showAlert("API Response", prettyJson);
 
                     } catch (IOException | JSONException e) {
                         e.printStackTrace();
@@ -562,10 +599,14 @@ public class AdminPunchActivity extends AppCompatActivity {
                             String tinyUrl = jsonObject.optString("data");
 
                             // Optional: Show alert with the URL
-                            showAlert("Short URL", tinyUrl);
+//                            showAlert("Short URL", tinyUrl);
+                            Log.d("QR_DEBUG", "Tiny URL received: " + tinyUrl);
 
                             // Generate QR Code from the URL
-                            generateQRCode(tinyUrl);
+//                            generateQRCode(tinyUrl);
+                            runOnUiThread(() -> {
+                                generateQRCode(tinyUrl);
+                            });
 
                         } else {
                             showAlert("Error", "Invalid response format or data missing.");
@@ -594,11 +635,35 @@ public class AdminPunchActivity extends AppCompatActivity {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bitmap = barcodeEncoder.encodeBitmap(data, BarcodeFormat.QR_CODE, 400, 400);
 
-
             ImageView qrCodeImage = findViewById(R.id.qrCodeImage);
             TextView qrCodeLabel = findViewById(R.id.qrCodeLabel);
             LinearLayout qrLayout = findViewById(R.id.qrLayout);
+            PreviewView previewView = findViewById(R.id.previewView);
+            MaterialCardView loadingPanel = findViewById(R.id.loadingPanel);
+
             qrCodeImage.setImageBitmap(bitmap);
+            qrLayout.setVisibility(View.VISIBLE);
+            previewView.setVisibility(View.GONE);
+            loadingPanel.setVisibility(View.GONE);
+
+            // 🔁 Start countdown from 20 seconds and update label dynamically
+            qrCountDownTimer = new CountDownTimer(30000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    long secondsLeft = millisUntilFinished / 1000;
+                    String countdownText = "Please scan the QR Code from your device for Touch less Check-In.\nThe barcode will be valid for " + secondsLeft + " seconds.";
+                    qrCodeLabel.setText(countdownText);
+                }
+
+                public void onFinish() {
+                    qrLayout.setVisibility(View.GONE);
+
+                    // ✅ Return to previous activity
+                    finish();
+                }
+            };
+
+            qrCountDownTimer.start();
+
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("QR Error", "Failed to generate QR code.");
@@ -881,6 +946,9 @@ public class AdminPunchActivity extends AppCompatActivity {
         // Dismiss the dialog if it's showing
         if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
             attendanceSuccessDialog.dismiss();
+        }
+        if (qrCountDownTimer != null) {
+            qrCountDownTimer.cancel();
         }
     }
 

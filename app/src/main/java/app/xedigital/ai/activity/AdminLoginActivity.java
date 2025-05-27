@@ -18,7 +18,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.Objects;
 
 import app.xedigital.ai.R;
-import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.adminApi.AdminAPIClient;
+import app.xedigital.ai.adminApi.AdminAPIInterface;
+import app.xedigital.ai.model.Admin.UserDetails.Role;
+import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,7 +32,7 @@ public class AdminLoginActivity extends AppCompatActivity {
     private TextInputEditText emailEditText, passwordEditText;
     private MaterialButton loginButton;
     private FrameLayout loadingOverlay;
-    private boolean isEmployee = false;
+    private boolean isEmployee;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,7 @@ public class AdminLoginActivity extends AppCompatActivity {
 
         showLoading(true);
 
-        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password);
+        retrofit2.Call<LoginModelResponse> call = AdminAPIClient.getInstance().getBase2().loginApi1(email, password);
 
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
@@ -78,12 +81,12 @@ public class AdminLoginActivity extends AppCompatActivity {
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
                         String empFirstName = loginResponse.getData().getUser().getFirstname();
+                        GetEmployee(authToken, userId, empEmail, empFirstName);
+//                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, isEmployee);
+//                        startActivity(new Intent(AdminLoginActivity.this, AdminDashboardActivity.class));
 
-                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, isEmployee);
-                        startActivity(new Intent(AdminLoginActivity.this, AdminDashboardActivity.class));
-
-                        Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        finish();
+//                        Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+//                        finish();
                     } else {
                         showAlertDialog(loginResponse.getMessage());
                     }
@@ -99,6 +102,74 @@ public class AdminLoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void GetEmployee(String authToken, String userId, String empEmail, String empFirstName) {
+        String token = "jwt " + authToken;
+        AdminAPIInterface employeeDetails = AdminAPIClient.getInstance().getBase2();
+
+        retrofit2.Call<UserDetailsResponse> employees = employeeDetails.getUser(token, userId);
+
+        employees.enqueue(new Callback<UserDetailsResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserDetailsResponse userDetailResponse = response.body();
+
+                    if (userDetailResponse.isSuccess()) {
+                        Role employeeRole = userDetailResponse.getData().getRole();
+
+                        if (employeeRole != null) {
+                            String roleName = employeeRole.getName();
+
+                            if ("branchadmin".equalsIgnoreCase(roleName) || "humanresource".equalsIgnoreCase(roleName)) {
+                                storeInSharedPreferences(userId, authToken, empEmail, empFirstName, false);
+                                startActivity(new Intent(AdminLoginActivity.this, AdminDashboardActivity.class));
+                                Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                            } else if ("employee".equalsIgnoreCase(roleName)) {
+                                showAlertDialogWithLogout();
+                            } else {
+                                Toast.makeText(AdminLoginActivity.this, "Unrecognized role: " + roleName, Toast.LENGTH_SHORT).show();
+                            }
+
+                        } else {
+                            Toast.makeText(AdminLoginActivity.this, "No role data found", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        Toast.makeText(AdminLoginActivity.this, "Failed to retrieve employee details", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(AdminLoginActivity.this, "Error in employee details response", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable throwable) {
+                Toast.makeText(AdminLoginActivity.this, "Failed to get employee data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void logoutUser() {
+        SharedPreferences preferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
+        startActivity(new Intent(AdminLoginActivity.this, LoginSelectionActivity.class));
+        finish();
+    }
+
+
+    private void showAlertDialogWithLogout() {
+        if (isFinishing() || isDestroyed()) return;
+
+        new AlertDialog.Builder(this).setTitle("Access Denied").setMessage("Please login with Admin or HR credentials, or try employee login.").setCancelable(false).setPositiveButton("OK", (dialog, which) -> {
+            dialog.dismiss();
+            logoutUser();
+        }).show();
+    }
+
 
     private void showAlertDialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

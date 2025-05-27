@@ -27,8 +27,12 @@ import java.util.Objects;
 
 import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.R;
+import app.xedigital.ai.adminApi.AdminAPIClient;
+import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
+import app.xedigital.ai.model.Admin.UserDetails.Role;
+import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.BioMetric;
@@ -40,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final boolean isEmployee = true;
+    private boolean isEmployee;
     private ActivityLoginBinding binding;
     private View loadingOverlay;
     private BioMetric bioMetric;
@@ -54,6 +58,9 @@ public class LoginActivity extends AppCompatActivity {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
+
+        // Retrieve isEmployee from intent
+        isEmployee = getIntent().getBooleanExtra("isEmployee", true);
 
 //        if (isLoggedIn()) {
 //            startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -120,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (userId != null && authToken != null) {
                         showLoading(false);
-                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName);
+                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                         finish();
@@ -224,11 +231,14 @@ public class LoginActivity extends AppCompatActivity {
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
                         String empFirstName = loginResponse.getData().getUser().getFirstname();
+                        isEmployee = true;
 
-                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName);
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        finish();
+                        getUserDetails(userId, authToken, empEmail, empFirstName);
+
+//                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
+//                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+//                        finish();
                     } else {
                         showAlertDialog(loginResponse.getMessage());
                     }
@@ -245,6 +255,72 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void getUserDetails(String userId, String authToken, String empEmail, String empFirstName) {
+        String token = "jwt " + authToken;
+        AdminAPIInterface employeeDetails = AdminAPIClient.getInstance().getBase2();
+
+        retrofit2.Call<UserDetailsResponse> employees = employeeDetails.getUser(token, userId);
+
+        employees.enqueue(new Callback<UserDetailsResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserDetailsResponse userDetailResponse = response.body();
+
+                    if (userDetailResponse.isSuccess()) {
+                        Role employeeRole = userDetailResponse.getData().getRole();
+
+                        if (employeeRole != null) {
+                            String roleName = employeeRole.getName();
+                            Log.e("EMPLOYEE_ROLE", roleName);
+
+                            if ("employee".equalsIgnoreCase(roleName)) {
+                                storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                            } else if ("branchadmin".equalsIgnoreCase(roleName) || "humanresource".equalsIgnoreCase(roleName)) {
+                                showAlertDialogWithLogout();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Unrecognized role: " + roleName, Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(LoginActivity.this, "No role data found", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Failed to retrieve employee details", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error in employee details response", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable throwable) {
+                Toast.makeText(LoginActivity.this, "Failed to get employee data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showAlertDialogWithLogout() {
+        if (isFinishing() || isDestroyed()) return;
+
+        new AlertDialog.Builder(this).setTitle("Access Denied").setMessage("Please login with employee credentials, or try Admin Or HR login.").setCancelable(false).setPositiveButton("OK", (dialog, which) -> {
+            dialog.dismiss();
+            logoutUser();
+        }).show();
+    }
+
+    private void logoutUser() {
+        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
+        startActivity(new Intent(LoginActivity.this, LoginSelectionActivity.class));
+        finish();
+    }
+
+
     private void clearSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -252,16 +328,18 @@ public class LoginActivity extends AppCompatActivity {
         editor.remove("authToken");
         editor.remove("empEmail");
         editor.remove("empFirstName");
+        editor.remove("isLoggedIn");
         editor.apply();
     }
 
-    private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName) {
+    private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName, boolean b) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userId", userId);
         editor.putString("authToken", authToken);
         editor.putString("empEmail", empEmail);
         editor.putString("empFirstName", empFirstName);
+        editor.putBoolean("isLoggedIn", b);
         editor.apply();
     }
 

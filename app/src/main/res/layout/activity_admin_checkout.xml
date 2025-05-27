@@ -21,33 +21,6 @@
         android:clickable="false"
         android:focusable="false" />
 
-    <!-- Center QR and Text -->
-    <LinearLayout
-        android:id="@+id/qrLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/qrCodeImage"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:contentDescription="QR Code Image" />
-
-        <TextView
-            android:id="@+id/qrCodeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="Scan the QR Code"
-            android:textColor="#66FFFD"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
     <!-- Capture Overlay at Bottom Center -->
     <TextView
         android:id="@+id/capture_overlay"
@@ -103,14 +76,4 @@
                 android:textSize="14sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <!-- QR Code Display in Center (initially hidden) -->
-    <!--    <ImageView-->
-    <!--        android:id="@+id/qrCodeImage"-->
-    <!--        android:layout_width="300dp"-->
-    <!--        android:layout_height="300dp"-->
-    <!--        android:layout_gravity="center"-->
-    <!--        android:visibility="gone"-->
-    <!--        android:contentDescription="QR Code Image" />-->
-
 </FrameLayout>
