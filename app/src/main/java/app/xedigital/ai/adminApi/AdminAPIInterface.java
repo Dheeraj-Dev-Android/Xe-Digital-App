@@ -26,7 +26,7 @@ public interface AdminAPIInterface {
     retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
 
     //GET APIs
-    @GET("employees")
+    @GET("employees?active=true")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
 
@@ -59,5 +59,12 @@ public interface AdminAPIInterface {
     @POST("/visitors/signout")
     retrofit2.Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
+    @GET("branches/{companyId}/company")
+    retrofit2.Call<ResponseBody> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
 
+    @POST("face/add")
+    retrofit2.Call<ResponseBody> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("images/add/bucket")
+    retrofit2.Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 }

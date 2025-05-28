@@ -1,3 +1,44 @@
 <resources>
     <dimen name="fab_margin">200dp</dimen>
+
+    <!--    Admin Dashboard-->
+    <!-- Screen dimensions -->
+    <dimen name="min_screen_height">1000dp</dimen>
+    <dimen name="max_content_width">800dp</dimen>
+
+    <!-- Padding and margins -->
+    <dimen name="screen_padding_horizontal">48dp</dimen>
+    <dimen name="screen_padding_vertical">32dp</dimen>
+    <dimen name="content_margin_top">24dp</dimen>
+
+    <!-- Card styling -->
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="card_elevation">8dp</dimen>
+    <dimen name="card_padding_horizontal">48dp</dimen>
+    <dimen name="card_padding_vertical">40dp</dimen>
+
+    <!-- Logo and branding -->
+    <dimen name="logo_size">220dp</dimen>
+    <dimen name="welcome_text_size">32sp</dimen>
+    <dimen name="welcome_text_margin_top">32dp</dimen>
+
+    <!-- Action buttons -->
+    <dimen name="action_button_size">150dp</dimen>
+    <dimen name="action_button_corner_radius">75dp</dimen>
+    <dimen name="action_button_padding">16dp</dimen>
+    <dimen name="action_icon_size">60dp</dimen>
+    <dimen name="action_text_size">14sp</dimen>
+    <dimen name="action_text_margin_top">8dp</dimen>
+    <dimen name="button_spacing">24dp</dimen>
+    <dimen name="buttons_margin_top">40dp</dimen>
+    <dimen name="buttons_margin_bottom">24dp</dimen>
+
+    <!-- Top bar -->
+    <dimen name="logout_icon_size">64dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
+
+    <!-- Loading animation -->
+    <dimen name="progress_bar_size">120dp</dimen>
+    <dimen name="loading_text_size">22sp</dimen>
+    <dimen name="loading_text_margin_top">20dp</dimen>
 </resources>
