@@ -13,8 +13,8 @@ public class EmployeesItem {
     @SerializedName("isVerified")
     private boolean isVerified;
 
-    @SerializedName("shift")
-    private Object shift;
+//	@SerializedName("shift")
+//	private Object shift;
 
     @SerializedName("joiningDate")
     private String joiningDate;
@@ -37,8 +37,8 @@ public class EmployeesItem {
     @SerializedName("company")
     private String company;
 
-    @SerializedName("department")
-    private Object department;
+//	@SerializedName("department")
+//	private Object department;
 
     @SerializedName("profileImageUrl")
     private Object profileImageUrl;
@@ -49,8 +49,8 @@ public class EmployeesItem {
     @SerializedName("updatedAt")
     private String updatedAt;
 
-    @SerializedName("reportingManager")
-    private Object reportingManager;
+//	@SerializedName("reportingManager")
+//	private Object reportingManager;
 
     @SerializedName("level")
     private String level;
@@ -81,6 +81,15 @@ public class EmployeesItem {
 
     @SerializedName("crossmanager")
     private String crossmanager;
+    @SerializedName("department")
+    private Department department;
+
+    @SerializedName("shift")
+    private Shift shift;
+
+    @SerializedName("reportingManager")
+    private ReportingManager reportingManager;
+
 
     public String getJoiningType() {
         return joiningType;
@@ -94,9 +103,9 @@ public class EmployeesItem {
         return isVerified;
     }
 
-    public Object getShift() {
-        return shift;
-    }
+//	public Object getShift(){
+//		return shift;
+//	}
 
     public String getJoiningDate() {
         return joiningDate;
@@ -126,9 +135,9 @@ public class EmployeesItem {
         return company;
     }
 
-    public Object getDepartment() {
-        return department;
-    }
+//	public Object getDepartment(){
+//		return department;
+//	}
 
     public Object getProfileImageUrl() {
         return profileImageUrl;
@@ -142,9 +151,9 @@ public class EmployeesItem {
         return updatedAt;
     }
 
-    public Object getReportingManager() {
-        return reportingManager;
-    }
+//	public Object getReportingManager(){
+//		return reportingManager;
+//	}
 
     public String getLevel() {
         return level;
@@ -185,4 +194,17 @@ public class EmployeesItem {
     public String getCrossmanager() {
         return crossmanager;
     }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public Shift getShift() {
+        return shift;
+    }
+
+    public ReportingManager getReportingManager() {
+        return reportingManager;
+    }
+
 }

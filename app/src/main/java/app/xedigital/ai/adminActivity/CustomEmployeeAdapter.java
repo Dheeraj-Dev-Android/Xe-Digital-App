@@ -19,13 +19,13 @@ public class CustomEmployeeAdapter extends ArrayAdapter<EmployeeDropdownItem> {
 
     private final Context context;
     private final List<EmployeeDropdownItem> originalList;
+    private final List<EmployeeDropdownItem> filteredList;
     private final Set<String> selectedEmployeeIds;
-    private List<EmployeeDropdownItem> filteredList;
 
     public CustomEmployeeAdapter(Context context, List<EmployeeDropdownItem> list, Set<String> selectedIds) {
         super(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(list));
         this.context = context;
-        this.originalList = new ArrayList<>(list);
+        this.originalList = new ArrayList<>(list); // Deep copy
         this.filteredList = new ArrayList<>(list);
         this.selectedEmployeeIds = selectedIds;
     }
@@ -46,7 +46,7 @@ public class CustomEmployeeAdapter extends ArrayAdapter<EmployeeDropdownItem> {
         View view = super.getView(position, convertView, parent);
         TextView textView = (TextView) view;
 
-        EmployeeDropdownItem item = filteredList.get(position);
+        EmployeeDropdownItem item = getItem(position);
         String fullName = item.getFirstName() + " " + item.getLastName();
         textView.setText(fullName);
 
@@ -59,31 +59,29 @@ public class CustomEmployeeAdapter extends ArrayAdapter<EmployeeDropdownItem> {
         return view;
     }
 
-    @NonNull
     @Override
     public Filter getFilter() {
         return new Filter() {
+
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                List<EmployeeDropdownItem> results = new ArrayList<>();
-
+                List<EmployeeDropdownItem> resultsList = new ArrayList<>();
                 if (constraint == null || constraint.length() == 0) {
-                    results.addAll(originalList);
+                    resultsList.addAll(originalList);
                 } else {
                     String filterPattern = constraint.toString().toLowerCase().trim();
-
                     for (EmployeeDropdownItem item : originalList) {
                         String fullName = (item.getFirstName() + " " + item.getLastName()).toLowerCase();
                         if (fullName.contains(filterPattern)) {
-                            results.add(item);
+                            resultsList.add(item);
                         }
                     }
                 }
 
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = results;
-                filterResults.count = results.size();
-                return filterResults;
+                FilterResults results = new FilterResults();
+                results.values = resultsList;
+                results.count = resultsList.size();
+                return results;
             }
 
             @Override

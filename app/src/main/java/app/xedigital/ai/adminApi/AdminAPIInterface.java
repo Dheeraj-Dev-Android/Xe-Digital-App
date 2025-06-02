@@ -1,8 +1,11 @@
 package app.xedigital.ai.adminApi;
 
+import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
+import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
+import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
 import app.xedigital.ai.model.Admin.visitorContact.VisitorContactResponse;
 import app.xedigital.ai.model.Admin.visitorFace.VisitorFaceResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
@@ -60,11 +63,14 @@ public interface AdminAPIInterface {
     retrofit2.Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @GET("branches/{companyId}/company")
-    retrofit2.Call<ResponseBody> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
+    retrofit2.Call<CompanyBranchResponse> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
 
     @POST("face/add")
-    retrofit2.Call<ResponseBody> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+    retrofit2.Call<AddFaceResponse> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @POST("images/add/bucket")
     retrofit2.Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("visitors/manual")
+    retrofit2.Call<ResponseBody> ManualVisitor(@Header("Authorization") String authToken, @Body VisitorManualRequest visitorManualRequest);
 }

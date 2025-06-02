@@ -2,15 +2,20 @@ package app.xedigital.ai.adminActivity;
 
 import androidx.annotation.NonNull;
 
+import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
+
+
 public class EmployeeDropdownItem {
     private final String id;
     private final String firstName;
     private final String lastName;
+    private final EmployeesItem employeeItem; // Full data object
 
-    public EmployeeDropdownItem(String id, String firstName, String lastName) {
+    public EmployeeDropdownItem(String id, String firstName, String lastName, EmployeesItem employeeItem) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName == null ? "" : lastName;
+        this.employeeItem = employeeItem;
     }
 
     public String getId() {
@@ -25,10 +30,13 @@ public class EmployeeDropdownItem {
         return lastName;
     }
 
+    public EmployeesItem getEmployeeItem() {
+        return employeeItem;
+    }
+
     @NonNull
     @Override
     public String toString() {
-        // This string is what the dropdown shows
         return lastName.isEmpty()
                 ? firstName
                 : firstName + " " + lastName;

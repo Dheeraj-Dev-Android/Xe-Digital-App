@@ -262,7 +262,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:hint="Bringing Device?"
+                        android:hint="Bringing Laptop?"
                         app:boxCornerRadiusBottomEnd="8dp"
                         app:boxCornerRadiusBottomStart="8dp"
                         app:boxCornerRadiusTopEnd="8dp"
@@ -279,6 +279,27 @@
                             android:text="Device"
                             android:textSize="16sp" />
 
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <!-- 📌 Serial Number Field (Initially Hidden) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/serialNumberLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="Laptop Serial Number"
+                        android:visibility="gone"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/serialNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>

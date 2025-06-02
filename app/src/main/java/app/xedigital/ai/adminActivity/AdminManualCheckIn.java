@@ -6,17 +6,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
@@ -28,7 +24,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
@@ -44,9 +39,12 @@ import androidx.fragment.app.FragmentManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,20 +53,32 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.adminActivity.VisitorMapper.DepartmentMapper;
+import app.xedigital.ai.adminActivity.VisitorMapper.ReportingManagerMapper;
+import app.xedigital.ai.adminActivity.VisitorMapper.ShiftMapper;
 import app.xedigital.ai.adminApi.AdminAPIClient;
 import app.xedigital.ai.adminApi.AdminAPIInterface;
+import app.xedigital.ai.model.Admin.Branches.BranchesItem;
+import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
+import app.xedigital.ai.model.Admin.VisitorManual.FaceData;
+import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
+import app.xedigital.ai.model.Admin.VisitorManual.WhomToMeetItem;
+import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
+import app.xedigital.ai.model.Admin.addFace.Data;
+import app.xedigital.ai.model.Admin.addFace.Face;
+import app.xedigital.ai.model.Admin.addFace.FaceDetail;
+import app.xedigital.ai.utills.DateTimeUtils;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -82,23 +92,31 @@ public class AdminManualCheckIn extends AppCompatActivity {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String CollectionName = "cloudfencedemo_wr8c2p";
     private final String bucketName = "visitors-profile-images";
+    private final Map<String, EmployeesItem> selectedEmployeeMap = new HashMap<>();
+    private final boolean hasDevice = false;
     private String token, userId;
     private PreviewView previewView;
     private ProcessCameraProvider cameraProvider;
     private ImageCapture imageCapture;
+    private String uploadedImageUrl = null;
+    private String uploadedImageKey = null;
+
     private Camera camera;
     private FragmentManager fragmentManager;
     private ExecutorService cameraExecutor;
     private TextView captureOverlay;
     private String base64Image;
     private String faceId, imageId;
-
+    private String companyI;
+    private String companyName;
     // Form views
     private NestedScrollView formScrollView;
-    private TextInputEditText nameEditText, contactEditText, emailEditText, companyEditText, purposeEditText;
+    private TextInputEditText nameEditText, contactEditText, emailEditText, companyEditText, purposeEditText, serialNumber;
+    private TextInputLayout serialLayout;
     private AutoCompleteTextView deviceAutoComplete;
     private MultiAutoCompleteTextView whomToMeetAutoComplete;
     private MaterialButton nextButton;
+    private String faceDataJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,25 +162,29 @@ public class AdminManualCheckIn extends AppCompatActivity {
         emailEditText = findViewById(R.id.emailEditText);
         companyEditText = findViewById(R.id.companyEditText);
         purposeEditText = findViewById(R.id.purposeEditText);
-//        whomToMeetAutoComplete = findViewById(R.id.whomToMeetAutoComplete);
         whomToMeetAutoComplete = findViewById(R.id.whomToMeetAutoComplete);
-
+        serialNumber = findViewById(R.id.serialNumber);
+        serialLayout = findViewById(R.id.serialNumberLayout);
         deviceAutoComplete = findViewById(R.id.deviceAutoComplete);
         nextButton = findViewById(R.id.nextButton);
     }
 
     private void setupDropdowns() {
-        // Setup "Whom to Meet" dropdown
-//        String[] whomToMeetOptions = {"John Doe", "Jane Smith", "Mike Johnson", "Sarah Wilson", "David Brown"};
-//        ArrayAdapter<String> whomToMeetAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, whomToMeetOptions);
-//        whomToMeetAutoComplete.setAdapter(whomToMeetAdapter);
-//        whomToMeetAutoComplete.setText("");
-
-        // Setup "Device" dropdown
         String[] deviceOptions = {"Yes", "No"};
         ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, deviceOptions);
         deviceAutoComplete.setAdapter(deviceAdapter);
         deviceAutoComplete.setText("");
+
+        deviceAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedOption = (String) parent.getItemAtPosition(position);
+            serialLayout = findViewById(R.id.serialNumberLayout);
+
+            if ("Yes".equalsIgnoreCase(selectedOption)) {
+                serialLayout.setVisibility(View.VISIBLE);
+            } else {
+                serialLayout.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void setupClickListeners() {
@@ -347,41 +369,36 @@ public class AdminManualCheckIn extends AppCompatActivity {
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase1();
         String authToken = "jwt " + token;
 
-        Call<ResponseBody> call = apiService.addFace(authToken, requestBody);
+        Call<AddFaceResponse> call = apiService.addFace(authToken, requestBody);
 
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<AddFaceResponse>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<AddFaceResponse> call, @NonNull Response<AddFaceResponse> response) {
                 hideCapturingOverlay();
+
                 if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        String responseBody = response.body().string();
-                        JSONObject jsonResponse = new JSONObject(responseBody);
-                        if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
-                            JSONObject dataObject = jsonResponse.getJSONObject("data");
+                    AddFaceResponse faceResponse = response.body();
 
-                            if (dataObject.has("Face") && !dataObject.isNull("Face")) {
-                                JSONObject faceObject = dataObject.getJSONObject("Face");
+                    Data data = faceResponse.getData();
+                    if (data != null && data.getFace() != null && data.getFaceDetail() != null) {
 
-                                faceId = faceObject.optString("FaceId", "N/A");
-                                imageId = faceObject.optString("ImageId", "N/A");
+                        Face face = data.getFace();
+                        FaceDetail faceDetail = data.getFaceDetail();
 
+                        faceId = face.getFaceId();
+                        imageId = face.getImageId();
 
-                                // Face recognized successfully, show form
+                        // Convert to JSON
+                        Gson gson = new Gson();
+                        JsonObject combinedData = new JsonObject();
+                        combinedData.add("Face", gson.toJsonTree(face));
+                        combinedData.add("FaceDetail", gson.toJsonTree(faceDetail));
 
-                            } else {
-                                Log.e("AdminManualCheckIn", "'Face' object not found in 'data'");
-                                handleError("Face not recognized. Please try again.");
-                            }
+                        // Store for later use in handleFormSubmission
+                        faceDataJson = gson.toJson(combinedData);
 
-                        } else {
-                            Log.e("AdminManualCheckIn", "Null or missing 'data' in API response: " + responseBody);
-                            Toast.makeText(AdminManualCheckIn.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
-                            handleError("No face found.");
-                        }
-                    } catch (JSONException | IOException e) {
-                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
-                        handleError("Error processing response. Please try again.");
+                    } else {
+                        handleError("Face or face details missing.");
                     }
 
                 } else {
@@ -393,13 +410,13 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+
                     handleError("Server Error: " + response.code() + " - " + response.message());
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<AddFaceResponse> call, @NonNull Throwable t) {
                 hideCapturingOverlay();
                 handleError("Network Error: " + t.getMessage());
             }
@@ -420,7 +437,16 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
-//                        Log.e("AdminManualCheckIn", "Response Body: " + jsonResponse);
+
+                        JSONObject dataObject = jsonResponse.optJSONObject("data");
+                        if (dataObject != null) {
+                            uploadedImageUrl = dataObject.optString("imageUrl", null);
+                            uploadedImageKey = dataObject.optString("imageKey", null);
+                        }
+
+                        if (uploadedImageUrl == null || uploadedImageKey == null) {
+                            Toast.makeText(getApplicationContext(), "Image upload succeeded, but image URL or key is missing.", Toast.LENGTH_LONG).show();
+                        }
 
                     } catch (JSONException | IOException e) {
                         Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
@@ -482,31 +508,35 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void getBranches(String token, String companyId) {
-//        String token1 = "jwt " + token;
-
         AdminAPIInterface getBranches = AdminAPIClient.getInstance().getBase2();
 
-        retrofit2.Call<ResponseBody> branches = getBranches.getBranches(token, companyId);
-        branches.enqueue(new Callback<ResponseBody>() {
+        retrofit2.Call<CompanyBranchResponse> branches = getBranches.getBranches(token, companyId);
+        branches.enqueue(new Callback<CompanyBranchResponse>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<CompanyBranchResponse> call, @NonNull Response<CompanyBranchResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        String responseBody = response.body().string();
-                        JSONObject jsonResponse = new JSONObject(responseBody);
-                        Log.e("AdminManualCheckIn", "Response Body: " + jsonResponse);
-                        fetchEmployees(token);
+                    CompanyBranchResponse companyBranchResponse = response.body();
+                    List<BranchesItem> branches = companyBranchResponse.getData().getBranches();
 
-                    } catch (JSONException | IOException e) {
-                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
-                        handleError("Error processing response. Please try again.");
+                    if (branches != null && !branches.isEmpty()) {
+                        BranchesItem firstBranch = branches.get(0);
+
+                        companyI = firstBranch.getCompany();
+                        companyName = firstBranch.getName();
+
+//                        Log.d("AdminManualCheckIn", "Company ID: " + companyId);
+//                        Log.d("AdminManualCheckIn", "Company Name: " + companyName);
                     }
-                }
 
+                    fetchEmployees(token);
+                } else {
+                    handleError("Failed to get a valid response.");
+                }
             }
 
+
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+            public void onFailure(@NonNull Call<CompanyBranchResponse> call, @NonNull Throwable throwable) {
                 Toast.makeText(AdminManualCheckIn.this, "Failed to get branches: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("AdminManualCheckIn", "Error getting branches: " + throwable.getMessage(), throwable);
                 handleError("Error getting branches: " + throwable.getMessage());
@@ -515,220 +545,66 @@ public class AdminManualCheckIn extends AppCompatActivity {
         });
     }
 
-
-//    private void fetchEmployees(String token) {
-//        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-//
-//        Call<EmployeeDetailResponse> call = apiService.getEmployees(token);
-//        call.enqueue(new Callback<EmployeeDetailResponse>() {
-//            @Override
-//            public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
-//                if (response.isSuccessful() && response.body() != null) {
-//                    List<EmployeesItem> employees = response.body().getData().getEmployees();
-//
-//                    List<EmployeeDropdownItem> employeeDropdownItems = new ArrayList<>();
-//
-//                    for (EmployeesItem employee : employees) {
-//                        employeeDropdownItems.add(new EmployeeDropdownItem(employee.getId(), employee.getFirstname(), employee.getLastname()));
-//                    }
-//
-//                    ArrayAdapter<EmployeeDropdownItem> adapter = new ArrayAdapter<>(AdminManualCheckIn.this, android.R.layout.simple_dropdown_item_1line, employeeDropdownItems);
-//
-//                    whomToMeetAutoComplete.setAdapter(adapter);
-//                    whomToMeetAutoComplete.setText("");
-//                    whomToMeetAutoComplete.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-//
-//                    whomToMeetAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-//                        EmployeeDropdownItem selected = (EmployeeDropdownItem) parent.getItemAtPosition(position);
-//                        String employeeId = selected.getId();
-//                        String employeeName = selected.getFirstName() + " " + selected.getLastName();
-//                        Log.d("EMPLOYEE_SELECTED", "ID: " + employeeId + ", Name: " + employeeName);
-//
-//                    });
-//
-//                } else {
-//                    Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<EmployeeDetailResponse> call, @NonNull Throwable t) {
-//                Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-//
-
-//    private void fetchEmployees(String token) {
-//        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-//
-//        Call<EmployeeDetailResponse> call = apiService.getEmployees(token);
-//        call.enqueue(new Callback<EmployeeDetailResponse>() {
-//            @Override
-//            public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
-//                if (response.isSuccessful() && response.body() != null) {
-//                    List<EmployeesItem> employees = response.body().getData().getEmployees();
-//
-//                    // List for dropdown and Set for tracking selection
-//                    List<EmployeeDropdownItem> employeeDropdownItems = new ArrayList<>();
-//                    Set<String> selectedEmployeeIds = new HashSet<>();
-//
-//                    for (EmployeesItem employee : employees) {
-//                        employeeDropdownItems.add(new EmployeeDropdownItem(
-//                                employee.getId(),
-//                                employee.getFirstname(),
-//                                employee.getLastname()
-//                        ));
-//                    }
-//
-//                    // Custom adapter for colored highlighting
-//                    CustomEmployeeAdapter adapter = new CustomEmployeeAdapter(
-//                            AdminManualCheckIn.this,
-//                            employeeDropdownItems,
-//                            selectedEmployeeIds
-//                    );
-//
-//                    whomToMeetAutoComplete.setAdapter(adapter);
-//                    whomToMeetAutoComplete.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-//                    whomToMeetAutoComplete.setText("");
-//
-//                    whomToMeetAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-//                        EmployeeDropdownItem selected = adapter.getItem(position);
-//                        if (selected == null) return;
-//
-//                        String fullName = selected.getFirstName() + " " + selected.getLastName();
-//
-//                        if (selectedEmployeeIds.contains(selected.getId())) {
-//                            // Unselect
-//                            selectedEmployeeIds.remove(selected.getId());
-//
-//                            String currentText = whomToMeetAutoComplete.getText().toString();
-//                            String updatedText = currentText.replace(fullName + ", ", "")
-//                                    .replace(fullName, "");
-//                            whomToMeetAutoComplete.setText(updatedText.trim());
-//                            whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
-//
-//                        } else {
-//                            // Select
-//                            selectedEmployeeIds.add(selected.getId());
-//
-//                            String currentText = whomToMeetAutoComplete.getText().toString();
-//                            if (!currentText.contains(fullName)) {
-//                                if (!currentText.isEmpty() && !currentText.endsWith(",")) {
-//                                    currentText += ", ";
-//                                }
-//                                whomToMeetAutoComplete.setText(currentText + fullName + ", ");
-//                                whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
-//                            }
-//                        }
-//
-//                        // Refresh dropdown to reflect highlight
-//                        adapter.notifyDataSetChanged();
-//                    });
-//
-//                } else {
-//                    Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<EmployeeDetailResponse> call, @NonNull Throwable t) {
-//                Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-
     private void fetchEmployees(String token) {
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-
         Call<EmployeeDetailResponse> call = apiService.getEmployees(token);
+
         call.enqueue(new Callback<EmployeeDetailResponse>() {
             @Override
             public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<EmployeesItem> employees = response.body().getData().getEmployees();
-
                     List<EmployeeDropdownItem> employeeDropdownItems = new ArrayList<>();
-                    Set<String> selectedEmployeeIds = new HashSet<>();
 
                     for (EmployeesItem employee : employees) {
-                        employeeDropdownItems.add(new EmployeeDropdownItem(
-                                employee.getId(),
-                                employee.getFirstname(),
-                                employee.getLastname()
-                        ));
+                        employeeDropdownItems.add(new EmployeeDropdownItem(employee.getId(), employee.getFirstname(), employee.getLastname(), employee));
                     }
 
-                    ArrayAdapter<EmployeeDropdownItem> adapter = new ArrayAdapter<EmployeeDropdownItem>(AdminManualCheckIn.this,
-                            android.R.layout.simple_dropdown_item_1line, employeeDropdownItems) {
-                        @NonNull
-                        @Override
-                        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                            View view = super.getView(position, convertView, parent);
-                            TextView textView = (TextView) view;
-
-                            EmployeeDropdownItem item = getItem(position);
-                            if (item != null && selectedEmployeeIds.contains(item.getId())) {
-                                textView.setBackgroundColor(Color.parseColor("#C8E6C9")); // Light green
-                            } else {
-                                textView.setBackgroundColor(Color.TRANSPARENT);
-                            }
-                            return view;
-                        }
-                    };
+                    CustomEmployeeAdapter adapter = new CustomEmployeeAdapter(AdminManualCheckIn.this, employeeDropdownItems, selectedEmployeeMap.keySet());
 
                     whomToMeetAutoComplete.setAdapter(adapter);
-                    whomToMeetAutoComplete.setText("");
                     whomToMeetAutoComplete.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+                    whomToMeetAutoComplete.setThreshold(1);
+                    whomToMeetAutoComplete.setText("");
 
-                    // Handle selection and toggling
+                    whomToMeetAutoComplete.setOnClickListener(v -> adapter.getFilter().filter(""));
+                    whomToMeetAutoComplete.setOnFocusChangeListener((v, hasFocus) -> {
+                        if (hasFocus) adapter.getFilter().filter("");
+                    });
+
                     whomToMeetAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-                        EmployeeDropdownItem selected = (EmployeeDropdownItem) parent.getItemAtPosition(position);
-                        String employeeId = selected.getId();
+                        EmployeeDropdownItem selected = adapter.getItem(position);
+                        if (selected == null) return;
+
                         String fullName = selected.getFirstName() + " " + selected.getLastName();
+                        String employeeId = selected.getId();
 
-                        if (selectedEmployeeIds.contains(employeeId)) {
-                            selectedEmployeeIds.remove(employeeId);
-//                            removeNameFromField(fullName);
+                        if (selectedEmployeeMap.containsKey(employeeId)) {
+                            // Unselect
+                            selectedEmployeeMap.remove(employeeId);
+
+                            String currentText = whomToMeetAutoComplete.getText().toString();
+                            String updatedText = currentText.replace(fullName + ", ", "").replace(fullName, "");
+                            whomToMeetAutoComplete.setText(updatedText.trim());
+                            whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
+
                         } else {
-                            selectedEmployeeIds.add(employeeId);
-                        }
+                            // Select
+                            selectedEmployeeMap.put(employeeId, selected.getEmployeeItem());
 
-                        adapter.notifyDataSetChanged(); // Refresh background colors
-                    });
-
-                    // 👇 ADD THIS TEXTWATCHER HERE
-                    whomToMeetAutoComplete.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            // Sync selectedEmployeeIds with actual text field
-                            String[] names = s.toString().split(",");
-                            Set<String> updatedIds = new HashSet<>();
-
-                            for (String name : names) {
-                                name = name.trim();
-                                for (EmployeeDropdownItem item : employeeDropdownItems) {
-                                    String fullName = item.getFirstName() + " " + item.getLastName();
-                                    if (name.equalsIgnoreCase(fullName)) {
-                                        updatedIds.add(item.getId());
-                                        break;
-                                    }
+                            String currentText = whomToMeetAutoComplete.getText().toString();
+                            if (!currentText.contains(fullName)) {
+                                if (!currentText.isEmpty() && !currentText.endsWith(",")) {
+                                    currentText += ", ";
                                 }
+                                whomToMeetAutoComplete.setText(currentText + fullName + ", ");
+                                whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
                             }
-
-                            selectedEmployeeIds.clear();
-                            selectedEmployeeIds.addAll(updatedIds);
-                            adapter.notifyDataSetChanged();
                         }
+
+                        adapter.notifyDataSetChanged();
                     });
+
 
                 } else {
                     Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
@@ -741,25 +617,214 @@ public class AdminManualCheckIn extends AppCompatActivity {
             }
         });
     }
-//    private void removeNameFromField(String fullName) {
-//        String currentText = whomToMeetAutoComplete.getText().toString();
-//        String[] names = currentText.split(",");
-//
-//        StringBuilder newText = new StringBuilder();
-//
-//        for (String name : names) {
-//            name = name.trim();
-//            if (!name.equalsIgnoreCase(fullName) && !name.isEmpty()) {
-//                if (newText.length() > 0) newText.append(", ");
-//                newText.append(name);
-//            }
-//        }
-//
-//        // Set the updated text without the removed name
-//        whomToMeetAutoComplete.setText(newText.toString());
-//        whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length()); // Move cursor to end
-//    }
 
+    private void submitFormData(String name, long contact, String email, String company, String whomToMeetStr, String purpose, boolean hasDevice, String serialNo, List<EmployeesItem> selectedEmployees, String faceDataJson, String imageUrl, String imageKey) {
+
+        nextButton.setEnabled(false);
+        nextButton.setText("SUBMITTING...");
+
+        VisitorManualRequest request = new VisitorManualRequest();
+
+        request.setName(name);
+        request.setContact(contact);
+        request.setEmail(email);
+        request.setCompanyFrom(company);
+        request.setPurposeOfmeeting(purpose);
+        request.setIsLaptop(String.valueOf(hasDevice));
+        request.setSerialNumber(serialNo);
+        request.setSignIn(DateTimeUtils.getCurrentUtcTimestamp());
+
+        // Fill with default/empty values
+        request.setApprovalStatus("");
+        request.setEmpcontact(null);
+        request.setEmpfirstname(null);
+        request.setEmplastname(null);
+        request.setGovernmentIdUploadedImage("");
+        request.setGovernmentIdUploadedImagePath("");
+        request.setItemImageUploadedPath("");
+        request.setItemUploadedImage("");
+        request.setCompany(companyI);
+        request.setCompanyName(companyName);
+        request.setProfileImage(base64Image);
+        request.setProfileImagePath(imageUrl);
+        request.setProfileImageKey(imageKey);
+        request.setSignatureImagePath("");
+        request.setVisitorCategory("");
+        request.setVisitorVisit("");
+
+
+        // ✅ Set list of WhomToMeetItem
+        List<WhomToMeetItem> whomToMeetList = new ArrayList<>();
+        for (EmployeesItem employee : selectedEmployees) {
+            WhomToMeetItem whom = new WhomToMeetItem();
+            whom.setId(employee.getId());
+            whom.setFirstname(employee.getFirstname());
+            whom.setLastname(employee.getLastname());
+            whom.setEmail(employee.getEmail());
+            whom.setContact(employee.getContact());
+            whom.setCompany(employee.getCompany());
+            whom.setDesignation(employee.getDesignation());
+            whom.setEmployeeCode(employee.getEmployeeCode());
+            whom.setJoiningDate(employee.getJoiningDate());
+            whom.setJoiningType(employee.getJoiningType());
+            whom.setIsVerified(employee.isIsVerified());
+            whom.setIsHROrAdmin(employee.isIsHROrAdmin());
+            whom.setProfileImageUrl(employee.getProfileImageUrl());
+            whom.setLevel(employee.getLevel());
+            whom.setActive(employee.isActive());
+            whom.setDateOfBirth(employee.getDateOfBirth());
+            whom.setEmployeeType(employee.getEmployeeType());
+            whom.setGrade(employee.getGrade());
+            whom.setCrossmanager(employee.getCrossmanager());
+            whom.setCreatedAt(employee.getCreatedAt());
+            whom.setUpdatedAt(employee.getUpdatedAt());
+            whom.setV(employee.getV());
+            // Use mappers to convert EmployeeDetails objects to VisitorManual objects
+            whom.setDepartment(DepartmentMapper.mapFromEmployeeDetailsDepartment(employee.getDepartment()));
+            whom.setShift(ShiftMapper.mapFromEmployeeDetailsShift(employee.getShift()));
+            whom.setReportingManager(ReportingManagerMapper.mapFromEmployeeDetailsReportingManager(employee.getReportingManager()));
+            // ✅ Deserialize and assign face data
+            if (faceDataJson != null && !faceDataJson.isEmpty()) {
+                try {
+                    Gson gson = new Gson();
+                    FaceData faceData = gson.fromJson(faceDataJson, FaceData.class);
+                    request.setFaceData(faceData);
+                } catch (JsonSyntaxException e) {
+                    Log.e("AdminManualCheckIn", "Invalid face data JSON: " + e.getMessage());
+                }
+            }
+
+            whomToMeetList.add(whom);
+        }
+
+        request.setWhomToMeet(whomToMeetList);
+
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        String authToken = "jwt " + token;
+
+        Call<ResponseBody> call = apiService.ManualVisitor(authToken, request);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                nextButton.setEnabled(true);
+                nextButton.setText("NEXT");
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(AdminManualCheckIn.this, "Form submitted successfully!", Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    String errorBody = "";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorBody = response.errorBody().string();
+                        }
+                    } catch (IOException e) {
+                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
+                    }
+                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+                    Toast.makeText(AdminManualCheckIn.this, "Failed to submit form. Please try again.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                nextButton.setEnabled(true);
+                nextButton.setText("NEXT");
+                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
+                Toast.makeText(AdminManualCheckIn.this, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+//    private void submitFormData(String name, long contact, String email, String company, String whomToMeetStr, String purpose, boolean hasDevice, String serialNo) {
+//        nextButton.setEnabled(false);
+//        nextButton.setText("SUBMITTING...");
+//
+//        VisitorManualRequest request = new VisitorManualRequest();
+//
+//        // Required basic fields
+//        request.setName(name);
+//        request.setContact(contact);
+//        request.setEmail(email);
+//        request.setCompanyFrom(company);
+//        request.setPurposeOfmeeting(purpose);
+//        request.setIsLaptop(String.valueOf(hasDevice));
+//        request.setSerialNumber(serialNo);
+//        request.setSignIn(DateTimeUtils.getCurrentUtcTimestamp());
+//
+//        request.setApprovalStatus("");
+//        request.setEmpcontact(null);
+//        request.setEmpfirstname(null);
+//        request.setEmplastname(null);
+//        request.setGovernmentIdUploadedImage("");
+//        request.setGovernmentIdUploadedImagePath("");
+//        request.setItemImageUploadedPath("");
+//        request.setItemUploadedImage("");
+//        request.setCompany(companyI);
+//        request.setCompanyName(companyName);
+//        request.setItemUploadedImage("");
+//        request.setItemImageUploadedPath("");
+//        request.setProfileImage(base64Image);
+//        request.setProfileImagePath("");
+//        request.setProfileImageKey("");
+//
+//        request.setSignatureImagePath("");
+//        request.setVisitorCategory("");
+//        request.setVisitorVisit("");
+//
+//
+//        // --- Set FaceData
+//        Face face = new Face();
+//        FaceDetail faceDetail = new FaceDetail();
+//        FaceData faceData = new FaceData();
+//
+//        // --- Set whomToMeet list
+//        List<WhomToMeetItem> whomToMeetList = new ArrayList<>();
+//        WhomToMeetItem whomToMeet = new WhomToMeetItem();
+//        whomToMeetList.add(whomToMeet);
+//        request.setWhomToMeet(whomToMeetList);
+//
+//        // --- Now make the API call
+//        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+//        String authToken = "jwt " + token;
+//
+//        Call<ResponseBody> call = apiService.ManualVisitor(authToken, request);
+//
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+//                nextButton.setEnabled(true);
+//                nextButton.setText("NEXT");
+//
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(AdminManualCheckIn.this, "Form submitted successfully!", Toast.LENGTH_SHORT).show();
+//                    setResult(Activity.RESULT_OK);
+//                    finish();
+//                } else {
+//                    String errorBody = "";
+//                    try {
+//                        if (response.errorBody() != null) {
+//                            errorBody = response.errorBody().string();
+//                        }
+//                    } catch (IOException e) {
+//                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
+//                    }
+//                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+//                    Toast.makeText(AdminManualCheckIn.this, "Failed to submit form. Please try again.", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+//                nextButton.setEnabled(true);
+//                nextButton.setText("NEXT");
+//                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
+//                Toast.makeText(AdminManualCheckIn.this, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 
     private void showForm() {
         try {
@@ -778,41 +843,36 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
     private void handleFormSubmission() {
         if (validateForm()) {
-            // Collect form data
-            String name = Objects.requireNonNull(nameEditText.getText()).toString().trim();
-            String contact = Objects.requireNonNull(contactEditText.getText()).toString().trim();
-            String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
-            String company = Objects.requireNonNull(companyEditText.getText()).toString().trim();
-            String whomToMeet = whomToMeetAutoComplete.getText().toString().trim();
-            String purpose = Objects.requireNonNull(purposeEditText.getText()).toString().trim();
+            String name = nameEditText.getText().toString().trim();
+            String contactStr = contactEditText.getText().toString().trim();
+            String email = emailEditText.getText().toString().trim();
+            String company = companyEditText.getText().toString().trim();
+            String whomToMeetStr = whomToMeetAutoComplete.getText().toString().trim();
+            String purpose = purposeEditText.getText().toString().trim();
             String device = deviceAutoComplete.getText().toString().trim();
+            String serialNo = serialNumber.getText().toString().trim();
 
-            // Create JSON object with form data
+            boolean hasDevice = "Yes".equalsIgnoreCase(device);
+
             try {
-                JSONObject formData = new JSONObject();
-                formData.put("faceId", faceId);
-                formData.put("imageId", imageId);
-                formData.put("name", name);
-                formData.put("contact", contact);
-                formData.put("email", email);
-                formData.put("company", company);
-                formData.put("whomToMeet", whomToMeet);
-                formData.put("purpose", purpose);
-                formData.put("device", device);
-                formData.put("timestamp", System.currentTimeMillis());
+                long contact = Long.parseLong(contactStr);
+                List<EmployeesItem> selectedEmployees = new ArrayList<>(selectedEmployeeMap.values());
+                if (faceDataJson == null || faceDataJson.isEmpty()) {
+                    Toast.makeText(this, "Please capture face data first.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (uploadedImageUrl == null || uploadedImageKey == null) {
+                    Toast.makeText(this, "Please upload image first.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                Log.d("AdminManualCheckIn", "Form Data: " + formData);
-                Toast.makeText(this, "Form Data: " + formData, Toast.LENGTH_SHORT).show();
-
-                // Here you can send this data to your server or handle it as needed
-//                submitFormData(formData);
-
-            } catch (JSONException e) {
-                Log.e("AdminManualCheckIn", "Error creating form JSON: " + e.getMessage(), e);
-                Toast.makeText(this, "Error processing form data", Toast.LENGTH_SHORT).show();
+                submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDevice, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid contact number", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
 
     private boolean validateForm() {
         boolean isValid = true;
@@ -869,57 +929,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
         return isValid;
     }
-
-//    private void submitFormData(JSONObject formData) {
-//        // Show progress or loading indicator
-//        nextButton.setEnabled(false);
-//        nextButton.setText("SUBMITTING...");
-//
-//        // Create request body
-//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), formData.toString());
-//
-//        // Make API call to submit form data
-//        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase1();
-//        String authToken = "jwt " + token;
-//
-//        // Assuming you have an endpoint for submitting visitor data
-//        // Replace this with your actual API endpoint method
-//        Call<ResponseBody> call = apiService.submitVisitorData(authToken, requestBody);
-//
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-//                nextButton.setEnabled(true);
-//                nextButton.setText("NEXT");
-//
-//                if (response.isSuccessful()) {
-//                    Toast.makeText(AdminManualCheckIn.this, "Form submitted successfully!", Toast.LENGTH_SHORT).show();
-//                    // Handle successful submission - maybe go to next activity or finish
-//                    setResult(Activity.RESULT_OK);
-//                    finish();
-//                } else {
-//                    String errorBody = "";
-//                    try {
-//                        if (response.errorBody() != null) {
-//                            errorBody = response.errorBody().string();
-//                        }
-//                    } catch (IOException e) {
-//                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
-//                    }
-//                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
-//                    Toast.makeText(AdminManualCheckIn.this, "Failed to submit form. Please try again.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-//                nextButton.setEnabled(true);
-//                nextButton.setText("NEXT");
-//                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
-//                Toast.makeText(AdminManualCheckIn.this, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

@@ -180,4 +180,10 @@ public class DateTimeUtils {
         String currentDate = getCurrentDateInISOFormat();
         System.out.println(currentDate);
     }
+
+    public static String getCurrentUtcTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
+    }
 }
