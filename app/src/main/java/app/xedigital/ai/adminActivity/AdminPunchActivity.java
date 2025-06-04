@@ -364,9 +364,11 @@ public class AdminPunchActivity extends AppCompatActivity {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
+                        Log.e("AdminPunchActivity", "Face Detail Response Body: " + responseBody);
 
-                        int statusCode = jsonResponse.optInt("statusCode", 0);
-                        String message = jsonResponse.optString("message", "");
+//                        int statusCode = jsonResponse.optInt("statusCode", 0);
+//                        String message = jsonResponse.optString("message", "");
+
 
                         // Check for specific message and null data
                         if (jsonResponse.has("data") && jsonResponse.isNull("data")) {
@@ -390,6 +392,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                             Log.e("AdminPunchActivity", "Face data not found in response.");
                             showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
                         }
+
                     } catch (IOException | JSONException e) {
                         Log.e("AdminPunchActivity", "Error processing face detail response: " + e.getMessage(), e);
                         showAttendanceFailedAlert("Attendance failed: An error occurred.");
@@ -877,13 +880,13 @@ public class AdminPunchActivity extends AppCompatActivity {
 
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
 
     private File getOutputDirectory() {
-        File mediaDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Punch");
+        File mediaDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "AdminPunch");
         if (!mediaDir.exists()) {
             if (!mediaDir.mkdirs()) {
                 Log.e("AdminPunchActivity", "Failed to create directory");

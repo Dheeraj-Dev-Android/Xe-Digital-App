@@ -256,9 +256,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
 
                         String base64Image = convertImageToBase64(bitmap.get());
-                        if (base64Image.length() >= 10) {
-                            Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
-                        }
+//                        if (base64Image.length() >= 10) {
+//                            Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
+//                        }
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("collection_name", CollectionName);
                         jsonObject.put("image", base64Image);
