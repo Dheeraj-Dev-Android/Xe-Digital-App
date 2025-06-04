@@ -764,7 +764,7 @@ public class LeavesFragment extends Fragment {
         String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
         String leaveCategoryTo = binding.spinnerLeaveCategoryTo.getText().toString();
         String leavingStation = binding.spinnerLeavingStation.getText().toString();
-        String leaveStationAddress = binding.etLeaveStationAddress.getText().toString();
+        String leaveStationAddress = Objects.requireNonNull(binding.etLeaveStationAddress.getText()).toString();
 
         if (fromDateText.isEmpty() || toDateText.isEmpty() || leaveType.isEmpty() || leaveCategoryFrom.isEmpty() || leaveCategoryTo.isEmpty() || leavingStation.isEmpty()) {
             showErrorAlert("Please fill in all required fields.");
@@ -774,6 +774,12 @@ public class LeavesFragment extends Fragment {
             showErrorAlert("Please enter your leave station address.");
             return false;
         }
+        String contactNumber = Objects.requireNonNull(binding.etContactNumber.getText()).toString().trim();
+        if (contactNumber.isEmpty()) {
+            showErrorAlert("Please enter a contact number.");
+            return false;
+        }
+
         // Check date range validation
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
