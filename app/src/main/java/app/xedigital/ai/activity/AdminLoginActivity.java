@@ -118,11 +118,15 @@ public class AdminLoginActivity extends AppCompatActivity {
                     if (userDetailResponse.isSuccess()) {
                         Role employeeRole = userDetailResponse.getData().getRole();
 
+                        String currentCompany = userDetailResponse.getData().getCompany().getCollectionName();
+//                        Log.d("Current Company", currentCompany);
+                        getIntent().putExtra("collectionName", userDetailResponse.getData().getCompany().getCollectionName());
+
                         if (employeeRole != null) {
                             String roleName = employeeRole.getName();
 
                             if ("branchadmin".equalsIgnoreCase(roleName) || "humanresource".equalsIgnoreCase(roleName)) {
-                                storeInSharedPreferences(userId, authToken, empEmail, empFirstName, false);
+                                storeInSharedPreferences(userId, authToken, empEmail, empFirstName, currentCompany, false);
                                 startActivity(new Intent(AdminLoginActivity.this, AdminDashboardActivity.class));
                                 Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                             } else if ("employee".equalsIgnoreCase(roleName)) {
@@ -186,7 +190,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         }
     }
 
-    private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName, boolean isEmployee) {
+    private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName, String collectionName, boolean isEmployee) {
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userId", userId);
@@ -194,6 +198,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         editor.putString("empEmail", empEmail);
         editor.putString("empFirstName", empFirstName);
         editor.putBoolean("isEmployee", isEmployee);
+        editor.putString("collectionName", collectionName);
         editor.apply();
     }
 }

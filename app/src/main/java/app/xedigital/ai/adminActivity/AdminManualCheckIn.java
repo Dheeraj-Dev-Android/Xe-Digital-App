@@ -12,11 +12,14 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
@@ -36,6 +40,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -56,6 +61,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
@@ -90,10 +96,10 @@ public class AdminManualCheckIn extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final Handler handler = new Handler();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String CollectionName = "cloudfencedemo_wr8c2p";
     private final String bucketName = "visitors-profile-images";
     private final Map<String, EmployeesItem> selectedEmployeeMap = new HashMap<>();
     private final boolean hasDevice = false;
+    private String CollectionName;
     private String token, userId;
     private PreviewView previewView;
     private ProcessCameraProvider cameraProvider;
@@ -126,6 +132,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
+        CollectionName = sharedPreferences.getString("collectionName", "");
         previewView = findViewById(R.id.previewView);
         captureOverlay = findViewById(R.id.capture_overlay);
 
@@ -227,14 +234,14 @@ public class AdminManualCheckIn extends AppCompatActivity {
                 try {
                     camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                     if (camera == null) {
-                        Log.e("AdminManualCheckIn", "Camera is null");
+//                        Log.e("AdminManualCheckIn", "Camera is null");
                         showRetryAlert();
                     } else {
                         showCapturingOverlay();
                         handler.postDelayed(this::captureImage, 3000);
                     }
                 } catch (IllegalArgumentException e) {
-                    Log.e("AdminManualCheckIn", "Error binding camera: " + e.getMessage(), e);
+//                    Log.e("AdminManualCheckIn", "Error binding camera: " + e.getMessage(), e);
                     showRetryAlert();
                 }
 
@@ -271,7 +278,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
                         bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
 
                         base64Image = convertImageToBase64(bitmap.get());
-                        Log.d("AdminManualCheckIn", "Base64 Image: " + base64Image);
+//                        Log.d("AdminManualCheckIn", "Base64 Image: " + base64Image);
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("collection_name", CollectionName);
                         jsonObject.put("image", base64Image);
@@ -291,18 +298,18 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
                         showForm();
                     } catch (Exception e) {
-                        Log.e("AdminManualCheckIn", "Error processing image: " + e.getMessage(), e);
+//                        Log.e("AdminManualCheckIn", "Error processing image: " + e.getMessage(), e);
                         handleError("Error processing image: " + e.getMessage());
                     }
                 } catch (Exception e) {
-                    Log.e("AdminManualCheckIn", "Error during face detection: " + e.getMessage(), e);
+//                    Log.e("AdminManualCheckIn", "Error during face detection: " + e.getMessage(), e);
                     handleError("Error detecting faces. Please try again.");
                 }
             }
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-                Log.e("AdminManualCheckIn", "Photo capture failed: " + exception.getMessage(), exception);
+//                Log.e("AdminManualCheckIn", "Photo capture failed: " + exception.getMessage(), exception);
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
@@ -334,12 +341,12 @@ public class AdminManualCheckIn extends AppCompatActivity {
 //                            }
 
                         } else {
-                            Log.e("AdminManualCheckIn", "Null or missing 'data' in API response: " + responseBody);
+//                            Log.e("AdminManualCheckIn", "Null or missing 'data' in API response: " + responseBody);
                             Toast.makeText(AdminManualCheckIn.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
                             handleError("No face found.");
                         }
                     } catch (JSONException | IOException e) {
-                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
+//                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
                         handleError("Error processing response. Please try again.");
                     }
 
@@ -352,7 +359,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+//                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     handleError("Server Error: " + response.code() + " - " + response.message());
                 }
             }
@@ -449,7 +456,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
                         }
 
                     } catch (JSONException | IOException e) {
-                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
+//                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
                         handleError("Error processing response. Please try again.");
                     }
 
@@ -462,7 +469,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+//                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     handleError("Server Error: " + response.code() + " - " + response.message());
                 }
             }
@@ -524,8 +531,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
                         companyI = firstBranch.getCompany();
                         companyName = firstBranch.getName();
 
-//                        Log.d("AdminManualCheckIn", "Company ID: " + companyId);
-//                        Log.d("AdminManualCheckIn", "Company Name: " + companyName);
                     }
 
                     fetchEmployees(token);
@@ -538,7 +543,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<CompanyBranchResponse> call, @NonNull Throwable throwable) {
                 Toast.makeText(AdminManualCheckIn.this, "Failed to get branches: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("AdminManualCheckIn", "Error getting branches: " + throwable.getMessage(), throwable);
+//                Log.e("AdminManualCheckIn", "Error getting branches: " + throwable.getMessage(), throwable);
                 handleError("Error getting branches: " + throwable.getMessage());
 
             }
@@ -546,20 +551,26 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void fetchEmployees(String token) {
+//        Log.e("AdminManualCheckIn", "Fetching employees with token: ");
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
         Call<EmployeeDetailResponse> call = apiService.getEmployees(token);
 
         call.enqueue(new Callback<EmployeeDetailResponse>() {
             @Override
             public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess() && response.body().getData() != null && response.body().getData().getEmployees() != null) {
                     List<EmployeesItem> employees = response.body().getData().getEmployees();
+//                    Log.e("API_RESPONSE", "Employees fetched: " + employees);
                     List<EmployeeDropdownItem> employeeDropdownItems = new ArrayList<>();
-
+//                    Log.e("ADAPTER_INPUT", "Size: " + employeeDropdownItems.size());
                     for (EmployeesItem employee : employees) {
                         employeeDropdownItems.add(new EmployeeDropdownItem(employee.getId(), employee.getFirstname(), employee.getLastname(), employee));
                     }
+//                    Log.e("DROPDOWN_ITEMS", "Dropdown items created: " + employeeDropdownItems);
 
+                    for (EmployeeDropdownItem item : employeeDropdownItems) {
+//                        Log.d("ADAPTER_INPUT", "Item: " + item.getFirstName() + " " + item.getLastName());
+                    }
                     CustomEmployeeAdapter adapter = new CustomEmployeeAdapter(AdminManualCheckIn.this, employeeDropdownItems, selectedEmployeeMap.keySet());
 
                     whomToMeetAutoComplete.setAdapter(adapter);
@@ -607,13 +618,17 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
 
                 } else {
+//                    Log.e("API_FAILURE", "statusCode: " + response.code() +
+//                            ", success: " + (response.body() != null ? response.body().isSuccess() : "null") +
+//                            ", message: " + (response.body() != null ? response.body().getMessage() : "null"));
                     Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<EmployeeDetailResponse> call, @NonNull Throwable t) {
-                Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminManualCheckIn.this, "please try again.", Toast.LENGTH_SHORT).show();
+//                Log.e("API_FAILURE", "onFailure: " + t.getMessage());
             }
         });
     }
@@ -675,7 +690,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
             whom.setDateOfBirth(employee.getDateOfBirth());
             whom.setEmployeeType(employee.getEmployeeType());
             whom.setGrade(employee.getGrade());
-            whom.setCrossmanager(employee.getCrossmanager());
+//            whom.setCrossmanager(employee.getCrossmanager());
             whom.setCreatedAt(employee.getCreatedAt());
             whom.setUpdatedAt(employee.getUpdatedAt());
             whom.setV(employee.getV());
@@ -722,7 +737,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+//                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     Toast.makeText(AdminManualCheckIn.this, "Failed to submit form. Please try again.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -731,100 +746,12 @@ public class AdminManualCheckIn extends AppCompatActivity {
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 nextButton.setEnabled(true);
                 nextButton.setText("NEXT");
-                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
+//                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
                 Toast.makeText(AdminManualCheckIn.this, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
-//    private void submitFormData(String name, long contact, String email, String company, String whomToMeetStr, String purpose, boolean hasDevice, String serialNo) {
-//        nextButton.setEnabled(false);
-//        nextButton.setText("SUBMITTING...");
-//
-//        VisitorManualRequest request = new VisitorManualRequest();
-//
-//        // Required basic fields
-//        request.setName(name);
-//        request.setContact(contact);
-//        request.setEmail(email);
-//        request.setCompanyFrom(company);
-//        request.setPurposeOfmeeting(purpose);
-//        request.setIsLaptop(String.valueOf(hasDevice));
-//        request.setSerialNumber(serialNo);
-//        request.setSignIn(DateTimeUtils.getCurrentUtcTimestamp());
-//
-//        request.setApprovalStatus("");
-//        request.setEmpcontact(null);
-//        request.setEmpfirstname(null);
-//        request.setEmplastname(null);
-//        request.setGovernmentIdUploadedImage("");
-//        request.setGovernmentIdUploadedImagePath("");
-//        request.setItemImageUploadedPath("");
-//        request.setItemUploadedImage("");
-//        request.setCompany(companyI);
-//        request.setCompanyName(companyName);
-//        request.setItemUploadedImage("");
-//        request.setItemImageUploadedPath("");
-//        request.setProfileImage(base64Image);
-//        request.setProfileImagePath("");
-//        request.setProfileImageKey("");
-//
-//        request.setSignatureImagePath("");
-//        request.setVisitorCategory("");
-//        request.setVisitorVisit("");
-//
-//
-//        // --- Set FaceData
-//        Face face = new Face();
-//        FaceDetail faceDetail = new FaceDetail();
-//        FaceData faceData = new FaceData();
-//
-//        // --- Set whomToMeet list
-//        List<WhomToMeetItem> whomToMeetList = new ArrayList<>();
-//        WhomToMeetItem whomToMeet = new WhomToMeetItem();
-//        whomToMeetList.add(whomToMeet);
-//        request.setWhomToMeet(whomToMeetList);
-//
-//        // --- Now make the API call
-//        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-//        String authToken = "jwt " + token;
-//
-//        Call<ResponseBody> call = apiService.ManualVisitor(authToken, request);
-//
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-//                nextButton.setEnabled(true);
-//                nextButton.setText("NEXT");
-//
-//                if (response.isSuccessful()) {
-//                    Toast.makeText(AdminManualCheckIn.this, "Form submitted successfully!", Toast.LENGTH_SHORT).show();
-//                    setResult(Activity.RESULT_OK);
-//                    finish();
-//                } else {
-//                    String errorBody = "";
-//                    try {
-//                        if (response.errorBody() != null) {
-//                            errorBody = response.errorBody().string();
-//                        }
-//                    } catch (IOException e) {
-//                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
-//                    }
-//                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
-//                    Toast.makeText(AdminManualCheckIn.this, "Failed to submit form. Please try again.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-//                nextButton.setEnabled(true);
-//                nextButton.setText("NEXT");
-//                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
-//                Toast.makeText(AdminManualCheckIn.this, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 
     private void showForm() {
         try {
@@ -843,14 +770,14 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
     private void handleFormSubmission() {
         if (validateForm()) {
-            String name = nameEditText.getText().toString().trim();
-            String contactStr = contactEditText.getText().toString().trim();
-            String email = emailEditText.getText().toString().trim();
-            String company = companyEditText.getText().toString().trim();
+            String name = Objects.requireNonNull(nameEditText.getText()).toString().trim();
+            String contactStr = Objects.requireNonNull(contactEditText.getText()).toString().trim();
+            String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
+            String company = Objects.requireNonNull(companyEditText.getText()).toString().trim();
             String whomToMeetStr = whomToMeetAutoComplete.getText().toString().trim();
-            String purpose = purposeEditText.getText().toString().trim();
+            String purpose = Objects.requireNonNull(purposeEditText.getText()).toString().trim();
             String device = deviceAutoComplete.getText().toString().trim();
-            String serialNo = serialNumber.getText().toString().trim();
+            String serialNo = Objects.requireNonNull(serialNumber.getText()).toString().trim();
 
             boolean hasDevice = "Yes".equalsIgnoreCase(device);
 
@@ -865,12 +792,40 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     Toast.makeText(this, "Please upload image first.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDevice, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
+                // ✅ Show confirm dialog before submitting
+                showConfirmationDialog(() -> {
+                    submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDevice, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
+                });
+//                submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDevice, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Invalid contact number", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void showConfirmationDialog(Runnable onConfirm) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.confirm_manual_dailog_layout, null);
+        builder.setView(dialogView);
+
+        ImageView imageView = dialogView.findViewById(R.id.imageView);
+        Button confirmButton = dialogView.findViewById(R.id.confirmButton);
+
+        // ✅ Load image from uploadedImageUrl
+        Glide.with(this).load(uploadedImageUrl)
+//                .placeholder(R.drawable.placeholder) // optional placeholder
+//                .error(R.drawable.image_error)       // optional error fallback
+                .into(imageView);
+
+        AlertDialog dialog = builder.create();
+
+        confirmButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            onConfirm.run(); // call your submitFormData
+        });
+
+        dialog.show();
     }
 
 

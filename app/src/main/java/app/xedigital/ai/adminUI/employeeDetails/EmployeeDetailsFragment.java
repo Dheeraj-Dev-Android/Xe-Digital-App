@@ -96,11 +96,8 @@ public class EmployeeDetailsFragment extends Fragment {
     }
 
     private void visitorsCategories(String token) {
-//        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
-//        String token = sharedPreferences.getString("authToken", null);
-
         if (token == null) {
-            Toast.makeText(getContext(), "Token not found", Toast.LENGTH_SHORT).show();
+            Log.e("Token", "Token not found");
             return;
         }
 
@@ -116,7 +113,6 @@ public class EmployeeDetailsFragment extends Fragment {
 
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         String json = gson.toJson(response.body());
-                        Log.e("Visitors Categories", json);
                         Toast.makeText(getContext(), "Visitors Categories API Response: " + json, LENGTH_SHORT).show();
 
                     } catch (JsonSyntaxException e) {

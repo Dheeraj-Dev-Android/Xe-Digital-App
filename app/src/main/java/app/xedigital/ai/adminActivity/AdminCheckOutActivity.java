@@ -75,7 +75,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     private final Handler handler = new Handler();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-    private final String CollectionName = "cloudfencedemo_wr8c2p";
+    private String CollectionName;
     private PreviewView previewView;
     private TextView captureOverlay;
     private ProcessCameraProvider cameraProvider;
@@ -96,6 +96,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_checkout);
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", "");
+        CollectionName = sharedPreferences.getString("collectionName", "");
         previewView = findViewById(R.id.previewView);
         captureOverlay = findViewById(R.id.capture_overlay);
         progressBar = findViewById(R.id.loadingPanel);
@@ -155,14 +156,14 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                 try {
                     camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                     if (camera == null) {
-                        Log.e("AdminCheckOutActivity", "Camera is null");
+//                        Log.e("AdminCheckOutActivity", "Camera is null");
                         showRetryAlert();
                     } else {
                         showCapturingOverlay();
                         handler.postDelayed(this::captureImage, 3000);
                     }
                 } catch (IllegalArgumentException e) {
-                    Log.e("AdminCheckOutActivity", "Error binding camera: " + e.getMessage(), e);
+//                    Log.e("AdminCheckOutActivity", "Error binding camera: " + e.getMessage(), e);
                     showRetryAlert();
                 }
 
@@ -214,11 +215,11 @@ public class AdminCheckOutActivity extends AppCompatActivity {
 //                   API CALL
                         sendToAPI(requestBody);
                     } catch (Exception e) {
-                        Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
+//                        Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
                         handleError("Error processing image: " + e.getMessage());
                     }
                 } catch (Exception e) {
-                    Log.e("AdminPunchActivity", "Error during face detection: " + e.getMessage(), e);
+//                    Log.e("AdminPunchActivity", "Error during face detection: " + e.getMessage(), e);
                     handleError("Error detecting faces. Please try again.");
                     progressBar.setVisibility(View.GONE);
                 }
@@ -226,7 +227,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-                Log.e("AdminCheckOutActivity", "Photo capture failed: " + exception.getMessage(), exception);
+//                Log.e("AdminCheckOutActivity", "Photo capture failed: " + exception.getMessage(), exception);
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
@@ -303,7 +304,8 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                                 faceId = faceObject.optString("FaceId", "N/A");
                                 imageId = faceObject.optString("ImageId", "N/A");
                             } else {
-                                Log.e("AdminCheckOutActivity", "'Face' object not found in 'data'");
+//                                Log.e("AdminCheckOutActivity", "'Face' object not found in 'data'");
+                                handleError("No face found. Retry ");
                             }
 
                             String requestBodyFace = dataObject.toString();
@@ -327,7 +329,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminCheckOutActivity", "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e("AdminCheckOutActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+//                    Log.e("AdminCheckOutActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
             }
@@ -381,7 +383,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     VisitorContactResponse responseBody = response.body();
-                    Log.d("AdminCheckOutActivity", "Response Body: " + responseBody);
+//                    Log.d("AdminCheckOutActivity", "Response Body: " + responseBody);
                     String contact = responseBody.getData().getVisitor().getContact();
                     String company = responseBody.getData().getVisitor().getCompany();
                     String signOut = getCurrentUtcTimestamp();

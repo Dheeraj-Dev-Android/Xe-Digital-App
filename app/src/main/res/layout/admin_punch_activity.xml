@@ -17,7 +17,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/glow_border"
         android:clickable="false"
         android:focusable="false" />
 
@@ -45,7 +44,7 @@
             android:gravity="center"
             android:text="Scan the QR Code"
             android:textColor="#66FFFD"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
     </LinearLayout>
     <!-- Capture Overlay at Bottom Center -->
@@ -57,7 +56,7 @@
         android:layout_marginBottom="32dp"
         android:text="@string/capturing_image"
         android:textColor="#66FFFD"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:visibility="gone" />
 

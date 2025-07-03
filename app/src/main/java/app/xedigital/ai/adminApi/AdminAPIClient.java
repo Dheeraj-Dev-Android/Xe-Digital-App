@@ -1,7 +1,12 @@
 package app.xedigital.ai.adminApi;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.concurrent.TimeUnit;
 
+import app.xedigital.ai.model.Admin.EmployeeDetails.Crossmanager;
+import app.xedigital.ai.model.Admin.EmployeeDetails.CrossmanagerDeserializer;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -21,6 +26,10 @@ public class AdminAPIClient {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Crossmanager.class, new CrossmanagerDeserializer())
+                .create();
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor) // Uncomment for logging
                 .retryOnConnectionFailure(true)
@@ -31,13 +40,13 @@ public class AdminAPIClient {
 
         retrofit1 = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
                 .build();
 
         retrofit2 = new Retrofit.Builder()
                 .baseUrl(BASE_URL_2)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
                 .build();
     }

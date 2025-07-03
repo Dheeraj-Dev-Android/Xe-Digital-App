@@ -96,8 +96,8 @@ public class AdminPunchActivity extends AppCompatActivity {
     private final Handler handler = new Handler();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION};
-    private final String CollectionName = "cloudfencedemo_wr8c2p";
     private PreviewView previewView;
+    private String CollectionName;
     private TextView captureOverlay;
     private ProcessCameraProvider cameraProvider;
     private ImageCapture imageCapture;
@@ -120,6 +120,7 @@ public class AdminPunchActivity extends AppCompatActivity {
         setContentView(R.layout.admin_punch_activity);
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", "");
+        CollectionName = sharedPreferences.getString("collectionName", "");
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         previewView = findViewById(R.id.previewView);
@@ -263,11 +264,11 @@ public class AdminPunchActivity extends AppCompatActivity {
 //                   API CALL
                         sendToAPI(requestBody);
                     } catch (Exception e) {
-                        Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
+//                        Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
                         handleError("Error processing image: " + e.getMessage());
                     }
                 } catch (Exception e) {
-                    Log.e("AdminPunchActivity", "Error during face detection: " + e.getMessage(), e);
+//                    Log.e("AdminPunchActivity", "Error during face detection: " + e.getMessage(), e);
                     handleError("Error detecting faces. Please try again.");
                     progressBar.setVisibility(View.GONE);
                 }
@@ -275,7 +276,7 @@ public class AdminPunchActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-                Log.e("AdminPunchActivity", "Photo capture failed: " + exception.getMessage(), exception);
+//                Log.e("AdminPunchActivity", "Photo capture failed: " + exception.getMessage(), exception);
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
@@ -295,7 +296,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                     try {
                         String responseBody = response.body().string();
                         String responseJson = gson.toJson(responseBody);
-                        Log.d("AdminPunchActivity", "Recognize Response Body:\n " + responseJson);
                         JSONObject jsonResponse = new JSONObject(responseBody);
                         // Check if "data" exists and is not null
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
@@ -317,7 +317,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                             // API CALL
                             callFaceDetailApi(FaceDetails);
                         } else {
-                            Log.e("AdminPunchActivity", "Null or missing 'data' in API response: " + responseBody);
+//                            Log.e("AdminPunchActivity", "Null or missing 'data' in API response: " + responseBody);
                             Toast.makeText(AdminPunchActivity.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
                             handleError("No face found.");
                         }
@@ -335,7 +335,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminPunchActivity", "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e("AdminPunchActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+//                    Log.e("AdminPunchActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     // Handle the error based on the response code and error body
                     handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
@@ -352,7 +352,7 @@ public class AdminPunchActivity extends AppCompatActivity {
     }
 
     private void callFaceDetailApi(RequestBody FaceDetails) {
-        Log.d("AdminPunchActivity", "Face Detail API Called");
+//        Log.d("AdminPunchActivity", "Face Detail API Called");
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetails(authToken, FaceDetails);
@@ -364,15 +364,13 @@ public class AdminPunchActivity extends AppCompatActivity {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
-                        Log.e("AdminPunchActivity", "Face Detail Response Body: " + responseBody);
-
+                        Log.e("Face Response", "Face Detail Response Body:" + responseBody);
 //                        int statusCode = jsonResponse.optInt("statusCode", 0);
 //                        String message = jsonResponse.optString("message", "");
 
-
                         // Check for specific message and null data
                         if (jsonResponse.has("data") && jsonResponse.isNull("data")) {
-                            Log.d("AdminPunchActivity", "Face not found or data missing, calling Visitor Face API...");
+                            Log.e("AdminPunchActivity", "Face not found or data missing, calling Visitor Face API...");
                             callVisitorFace(FaceDetails);
                             return;
                         }
@@ -380,32 +378,33 @@ public class AdminPunchActivity extends AppCompatActivity {
                         // Proceed normally if data exists
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
+                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject.toString());
                             JSONObject employeeObject = dataObject.getJSONObject("employee");
                             String id = employeeObject.getString("_id");
                             String firstName = employeeObject.getString("firstname");
-                            if (id != null) {
+                            if (id != null && firstName != null) {
                                 callAttendanceApi(id, firstName);
                             } else {
                                 showAttendanceFailedAlert("Attendance failed: User not Found.");
                             }
                         } else {
-                            Log.e("AdminPunchActivity", "Face data not found in response.");
+//                            Log.e("AdminPunchActivity", "Face data not found in response.");
                             showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
                         }
 
                     } catch (IOException | JSONException e) {
-                        Log.e("AdminPunchActivity", "Error processing face detail response: " + e.getMessage(), e);
+//                        Log.e("AdminPunchActivity", "Error processing face detail response: " + e.getMessage(), e);
                         showAttendanceFailedAlert("Attendance failed: An error occurred.");
                     }
                 } else {
-                    Log.e("AdminPunchActivity", "Face Detail Response Error: " + response.code() + " - " + response.message());
+//                    Log.e("AdminPunchActivity", "Face Detail Response Error: " + response.code() + " - " + response.message());
                     showAttendanceFailedAlert("Error processing face detail");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Log.e("AdminPunchActivity", "Face Detail Error: " + throwable.getMessage(), throwable);
+//                Log.e("AdminPunchActivity", "Face Detail Error: " + throwable.getMessage(), throwable);
                 showAttendanceFailedAlert("Error processing face detail.");
             }
         });
@@ -413,7 +412,6 @@ public class AdminPunchActivity extends AppCompatActivity {
 
     private void callAttendanceApi(String employeeId, String employeeName) {
         if (employeeId != null && !employeeId.isEmpty()) {
-            Log.d("AdminPunchActivity", "Attendance API Called");
 
             getCurrentLocation(address -> {
                 currentAddress = address;
@@ -440,15 +438,12 @@ public class AdminPunchActivity extends AppCompatActivity {
                                     String responseBody = response.body().string();
                                     JSONObject responseJson = new JSONObject(responseBody);
                                     String message = responseJson.getString("message");
-                                    Log.d("AdminPunchActivity", "Attendance Response Message: " + message);
                                     showAttendanceSuccessAlert(responseBody);
                                     progressBar.setVisibility(View.GONE);
 
                                     String responseJsonn = gson.toJson(responseBody);
-                                    Log.d("AdminPunchActivity", "Attendance Response Body:\n" + responseJsonn);
                                 } catch (IOException | JSONException e) {
                                     progressBar.setVisibility(View.GONE);
-                                    Log.e("AdminPunchActivity", "Error reading response body: " + e.getMessage(), e);
                                     throw new RuntimeException(e);
                                 }
                             }
@@ -456,25 +451,21 @@ public class AdminPunchActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                            Log.e("AdminPunchActivity", "Attendance Error: " + throwable.getMessage(), throwable);
                             progressBar.setVisibility(View.GONE);
                             throw new RuntimeException(throwable);
                         }
                     });
                 } catch (JSONException e) {
-                    Log.e("AdminPunchActivity", "Error creating request body: " + e.getMessage(), e);
                     progressBar.setVisibility(View.GONE);
                     throw new RuntimeException(e);
                 }
             });
         } else {
-            Log.e("AdminPunchActivity", "User Id Mismatch");
             showAttendanceFailedAlert("Attendance failed: User not found.");
         }
     }
 
     private void callVisitorFace(RequestBody requestBodyFacee) {
-        Log.d("AdminPunchActivity", "Visitor Face API Called");
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         retrofit2.Call<VisitorFaceResponse> faceDetails = faceApiService.FaceDetailsVisitor(authToken, requestBodyFacee);
@@ -487,7 +478,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                         VisitorFaceResponse responseBody = response.body();
 //                        JSONObject jsonResponse = new JSONObject(String.valueOf(responseBody));
 
-                        // Convert POJO to JSON string
                         String responseJson = gson.toJson(responseBody);
 
                         // Parse that string to a JSONObject
@@ -500,11 +490,15 @@ public class AdminPunchActivity extends AppCompatActivity {
                         }
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
+                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject.toString());
+                            JSONObject employeeObject = dataObject.getJSONObject("employee");
+                            String id = employeeObject.getString("_id");
+                            String firstName = employeeObject.getString("firstname");
+                            Log.e("AdminPunchActivity", "Face data found in response: " + id + " " + firstName);
+
 
 //                            String responseJson = gson.toJson(responseBody);
 //                            matchVisitor();
-                            Log.d("AdminPunchActivity", "Face Detail Response Body:\n" + responseJson);
-
 
                         } else {
                             Log.e("AdminPunchActivity", "Face data not found in response.");
@@ -526,8 +520,6 @@ public class AdminPunchActivity extends AppCompatActivity {
     }
 
     private void addBucket(String base64Image) {
-        Log.d("AdminPunchActivity", "Calling Add Bucket API");
-
         AddBucketRequest request = new AddBucketRequest(base64Image, "visitors-profile-images", "");
         String authToken = "jwt " + token;
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
@@ -568,8 +560,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                         e.printStackTrace();
                         showAlert("Error", "Failed to parse response.");
                     }
-
-                    Log.d("AdminPunchActivity", "Add Bucket API Success");
                 } else {
                     Log.e("AdminPunchActivity", "Add Bucket API Failed: " + response.code() + " - " + response.message());
                 }
@@ -603,10 +593,8 @@ public class AdminPunchActivity extends AppCompatActivity {
 
                             // Optional: Show alert with the URL
 //                            showAlert("Short URL", tinyUrl);
-                            Log.d("QR_DEBUG", "Tiny URL received: " + tinyUrl);
 
                             // Generate QR Code from the URL
-//                            generateQRCode(tinyUrl);
                             runOnUiThread(() -> {
                                 generateQRCode(tinyUrl);
                             });
@@ -722,7 +710,7 @@ public class AdminPunchActivity extends AppCompatActivity {
             String message = responseJson.getString("message");
             if (success) {
                 JSONObject data = responseJson.getJSONObject("data");
-                Log.d("AdminPunchActivity", "Attendance Data: " + data);
+//                Log.d("AdminPunchActivity", "Attendance Data: " + data);
                 String punchInAddress = data.getString("punchInAddress");
                 String punchOutAddress = data.getString("punchOutAddress");
 
@@ -763,7 +751,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                 });
             }
         } catch (JSONException e) {
-            Log.e("AdminPunchActivity", "Error parsing JSON response", e);
             throw new RuntimeException(e);
         }
     }
@@ -800,9 +787,9 @@ public class AdminPunchActivity extends AppCompatActivity {
                     Location location = locationResult.getLastLocation();
                     if (location != null) {
                         getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
-                        Log.d("AdminPunchActivity", "Location: " + location.getLatitude() + ", " + location.getLongitude());
+//                        Log.d("AdminPunchActivity", "Location: " + location.getLatitude() + ", " + location.getLongitude());
                     } else {
-                        Log.e("AdminPunchActivity", "Location is null in onLocationResult");
+//                        Log.e("AdminPunchActivity", "Location is null in onLocationResult");
                         callback.onAddressReceived("Location not found");
                     }
                 }
@@ -820,7 +807,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                     finish();
                 }).show();
             } else {
-                Log.e("AdminPunchActivity", "Location permission not granted");
+//                Log.e("AdminPunchActivity", "Location permission not granted");
                 callback.onAddressReceived("Location not found");
             }
         }
@@ -841,7 +828,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         break; // Exit the loop if an address is found
                     }
                 } catch (IOException e) {
-                    Log.e("AdminPunchActivity", "Error getting address:", e);
+//                    Log.e("AdminPunchActivity", "Error getting address:", e);
                     retryCount++;
                     try {
                         Thread.sleep((long) (Math.pow(2, retryCount) * 1000));
@@ -861,7 +848,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                 addressResult = completeAddress.toString();
             } else {
                 addressResult = "Location not found";
-                Log.e("AdminPunchActivity", "No address found for location or max retries reached");
+//                Log.e("AdminPunchActivity", "No address found for location or max retries reached");
                 Toast.makeText(AdminPunchActivity.this, "No address found for location", Toast.LENGTH_SHORT).show();
             }
 
@@ -960,18 +947,5 @@ public class AdminPunchActivity extends AppCompatActivity {
     }
 
     private final Runnable captureRunnable = this::captureImage;
-
-
-//    private void showPermissionDeniedDialog() {
-//        if (isFinishing() || isDestroyed()) return;
-//        new AlertDialog.Builder(this).setTitle("Camera Permission Needed").setMessage("Camera permission is required to use this feature.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).show();
-//    }
-
-
-//    private final ActivityResultLauncher<String> cameraPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-//        if (isGranted) startCamera();
-//        else showPermissionDeniedDialog();
-//    });
-
 
 }

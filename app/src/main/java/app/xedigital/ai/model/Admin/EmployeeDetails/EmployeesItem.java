@@ -2,10 +2,18 @@ package app.xedigital.ai.model.Admin.EmployeeDetails;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class EmployeesItem {
 
     @SerializedName("joiningType")
     private String joiningType;
+
+    @SerializedName("fatherName")
+    private String fatherName;
+
+    @SerializedName("components")
+    private List<ComponentsItem> components;
 
     @SerializedName("firstname")
     private String firstname;
@@ -13,8 +21,14 @@ public class EmployeesItem {
     @SerializedName("isVerified")
     private boolean isVerified;
 
-//	@SerializedName("shift")
-//	private Object shift;
+    @SerializedName("addpayroll")
+    private Object addpayroll;
+
+    @SerializedName("totalMonthlySalary")
+    private Object totalMonthlySalary;
+
+    @SerializedName("shift")
+    private Shift shift;
 
     @SerializedName("joiningDate")
     private String joiningDate;
@@ -25,6 +39,9 @@ public class EmployeesItem {
     @SerializedName("createdAt")
     private String createdAt;
 
+    @SerializedName("ctc")
+    private int ctc;
+
     @SerializedName("contact")
     private String contact;
 
@@ -34,11 +51,17 @@ public class EmployeesItem {
     @SerializedName("isHROrAdmin")
     private boolean isHROrAdmin;
 
+    @SerializedName("epf")
+    private boolean epf;
+
     @SerializedName("company")
     private String company;
 
-//	@SerializedName("department")
-//	private Object department;
+    @SerializedName("state")
+    private String state;
+
+    @SerializedName("department")
+    private Department department;
 
     @SerializedName("profileImageUrl")
     private Object profileImageUrl;
@@ -49,11 +72,29 @@ public class EmployeesItem {
     @SerializedName("updatedAt")
     private String updatedAt;
 
-//	@SerializedName("reportingManager")
-//	private Object reportingManager;
+    @SerializedName("pincode")
+    private String pincode;
+
+    @SerializedName("reportingManager")
+    private ReportingManager reportingManager;
+
+    @SerializedName("totalYearlySalary")
+    private Object totalYearlySalary;
+
+    @SerializedName("address")
+    private String address;
 
     @SerializedName("level")
     private String level;
+
+    @SerializedName("differentlyAbled")
+    private String differentlyAbled;
+
+    @SerializedName("pfAccountNo")
+    private String pfAccountNo;
+
+    @SerializedName("panNo")
+    private String panNo;
 
     @SerializedName("active")
     private boolean active;
@@ -73,6 +114,9 @@ public class EmployeesItem {
     @SerializedName("grade")
     private String grade;
 
+    @SerializedName("esi")
+    private boolean esi;
+
     @SerializedName("designation")
     private String designation;
 
@@ -80,19 +124,24 @@ public class EmployeesItem {
     private String id;
 
     @SerializedName("crossmanager")
-    private String crossmanager;
-    @SerializedName("department")
-    private Department department;
+    private Crossmanager crossmanager;
 
-    @SerializedName("shift")
-    private Shift shift;
+    @SerializedName("uanno")
+    private String uanno;
 
-    @SerializedName("reportingManager")
-    private ReportingManager reportingManager;
-
+    @SerializedName("adharNo")
+    private String adharNo;
 
     public String getJoiningType() {
         return joiningType;
+    }
+
+    public String getFatherName() {
+        return fatherName;
+    }
+
+    public List<ComponentsItem> getComponents() {
+        return components;
     }
 
     public String getFirstname() {
@@ -103,9 +152,17 @@ public class EmployeesItem {
         return isVerified;
     }
 
-//	public Object getShift(){
-//		return shift;
-//	}
+    public Object getAddpayroll() {
+        return addpayroll;
+    }
+
+    public Object getTotalMonthlySalary() {
+        return totalMonthlySalary;
+    }
+
+    public Shift getShift() {
+        return shift;
+    }
 
     public String getJoiningDate() {
         return joiningDate;
@@ -117,6 +174,10 @@ public class EmployeesItem {
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public int getCtc() {
+        return ctc;
     }
 
     public String getContact() {
@@ -131,13 +192,21 @@ public class EmployeesItem {
         return isHROrAdmin;
     }
 
+    public boolean isEpf() {
+        return epf;
+    }
+
     public String getCompany() {
         return company;
     }
 
-//	public Object getDepartment(){
-//		return department;
-//	}
+    public String getState() {
+        return state;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
 
     public Object getProfileImageUrl() {
         return profileImageUrl;
@@ -151,12 +220,36 @@ public class EmployeesItem {
         return updatedAt;
     }
 
-//	public Object getReportingManager(){
-//		return reportingManager;
-//	}
+    public String getPincode() {
+        return pincode;
+    }
+
+    public ReportingManager getReportingManager() {
+        return reportingManager;
+    }
+
+    public Object getTotalYearlySalary() {
+        return totalYearlySalary;
+    }
+
+    public String getAddress() {
+        return address;
+    }
 
     public String getLevel() {
         return level;
+    }
+
+    public String getDifferentlyAbled() {
+        return differentlyAbled;
+    }
+
+    public String getPfAccountNo() {
+        return pfAccountNo;
+    }
+
+    public String getPanNo() {
+        return panNo;
     }
 
     public boolean isActive() {
@@ -183,6 +276,10 @@ public class EmployeesItem {
         return grade;
     }
 
+    public boolean isEsi() {
+        return esi;
+    }
+
     public String getDesignation() {
         return designation;
     }
@@ -191,20 +288,15 @@ public class EmployeesItem {
         return id;
     }
 
-    public String getCrossmanager() {
+    public Crossmanager getCrossmanager() {
         return crossmanager;
     }
 
-    public Department getDepartment() {
-        return department;
+    public String getUanno() {
+        return uanno;
     }
 
-    public Shift getShift() {
-        return shift;
+    public String getAdharNo() {
+        return adharNo;
     }
-
-    public ReportingManager getReportingManager() {
-        return reportingManager;
-    }
-
 }

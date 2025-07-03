@@ -9,7 +9,7 @@ public class EmployeeDropdownItem {
     private final String id;
     private final String firstName;
     private final String lastName;
-    private final EmployeesItem employeeItem; // Full data object
+    private final EmployeesItem employeeItem;
 
     public EmployeeDropdownItem(String id, String firstName, String lastName, EmployeesItem employeeItem) {
         this.id = id;
