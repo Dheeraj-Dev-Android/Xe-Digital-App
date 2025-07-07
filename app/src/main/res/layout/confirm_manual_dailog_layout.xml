@@ -14,7 +14,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/welcome_background"
         app:layout_constraintBottom_toTopOf="@+id/confirmButton"
-        app:layout_constraintDimensionRatio="16:20"
+        app:layout_constraintDimensionRatio="6:10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

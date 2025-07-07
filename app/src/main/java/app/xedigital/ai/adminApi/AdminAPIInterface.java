@@ -1,6 +1,7 @@
 package app.xedigital.ai.adminApi;
 
 import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
+import app.xedigital.ai.model.Admin.Dashboard.AdminDashboardResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
@@ -32,6 +33,10 @@ public interface AdminAPIInterface {
     @GET("employees?active=true")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
+
+    @GET("dashboard")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<AdminDashboardResponse> getDashboard(@Header("Authorization") String authToken);
 
     @GET("users/profile/{userId}")
     Call<UserDetailsResponse> getUser(@Header("Authorization") String authToken, @Path("userId") String userId);
