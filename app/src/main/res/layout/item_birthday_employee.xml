@@ -76,8 +76,7 @@
                     android:layout_height="16dp"
                     android:layout_marginEnd="4dp"
                     android:contentDescription="Birthday Icon"
-                    android:src="@mipmap/cake"
-                    app:tint="#FFFFFF" />
+                    android:src="@mipmap/cake" />
 
                 <TextView
                     android:id="@+id/birthdayDate"
