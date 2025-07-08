@@ -260,7 +260,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Birthday Celebrations This Month"
+                        android:text="@string/birthday_celebrations_this_month"
                         android:textColor="#FF6F00"
                         android:textSize="18sp"
                         android:textStyle="bold" />

@@ -131,6 +131,7 @@
     <string name="manual_check_in">Manual Check In</string>
     <string name="punch_out">Check Out</string>
     <string name="confirm_check_in">Confirm Check In</string>
+    <string name="birthday_celebrations_this_month">Birthday Celebrations This Month</string>
 
 
 </resources>

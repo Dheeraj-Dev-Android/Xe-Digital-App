@@ -30,7 +30,7 @@
                 android:layout_height="60dp"
                 android:layout_marginEnd="16dp"
                 android:contentDescription="Profile Image"
-                android:src="@drawable/ic_person" />
+                android:src="@drawable/ic_profile_placeholder" />
 
             <LinearLayout
                 android:layout_width="0dp"
