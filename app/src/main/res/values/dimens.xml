@@ -94,6 +94,7 @@
     <dimen name="progress_bar_size">60dp</dimen>
     <dimen name="loading_text_size">16sp</dimen>
     <dimen name="loading_text_margin_top">12dp</dimen>
+    <dimen name="birthday_item_spacing">12dp</dimen>
 
 </resources>
 

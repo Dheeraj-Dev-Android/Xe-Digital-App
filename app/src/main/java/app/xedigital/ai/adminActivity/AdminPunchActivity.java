@@ -378,7 +378,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         // Proceed normally if data exists
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
-                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject.toString());
+                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject);
                             JSONObject employeeObject = dataObject.getJSONObject("employee");
                             String id = employeeObject.getString("_id");
                             String firstName = employeeObject.getString("firstname");
@@ -490,7 +490,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         }
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
-                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject.toString());
+                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject);
                             JSONObject employeeObject = dataObject.getJSONObject("employee");
                             String id = employeeObject.getString("_id");
                             String firstName = employeeObject.getString("firstname");
