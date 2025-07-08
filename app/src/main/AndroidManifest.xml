@@ -81,7 +81,7 @@
             android:launchMode="singleTask"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
         <activity
-            android:name=".activity.AdminDashboardActivity"
+            android:name=".activity.VisitorActivity"
             android:exported="true"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
         <activity

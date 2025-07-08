@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
@@ -20,7 +21,7 @@ import app.xedigital.ai.adminActivity.AdminCheckOutActivity;
 import app.xedigital.ai.adminActivity.AdminManualCheckIn;
 import app.xedigital.ai.adminActivity.AdminPunchActivity;
 
-public class AdminDashboardActivity extends AppCompatActivity {
+public class VisitorActivity extends AppCompatActivity {
 
     private Handler handler;
     private View loadingAnimation;
@@ -34,7 +35,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin_dasboard_activity);
+        setContentView(R.layout.visitor_activity);
+
+        Log.d("VISITOR_ACTIVITY", "VisitorActivity opened");
+        Toast.makeText(this, "Visitor Activity Loaded", Toast.LENGTH_SHORT).show();
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         handler = new Handler(Looper.getMainLooper());
@@ -97,7 +102,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Toast.makeText(AdminDashboardActivity.this, "Back pressed! : Logged Out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VisitorActivity.this, "Back pressed! : Logged Out", Toast.LENGTH_SHORT).show();
                 finishAffinity(); // Closes all activities and exits app
             }
         };
@@ -178,7 +183,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         getSharedPreferences("AdminCred", MODE_PRIVATE).edit().clear().apply();
 
         // Navigate back to login screen
-        Intent intent = new Intent(AdminDashboardActivity.this, LoginSelectionActivity.class);
+        Intent intent = new Intent(VisitorActivity.this, LoginSelectionActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
@@ -189,7 +194,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         animateButtonPress(punchInButton);
 
         // Navigate to punch in screen
-        Intent intent = new Intent(AdminDashboardActivity.this, AdminPunchActivity.class);
+        Intent intent = new Intent(VisitorActivity.this, AdminPunchActivity.class);
         startActivity(intent);
     }
 
@@ -198,14 +203,14 @@ public class AdminDashboardActivity extends AppCompatActivity {
         animateButtonPress(punchOutButton);
 
         // Navigate to punch out screen
-        Intent intent = new Intent(AdminDashboardActivity.this, AdminCheckOutActivity.class);
+        Intent intent = new Intent(VisitorActivity.this, AdminCheckOutActivity.class);
         startActivity(intent);
     }
 
     private void handleManualCheckIn() {
         animateButtonPress(manualCheckInButton);
         Toast.makeText(this, "Manual Check-In clicked", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(AdminDashboardActivity.this, AdminManualCheckIn.class);
+        Intent intent = new Intent(VisitorActivity.this, AdminManualCheckIn.class);
         startActivity(intent);
     }
 

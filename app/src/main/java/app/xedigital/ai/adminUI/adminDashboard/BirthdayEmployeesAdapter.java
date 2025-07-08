@@ -1,4 +1,4 @@
-package app.xedigital.ai.adminUI.employeeDetails.adminDashboard;
+package app.xedigital.ai.adminUI.adminDashboard;
 
 import static app.xedigital.ai.utills.BirthdayUtils.formatBirthdayDate;
 import static app.xedigital.ai.utills.BirthdayUtils.isBirthdayToday;

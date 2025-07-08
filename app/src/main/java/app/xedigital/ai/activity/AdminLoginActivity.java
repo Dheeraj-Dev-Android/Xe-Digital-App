@@ -84,7 +84,7 @@ public class AdminLoginActivity extends AppCompatActivity {
                         String empFirstName = loginResponse.getData().getUser().getFirstname();
                         GetEmployee(authToken, userId, empEmail, empFirstName);
 //                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, isEmployee);
-//                        startActivity(new Intent(AdminLoginActivity.this, AdminDashboardActivity.class));
+//                        startActivity(new Intent(AdminLoginActivity.this, VisitorActivity.class));
 
 //                        Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
 //                        finish();

@@ -1,4 +1,4 @@
-package app.xedigital.ai.adminUI.employeeDetails.adminDashboard;
+package app.xedigital.ai.adminUI.adminDashboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;

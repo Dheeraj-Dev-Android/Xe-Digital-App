@@ -696,7 +696,7 @@ public class AdminPunchActivity extends AppCompatActivity {
     }
 
 //    private void navigateToDashboard() {
-//        Intent intent = new Intent(AdminPunchActivity.this, AdminDashboardActivity.class);
+//        Intent intent = new Intent(AdminPunchActivity.this, VisitorActivity.class);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 //        startActivity(intent);
 //        finish();
