@@ -3,24 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
-    android:padding="16dp">
+    android:padding="6dp">
 
     <!-- Camera Preview (Initially visible) -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Capture Overlay at Bottom Center -->
     <TextView
         android:id="@+id/capture_overlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="32dp"
         android:text="@string/capturing_image"
         android:textColor="#66FFFD"
@@ -29,34 +29,38 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/previewView" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Form Container (Initially hidden) -->
+    <!-- Form Container (Initially hidden, placed after PreviewView for Z-order) -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/formScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:elevation="8dp"
         android:fillViewport="true"
+        android:paddingBottom="16dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
 
             <!-- Header Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/headerCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -79,20 +83,17 @@
                         android:text="Please fill in your details to schedule a meeting"
                         android:textColor="@color/secondary_text"
                         android:textSize="16sp" />
-
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Main Form Card -->
+            <!-- Form Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/formCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/headerCard">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -100,7 +101,7 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Name Field -->
+                    <!-- Name -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/nameInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -108,10 +109,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Full Name"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_person"
                         app:startIconTint="@color/primary_color">
 
@@ -120,12 +117,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName"
-                            android:paddingStart="40dp"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Contact Field -->
+                    <!-- Contact -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/contactInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -133,10 +128,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Contact Number"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_phone"
                         app:startIconTint="@color/primary_color">
 
@@ -145,12 +136,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="phone"
-                            android:paddingStart="40dp"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Email Field -->
+                    <!-- Email -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/emailInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -158,10 +147,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Email Address"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_email"
                         app:startIconTint="@color/primary_color">
 
@@ -170,12 +155,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textEmailAddress"
-                            android:paddingStart="40dp"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Company Field -->
+                    <!-- Company -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/companyInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -183,10 +166,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Company Name"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_business"
                         app:startIconTint="@color/primary_color">
 
@@ -195,12 +174,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="text"
-                            android:paddingStart="40dp"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Whom to Meet Dropdown -->
+                    <!-- Whom to Meet -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/whomToMeetInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -208,10 +185,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Whom to Meet"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_group"
                         app:startIconTint="@color/primary_color">
 
@@ -220,14 +193,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="none"
-                            android:labelFor="@id/whomToMeetAutoComplete"
-                            android:paddingStart="40dp"
-                            android:text="Whom To Meet"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Purpose of Meeting Field -->
+                    <!-- Purpose -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/purposeInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -235,10 +204,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Purpose of Meeting"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_description"
                         app:startIconTint="@color/primary_color">
 
@@ -247,15 +212,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textMultiLine"
-                            android:lines="3"
                             android:maxLines="5"
                             android:minLines="2"
-                            android:paddingStart="40dp"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Device Dropdown -->
+                    <!-- Device -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/deviceInputLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -263,10 +225,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Bringing Laptop?"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
                         app:startIconDrawable="@drawable/ic_devices"
                         app:startIconTint="@color/primary_color">
 
@@ -275,12 +233,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="none"
-                            android:paddingStart="40dp"
-                            android:text="Device"
                             android:textSize="16sp" />
-
                     </com.google.android.material.textfield.TextInputLayout>
-                    <!-- 📌 Serial Number Field (Initially Hidden) -->
+
+                    <!-- Serial Number (Hidden by Default) -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/serialNumberLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -289,10 +245,7 @@
                         android:layout_marginBottom="16dp"
                         android:hint="Laptop Serial Number"
                         android:visibility="gone"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp">
+                        app:startIconTint="@color/primary_color">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/serialNumber"
@@ -301,15 +254,13 @@
                             android:inputType="text"
                             android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
-
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Next Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/nextButton"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
                 android:backgroundTint="@color/primary_color"
@@ -320,13 +271,7 @@
                 app:cornerRadius="28dp"
                 app:icon="@drawable/animated_arrow"
                 app:iconGravity="end"
-                app:iconPadding="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/formCard" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+                app:iconPadding="8dp" />
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

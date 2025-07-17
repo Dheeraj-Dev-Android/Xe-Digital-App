@@ -1,13 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/employee_fragment_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/icon_background"
+    android:orientation="vertical"
+    android:padding="12dp"
     tools:context=".adminUI.employeeDetails.EmployeeDetailsFragment">
 
-    <TextView
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupFilter"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        app:selectionRequired="false"
+        app:singleSelection="true">
 
-</FrameLayout>
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAll"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All"
+            android:textColor="@color/white"
+            app:checkedIconVisible="false"
+            app:chipBackgroundColor="@color/colorPrimary" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipActive"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Active"
+            android:textColor="@color/white"
+            app:checkedIconVisible="false"
+            app:chipBackgroundColor="@color/active_green" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipInactive"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Inactive"
+            android:textColor="@color/white"
+            app:checkedIconVisible="false"
+            app:chipBackgroundColor="@color/inactive_gray" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <EditText
+        android:id="@+id/etSearchEmployee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/search_edittext_background"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:hint="Search employee by name"
+        android:padding="12dp" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEmployees"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_employee_card" />
+
+</LinearLayout>

@@ -4,6 +4,7 @@ import static app.xedigital.ai.utills.BirthdayUtils.formatBirthdayDate;
 import static app.xedigital.ai.utills.BirthdayUtils.isBirthdayToday;
 
 import android.graphics.Rect;
+import android.icu.util.Calendar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
@@ -34,21 +42,58 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
     // Method to set up horizontal scrolling for the RecyclerView
     public static void setupHorizontalScrolling(RecyclerView recyclerView) {
         // Set horizontal LinearLayoutManager
-        LinearLayoutManager layoutManager = new LinearLayoutManager(
-                recyclerView.getContext(),
-                LinearLayoutManager.HORIZONTAL,
-                false
-        );
+        LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
         // Add item decoration for spacing between items
-        recyclerView.addItemDecoration(new HorizontalSpaceItemDecoration(
-                recyclerView.getContext().getResources().getDimensionPixelSize(R.dimen.birthday_item_spacing)
-        ));
+        recyclerView.addItemDecoration(new HorizontalSpaceItemDecoration(recyclerView.getContext().getResources().getDimensionPixelSize(R.dimen.birthday_item_spacing)));
     }
 
+    //    public void updateBirthdayEmployees(List<EmployeesItem> employees) {
+//        this.birthdayEmployees = employees != null ? employees : new ArrayList<>();
+//        notifyDataSetChanged();
+//    }
     public void updateBirthdayEmployees(List<EmployeesItem> employees) {
-        this.birthdayEmployees = employees != null ? employees : new ArrayList<>();
+        this.birthdayEmployees = employees != null ? new ArrayList<>(employees) : new ArrayList<>();
+
+        Collections.sort(this.birthdayEmployees, new Comparator<EmployeesItem>() {
+            private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+            @Override
+            public int compare(EmployeesItem e1, EmployeesItem e2) {
+                try {
+                    if (e1.getDateOfBirth() == null || e2.getDateOfBirth() == null) {
+                        return 0;
+                    }
+
+                    Date date1 = sdf.parse(e1.getDateOfBirth());
+                    Date date2 = sdf.parse(e2.getDateOfBirth());
+
+                    Calendar cal1 = Calendar.getInstance();
+                    Calendar cal2 = Calendar.getInstance();
+
+                    cal1.setTime(date1);
+                    cal2.setTime(date2);
+
+                    int month1 = cal1.get(Calendar.MONTH);
+                    int day1 = cal1.get(Calendar.DAY_OF_MONTH);
+
+                    int month2 = cal2.get(Calendar.MONTH);
+                    int day2 = cal2.get(Calendar.DAY_OF_MONTH);
+
+                    // Compare by month first, then by day
+                    if (month1 != month2) {
+                        return Integer.compare(month1, month2);
+                    } else {
+                        return Integer.compare(day1, day2);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
         notifyDataSetChanged();
     }
 
@@ -79,12 +124,11 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         }
 
         @Override
-        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
-                                   @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             int position = parent.getChildAdapterPosition(view);
 
             // Add spacing to the right of each item except the last one
-            if (position < parent.getAdapter().getItemCount() - 1) {
+            if (position < (Objects.requireNonNull(parent.getAdapter()).getItemCount() - 1)) {
                 outRect.right = spacing;
             }
 
@@ -121,7 +165,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         }
 
         public void bind(EmployeesItem employee) {
-            // Set employee name - Fixed null check logic
             String fullName = "";
             if (employee.getFirstname() != null && employee.getLastname() != null) {
                 fullName = employee.getFirstname() + " " + employee.getLastname();
@@ -164,25 +207,17 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
             // Add special styling for today's birthday
             if (isBirthdayToday(dateOfBirth)) {
                 birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.holo_red_light));
-                // You can add more special styling here like background, animation, etc.
             } else {
-                // Reset to default color for recycled views
                 birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.black));
             }
         }
 
         private void loadProfileImage(EmployeesItem employee) {
             if (employee.getProfileImageUrl() != null) {
-                Glide.with(itemView.getContext())
-                        .load(employee.getProfileImageUrl())
-                        .apply(new RequestOptions()
-                                .placeholder(R.drawable.ic_person)
-                                .error(R.drawable.ic_person)
-                                .centerCrop())
-                        .into(profileImage);
+                Glide.with(itemView.getContext()).load(employee.getProfileImageUrl()).apply(new RequestOptions().placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).centerCrop()).into(profileImage);
             } else {
                 // Set default profile image
-                profileImage.setImageResource(R.drawable.ic_person);
+                profileImage.setImageResource(R.drawable.ic_profile_placeholder);
             }
         }
     }

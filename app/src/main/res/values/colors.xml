@@ -161,4 +161,51 @@
     <color name="status_chip_background">#4CAF50</color>
     <color name="submenu_background">#9AB8EC</color>
 
+    <!-- Material Design Colors -->
+    <color name="material_primary">#6200EE</color>
+    <color name="material_primary_variant">#3700B3</color>
+    <color name="material_primary_container">#BB86FC</color>
+    <color name="material_on_primary">#FFFFFF</color>
+    <color name="material_on_primary_container">#000000</color>
+
+    <color name="material_secondary">#03DAC6</color>
+    <color name="material_secondary_variant">#018786</color>
+    <color name="material_secondary_container">#A7F3D0</color>
+    <color name="material_on_secondary">#000000</color>
+    <color name="material_on_secondary_container">#000000</color>
+
+    <color name="material_surface">#FFFFFF</color>
+    <color name="material_surface_variant">#F5F5F5</color>
+    <color name="material_on_surface">#000000</color>
+    <color name="material_on_surface_variant">#49454F</color>
+    <color name="material_on_surface_emphasis_medium">#99000000</color>
+    <color name="material_on_surface_stroke">#E0E0E0</color>
+
+    <color name="material_background">#FEFBFF</color>
+    <color name="material_on_background">#1C1B1F</color>
+
+    <color name="material_outline">#79747E</color>
+    <color name="material_outline_variant">#C4C7C5</color>
+
+    <color name="material_error">#B00020</color>
+    <color name="material_on_error">#FFFFFF</color>
+
+    <!-- Status Colors -->
+    <color name="material_green_500">#4CAF50</color>
+    <color name="material_red_500">#F44336</color>
+    <color name="material_amber_500">#FF9800</color>
+
+    <!-- Common Colors -->
+    <color name="active_green">#4CAF50</color>
+    <color name="inactive_gray">#F44336</color>
+
+    <color name="transparent">#00000000</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="material_surface_dark">#121212</color>
+    <color name="material_on_surface_dark">#FFFFFF</color>
+    <color name="material_background_dark">#121212</color>
+    <color name="material_on_background_dark">#FFFFFF</color>
+
+
 </resources>

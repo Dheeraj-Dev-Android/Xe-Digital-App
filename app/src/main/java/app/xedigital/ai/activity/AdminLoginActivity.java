@@ -17,8 +17,8 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
 
+import app.xedigital.ai.AdminMainActivity;
 import app.xedigital.ai.R;
-import app.xedigital.ai.adminActivity.AdminDashboard;
 import app.xedigital.ai.adminApi.AdminAPIClient;
 import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.model.Admin.UserDetails.Role;
@@ -128,7 +128,7 @@ public class AdminLoginActivity extends AppCompatActivity {
 
                             if ("branchadmin".equalsIgnoreCase(roleName) || "humanresource".equalsIgnoreCase(roleName)) {
                                 storeInSharedPreferences(userId, authToken, empEmail, empFirstName, currentCompany, false);
-                                startActivity(new Intent(AdminLoginActivity.this, AdminDashboard.class));
+                                startActivity(new Intent(AdminLoginActivity.this, AdminMainActivity.class));
                                 Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                             } else if ("employee".equalsIgnoreCase(roleName)) {
                                 showAlertDialogWithLogout();

@@ -80,10 +80,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
-        <activity
-            android:name=".activity.VisitorActivity"
-            android:exported="true"
-            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
         <activity
             android:name=".adminActivity.AdminPunchActivity"
             android:exported="true"
@@ -96,16 +93,19 @@
             android:name=".adminActivity.AdminManualCheckIn"
             android:exported="true"
             android:hardwareAccelerated="true" />
-        <activity
-            android:name=".adminActivity.AdminDashboard"
-            android:exported="true"
-            android:hardwareAccelerated="true"
-            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
         <activity
             android:name=".MainActivity"
             android:enableOnBackInvokedCallback="true"
             android:exported="true"
-            android:theme="@style/Theme.XEDigital.NoActionBar" />
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            tools:targetApi="tiramisu" />
+        <activity
+            android:name="app.xedigital.ai.AdminMainActivity"
+            android:enableOnBackInvokedCallback="true"
+            android:exported="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            tools:targetApi="tiramisu" />
 
         <meta-data
             android:name="firebase_performance_logcat_enabled"

@@ -30,7 +30,8 @@ public interface AdminAPIInterface {
     retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
 
     //GET APIs
-    @GET("employees?active=true")
+    @GET("employees")
+//    @GET("employees?active=true")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
 

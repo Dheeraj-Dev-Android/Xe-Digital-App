@@ -2,14 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/visitor_check_in_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.VisitorActivity">
-
-    <FrameLayout
-        android:id="@+id/admin_dashboard"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    tools:context=".adminUI.Visitor.VisitorCheckInFragment">
 
     <!-- Scrollable Content Container -->
     <ScrollView
@@ -22,60 +18,18 @@
             android:layout_height="wrap_content"
             android:minHeight="@dimen/min_screen_height">
 
-            <!-- Top Action Bar -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/top_action_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/screen_padding_horizontal"
-                android:paddingVertical="@dimen/screen_padding_vertical"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <!-- Spacer to push logout button to the right -->
-                <View
-                    android:id="@+id/spacer"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toStartOf="@+id/logout_button"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/logout_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="@dimen/button_padding">
-
-                        <ImageView
-                            android:layout_width="@dimen/logout_icon_size"
-                            android:layout_height="@dimen/logout_icon_size"
-                            android:contentDescription="Logout"
-                            android:src="@mipmap/logout" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
             <!-- Main Content Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/main_content_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/screen_padding_horizontal"
-                android:layout_marginTop="@dimen/content_margin_top"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/top_action_bar"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_max="@dimen/max_content_width">
 
                 <LinearLayout
@@ -86,7 +40,6 @@
                     android:paddingHorizontal="@dimen/card_padding_horizontal"
                     android:paddingVertical="@dimen/card_padding_vertical">
 
-                    <!-- Company Logo -->
                     <ImageView
                         android:id="@+id/company_logo"
                         android:layout_width="@dimen/logo_size"
@@ -94,7 +47,6 @@
                         android:contentDescription="@string/consultedge_global"
                         android:src="@mipmap/ceg_logo" />
 
-                    <!-- Welcome Text -->
                     <TextView
                         android:id="@+id/welcome_text"
                         android:layout_width="wrap_content"
@@ -106,7 +58,6 @@
                         android:textSize="@dimen/welcome_text_size"
                         android:textStyle="bold" />
 
-                    <!-- Action Buttons Container -->
                     <LinearLayout
                         android:id="@+id/buttons_container"
                         android:layout_width="wrap_content"
@@ -116,7 +67,6 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <!-- Punch Out Button -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/punch_out_button"
                             android:layout_width="@dimen/action_button_size"
@@ -154,7 +104,6 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Punch In Button -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/punch_in_button"
                             android:layout_width="@dimen/action_button_size"
@@ -192,7 +141,6 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Manual Check In Button -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/manual_checkIn_button"
                             android:layout_width="@dimen/action_button_size"
@@ -229,21 +177,13 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Spacer to push content up when needed -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_content_card" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <!-- Loading Animation Overlay -->
+    <!-- Loading Overlay -->
     <LinearLayout
         android:id="@+id/loading_animation"
         android:layout_width="wrap_content"

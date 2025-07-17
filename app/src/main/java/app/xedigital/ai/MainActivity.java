@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         if (dismissButton != null) {
             dismissButton.setOnClickListener(v -> {
                 slowInternetLayout.setVisibility(View.GONE);
-                Toast.makeText(MainActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
             });
         }
 

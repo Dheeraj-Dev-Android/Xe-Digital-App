@@ -2,17 +2,42 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-    <group android:checkableBehavior="single">
+    <item
+        android:id="@+id/nav_admin_dashboard"
+        android:title="Dashboard" />
+
+    <group
+        android:id="@+id/digital_identity_group"
+        android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:title="Dashboard" />
-        <item
-            android:id="@+id/nav_visitor"
-            android:icon="@drawable/ic_person"
-            android:title="Visitors" />
-        <item
-            android:id="@+id/nav_logout"
-            android:title="Logout" />
+            android:id="@+id/nav_digital_identity"
+            android:icon="@drawable/ic_dropdown_adaptive_fore"
+            android:title="Digital Identity" />
     </group>
+
+    <group
+        android:id="@+id/digital_identity_submenu"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_visitorCheckInFragment"
+            android:title="Visitor"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_employees"
+            android:title="Employees"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_partners"
+            android:title="Partners"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_users"
+            android:title="Users"
+            android:visible="false" />
+    </group>
+
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Logout" />
 
 </menu>

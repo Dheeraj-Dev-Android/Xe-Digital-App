@@ -13,67 +13,69 @@
         android:layout_height="match_parent"
         android:scaleType="fitCenter" />
 
-    <!-- Futuristic glowing border -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/glow_border"
-        android:clickable="false"
-        android:focusable="false" />
-
-    <!-- Capture Overlay at Bottom Center -->
-    <TextView
-        android:id="@+id/capture_overlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="32dp"
-        android:text="@string/capturing_image"
-        android:textColor="#66FFFD"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
-
-    <!-- Loading Panel in Center -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/loadingPanel"
+    <!-- Loading Panel and Capturing Text Container -->
+    <LinearLayout
+        android:id="@+id/loading_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
-        app:cardBackgroundColor="#99000000">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <LinearLayout
+        <!-- Loading Panel -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/loadingPanel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="24dp">
+            app:cardBackgroundColor="#99000000">
 
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/progressBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    app:indicatorColor="#2196F3"
-                    app:indicatorSize="56dp"
-                    app:trackColor="#1A2196F3"
-                    app:trackThickness="6dp" />
-            </com.facebook.shimmer.ShimmerFrameLayout>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/loadingText"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/wait_while_we_are_getting_details"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="14sp" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/progressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        app:indicatorColor="#2196F3"
+                        app:indicatorSize="56dp"
+                        app:trackColor="#1A2196F3"
+                        app:trackThickness="6dp" />
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/loadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/wait_while_we_are_getting_details"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Capture Overlay Below Loading Panel -->
+        <TextView
+            android:id="@+id/capture_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/capturing_image"
+            android:textColor="#66FFFD"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
 </FrameLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/admin_nav_graph"
+    app:startDestination="@id/nav_admin_dashboard">
+
+    <fragment
+        android:id="@+id/nav_admin_dashboard"
+        android:name="app.xedigital.ai.adminUI.adminDashboard.AdminDashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_admin_dashboard" />
+
+    <fragment
+        android:id="@+id/nav_visitorCheckInFragment"
+        android:name="app.xedigital.ai.adminUI.Visitor.VisitorCheckInFragment"
+        android:label="Visitor Check-In"
+        tools:layout="@layout/fragment_visitor_check_in" />
+
+    <fragment
+        android:id="@+id/nav_employees"
+        android:name="app.xedigital.ai.adminUI.employeeDetails.EmployeeDetailsFragment"
+        android:label="Employees"
+        tools:layout="@layout/fragment_employee_details" />
+
+    <!--    <fragment-->
+    <!--        android:id="@+id/nav_partners"-->
+    <!--        android:name="app.xedigital.ai.adminUI.Partners.PartnersFragment"-->
+    <!--        android:label="Partners"-->
+    <!--        tools:layout="@layout/fragment_partners" />-->
+
+    <!--    <fragment-->
+    <!--        android:id="@+id/nav_users"-->
+    <!--        android:name="app.xedigital.ai.adminUI.Users.UsersFragment"-->
+    <!--        android:label="Users"-->
+    <!--        tools:layout="@layout/fragment_users" />-->
+
+</navigation>

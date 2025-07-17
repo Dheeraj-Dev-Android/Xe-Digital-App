@@ -1,38 +1,40 @@
 package app.xedigital.ai.adminUI.employeeDetails;
 
-import static android.widget.Toast.LENGTH_SHORT;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.android.material.chip.Chip;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import app.xedigital.ai.R;
-import app.xedigital.ai.adminApi.AdminAPIClient;
-import app.xedigital.ai.adminApi.AdminAPIInterface;
-import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import app.xedigital.ai.adminAdapter.EmployeeAdapter;
+import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
 
 public class EmployeeDetailsFragment extends Fragment {
 
+    private final List<EmployeesItem> employeeList = new ArrayList<>();
+    private final List<EmployeesItem> fullEmployeeList = new ArrayList<>();
     private EmployeeDetailsViewModel mViewModel;
     private String token;
+    private RecyclerView rvEmployees;
+    private EmployeeAdapter adapter;
 
     public static EmployeeDetailsFragment newInstance() {
         return new EmployeeDetailsFragment();
@@ -44,90 +46,103 @@ public class EmployeeDetailsFragment extends Fragment {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", null);
 
-        fetchEmployees(token);
-        visitorsCategories(token);
+        rvEmployees = view.findViewById(R.id.rvEmployees);
+        rvEmployees.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new EmployeeAdapter(getContext(), employeeList);
+        rvEmployees.setAdapter(adapter);
+        Chip chipAll = view.findViewById(R.id.chipAll);
+        Chip chipActive = view.findViewById(R.id.chipActive);
+        Chip chipInactive = view.findViewById(R.id.chipInactive);
+
+// Set default selection to "All"
+        chipAll.setChecked(true);
+
+// Chip click listeners
+        chipAll.setOnClickListener(v -> filterEmployees("ALL"));
+        chipActive.setOnClickListener(v -> filterEmployees("ACTIVE"));
+        chipInactive.setOnClickListener(v -> filterEmployees("INACTIVE"));
+
+        EditText etSearch = view.findViewById(R.id.etSearchEmployee);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterByName(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         return view;
+    }
+
+    private void filterByName(String query) {
+        employeeList.clear();
+
+        if (query.isEmpty()) {
+            employeeList.addAll(fullEmployeeList);
+        } else {
+            for (EmployeesItem employee : fullEmployeeList) {
+                if (employee.getFirstname() != null && employee.getFirstname().toLowerCase().contains(query.toLowerCase())) {
+                    employeeList.add(employee);
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(EmployeeDetailsViewModel.class);
-        // TODO: Use the ViewModel
+
+        mViewModel.getEmployeeList().observe(getViewLifecycleOwner(), employees -> {
+            fullEmployeeList.clear();
+            employeeList.clear();
+            fullEmployeeList.addAll(employees);
+            employeeList.addAll(employees);
+            adapter.notifyDataSetChanged();
+        });
+
+
+        // Observe error messages
+        mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), message -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
+
+        mViewModel.fetchEmployees(token);
     }
 
+    private void filterEmployees(String filterType) {
+        employeeList.clear();
 
-    private void fetchEmployees(String token) {
+        switch (filterType) {
+            case "ALL":
+                employeeList.addAll(fullEmployeeList);
+                break;
 
+            case "ACTIVE":
+                for (EmployeesItem employee : fullEmployeeList) {
+                    if (employee.isActive()) {
+                        employeeList.add(employee);
+                    }
+                }
+                break;
 
-        if (token == null) {
-            Toast.makeText(getContext(), "Token not found", Toast.LENGTH_SHORT).show();
-            return;
+            case "INACTIVE":
+                for (EmployeesItem employee : fullEmployeeList) {
+                    if (!employee.isActive()) {
+                        employeeList.add(employee);
+                    }
+                }
+                break;
         }
 
-        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-
-        Call<EmployeeDetailResponse> call = apiService.getEmployees("jwt " + token);
-        call.enqueue(new Callback<EmployeeDetailResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    try {
-//                        String responseString = String.valueOf(response.body());
-
-                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                        String json = gson.toJson(response.body());
-                        Log.e("EMPLOYEES_RESPONSE", json);
-                        Toast.makeText(getContext(), "API Response: " + json, LENGTH_SHORT).show();
-
-                    } catch (JsonSyntaxException e) {
-                        Log.e("EMPLOYEES_RESPONSE", "Invalid JSON format");
-                    }
-                } else {
-                    Toast.makeText(getContext(), "API Error: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<EmployeeDetailResponse> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void visitorsCategories(String token) {
-        if (token == null) {
-            Log.e("Token", "Token not found");
-            return;
-        }
-
-        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
-
-        Call<ResponseBody> call = apiService.getVisitorCategories("jwt " + token);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    try {
-//                        String responseString = String.valueOf(response.body());
-
-                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                        String json = gson.toJson(response.body());
-                        Toast.makeText(getContext(), "Visitors Categories API Response: " + json, LENGTH_SHORT).show();
-
-                    } catch (JsonSyntaxException e) {
-                        Log.e("Visitors Categories", "Invalid JSON format");
-                    }
-                } else {
-                    Toast.makeText(getContext(), "API Error: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        adapter.notifyDataSetChanged();
     }
 
 }

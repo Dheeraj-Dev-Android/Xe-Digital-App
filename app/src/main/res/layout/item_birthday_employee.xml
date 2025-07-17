@@ -45,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:text="Dheeraj Tripathi"
                     android:textColor="#212121"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="John Doe" />
 
