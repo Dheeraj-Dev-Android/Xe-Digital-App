@@ -20,14 +20,26 @@ import app.xedigital.ai.R;
 
 public class AdminDashboardFragment extends Fragment {
 
+    private final int SCROLL_INTERVAL = 3000;
+    private final android.os.Handler scrollHandler = new android.os.Handler();
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
-
     private String token;
     private TextView totalSignin, totalSignout, totalEmployees, totalBranches;
     private TextView birthdayCount;
     private RecyclerView birthdayRecyclerView;
     private LinearLayout emptyBirthdayState;
+    private int currentPosition = 0;
+    private final Runnable scrollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (birthdayAdapter != null && birthdayAdapter.getItemCount() > 0) {
+                currentPosition = (currentPosition + 1) % birthdayAdapter.getItemCount();
+                birthdayRecyclerView.smoothScrollToPosition(currentPosition);
+                scrollHandler.postDelayed(this, SCROLL_INTERVAL);
+            }
+        }
+    };
 
     public static AdminDashboardFragment newInstance() {
         return new AdminDashboardFragment();
@@ -102,6 +114,26 @@ public class AdminDashboardFragment extends Fragment {
         });
 
         // Observe birthday data
+//        mViewModel.getBirthdayData().observe(getViewLifecycleOwner(), birthdayEmployees -> {
+//            if (birthdayEmployees != null && !birthdayEmployees.isEmpty()) {
+//                // Show birthday data
+//                birthdayCount.setText(String.valueOf(birthdayEmployees.size()));
+//                birthdayAdapter.updateBirthdayEmployees(birthdayEmployees);
+//
+//                // Show RecyclerView and hide empty state
+//                birthdayRecyclerView.setVisibility(View.VISIBLE);
+//                emptyBirthdayState.setVisibility(View.GONE);
+//            } else {
+//                // Show empty state
+//                birthdayCount.setText("0");
+//                birthdayAdapter.updateBirthdayEmployees(null);
+//
+//                // Hide RecyclerView and show empty state
+//                birthdayRecyclerView.setVisibility(View.GONE);
+//                emptyBirthdayState.setVisibility(View.VISIBLE);
+//            }
+//        });
+        // Observe birthday data
         mViewModel.getBirthdayData().observe(getViewLifecycleOwner(), birthdayEmployees -> {
             if (birthdayEmployees != null && !birthdayEmployees.isEmpty()) {
                 // Show birthday data
@@ -111,6 +143,10 @@ public class AdminDashboardFragment extends Fragment {
                 // Show RecyclerView and hide empty state
                 birthdayRecyclerView.setVisibility(View.VISIBLE);
                 emptyBirthdayState.setVisibility(View.GONE);
+
+                // 👉 Start auto-scroll
+                scrollHandler.removeCallbacks(scrollRunnable);
+                scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
             } else {
                 // Show empty state
                 birthdayCount.setText("0");
@@ -119,8 +155,12 @@ public class AdminDashboardFragment extends Fragment {
                 // Hide RecyclerView and show empty state
                 birthdayRecyclerView.setVisibility(View.GONE);
                 emptyBirthdayState.setVisibility(View.VISIBLE);
+
+                // 👉 Stop auto-scroll
+                scrollHandler.removeCallbacks(scrollRunnable);
             }
         });
+
 
         // Observe loading state
         mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
@@ -135,4 +175,12 @@ public class AdminDashboardFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Stop auto-scroll when view is destroyed
+        scrollHandler.removeCallbacks(scrollRunnable);
+    }
+
 }
