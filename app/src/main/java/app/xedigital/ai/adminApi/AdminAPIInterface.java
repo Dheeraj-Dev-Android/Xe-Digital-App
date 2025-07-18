@@ -3,8 +3,10 @@ package app.xedigital.ai.adminApi;
 import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
 import app.xedigital.ai.model.Admin.Dashboard.AdminDashboardResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
+import app.xedigital.ai.model.Admin.LeaveGraph.LeaveGraphResponse;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
+import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
 import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
 import app.xedigital.ai.model.Admin.visitorContact.VisitorContactResponse;
@@ -28,6 +30,9 @@ public interface AdminAPIInterface {
     @FormUrlEncoded
     @POST("authentication/login")
     retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
+
+    @GET("leaves/dashboard/graph/approved/employees")
+    retrofit2.Call<LeaveGraphResponse> getLeavesGraph(@Header("Authorization") String authToken);
 
     //GET APIs
     @GET("employees")
@@ -79,4 +84,9 @@ public interface AdminAPIInterface {
 
     @POST("visitors/manual")
     retrofit2.Call<ResponseBody> ManualVisitor(@Header("Authorization") String authToken, @Body VisitorManualRequest visitorManualRequest);
+
+    //    ?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=
+    @GET("visitors")
+    retrofit2.Call<VisitorsAdminDetailsResponse> getVisitors(@Header("Authorization") String authToken);
+
 }

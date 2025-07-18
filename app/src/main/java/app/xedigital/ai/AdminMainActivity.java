@@ -9,8 +9,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,10 +26,16 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import app.xedigital.ai.activity.LoginSelectionActivity;
+import app.xedigital.ai.adminApi.AdminAPIClient;
+import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.databinding.ActivityAdminMainBinding;
 import app.xedigital.ai.databinding.NoInternetConnectionBinding;
 import app.xedigital.ai.databinding.SlowInternetConnectionBinding;
+import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.utills.NetworkUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminMainActivity extends AppCompatActivity {
 
@@ -68,7 +77,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
 //        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_logout).setOpenableLayout(drawer).build();
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_users, R.id.nav_logout).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_users, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -125,12 +134,13 @@ public class AdminMainActivity extends AppCompatActivity {
 
     private void setVisitorSubMenuVisibility(Menu menu, boolean visible) {
         menu.findItem(R.id.nav_visitorCheckInFragment).setVisible(visible);
+        menu.findItem(R.id.nav_visitorDetailsFragment).setVisible(visible);
         menu.findItem(R.id.nav_employees).setVisible(visible);
         menu.findItem(R.id.nav_partners).setVisible(visible);
         menu.findItem(R.id.nav_users).setVisible(visible);
 
         MenuItem parentItem = menu.findItem(R.id.nav_digital_identity);
-        parentItem.setIcon(visible ? R.drawable.ic_dropdown_adaptive_fore : R.drawable.ic_dropdown_adaptive_back);
+        parentItem.setIcon(visible ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isVisitorSubMenuVisible = visible;
     }
 
@@ -155,16 +165,6 @@ public class AdminMainActivity extends AppCompatActivity {
         slowInternetBinding.tvSpeed.setText(speedText);
     }
 
-//    private void toggleVisitorSubMenuVisibility(Menu menu) {
-//        MenuItem visitorItem = menu.findItem(R.id.visitor_submenu);
-//        boolean newVisibility = !isVisitorSubMenuVisible;
-//        menu.findItem(R.id.nav_check_in_visitor).setVisible(newVisibility);
-//
-//        visitorItem.setIcon(newVisibility ? R.drawable.ic_dropdown_adaptive_fore : R.drawable.ic_dropdown_adaptive_back);
-//        binding.adminNavView.invalidate();
-//        isVisitorSubMenuVisible = newVisibility;
-//    }
-
     private void toggleVisitorSubMenuVisibility(Menu menu) {
         boolean newVisibility = !isVisitorSubMenuVisible;
         setVisitorSubMenuVisibility(menu, newVisibility);
@@ -183,7 +183,54 @@ public class AdminMainActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfileData() {
-        // TODO: Add real data fetching logic
+        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", "");
+        String userId = sharedPreferences.getString("userId", "");
+
+        if (authToken.isEmpty() || userId.isEmpty()) {
+            Log.e(TAG, "Missing auth token or user ID");
+            return;
+        }
+
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        Call<UserDetailsResponse> call = apiService.getUser("jwt " + authToken, userId);
+
+        call.enqueue(new Callback<UserDetailsResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserDetailsResponse userDetails = response.body();
+                    bindUserToDrawer(userDetails);
+                } else {
+                    Log.e(TAG, "Failed to fetch profile: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable t) {
+                Log.e(TAG, "API failure: " + t.getMessage());
+            }
+        });
+    }
+
+    private void bindUserToDrawer(UserDetailsResponse userDetails) {
+        NavigationView navigationView = binding.adminNavView;
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView nameText = headerView.findViewById(R.id.textView);
+        TextView subtitleText = headerView.findViewById(R.id.subtitleText);
+        ImageView profileImage = headerView.findViewById(R.id.imageView);
+        String FirstName = userDetails.getData().getUser().getFirstname();
+        String LastName = userDetails.getData().getUser().getLastname();
+
+        nameText.setText(FirstName + "" + LastName);
+        subtitleText.setText(userDetails.getData().getUser().getEmail());
+
+        // Load profile image if exists (use Glide or Picasso)
+//        if (userDetails.getData(). != null) {
+//            Glide.with(this).load(userDetails.getData().getProfileImageUrl()).placeholder(R.drawable.default_profile).into(profileImage);
+
+//        }
     }
 
     public void onRetryButtonClicked(View view) {

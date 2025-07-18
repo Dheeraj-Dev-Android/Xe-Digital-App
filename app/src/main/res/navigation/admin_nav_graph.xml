@@ -23,6 +23,12 @@
         android:label="Employees"
         tools:layout="@layout/fragment_employee_details" />
 
+    <fragment
+        android:id="@+id/nav_visitorDetailsFragment"
+        android:name="app.xedigital.ai.adminUI.Visitor.VisitorsDetailsFragment"
+        android:label="Visitor Details"
+        tools:layout="@layout/fragment_visitors_details" />
+
     <!--    <fragment-->
     <!--        android:id="@+id/nav_partners"-->
     <!--        android:name="app.xedigital.ai.adminUI.Partners.PartnersFragment"-->

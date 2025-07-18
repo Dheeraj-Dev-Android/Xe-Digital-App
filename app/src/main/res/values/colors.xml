@@ -37,6 +37,7 @@
     <color name="status_approved">#059669</color>
     <color name="status_pending">#D97706</color>
     <color name="status_rejected">#DC2626</color>
+    <color name="status_default">#FFD740</color>
     <color name="icon_tint">#3B82F6</color>
     <color name="icon_background">#EFF6FF</color>
 

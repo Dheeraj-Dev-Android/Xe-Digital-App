@@ -20,7 +20,11 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_visitorCheckInFragment"
-            android:title="Visitor"
+            android:title="Visitor Check In "
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_visitorDetailsFragment"
+            android:title="Visitor Details"
             android:visible="false" />
         <item
             android:id="@+id/nav_employees"

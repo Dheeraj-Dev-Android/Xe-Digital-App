@@ -2,6 +2,7 @@ package app.xedigital.ai.adminUI.adminDashboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,24 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import app.xedigital.ai.R;
+import app.xedigital.ai.model.Admin.LeaveGraph.Data;
 
 public class AdminDashboardFragment extends Fragment {
 
     private final int SCROLL_INTERVAL = 3000;
     private final android.os.Handler scrollHandler = new android.os.Handler();
+    PieChart leavesBarChart;
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
     private String token;
@@ -40,6 +53,7 @@ public class AdminDashboardFragment extends Fragment {
             }
         }
     };
+
 
     public static AdminDashboardFragment newInstance() {
         return new AdminDashboardFragment();
@@ -64,6 +78,7 @@ public class AdminDashboardFragment extends Fragment {
         String authToken = "jwt " + token;
         mViewModel.fetchDashboardData(authToken);
         mViewModel.fetchBirthdayData(authToken);
+        mViewModel.fetchLeavesGraph(authToken);
     }
 
     private void initializeViews(View view) {
@@ -77,6 +92,8 @@ public class AdminDashboardFragment extends Fragment {
         birthdayCount = view.findViewById(R.id.birthdayCount);
         birthdayRecyclerView = view.findViewById(R.id.birthdayRecyclerView);
         emptyBirthdayState = view.findViewById(R.id.emptyBirthdayState);
+
+        leavesBarChart = view.findViewById(R.id.pieChart);
     }
 
     private void setupRecyclerView() {
@@ -160,7 +177,18 @@ public class AdminDashboardFragment extends Fragment {
                 scrollHandler.removeCallbacks(scrollRunnable);
             }
         });
-
+//        mViewModel.getLeavesGraphData().observe(getViewLifecycleOwner(), leaveGraphResponse -> {
+//            if (leaveGraphResponse != null) {
+//                updatePieChart(leaveGraphResponse);
+//            } else {
+//                Toast.makeText(getContext(), "Failed to fetch leave graph data", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+        mViewModel.getLeavesGraphData().observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.getData() != null) {
+                updatePieChart(response.getData());
+            }
+        });
 
         // Observe loading state
         mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
@@ -175,6 +203,124 @@ public class AdminDashboardFragment extends Fragment {
             }
         });
     }
+
+//    private void updateGraphUI(LeaveGraphResponse response) {
+//        if (response.getData() == null) return;
+//
+//        List<Integer> graphData = response.getData().getGraphData();
+//        List<String> graphLabels = response.getData().getGraphLabels();
+//        List<String> graphColors = response.getData().getGraphBackground();
+//
+//        List<BarEntry> entries = new ArrayList<>();
+//        List<Integer> colors = new ArrayList<>();
+//
+//        for (int i = 0; i < graphData.size(); i++) {
+//            entries.add(new BarEntry(i, graphData.get(i)));
+//            colors.add(getColorFromName(graphColors.get(i)));
+//        }
+//
+//        BarDataSet dataSet = new BarDataSet(entries, "Leave Types");
+//        dataSet.setColors(colors); // Set individual bar colors
+//        dataSet.setValueTextColor(Color.BLACK);
+//        dataSet.setValueTextSize(12f);
+//
+//        BarData barData = new BarData(dataSet);
+//        barData.setBarWidth(0.8f);
+//
+//        leavesBarChart.setData(barData);
+//        leavesBarChart.getDescription().setEnabled(false);
+//        leavesBarChart.setFitBars(true);
+//        leavesBarChart.animateY(1000);
+//
+//        // X Axis
+//        XAxis xAxis = leavesBarChart.getXAxis();
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        xAxis.setGranularity(1f);
+//        xAxis.setValueFormatter(new IndexAxisValueFormatter(graphLabels));
+//        xAxis.setDrawGridLines(false);
+//        xAxis.setLabelRotationAngle(-35);
+//        xAxis.setTextSize(10f);
+//
+//        // Y Axis
+//        leavesBarChart.getAxisRight().setEnabled(false);
+//        leavesBarChart.getAxisLeft().setDrawGridLines(false);
+//
+//        leavesBarChart.invalidate();
+//    }
+
+    private void updatePieChart(Data leaveGraphData) {
+        PieChart pieChart = leavesBarChart;
+
+        List<Integer> values = leaveGraphData.getGraphData();
+        List<String> labels = leaveGraphData.getGraphLabels();
+        List<String> colors = leaveGraphData.getGraphBackground();
+
+        List<PieEntry> entries = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            entries.add(new PieEntry(values.get(i), labels.get(i)));
+        }
+
+        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
+
+        // Convert color names to actual Android colors (fallback to random if needed)
+        List<Integer> colorInts = new ArrayList<>();
+        for (String colorName : colors) {
+            try {
+                colorInts.add(Color.parseColor(colorName));
+            } catch (IllegalArgumentException e) {
+                colorInts.add(Color.rgb((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
+            }
+        }
+
+        dataSet.setColors(colorInts);
+
+        PieData data = new PieData(dataSet);
+        data.setValueTextSize(12f);
+        data.setValueTextColor(Color.WHITE);
+
+        pieChart.setData(data);
+        pieChart.setUsePercentValues(true);
+        pieChart.setDrawHoleEnabled(true);
+        pieChart.setHoleColor(Color.TRANSPARENT);
+        pieChart.setTransparentCircleAlpha(110);
+        pieChart.setCenterText("Leave Distribution");
+        pieChart.setCenterTextSize(16f);
+        pieChart.getDescription().setEnabled(false);
+        pieChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+        pieChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
+        pieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+
+        pieChart.animateY(1400, Easing.EaseInOutQuad);
+        pieChart.invalidate(); // Refresh chart
+    }
+
+//    private int getColorFromName(String colorName) {
+//        switch (colorName.toLowerCase()) {
+//            case "red":
+//                return Color.RED;
+//            case "blue":
+//                return Color.BLUE;
+//            case "green":
+//                return Color.GREEN;
+//            case "lime":
+//                return Color.rgb(0, 255, 0);
+//            case "maroon":
+//                return Color.rgb(128, 0, 0);
+//            case "orange":
+//                return Color.rgb(255, 165, 0);
+//            case "yellow":
+//                return Color.YELLOW;
+//            case "purple":
+//                return Color.MAGENTA;
+//            case "teal":
+//                return Color.CYAN;
+//            default:
+//                return Color.GRAY;
+//        }
+//    }
+
 
     @Override
     public void onDestroyView() {

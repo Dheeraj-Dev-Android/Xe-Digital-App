@@ -21,6 +21,7 @@ import app.xedigital.ai.model.Admin.Dashboard.AdminDashboardResponse;
 import app.xedigital.ai.model.Admin.Dashboard.CounterData;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
+import app.xedigital.ai.model.Admin.LeaveGraph.LeaveGraphResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,6 +33,7 @@ public class AdminDashboardViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final AdminAPIInterface apiInterface;
+    private final MutableLiveData<LeaveGraphResponse> leavesGraphData = new MutableLiveData<>();
 
     public AdminDashboardViewModel() {
         apiInterface = AdminAPIClient.getInstance().getBase2();
@@ -52,6 +54,11 @@ public class AdminDashboardViewModel extends ViewModel {
     public LiveData<String> getErrorMessage() {
         return errorMessage;
     }
+
+    public LiveData<LeaveGraphResponse> getLeavesGraphData() {
+        return leavesGraphData;
+    }
+
 
     public void fetchDashboardData(String token) {
         isLoading.setValue(true);
@@ -150,4 +157,32 @@ public class AdminDashboardViewModel extends ViewModel {
 
         return birthdayEmployees;
     }
+
+    public void fetchLeavesGraph(String token) {
+        isLoading.setValue(true);
+
+        apiInterface.getLeavesGraph(token).enqueue(new Callback<LeaveGraphResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<LeaveGraphResponse> call, @NonNull Response<LeaveGraphResponse> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    leavesGraphData.setValue(response.body());
+                    Log.d("LeavesGraph", "Graph data loaded successfully");
+                } else {
+                    leavesGraphData.setValue(null);
+                    errorMessage.setValue("Failed to load leaves graph data");
+                    Log.e("LeavesGraph", "Response error or null body");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<LeaveGraphResponse> call, @NonNull Throwable throwable) {
+                isLoading.setValue(false);
+                leavesGraphData.setValue(null);
+                errorMessage.setValue("Network error while loading leaves graph: " + throwable.getMessage());
+                Log.e("LeavesGraph", "API call failed", throwable);
+            }
+        });
+    }
+
 }
