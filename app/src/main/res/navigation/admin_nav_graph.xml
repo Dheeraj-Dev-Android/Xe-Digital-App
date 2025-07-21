@@ -29,11 +29,11 @@
         android:label="Visitor Details"
         tools:layout="@layout/fragment_visitors_details" />
 
-    <!--    <fragment-->
-    <!--        android:id="@+id/nav_partners"-->
-    <!--        android:name="app.xedigital.ai.adminUI.Partners.PartnersFragment"-->
-    <!--        android:label="Partners"-->
-    <!--        tools:layout="@layout/fragment_partners" />-->
+    <fragment
+        android:id="@+id/nav_partners"
+        android:name="app.xedigital.ai.adminUI.partners.PartnersFragment"
+        android:label="Partners"
+        tools:layout="@layout/fragment_partners" />
 
     <!--    <fragment-->
     <!--        android:id="@+id/nav_users"-->

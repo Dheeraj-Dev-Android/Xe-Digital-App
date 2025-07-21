@@ -133,5 +133,11 @@
     <string name="confirm_check_in">Confirm Check In</string>
     <string name="birthday_celebrations_this_month">Birthday Celebrations This Month</string>
 
+    <string-array name="status_options">
+        <item>Select Status</item>
+        <item>Active</item>
+        <item>Deactive</item>
+    </string-array>
+
 
 </resources>

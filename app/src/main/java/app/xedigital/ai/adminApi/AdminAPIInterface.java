@@ -9,6 +9,7 @@ import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
 import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
+import app.xedigital.ai.model.Admin.partners.PartnersResponse;
 import app.xedigital.ai.model.Admin.visitorContact.VisitorContactResponse;
 import app.xedigital.ai.model.Admin.visitorFace.VisitorFaceResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
@@ -22,6 +23,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface AdminAPIInterface {
@@ -33,6 +35,15 @@ public interface AdminAPIInterface {
 
     @GET("leaves/dashboard/graph/approved/employees")
     retrofit2.Call<LeaveGraphResponse> getLeavesGraph(@Header("Authorization") String authToken);
+
+    @GET("partners")
+    retrofit2.Call<PartnersResponse> getPartners(@Header("Authorization") String authToken);
+
+    @GET("partners/profile/{partnerId}")
+    retrofit2.Call<UserDetailsResponse> getPartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId);
+
+    @PUT("partners/profile/{partnerId}")
+    retrofit2.Call<ResponseBody> updatePartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId, @Body RequestBody requestBody);
 
     //GET APIs
     @GET("employees")
