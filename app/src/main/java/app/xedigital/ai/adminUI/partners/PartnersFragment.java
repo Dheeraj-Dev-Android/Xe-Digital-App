@@ -26,11 +26,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adminAdapter.PartnersAdapter;
+import app.xedigital.ai.adminApi.AdminAPIClient;
+import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.model.Admin.partners.PartnersItem;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PartnersFragment extends Fragment {
 
@@ -199,7 +209,52 @@ public class PartnersFragment extends Fragment {
             // === All validations passed ===
             Toast.makeText(requireContext(), "Partner added: " + name, Toast.LENGTH_SHORT).show();
 
-            // TODO: Send this data to ViewModel or API
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", name);
+                jsonObject.put("email", email);
+                jsonObject.put("contact", contact);
+                jsonObject.put("address", address);
+                jsonObject.put("city", city);
+                jsonObject.put("state", state);
+                jsonObject.put("zip", zip);
+                jsonObject.put("website", website.isEmpty() ? JSONObject.NULL : website);
+                jsonObject.put("company", JSONObject.NULL);
+                jsonObject.put("active", status.equalsIgnoreCase("Active") ? "true" : "false");
+
+                RequestBody requestBody = RequestBody.create(jsonObject.toString(), okhttp3.MediaType.parse("application/json; charset=utf-8"));
+
+                String token = "jwt " + authToken;
+
+
+                AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+                Call<ResponseBody> call = apiService.addPartner(token, requestBody);
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(requireContext(), "Partner added successfully!", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+
+                            // Refresh list
+                            partnersViewModel.fetchPartners(token);
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to add partner", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                        Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(requireContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
             dialog.dismiss();
         });
 
@@ -223,20 +278,6 @@ public class PartnersFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_add_partner, menu);
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (super.onOptionsItemSelected(item)) {
-//            return true;
-//        }
-//
-//        int id = item.getItemId();
-//        if (id == R.id.action_add_newPartner) {
-//            Toast.makeText(getContext(), "Coming Soon", Toast.LENGTH_SHORT).show();
-//            return true;
-//        }
-//        return false;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

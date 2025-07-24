@@ -35,10 +35,10 @@
         android:label="Partners"
         tools:layout="@layout/fragment_partners" />
 
-    <!--    <fragment-->
-    <!--        android:id="@+id/nav_users"-->
-    <!--        android:name="app.xedigital.ai.adminUI.Users.UsersFragment"-->
-    <!--        android:label="Users"-->
-    <!--        tools:layout="@layout/fragment_users" />-->
+    <fragment
+        android:id="@+id/nav_allUsers"
+        android:name="app.xedigital.ai.adminUI.allUsers.AllUsersFragment"
+        android:label="All Users"
+        tools:layout="@layout/fragment_all_users" />
 
 </navigation>

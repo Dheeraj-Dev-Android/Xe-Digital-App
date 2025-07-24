@@ -35,10 +35,9 @@ import retrofit2.Call;
 
 public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHolder> {
 
+    private final Context context;
+    private final OnPartnerUpdatedListener updateListener;
     private List<PartnersItem> partnersList;
-    private Context context;
-
-    private OnPartnerUpdatedListener updateListener;
 
     public PartnersAdapter(Context context, List<PartnersItem> partners, OnPartnerUpdatedListener listener) {
         this.context = context;

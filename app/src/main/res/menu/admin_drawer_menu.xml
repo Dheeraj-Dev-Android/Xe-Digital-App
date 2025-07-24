@@ -35,7 +35,7 @@
             android:title="Partners"
             android:visible="false" />
         <item
-            android:id="@+id/nav_users"
+            android:id="@+id/nav_allUsers"
             android:title="Users"
             android:visible="false" />
     </group>

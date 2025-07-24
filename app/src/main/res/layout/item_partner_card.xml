@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/partnerCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:elevation="4dp"
-    android:padding="12dp">
+    app:cardBackgroundColor="#E3F2FD"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Name:"
-                android:textColor="#666666"
+                android:textColor="#1565C0"
                 android:textStyle="bold" />
 
             <TextView
@@ -71,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:text="Partner Name"
-                android:textColor="#333333"
+                android:textColor="#0D47A1"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -89,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Email:"
-                android:textColor="#666666"
+                android:textColor="#1565C0"
                 android:textStyle="bold" />
 
             <TextView
@@ -99,7 +101,7 @@
                 android:layout_weight="2"
                 android:autoLink="email"
                 android:text="partner@example.com"
-                android:textColor="#333333" />
+                android:textColor="#0D47A1" />
 
         </LinearLayout>
 
@@ -115,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Contact:"
-                android:textColor="#666666"
+                android:textColor="#1565C0"
                 android:textStyle="bold" />
 
             <TextView
@@ -125,7 +127,7 @@
                 android:layout_weight="2"
                 android:autoLink="phone"
                 android:text="+1 (555) 123-4567"
-                android:textColor="#333333" />
+                android:textColor="#0D47A1" />
 
         </LinearLayout>
 
@@ -141,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Address:"
-                android:textColor="#666666"
+                android:textColor="#1565C0"
                 android:textStyle="bold" />
 
             <TextView
@@ -152,7 +154,7 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="Gurugram, Haryana"
-                android:textColor="#333333" />
+                android:textColor="#0D47A1" />
 
         </LinearLayout>
 
@@ -168,7 +170,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Website:"
-                android:textColor="#666666"
+                android:textColor="#1565C0"
                 android:textStyle="bold" />
 
             <TextView
@@ -178,36 +180,11 @@
                 android:layout_weight="2"
                 android:autoLink="web"
                 android:text="www.partner.com"
-                android:textColor="#2196F3" />
+                android:textColor="#1976D2" />
 
         </LinearLayout>
-
 
         <!-- Created Date -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Created:"
-                android:textColor="#666666"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/partnerCreatedDate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Jan 15, 2025"
-                android:textColor="#666666"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-        <!-- Status -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -218,8 +195,33 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="Created:"
+                android:textColor="#1565C0"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/partnerCreatedDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Jan 15, 2025"
+                android:textColor="#424242"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Status:"
-                android:textColor="#666666"
+                android:textColor="#1565C0"
                 android:textStyle="bold" />
 
             <com.google.android.material.chip.Chip
@@ -231,6 +233,7 @@
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
                 android:text="Active"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -238,4 +241,4 @@
         </LinearLayout>
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

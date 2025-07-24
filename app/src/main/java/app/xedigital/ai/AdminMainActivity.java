@@ -77,7 +77,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
 //        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_logout).setOpenableLayout(drawer).build();
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_users, R.id.nav_logout).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -120,8 +120,8 @@ public class AdminMainActivity extends AppCompatActivity {
             return true;
         });
 
-        navigationView.getMenu().findItem(R.id.nav_users).setOnMenuItemClickListener(item -> {
-            navController.navigate(R.id.nav_users);
+        navigationView.getMenu().findItem(R.id.nav_allUsers).setOnMenuItemClickListener(item -> {
+            navController.navigate(R.id.nav_allUsers);
             return true;
         });
 
@@ -137,7 +137,7 @@ public class AdminMainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_visitorDetailsFragment).setVisible(visible);
         menu.findItem(R.id.nav_employees).setVisible(visible);
         menu.findItem(R.id.nav_partners).setVisible(visible);
-        menu.findItem(R.id.nav_users).setVisible(visible);
+        menu.findItem(R.id.nav_allUsers).setVisible(visible);
 
         MenuItem parentItem = menu.findItem(R.id.nav_digital_identity);
         parentItem.setIcon(visible ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
@@ -223,7 +223,7 @@ public class AdminMainActivity extends AppCompatActivity {
         String FirstName = userDetails.getData().getUser().getFirstname();
         String LastName = userDetails.getData().getUser().getLastname();
 
-        nameText.setText(FirstName + "" + LastName);
+        nameText.setText(FirstName + LastName);
         subtitleText.setText(userDetails.getData().getUser().getEmail());
 
         // Load profile image if exists (use Glide or Picasso)

@@ -200,13 +200,45 @@
     <color name="active_green">#4CAF50</color>
     <color name="inactive_gray">#F44336</color>
 
-    <color name="transparent">#00000000</color>
 
     <!-- Dark Theme Colors -->
     <color name="material_surface_dark">#121212</color>
     <color name="material_on_surface_dark">#FFFFFF</color>
     <color name="material_background_dark">#121212</color>
     <color name="material_on_background_dark">#FFFFFF</color>
+
+
+    <!-- Primary Colors -->
+
+    <color name="primary_light">#E3F2FD</color>
+    <color name="primary_variant">#1565C0</color>
+
+    <!-- Success Colors -->
+
+    <color name="success_light">#E8F5E8</color>
+
+    <!-- Warning Colors -->
+
+    <color name="warning_light">#FFF3E0</color>
+
+    <!-- Error Colors -->
+
+    <color name="error_light">#FFEBEE</color>
+
+    <!-- Text Colors -->
+
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Background Colors -->
+
+    <color name="surface_light">#FFFFFF</color>
+
+    <!-- Divider Colors -->
+    <color name="divider_light">#E0E0E0</color>
+
+    <!-- Material Colors -->
+
+    <color name="transparent">#00000000</color>
 
 
 </resources>

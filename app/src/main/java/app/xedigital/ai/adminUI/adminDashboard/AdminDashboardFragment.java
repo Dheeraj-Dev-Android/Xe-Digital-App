@@ -20,12 +20,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.MarkerView;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.utils.MPPointF;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.Admin.LeaveGraph.Data;
@@ -131,26 +136,6 @@ public class AdminDashboardFragment extends Fragment {
         });
 
         // Observe birthday data
-//        mViewModel.getBirthdayData().observe(getViewLifecycleOwner(), birthdayEmployees -> {
-//            if (birthdayEmployees != null && !birthdayEmployees.isEmpty()) {
-//                // Show birthday data
-//                birthdayCount.setText(String.valueOf(birthdayEmployees.size()));
-//                birthdayAdapter.updateBirthdayEmployees(birthdayEmployees);
-//
-//                // Show RecyclerView and hide empty state
-//                birthdayRecyclerView.setVisibility(View.VISIBLE);
-//                emptyBirthdayState.setVisibility(View.GONE);
-//            } else {
-//                // Show empty state
-//                birthdayCount.setText("0");
-//                birthdayAdapter.updateBirthdayEmployees(null);
-//
-//                // Hide RecyclerView and show empty state
-//                birthdayRecyclerView.setVisibility(View.GONE);
-//                emptyBirthdayState.setVisibility(View.VISIBLE);
-//            }
-//        });
-        // Observe birthday data
         mViewModel.getBirthdayData().observe(getViewLifecycleOwner(), birthdayEmployees -> {
             if (birthdayEmployees != null && !birthdayEmployees.isEmpty()) {
                 // Show birthday data
@@ -204,50 +189,6 @@ public class AdminDashboardFragment extends Fragment {
         });
     }
 
-//    private void updateGraphUI(LeaveGraphResponse response) {
-//        if (response.getData() == null) return;
-//
-//        List<Integer> graphData = response.getData().getGraphData();
-//        List<String> graphLabels = response.getData().getGraphLabels();
-//        List<String> graphColors = response.getData().getGraphBackground();
-//
-//        List<BarEntry> entries = new ArrayList<>();
-//        List<Integer> colors = new ArrayList<>();
-//
-//        for (int i = 0; i < graphData.size(); i++) {
-//            entries.add(new BarEntry(i, graphData.get(i)));
-//            colors.add(getColorFromName(graphColors.get(i)));
-//        }
-//
-//        BarDataSet dataSet = new BarDataSet(entries, "Leave Types");
-//        dataSet.setColors(colors); // Set individual bar colors
-//        dataSet.setValueTextColor(Color.BLACK);
-//        dataSet.setValueTextSize(12f);
-//
-//        BarData barData = new BarData(dataSet);
-//        barData.setBarWidth(0.8f);
-//
-//        leavesBarChart.setData(barData);
-//        leavesBarChart.getDescription().setEnabled(false);
-//        leavesBarChart.setFitBars(true);
-//        leavesBarChart.animateY(1000);
-//
-//        // X Axis
-//        XAxis xAxis = leavesBarChart.getXAxis();
-//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//        xAxis.setGranularity(1f);
-//        xAxis.setValueFormatter(new IndexAxisValueFormatter(graphLabels));
-//        xAxis.setDrawGridLines(false);
-//        xAxis.setLabelRotationAngle(-35);
-//        xAxis.setTextSize(10f);
-//
-//        // Y Axis
-//        leavesBarChart.getAxisRight().setEnabled(false);
-//        leavesBarChart.getAxisLeft().setDrawGridLines(false);
-//
-//        leavesBarChart.invalidate();
-//    }
-
     private void updatePieChart(Data leaveGraphData) {
         PieChart pieChart = leavesBarChart;
 
@@ -255,16 +196,18 @@ public class AdminDashboardFragment extends Fragment {
         List<String> labels = leaveGraphData.getGraphLabels();
         List<String> colors = leaveGraphData.getGraphBackground();
 
+        // Prepare entries
         List<PieEntry> entries = new ArrayList<>();
         for (int i = 0; i < values.size(); i++) {
             entries.add(new PieEntry(values.get(i), labels.get(i)));
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(5f);
+        // Dataset
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setSliceSpace(1f);
+        dataSet.setSelectionShift(10f);
 
-        // Convert color names to actual Android colors (fallback to random if needed)
+        // Set colors
         List<Integer> colorInts = new ArrayList<>();
         for (String colorName : colors) {
             try {
@@ -273,53 +216,73 @@ public class AdminDashboardFragment extends Fragment {
                 colorInts.add(Color.rgb((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
             }
         }
-
         dataSet.setColors(colorInts);
 
-        PieData data = new PieData(dataSet);
-        data.setValueTextSize(12f);
-        data.setValueTextColor(Color.WHITE);
+        // Hide default slice values
+//        PieData data = new PieData(dataSet);
+//        data.setDrawValues(false); // ✅ hides % on chart initially
+//
+//        pieChart.setData(data);
+//        pieChart.setUsePercentValues(true);
+//        pieChart.setDrawHoleEnabled(true);
+//        pieChart.setHoleRadius(0f);
+//        pieChart.setHoleColor(Color.TRANSPARENT);
+//        pieChart.setTransparentCircleAlpha(0);
+//        pieChart.setCenterText("");
+//        pieChart.setEntryLabelColor(Color.TRANSPARENT);
+//        pieChart.setEntryLabelTextSize(0f);
+//        pieChart.getDescription().setEnabled(false);
 
+        PieData data = new PieData(dataSet);
+        data.setDrawValues(false);
         pieChart.setData(data);
-        pieChart.setUsePercentValues(true);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(Color.TRANSPARENT);
-        pieChart.setTransparentCircleAlpha(110);
-        pieChart.setCenterText("Leave Distribution");
-        pieChart.setCenterTextSize(16f);
+
         pieChart.getDescription().setEnabled(false);
-        pieChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
-        pieChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
-        pieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        pieChart.setDrawHoleEnabled(false);
+        pieChart.setHoleRadius(25f);
+        pieChart.setCenterText("");
+        pieChart.setTransparentCircleRadius(45f);
+        pieChart.animateXY(1000, 1000);
+        pieChart.setDrawEntryLabels(false);
+        pieChart.invalidate();
+
+        // Legend setup
+        Legend legend = pieChart.getLegend();
+        legend.setEnabled(false);
+        legend.setOrientation(Legend.LegendOrientation.VERTICAL);
+        legend.setDrawInside(false);
+        legend.setWordWrapEnabled(true);
+        legend.setTextSize(8f);
+        legend.setForm(Legend.LegendForm.CIRCLE);
+        legend.setXEntrySpace(8f);
+        legend.setYEntrySpace(8f);
+
+        // Custom MarkerView to show selected info on chart
+        MarkerView mv = new MarkerView(pieChart.getContext(), R.layout.marker_view) {
+            @Override
+            public void refreshContent(Entry e, Highlight highlight) {
+                if (e instanceof PieEntry) {
+                    PieEntry pieEntry = (PieEntry) e;
+                    float total = 0f;
+                    for (int val : values) total += val;
+                    float percentage = (pieEntry.getValue() / total) * 100f;
+
+                    TextView tv = findViewById(R.id.marker_text);
+                    tv.setText(pieEntry.getLabel() + "\n" + String.format(Locale.US, "%.1f", percentage) + "%");
+                }
+                super.refreshContent(e, highlight);
+            }
+
+            @Override
+            public MPPointF getOffset() {
+                return new MPPointF(-(getWidth() / 2f), -getHeight());
+            }
+        };
+        pieChart.setMarker(mv);
 
         pieChart.animateY(1400, Easing.EaseInOutQuad);
-        pieChart.invalidate(); // Refresh chart
+        pieChart.invalidate();
     }
-
-//    private int getColorFromName(String colorName) {
-//        switch (colorName.toLowerCase()) {
-//            case "red":
-//                return Color.RED;
-//            case "blue":
-//                return Color.BLUE;
-//            case "green":
-//                return Color.GREEN;
-//            case "lime":
-//                return Color.rgb(0, 255, 0);
-//            case "maroon":
-//                return Color.rgb(128, 0, 0);
-//            case "orange":
-//                return Color.rgb(255, 165, 0);
-//            case "yellow":
-//                return Color.YELLOW;
-//            case "purple":
-//                return Color.MAGENTA;
-//            case "teal":
-//                return Color.CYAN;
-//            default:
-//                return Color.GRAY;
-//        }
-//    }
 
 
     @Override

@@ -43,11 +43,10 @@
                     android:id="@+id/employeeName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Dheeraj Tripathi"
+                    android:text="Xe Digital.ai"
                     android:textColor="#212121"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:text="John Doe" />
+                    android:textStyle="bold" />
 
                 <!-- Employee Code -->
                 <TextView
@@ -71,12 +70,12 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="4dp"
-                    android:contentDescription="Birthday Icon"
-                    android:src="@mipmap/cake" />
+                <!--                <ImageView-->
+                <!--                    android:layout_width="16dp"-->
+                <!--                    android:layout_height="16dp"-->
+                <!--                    android:layout_marginEnd="4dp"-->
+                <!--                    android:contentDescription="Birthday Icon"-->
+                <!--                    android:src="@mipmap/cake" />-->
 
                 <TextView
                     android:id="@+id/birthdayDate"

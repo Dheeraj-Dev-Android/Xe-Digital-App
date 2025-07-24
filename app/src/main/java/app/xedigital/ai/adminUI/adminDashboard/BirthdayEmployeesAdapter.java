@@ -20,7 +20,6 @@ import com.bumptech.glide.request.RequestOptions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +38,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         this.birthdayEmployees = new ArrayList<>();
     }
 
-    // Method to set up horizontal scrolling for the RecyclerView
     public static void setupHorizontalScrolling(RecyclerView recyclerView) {
         // Set horizontal LinearLayoutManager
         LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -49,14 +47,66 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         recyclerView.addItemDecoration(new HorizontalSpaceItemDecoration(recyclerView.getContext().getResources().getDimensionPixelSize(R.dimen.birthday_item_spacing)));
     }
 
-    //    public void updateBirthdayEmployees(List<EmployeesItem> employees) {
-//        this.birthdayEmployees = employees != null ? employees : new ArrayList<>();
+//    public void updateBirthdayEmployees(List<EmployeesItem> employees) {
+//        this.birthdayEmployees = employees != null ? new ArrayList<>(employees) : new ArrayList<>();
+//
+//        this.birthdayEmployees.sort(new Comparator<EmployeesItem>() {
+//            private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//
+//            @Override
+//            public int compare(EmployeesItem e1, EmployeesItem e2) {
+//                try {
+//                    if (e1.getDateOfBirth() == null || e2.getDateOfBirth() == null) {
+//                        return 0;
+//                    }
+//
+//                    Date date1 = sdf.parse(e1.getDateOfBirth());
+//                    Date date2 = sdf.parse(e2.getDateOfBirth());
+//
+//                    Calendar cal1 = Calendar.getInstance();
+//                    Calendar cal2 = Calendar.getInstance();
+//
+//                    cal1.setTime(date1);
+//                    cal2.setTime(date2);
+//
+//                    int month1 = cal1.get(Calendar.MONTH);
+//                    int day1 = cal1.get(Calendar.DAY_OF_MONTH);
+//
+//                    int month2 = cal2.get(Calendar.MONTH);
+//                    int day2 = cal2.get(Calendar.DAY_OF_MONTH);
+//
+//                    // Compare by month first, then by day
+//                    if (month1 != month2) {
+//                        return Integer.compare(month1, month2);
+//                    } else {
+//                        return Integer.compare(day1, day2);
+//                    }
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                    return 0;
+//                }
+//            }
+//        });
+//
 //        notifyDataSetChanged();
 //    }
-    public void updateBirthdayEmployees(List<EmployeesItem> employees) {
-        this.birthdayEmployees = employees != null ? new ArrayList<>(employees) : new ArrayList<>();
 
-        Collections.sort(this.birthdayEmployees, new Comparator<EmployeesItem>() {
+    public void updateBirthdayEmployees(List<EmployeesItem> employees) {
+        if (employees == null) {
+            this.birthdayEmployees = new ArrayList<>();
+        } else {
+            // Filter only active employees
+            this.birthdayEmployees = new ArrayList<>();
+            for (EmployeesItem emp : employees) {
+                if (emp.isActive()) {
+                    this.birthdayEmployees.add(emp);
+                }
+
+            }
+        }
+
+        // Sort by birthday (month and day)
+        this.birthdayEmployees.sort(new Comparator<EmployeesItem>() {
             private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
             @Override
@@ -81,7 +131,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
                     int month2 = cal2.get(Calendar.MONTH);
                     int day2 = cal2.get(Calendar.DAY_OF_MONTH);
 
-                    // Compare by month first, then by day
                     if (month1 != month2) {
                         return Integer.compare(month1, month2);
                     } else {
@@ -206,9 +255,9 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
 
             // Add special styling for today's birthday
             if (isBirthdayToday(dateOfBirth)) {
-                birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.holo_red_light));
+                birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.white));
             } else {
-                birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.black));
+                birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.white));
             }
         }
 
