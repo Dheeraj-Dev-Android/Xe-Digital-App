@@ -5,6 +5,7 @@ import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
 import app.xedigital.ai.model.Admin.Dashboard.AdminDashboardResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.model.Admin.LeaveGraph.LeaveGraphResponse;
+import app.xedigital.ai.model.Admin.Role.UserRoleResponse;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
@@ -51,6 +52,9 @@ public interface AdminAPIInterface {
 
     @PUT("partners/profile/{partnerId}")
     retrofit2.Call<ResponseBody> updatePartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId, @Body RequestBody requestBody);
+
+    @GET("roles")
+    retrofit2.Call<UserRoleResponse> getRoles(@Header("Authorization") String authToken);
 
     //GET APIs
     @GET("employees")

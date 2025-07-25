@@ -1,12 +1,17 @@
 package app.xedigital.ai.adminAdapter;
 
+import static app.xedigital.ai.ui.timesheet.SelectedTimesheetFragment.ARG_SELECTED_ITEM;
+
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
@@ -109,7 +114,20 @@ public class AllUsersAdapter extends RecyclerView.Adapter<AllUsersAdapter.UserVi
 
             // Action click
             actionButton.setOnClickListener(v -> {
-                if (listener != null) listener.onUserClicked(user);
+                int adapterPosition = getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    UsersItem selectedItem = users.get(adapterPosition);
+                    String userId = selectedItem.getId();
+                    if (userId != null) {
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(ARG_SELECTED_ITEM, selectedItem);
+                        Navigation.findNavController(v).navigate(R.id.nav_allUsers_to_nav_editUser, bundle);
+                    } else {
+                        Toast.makeText(v.getContext(), "Selected Employee or EmployeeId is null", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(v.getContext(), "Invalid position", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 

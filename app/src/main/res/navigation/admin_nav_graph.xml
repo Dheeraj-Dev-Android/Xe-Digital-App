@@ -39,6 +39,20 @@
         android:id="@+id/nav_allUsers"
         android:name="app.xedigital.ai.adminUI.allUsers.AllUsersFragment"
         android:label="All Users"
-        tools:layout="@layout/fragment_all_users" />
+        tools:layout="@layout/fragment_all_users">
+        <action
+            android:id="@+id/nav_allUsers_to_nav_editUser"
+            app:destination="@id/nav_editUser" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_editUser"
+        android:name="app.xedigital.ai.adminUI.allUsers.EditUserFragment"
+        android:label="Edit User"
+        tools:layout="@layout/fragment_edit_user">
+        <action
+            android:id="@+id/nav_editUser_to_nav_allUsers"
+            app:destination="@id/nav_allUsers" />
+    </fragment>
 
 </navigation>

@@ -2,7 +2,9 @@ package app.xedigital.ai.model.Admin.AdminUsers;
 
 import com.google.gson.annotations.SerializedName;
 
-public class UsersItem {
+import java.io.Serializable;
+
+public class UsersItem implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;
