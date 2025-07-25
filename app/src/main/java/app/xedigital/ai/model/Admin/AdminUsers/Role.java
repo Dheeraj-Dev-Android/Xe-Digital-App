@@ -2,7 +2,9 @@ package app.xedigital.ai.model.Admin.AdminUsers;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Role {
+import java.io.Serializable;
+
+public class Role implements Serializable {
 
     @SerializedName("displayName")
     private String displayName;

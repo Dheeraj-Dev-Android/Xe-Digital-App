@@ -2,7 +2,9 @@ package app.xedigital.ai.model.Admin.AdminUsers;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Branch {
+import java.io.Serializable;
+
+public class Branch implements Serializable {
 
     @SerializedName("contact")
     private String contact;
