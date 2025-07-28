@@ -22,6 +22,12 @@ public class EditUserViewModel extends ViewModel {
     public LiveData<List<RolesItem>> getRolesLiveData() {
         return rolesLiveData;
     }
+//    private final Context context;
+
+//    public EditUserViewModel(Context context) {
+//        this.context = context.getApplicationContext();
+//    }
+
 
     public void fetchRoles(String authToken) {
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
@@ -35,8 +41,31 @@ public class EditUserViewModel extends ViewModel {
 
             @Override
             public void onFailure(@NonNull Call<UserRoleResponse> call, @NonNull Throwable t) {
-                rolesLiveData.postValue(null); // Or handle with error message LiveData
+                rolesLiveData.postValue(null);
             }
         });
     }
+
+//    public void updateUser(String authToken, String userId, RequestBody requestBody) {
+//        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+//        Call<ResponseBody> call = apiService.updateUser(authToken, userId, requestBody);
+//
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(context, "User updated successfully", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    Toast.makeText(context, "Failed to update user: " + response.code(), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<ResponseBody> call, Throwable t) {
+//                Toast.makeText(context, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+////                Toast.makeText(context, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+
 }

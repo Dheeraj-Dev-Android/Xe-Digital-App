@@ -69,6 +69,9 @@ public interface AdminAPIInterface {
     @GET("users/profile/{userId}")
     Call<UserDetailsResponse> getUser(@Header("Authorization") String authToken, @Path("userId") String userId);
 
+    @PUT("users/profile/{userId}")
+    Call<ResponseBody> updateUser(@Header("Authorization") String authToken, @Path("userId") String userId, @Body RequestBody requestBody);
+
     @GET("visitorcategories")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<ResponseBody> getVisitorCategories(@Header("Authorization") String authToken);
