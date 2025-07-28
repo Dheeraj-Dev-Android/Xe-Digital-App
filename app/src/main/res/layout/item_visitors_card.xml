@@ -6,7 +6,11 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:rippleColor="@color/primary_light"
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -25,18 +29,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/CircularImageView" />
 
-        <!-- View More Button at top-right -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/btnViewMoreVisitor"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@drawable/circular_background"
-            android:padding="8dp"
-            android:src="@drawable/ic_eye"
-            app:layout_constraintEnd_toEndOf="@+id/visProfile"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/CircularImageView"
-            app:tint="@color/icon_tint" />
 
         <!-- Employee details below -->
         <LinearLayout
@@ -49,141 +41,203 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/visProfile">
 
-            <!-- Repeating horizontal rows -->
+            <!-- Name Row -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lblName"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Name:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.textview.MaterialTextView
+                <TextView
                     android:id="@+id/visName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text=" Xe Digital" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:orientation="horizontal">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lblWhomToMeet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="WhomToMeet: "
+                    android:layout_weight="2"
+                    android:text="Xe Digital"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.textview.MaterialTextView
+            </LinearLayout>
+
+
+            <!-- Whom to Meet Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Whom to Meet:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/visWhomToMeet"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="WhomToMeet" />
+                    android:layout_weight="2"
+                    android:text="WhomToMeet"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
             </LinearLayout>
 
+            <!-- Contact Row -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lblContact"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Contact: "
+                    android:layout_weight="1"
+                    android:text="Contact:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.textview.MaterialTextView
+                <TextView
                     android:id="@+id/visContact"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:layout_weight="2"
+                    android:autoLink="phone"
                     android:text="+919874563210"
-                    android:textSize="12sp" />
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
             </LinearLayout>
 
+            <!-- Email Row -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lblEmail"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Visitor Mail : "
+                    android:layout_weight="1"
+                    android:text="Visitor Mail:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.textview.MaterialTextView
+                <TextView
                     android:id="@+id/visEmail"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="Vistior@xeDigital.ai"
-                    android:textSize="12sp" />
+                    android:layout_weight="2"
+                    android:autoLink="email"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Visitor@xeDigital.ai"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
             </LinearLayout>
 
+            <!-- Check In Date Row -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lblCheckInDate"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Check In Date :"
+                    android:layout_weight="1"
+                    android:text="Check In Date:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.textview.MaterialTextView
+                <TextView
                     android:id="@+id/visCheckInDate"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text=" Check In Date "
-                    android:textSize="12sp" />
+                    android:layout_weight="2"
+                    android:text="Check In Date"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
             </LinearLayout>
 
-            <!-- Status row -->
+            <!-- Status Row -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lblApprovalStatus"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Approval Status:"
+                    android:layout_weight="1"
+                    android:text="Status:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/visApprovalStatus"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:checkable="false"
+                    android:clickable="false"
                     android:text="Approved"
                     android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="@color/success_light"
+                    app:chipCornerRadius="12dp"
+                    app:chipMinHeight="24dp" />
+                <!-- View Button -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnViewMoreVisitor"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/circular_background"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_eye"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:tint="@color/icon_tint" />
+
+                <!-- Print Button -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnPrintVisitor"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/circular_background"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_print"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:tint="@color/icon_tint" />
+
             </LinearLayout>
 
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </com.google.android.material.card.MaterialCardView>

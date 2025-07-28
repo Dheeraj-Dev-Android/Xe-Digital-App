@@ -38,12 +38,9 @@ public class AllUsersFragment extends Fragment {
     private void applyFilters(String searchText, String status) {
         filteredUsers.clear();
         for (UsersItem user : allUsers) {
-            boolean matchesSearch = user.getFirstname().toLowerCase().contains(searchText.toLowerCase()) ||
-                    user.getLastname().toLowerCase().contains(searchText.toLowerCase());
+            boolean matchesSearch = user.getFirstname().toLowerCase().contains(searchText.toLowerCase()) || user.getLastname().toLowerCase().contains(searchText.toLowerCase());
 
-            boolean matchesStatus = status.equals("All") ||
-                    (status.equals("Active") && user.isActive()) ||
-                    (status.equals("Inactive") && !user.isActive());
+            boolean matchesStatus = status.equals("All") || (status.equals("Active") && user.isActive()) || (status.equals("Inactive") && !user.isActive());
 
             if (matchesSearch && matchesStatus) {
                 filteredUsers.add(user);
@@ -57,48 +54,10 @@ public class AllUsersFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_all_users, container, false);
     }
 
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//        mViewModel = new ViewModelProvider(this).get(AllUsersViewModel.class);
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
-//        String token = sharedPreferences.getString("authToken", "");
-//        String authToken = "jwt " + token;
-//
-//        mViewModel.fetchAllUsers(authToken);
-//
-//        RecyclerView recyclerView = view.findViewById(R.id.allUserRecyclerView);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//
-//        AllUsersAdapter adapter = new AllUsersAdapter(new ArrayList<>(), user -> {
-//            // Handle user click
-//            Toast.makeText(getContext(), "Clicked: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-//        });
-//
-//        recyclerView.setAdapter(adapter);
-//
-//        mViewModel.getUserResponse().observe(getViewLifecycleOwner(), response -> {
-//            if (response != null && response.getData() != null) {
-//                adapter.updateData(response.getData().getUsers());
-//            }
-//        });
-//
-//
-//        mViewModel.getLoadingStatus().observe(getViewLifecycleOwner(), isLoading -> {
-//            // Show/hide loading spinner
-//        });
-//
-//        mViewModel.getError().observe(getViewLifecycleOwner(), errorMsg -> {
-//            // Show error message
-//            Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-//        });
-//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

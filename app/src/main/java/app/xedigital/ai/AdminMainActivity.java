@@ -75,8 +75,6 @@ public class AdminMainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.adminNavView;
         navController = Navigation.findNavController(this, R.id.admin_nav_host_fragment_content_main);
 
-//        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_logout).setOpenableLayout(drawer).build();
-
         mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -84,12 +82,6 @@ public class AdminMainActivity extends AppCompatActivity {
 
         // Handle dismiss slow internet layout
         slowInternetBinding.btnDismiss.setOnClickListener(v -> slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
-
-        // Menu item listeners
-        navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener(item -> {
-            handleLogout();
-            return true;
-        });
 
         // Digital Identity main toggle item
         MenuItem digitalIdentityGroup = navigationView.getMenu().findItem(R.id.nav_digital_identity);
@@ -100,36 +92,17 @@ public class AdminMainActivity extends AppCompatActivity {
         // Set all sub-items initially hidden (if needed)
         setVisitorSubMenuVisibility(navigationView.getMenu(), false);
 
-        navigationView.getMenu().findItem(R.id.nav_visitorCheckInFragment).setOnMenuItemClickListener(item -> {
-            navController.navigate(R.id.nav_visitorCheckInFragment);
-            return true;
-        });
-
-        navigationView.getMenu().findItem(R.id.nav_employees).setOnMenuItemClickListener(item -> {
-            navController.navigate(R.id.nav_employees);
-            return true;
-        });
-        navigationView.getMenu().findItem(R.id.nav_admin_dashboard).setOnMenuItemClickListener(item -> {
-            navController.navigate(R.id.nav_admin_dashboard);
-
-            return true;
-        });
-
-        navigationView.getMenu().findItem(R.id.nav_partners).setOnMenuItemClickListener(item -> {
-            navController.navigate(R.id.nav_partners);
-            return true;
-        });
-
-        navigationView.getMenu().findItem(R.id.nav_allUsers).setOnMenuItemClickListener(item -> {
-            navController.navigate(R.id.nav_allUsers);
-            return true;
-        });
-
         if (navigationView != null) {
             fetchUserProfileData();
         } else {
             Log.e(TAG, "Navigation view is null, cannot fetch user profile");
         }
+
+        MenuItem logout = navigationView.getMenu().findItem(R.id.nav_logout);
+        logout.setOnMenuItemClickListener(item -> {
+            handleLogout();
+            return true;
+        });
     }
 
     private void setVisitorSubMenuVisibility(Menu menu, boolean visible) {

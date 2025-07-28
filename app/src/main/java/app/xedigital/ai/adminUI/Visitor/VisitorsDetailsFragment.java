@@ -94,7 +94,11 @@ public class VisitorsDetailsFragment extends Fragment {
                 }
             }
         }
-        adapter.notifyDataSetChanged();
+//        adapter.notifyDataSetChanged();
+
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private String getAuthToken() {

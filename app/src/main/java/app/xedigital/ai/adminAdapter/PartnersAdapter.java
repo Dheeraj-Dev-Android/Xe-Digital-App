@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +18,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import org.json.JSONObject;
 
@@ -58,6 +58,17 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
         return new ViewHolder(view);
     }
 
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "?";
+        String[] words = name.trim().split(" ");
+        if (words.length == 1) {
+            return words[0].substring(0, 1).toUpperCase();
+        } else {
+            return (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
+        }
+    }
+
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         PartnersItem partner = partnersList.get(position);
@@ -68,10 +79,13 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
         holder.address.setText(partner.getAddress() + ", " + partner.getCity() + ", " + partner.getState());
         holder.website.setText(partner.getWebsite());
         holder.createdDate.setText(DateTimeUtils.getDayOfWeekAndDate(partner.getCreatedAt()));
+        String name = partner.getName();
+        holder.avatarText.setText(getInitials(name));
+
 
         boolean isActive = partner.isActive();
         String statusText = isActive ? "Active" : "Deactive";
-        int chipBackgroundColorResourceId = isActive ? R.color.active_green : R.color.status_rejected;
+        int chipBackgroundColorResourceId = isActive ? R.color.success : R.color.error;
 
         holder.status.setText(statusText);
         holder.status.setChipBackgroundColorResource(chipBackgroundColorResourceId);
@@ -93,6 +107,7 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
             EditText websiteEdit = editView.findViewById(R.id.editWebsite);
             Button submitButton = editView.findViewById(R.id.btnSubmit);
             Button clearButton = editView.findViewById(R.id.btnClear);
+
 
             // Fill data from partner
             nameEdit.setText(partner.getName());
@@ -215,7 +230,9 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
         TextView contact, address, website, createdDate;
         Chip status;
         CardView cardView;
-        ImageButton edit;
+        ShapeableImageView edit;
+        TextView avatarText;
+
 
         public ViewHolder(View view) {
             super(view);
@@ -227,6 +244,8 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
             status = view.findViewById(R.id.partnerStatus);
             createdDate = view.findViewById(R.id.partnerCreatedDate);
             edit = view.findViewById(R.id.btnEdit);
+            avatarText = view.findViewById(R.id.avatarText);
+
 
             cardView = view.findViewById(R.id.partnerCard);
         }

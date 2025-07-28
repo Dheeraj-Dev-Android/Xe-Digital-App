@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,6 +82,70 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             holder.visProfile.setImageResource(R.drawable.ic_user_placeholder);
         }
 
+//        holder.btnViewMoreVisitor.setOnClickListener(v -> {
+//            Toast.makeText(context, "View More", Toast.LENGTH_SHORT).show();
+//        });
+
+        holder.btnPrintVisitor.setOnClickListener(v -> {
+            Toast.makeText(context, "Available Soon :)", Toast.LENGTH_SHORT).show();
+        });
+
+        holder.btnViewMoreVisitor.setOnClickListener(v -> {
+            View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_visitor_details, null);
+
+            // Find all dialog views
+            ShapeableImageView imgProfile = dialogView.findViewById(R.id.imgProfile);
+            TextView tvFullName = dialogView.findViewById(R.id.tvFullName);
+            TextView tvContact = dialogView.findViewById(R.id.tvContact);
+            TextView tvEmail = dialogView.findViewById(R.id.tvEmail);
+            TextView tvWhomToMeet = dialogView.findViewById(R.id.tvWhomToMeet);
+            TextView tvCheckInDate = dialogView.findViewById(R.id.tvCheckInDate);
+            TextView tvCheckOutDate = dialogView.findViewById(R.id.tvCheckOutDate);
+            TextView tvCheckInTime = dialogView.findViewById(R.id.tvCheckInTime);
+            TextView tvCheckOutTime = dialogView.findViewById(R.id.tvCheckOutTime);
+            TextView tvCompanyFrom = dialogView.findViewById(R.id.tvCompanyFrom);
+            TextView tvLaptopSerial = dialogView.findViewById(R.id.tvLaptopSerial);
+
+            // Set data for all fields
+            tvFullName.setText(visitor.getName());
+            tvContact.setText(visitor.getContact());
+            tvEmail.setText(visitor.getEmail());
+            tvWhomToMeet.setText((visitor.getWhomToMeet() != null ?
+                    visitor.getWhomToMeet().getFirstname() + " " + visitor.getWhomToMeet().getLastname() : "N/A"));
+
+            // Date and Time fields
+            tvCheckInDate.setText(DateTimeUtils.getDayOfWeekAndDate(visitor.getSignIn()));
+            tvCheckOutDate.setText(visitor.getSignOut() != null ?
+                    DateTimeUtils.getDayOfWeekAndDate(visitor.getSignOut()) : "N/A");
+            tvCheckInTime.setText(visitor.getSignIn() != null ?
+                    DateTimeUtils.extractTime(visitor.getSignIn()) : "N/A");
+            tvCheckOutTime.setText(visitor.getSignOut() != null ?
+                    DateTimeUtils.extractTime(visitor.getSignOut()) : "N/A");
+
+            // Company and laptop serial
+            tvCompanyFrom.setText(visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A");
+            tvLaptopSerial.setText(visitor.getSerialNumber() != null ? visitor.getSerialNumber() : "N/A");
+
+            // Profile image
+            if (visitor.getProfileImagePath() != null) {
+                Glide.with(context)
+                        .load(visitor.getProfileImagePath())
+                        .placeholder(R.drawable.ic_user_placeholder)
+                        .into(imgProfile);
+            } else {
+                imgProfile.setImageResource(R.drawable.ic_user_placeholder);
+            }
+
+            // Build and show dialog
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setView(dialogView)
+                    .setCancelable(true)
+                    .setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+
+            android.app.AlertDialog dialog = builder.create();
+            dialog.show();
+        });
+
 
     }
 
@@ -92,7 +157,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
     public class VisitorViewHolder extends RecyclerView.ViewHolder {
         TextView visName, visWhomToMeet, visContact, visEmail, visCheckInDate;
         Chip visApprovalStatus;
-        ShapeableImageView visProfile;
+        ShapeableImageView visProfile, btnViewMoreVisitor, btnPrintVisitor;
 
         public VisitorViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -103,6 +168,8 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             visCheckInDate = itemView.findViewById(R.id.visCheckInDate);
             visApprovalStatus = itemView.findViewById(R.id.visApprovalStatus);
             visProfile = itemView.findViewById(R.id.visProfile);
+            btnViewMoreVisitor = itemView.findViewById(R.id.btnViewMoreVisitor);
+            btnPrintVisitor = itemView.findViewById(R.id.btnPrintVisitor);
         }
     }
 }

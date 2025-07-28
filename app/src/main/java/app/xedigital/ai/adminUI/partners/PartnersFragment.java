@@ -65,8 +65,10 @@ public class PartnersFragment extends Fragment {
             partnersViewModel.fetchPartners(token);
         });
 
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
+
         return view;
     }
 

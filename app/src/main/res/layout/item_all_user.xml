@@ -272,6 +272,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/circular_background"
+            android:contentDescription="Edit User"
             android:padding="8dp"
             android:src="@mipmap/edit_profile_round"
             app:layout_constraintEnd_toEndOf="parent"
