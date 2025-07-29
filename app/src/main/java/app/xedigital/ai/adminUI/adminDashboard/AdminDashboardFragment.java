@@ -103,12 +103,9 @@ public class AdminDashboardFragment extends Fragment {
 
     private void setupRecyclerView() {
         birthdayAdapter = new BirthdayEmployeesAdapter();
-//        birthdayRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         BirthdayEmployeesAdapter.setupHorizontalScrolling(birthdayRecyclerView);
         birthdayRecyclerView.setAdapter(birthdayAdapter);
         birthdayRecyclerView.setNestedScrollingEnabled(false);
-        // Optional: Add snap helper for smooth item-by-item scrolling
-        // This makes the scrolling snap to each item like a pager
         androidx.recyclerview.widget.PagerSnapHelper snapHelper = new androidx.recyclerview.widget.PagerSnapHelper();
         snapHelper.attachToRecyclerView(birthdayRecyclerView);
     }

@@ -1,12 +1,14 @@
 package app.xedigital.ai.adminAdapter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +19,7 @@ import com.google.android.material.textview.MaterialTextView;
 import java.util.List;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.adminUI.employeeDetails.EditEmployeeFragment;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
 
 public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
@@ -50,7 +53,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         if (employee.getDepartment() != null && employee.getDepartment().getName() != null) {
             holder.tvDepartment.setText(employee.getDepartment().getName());
         } else {
-            holder.tvDepartment.setText("N/A"); // or use empty string or placeholder
+            holder.tvDepartment.setText("N/A");
         }
         if (employee.getShift() != null &&
                 employee.getShift().getName() != null &&
@@ -75,13 +78,34 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
         // Load profile image using Glide (fallback to placeholder)
         if (employee.getProfileImageUrl() != null) {
-            Glide.with(context).load(employee.getProfileImageUrl()).placeholder(R.drawable.ic_user_placeholder).into(holder.ivProfile);
+            Glide.with(context).load(employee.getProfileImageUrl()).placeholder(R.drawable.ic_profile_placeholder).into(holder.ivProfile);
         } else {
-            holder.ivProfile.setImageResource(R.drawable.ic_user_placeholder);
+            holder.ivProfile.setImageResource(R.drawable.ic_profile_placeholder);
         }
 
         holder.btnViewMore.setOnClickListener(v -> {
             Toast.makeText(context, "View more for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+        });
+        holder.empEditBtn.setOnClickListener(v -> {
+            Toast.makeText(context, "Edit for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+            EmployeesItem selectedItem = employeeList.get(position);
+            String userId = selectedItem.getId();
+            if (userId != null) {
+//                EditEmployeeFragment fragment = new EditEmployeeFragment();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(EditEmployeeFragment.ARG_SELECTED_ITEM, selectedItem);
+//                fragment.setArguments(bundle);
+                Navigation.findNavController(v).navigate(R.id.nav_employees_to_nav_editEmployee, bundle);
+            } else {
+                Toast.makeText(v.getContext(), "Selected Employee or EmployeeId is null", Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.empAddFace.setOnClickListener(v -> {
+            Toast.makeText(context, "Add Face for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+        });
+
+        holder.empAddLeave.setOnClickListener(v -> {
+            Toast.makeText(context, "Add Leave for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -94,7 +118,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         ShapeableImageView ivProfile;
         MaterialTextView tvName, tvEmail, tvDesignation, tvDepartment, tvShift;
         Chip chipStatus;
-        ShapeableImageView btnViewMore;
+        ShapeableImageView btnViewMore, empEditBtn, empAddFace, empAddLeave;
 
         public EmployeeViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -106,6 +130,9 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             tvShift = itemView.findViewById(R.id.emplShift);
             chipStatus = itemView.findViewById(R.id.emplChipStatus);
             btnViewMore = itemView.findViewById(R.id.btnViewMore);
+            empEditBtn = itemView.findViewById(R.id.empEditBtn);
+            empAddFace = itemView.findViewById(R.id.empAddFace);
+            empAddLeave = itemView.findViewById(R.id.empAddLeave);
         }
     }
 }

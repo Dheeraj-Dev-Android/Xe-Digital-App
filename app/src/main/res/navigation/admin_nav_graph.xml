@@ -21,7 +21,11 @@
         android:id="@+id/nav_employees"
         android:name="app.xedigital.ai.adminUI.employeeDetails.EmployeeDetailsFragment"
         android:label="Employees"
-        tools:layout="@layout/fragment_employee_details" />
+        tools:layout="@layout/fragment_employee_details">
+        <action
+            android:id="@+id/nav_employees_to_nav_editEmployee"
+            app:destination="@id/nav_editEmployee" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_visitorDetailsFragment"
@@ -53,6 +57,17 @@
         <action
             android:id="@+id/nav_editUser_to_nav_allUsers"
             app:destination="@id/nav_allUsers" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_editEmployee"
+        android:name="app.xedigital.ai.adminUI.employeeDetails.EditEmployeeFragment"
+        android:label="Edit Employee"
+        tools:layout="@layout/fragment_edit_employee">
+        <action
+            android:id="@+id/nav_editEmployee_to_nav_employees"
+            app:destination="@id/nav_employees" />
+
     </fragment>
 
 </navigation>

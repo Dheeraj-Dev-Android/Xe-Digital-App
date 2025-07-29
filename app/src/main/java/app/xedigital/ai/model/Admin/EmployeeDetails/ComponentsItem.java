@@ -2,7 +2,9 @@ package app.xedigital.ai.model.Admin.EmployeeDetails;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ComponentsItem {
+import java.io.Serializable;
+
+public class ComponentsItem implements Serializable {
 
     @SerializedName("calculationType")
     private String calculationType;
