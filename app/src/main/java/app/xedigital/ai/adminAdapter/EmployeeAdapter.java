@@ -5,13 +5,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
@@ -46,8 +49,6 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         holder.tvName.setText(employee.getFirstname() + " " + employee.getLastname());
         holder.tvEmail.setText(employee.getEmail());
         holder.tvDesignation.setText(employee.getDesignation());
-//        holder.tvDepartment.setText(employee.getDepartment().getName());
-//        holder.tvShift.setText(employee.getShift().getName() + " : " + employee.getShift().getStartTime() + "-" + employee.getShift().getEndTime());
         holder.chipStatus.setText(employee.isActive() ? "Active" : "Inactive");
 
         if (employee.getDepartment() != null && employee.getDepartment().getName() != null) {
@@ -55,14 +56,9 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         } else {
             holder.tvDepartment.setText("N/A");
         }
-        if (employee.getShift() != null &&
-                employee.getShift().getName() != null &&
-                employee.getShift().getStartTime() != null &&
-                employee.getShift().getEndTime() != null) {
+        if (employee.getShift() != null && employee.getShift().getName() != null && employee.getShift().getStartTime() != null && employee.getShift().getEndTime() != null) {
 
-            String shiftText = employee.getShift().getName() + " ( " +
-                    employee.getShift().getStartTime() + " - " +
-                    employee.getShift().getEndTime() + ")";
+            String shiftText = employee.getShift().getName() + " ( " + employee.getShift().getStartTime() + " - " + employee.getShift().getEndTime() + ")";
             holder.tvShift.setText(shiftText);
         } else {
             holder.tvShift.setText("Shift not assigned");
@@ -104,9 +100,40 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             Toast.makeText(context, "Add Face for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
         });
 
+//        holder.empAddLeave.setOnClickListener(v -> {
+//            Toast.makeText(context, "Add Leave for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+//        });
         holder.empAddLeave.setOnClickListener(v -> {
-            Toast.makeText(context, "Add Leave for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+            // Inflate the custom layout
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View dialogView = inflater.inflate(R.layout.item_add_leave, null);
+
+            // Optional: If you want to access views from dialogView
+            TextView tvTitle = dialogView.findViewById(R.id.tvTitle);
+            tvTitle.setText("Leave Assign - " + employee.getFirstname() + " " + employee.getLastname());
+
+            MaterialButton btnClose = dialogView.findViewById(R.id.btnClose);
+            MaterialButton btnSubmit = dialogView.findViewById(R.id.btnSubmit);
+
+            // Build the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog);
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+
+            // Close button action
+            btnClose.setOnClickListener(view -> dialog.dismiss());
+
+            // Submit button action
+            btnSubmit.setOnClickListener(view -> {
+                // Handle submission logic here
+                Toast.makeText(context, "Leave submitted for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            });
+
+            // Show the dialog
+            dialog.show();
         });
+
     }
 
     @Override

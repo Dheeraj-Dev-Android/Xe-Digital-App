@@ -1,5 +1,6 @@
 package app.xedigital.ai.adminApi;
 
+import app.xedigital.ai.model.Admin.ActiveShift.ActiveShiftResponse;
 import app.xedigital.ai.model.Admin.AdminUsers.AdminUserResponse;
 import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
 import app.xedigital.ai.model.Admin.Dashboard.AdminDashboardResponse;
@@ -11,7 +12,9 @@ import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
 import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
+import app.xedigital.ai.model.Admin.department.DepartmentResponse;
 import app.xedigital.ai.model.Admin.partners.PartnersResponse;
+import app.xedigital.ai.model.Admin.updateEmployee.UpdateEmployeeRequest;
 import app.xedigital.ai.model.Admin.visitorContact.VisitorContactResponse;
 import app.xedigital.ai.model.Admin.visitorFace.VisitorFaceResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
@@ -58,13 +61,23 @@ public interface AdminAPIInterface {
 
     //GET APIs
     @GET("employees")
-//    @GET("employees?active=true")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
+
+    @PUT("employees/profile/{employeeId}")
+    retrofit2.Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
 
     @GET("dashboard")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<AdminDashboardResponse> getDashboard(@Header("Authorization") String authToken);
+
+    @GET("departments")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<DepartmentResponse> getDepartments(@Header("Authorization") String authToken);
+
+    @GET("shifts?active=true")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<ActiveShiftResponse> getShifts(@Header("Authorization") String authToken);
 
     @GET("users/profile/{userId}")
     Call<UserDetailsResponse> getUser(@Header("Authorization") String authToken, @Path("userId") String userId);

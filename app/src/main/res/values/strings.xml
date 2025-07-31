@@ -139,5 +139,28 @@
         <item>Deactive</item>
     </string-array>
 
+    <string-array name="differently_able_options">
+        <item>Please Select</item>
+        <item>Visual</item>
+        <item>Hearing</item>
+        <item>Speech</item>
+        <item>Mobility</item>
+        <item>Other</item>
+        <item>Not Differently Abled</item>
+    </string-array>
+
+
+    <string-array name="joining_type_options">
+        <item>Please Select</item>
+        <item>Probation</item>
+        <item>Confirm</item>
+    </string-array>
+
+
+    <string-array name="employee_type_options">
+        <item>Internal Employee</item>
+        <item>Partner</item>
+    </string-array>
+
 
 </resources>

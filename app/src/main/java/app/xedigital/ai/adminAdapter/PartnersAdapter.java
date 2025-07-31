@@ -64,7 +64,12 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
         if (words.length == 1) {
             return words[0].substring(0, 1).toUpperCase();
         } else {
-            return (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
+            if (words[0].isEmpty() || words[1].isEmpty()) {
+                return "?";
+            }
+            String sb = String.valueOf(words[0].charAt(0)) +
+                    words[1].charAt(0);
+            return sb.toUpperCase();
         }
     }
 
