@@ -12,7 +12,10 @@ import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
 import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
+import app.xedigital.ai.model.Admin.assignLeave.AssignLeaveRequest;
 import app.xedigital.ai.model.Admin.department.DepartmentResponse;
+import app.xedigital.ai.model.Admin.leaveBalance.LeaveBalanceResponse;
+import app.xedigital.ai.model.Admin.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.model.Admin.partners.PartnersResponse;
 import app.xedigital.ai.model.Admin.updateEmployee.UpdateEmployeeRequest;
 import app.xedigital.ai.model.Admin.visitorContact.VisitorContactResponse;
@@ -38,14 +41,14 @@ public interface AdminAPIInterface {
     @POST("authentication/login")
     retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
 
+
+    //GET APIs
+
     @GET("leaves/dashboard/graph/approved/employees")
     retrofit2.Call<LeaveGraphResponse> getLeavesGraph(@Header("Authorization") String authToken);
 
     @GET("partners")
     retrofit2.Call<PartnersResponse> getPartners(@Header("Authorization") String authToken);
-
-    @POST("partners")
-    retrofit2.Call<ResponseBody> addPartner(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @GET("partners/profile/{partnerId}")
     retrofit2.Call<UserDetailsResponse> getPartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId);
@@ -59,13 +62,9 @@ public interface AdminAPIInterface {
     @GET("roles")
     retrofit2.Call<UserRoleResponse> getRoles(@Header("Authorization") String authToken);
 
-    //GET APIs
     @GET("employees")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
-
-    @PUT("employees/profile/{employeeId}")
-    retrofit2.Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
 
     @GET("dashboard")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
@@ -82,16 +81,33 @@ public interface AdminAPIInterface {
     @GET("users/profile/{userId}")
     Call<UserDetailsResponse> getUser(@Header("Authorization") String authToken, @Path("userId") String userId);
 
-    @PUT("users/profile/{userId}")
-    Call<ResponseBody> updateUser(@Header("Authorization") String authToken, @Path("userId") String userId, @Body RequestBody requestBody);
-
     @GET("visitorcategories")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<ResponseBody> getVisitorCategories(@Header("Authorization") String authToken);
 
+    @GET("visitors/checkedout/{contact}")
+    retrofit2.Call<VisitorContactResponse> getCheckedOut(@Header("Authorization") String authToken, @Path("contact") String contact);
+
+    @GET("branches/{companyId}/company")
+    retrofit2.Call<CompanyBranchResponse> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
+
+    //    ?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=
+    @GET("visitors")
+    retrofit2.Call<VisitorsAdminDetailsResponse> getVisitors(@Header("Authorization") String authToken);
+
+    @GET("leavetypes?active=true")
+    retrofit2.Call<LeaveTypeResponse> getLeaveTypes(@Header("Authorization") String authToken);
+
+    @GET("leaves/type/{leaveId}/employees/{employeeId}")
+    retrofit2.Call<LeaveBalanceResponse> getLeaves(@Header("Authorization") String authToken, @Path("leaveId") String leaveId, @Path("employeeId") String employeeId);
+
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> recognizeFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("partners")
+    retrofit2.Call<ResponseBody> addPartner(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @POST("employees/face")
     retrofit2.Call<ResponseBody> FaceDetails(@Header("Authorization") String authToken, @Body RequestBody requestBody);
@@ -105,14 +121,8 @@ public interface AdminAPIInterface {
     @POST("otp/tinyurl")
     retrofit2.Call<ResponseBody> getTinyUrl(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
-    @GET("visitors/checkedout/{contact}")
-    retrofit2.Call<VisitorContactResponse> getCheckedOut(@Header("Authorization") String authToken, @Path("contact") String contact);
-
     @POST("/visitors/signout")
     retrofit2.Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @GET("branches/{companyId}/company")
-    retrofit2.Call<CompanyBranchResponse> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
 
     @POST("face/add")
     retrofit2.Call<AddFaceResponse> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
@@ -123,8 +133,15 @@ public interface AdminAPIInterface {
     @POST("visitors/manual")
     retrofit2.Call<ResponseBody> ManualVisitor(@Header("Authorization") String authToken, @Body VisitorManualRequest visitorManualRequest);
 
-    //    ?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=
-    @GET("visitors")
-    retrofit2.Call<VisitorsAdminDetailsResponse> getVisitors(@Header("Authorization") String authToken);
+    @POST("leaves/assign/employee")
+    retrofit2.Call<ResponseBody> assignLeave(@Header("Authorization") String authToken, @Body AssignLeaveRequest requestBody);
+
+    //    PUT APIs
+    @PUT("users/profile/{userId}")
+    Call<ResponseBody> updateUser(@Header("Authorization") String authToken, @Path("userId") String userId, @Body RequestBody requestBody);
+
+    @PUT("employees/profile/{employeeId}")
+    retrofit2.Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
+
 
 }

@@ -35,7 +35,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Leave Type Section -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilLeaveType"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -48,10 +47,10 @@
                 android:id="@+id/actLeaveType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
                 android:inputType="none"
                 android:text="Please select"
                 android:textSize="16sp" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Leave Balance Display -->
@@ -75,7 +74,6 @@
                 android:id="@+id/tvLeaveBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
                 android:text="0 Leave"
                 android:textColor="@color/colorAccent"
                 android:textSize="14sp" />
@@ -94,7 +92,6 @@
                 android:id="@+id/actvCalculationType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
                 android:inputType="none"
                 android:text="Please select"
                 android:textSize="16sp" />
