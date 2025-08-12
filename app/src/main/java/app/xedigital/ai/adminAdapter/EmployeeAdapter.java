@@ -235,17 +235,14 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                 calculateAndSetTotalLeave(etAssignedLeave.getText().toString(), tvLeaveBalance.getText().toString(), actCalculationType.getText().toString(), etTotalLeave);
             });
 
-
             // Close button action
             btnClose.setOnClickListener(view -> dialog.dismiss());
 
             // Submit button action
-
             btnSubmit.setOnClickListener(view -> {
                 // Get data from views
-                String leavetypeId = selectedId;
+                String leaveTypeId = selectedId;
                 String calculationType = actCalculationType.getText().toString();
-//                int assignedLeave = Integer.parseInt(etAssignedLeave.getText().toString().trim());
                 String input = etAssignedLeave.getText().toString().trim();
                 double assignedLeave = Double.parseDouble(input);
 
@@ -257,7 +254,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
                 // Create request body
                 AssignLeaveRequest request = new AssignLeaveRequest();
-                request.setLeavetype(leavetypeId);
+                request.setLeavetype(leaveTypeId);
                 request.setLeaveCalculationType(calculationType.toLowerCase());
                 request.setAssignedLeave(assignedLeave);
                 request.setRemarks(remarks);
@@ -284,12 +281,13 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                     }
                 });
             });
-
-
             // Show the dialog
             dialog.show();
         });
 
+        holder.empLeaveDetails.setOnClickListener(v -> {
+            Toast.makeText(context, "Leave Details for " + employee.getFirstname(), Toast.LENGTH_SHORT).show();
+        });
     }
 
 
@@ -330,7 +328,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         ShapeableImageView ivProfile;
         MaterialTextView tvName, tvEmail, tvDesignation, tvDepartment, tvShift;
         Chip chipStatus;
-        ShapeableImageView btnViewMore, empEditBtn, empAddFace, empAddLeave;
+        ShapeableImageView btnViewMore, empEditBtn, empAddFace, empAddLeave, empLeaveDetails;
 
         public EmployeeViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -345,6 +343,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             empEditBtn = itemView.findViewById(R.id.empEditBtn);
             empAddFace = itemView.findViewById(R.id.empAddFace);
             empAddLeave = itemView.findViewById(R.id.empAddLeave);
+            empLeaveDetails = itemView.findViewById(R.id.empLeaveDetails);
         }
     }
 }

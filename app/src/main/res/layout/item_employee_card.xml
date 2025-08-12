@@ -208,6 +208,13 @@
                     android:layout_marginEnd="8dp"
                     android:src="@mipmap/add_leave" />
 
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/empLeaveDetails"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@mipmap/view_leave_employee" />
+
             </LinearLayout>
 
         </LinearLayout>

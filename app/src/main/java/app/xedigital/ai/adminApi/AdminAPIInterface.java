@@ -5,6 +5,7 @@ import app.xedigital.ai.model.Admin.AdminUsers.AdminUserResponse;
 import app.xedigital.ai.model.Admin.Branches.CompanyBranchResponse;
 import app.xedigital.ai.model.Admin.Dashboard.AdminDashboardResponse;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeeDetailResponse;
+import app.xedigital.ai.model.Admin.EmployeeLeaves.EmployeeLeaveResponse;
 import app.xedigital.ai.model.Admin.LeaveGraph.LeaveGraphResponse;
 import app.xedigital.ai.model.Admin.Role.UserRoleResponse;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
@@ -100,6 +101,9 @@ public interface AdminAPIInterface {
 
     @GET("leaves/type/{leaveId}/employees/{employeeId}")
     retrofit2.Call<LeaveBalanceResponse> getLeaves(@Header("Authorization") String authToken, @Path("leaveId") String leaveId, @Path("employeeId") String employeeId);
+
+    @GET("leaves/employee/{employeeId}")
+    retrofit2.Call<EmployeeLeaveResponse> getLeavesEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
 
     //    POST APIs
