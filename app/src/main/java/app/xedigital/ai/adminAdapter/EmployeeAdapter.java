@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -310,6 +311,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             } else {
                 totalLeave = assignedLeave; // Fallback
             }
+            Log.d("TotalLeave", String.valueOf(totalLeave));
 
             etTotalLeave.setText(String.valueOf(totalLeave));
         } catch (NumberFormatException e) {
