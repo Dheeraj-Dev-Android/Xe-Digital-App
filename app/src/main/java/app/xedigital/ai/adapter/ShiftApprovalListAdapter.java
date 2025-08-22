@@ -1,5 +1,6 @@
 package app.xedigital.ai.adapter;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -169,16 +169,29 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         String formattedDate = dateFormat.format(currentDate);
 
-        requestBody.setApprovedDate(formattedDate);
-        requestBody.setApprovedByName(fName + " " + lName);
+//        requestBody.setApprovedDate(formattedDate);
+//        requestBody.setApprovedByName(fName + " " + lName);
 
 //        requestBody.setId(originalPayload.getId());
-        requestBody.setAppliedDate(originalPayload.getAppliedDate());
+//        requestBody.setAppliedDate(originalPayload.getAppliedDate());
 //        requestBody.setShiftType(originalPayload.getShiftType());
 //        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
 //        requestBody.setReportingManager(originalPayload.getReportingManager());
 //        requestBody.setShift(originalPayload.getShift());
 //        requestBody.setEmployee(originalPayload.getEmployee());
+
+        requestBody.setId(originalPayload.getId());
+        requestBody.setAppliedDate(originalPayload.getAppliedDate());
+        requestBody.setApprovedDate(formattedDate);
+        requestBody.setStatus(status);
+        requestBody.setShiftType(originalPayload.getShiftType());
+        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
+        requestBody.setReportingManager(originalPayload.getReportingManager());
+        requestBody.setShift(originalPayload.getShift());
+        requestBody.setEmployee(originalPayload.getEmployee());
+        requestBody.setApprovedByName(fName + " " + lName);
+        requestBody.setComment(comment);
+
 
 
         APIInterface apiInterface = APIClient.getInstance().getShiftTypes();
@@ -190,27 +203,43 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
                     ResponseBody responseBody = response.body();
                     if (response.isSuccessful() && responseBody != null) {
                         String responseJson = gson.toJson(response.body());
-//                        Log.d("ShiftStatus", "Response JSON: " + responseJson);
+                        String successMsg = "Shift status updated successfully!";
+                        showAlertDialog("Success", successMsg);
                     } else {
                         // Log error response
                         assert response.errorBody() != null;
                         String errorBody = response.errorBody().string();
+                        showAlertDialog("Error", "Failed to update shift: " + errorBody);
                         Log.d("ShiftStatus", "Error Response: " + errorBody);
                     }
                 } catch (IOException e) {
                     Log.e("ShiftStatus", "Error reading response body", e);
+                    showAlertDialog("Error", "Something went wrong while processing the response.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Log.d("ShiftStatus", "Failed to update shift status: " + t.getMessage());
-                Toast.makeText(context, "Failed to update shift status: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                String failMsg = "Failed to update shift status: " + t.getMessage();
+                Log.d("ShiftStatus", failMsg);
+                showAlertDialog("Failure", failMsg);
             }
         });
 
     }
 
+
+    private void showAlertDialog(String title, String message) {
+        if (context instanceof Activity) {
+            ((Activity) context).runOnUiThread(() -> {
+                new AlertDialog.Builder(context)
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                        .show();
+            });
+        }
+    }
     private String formatDate(String dateString) {
         if (dateString == null || dateString.isEmpty()) {
             return "";

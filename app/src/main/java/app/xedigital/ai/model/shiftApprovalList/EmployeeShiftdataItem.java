@@ -38,7 +38,7 @@ public class EmployeeShiftdataItem {
         return approvedDate;
     }
 
-    public ShiftType getShiftType() {
+    public app.xedigital.ai.model.shiftApprove.ShiftType getShiftType() {
         return shiftType;
     }
 
@@ -46,11 +46,11 @@ public class EmployeeShiftdataItem {
         return reportingManager;
     }
 
-    public Shift getShift() {
+    public app.xedigital.ai.model.shiftApprove.Shift getShift() {
         return shift;
     }
 
-    public ShiftUpdate getShiftUpdate() {
+    public app.xedigital.ai.model.shiftApprove.ShiftUpdate getShiftUpdate() {
         return shiftUpdate;
     }
 
@@ -66,7 +66,7 @@ public class EmployeeShiftdataItem {
         return id;
     }
 
-    public Employee getEmployee() {
+    public app.xedigital.ai.model.shiftApprove.Employee getEmployee() {
         return employee;
     }
 
