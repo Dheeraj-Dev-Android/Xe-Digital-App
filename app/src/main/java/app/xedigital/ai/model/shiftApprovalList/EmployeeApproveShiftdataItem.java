@@ -2,7 +2,7 @@ package app.xedigital.ai.model.shiftApprovalList;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeeShiftdataItem {
+public class EmployeeApproveShiftdataItem {
 
     @SerializedName("approvedDate")
     private String approvedDate;
@@ -38,7 +38,7 @@ public class EmployeeShiftdataItem {
         return approvedDate;
     }
 
-    public app.xedigital.ai.model.shiftApprove.ShiftType getShiftType() {
+    public ShiftType getShiftType() {
         return shiftType;
     }
 
@@ -46,11 +46,11 @@ public class EmployeeShiftdataItem {
         return reportingManager;
     }
 
-    public app.xedigital.ai.model.shiftApprove.Shift getShift() {
+    public Shift getShift() {
         return shift;
     }
 
-    public app.xedigital.ai.model.shiftApprove.ShiftUpdate getShiftUpdate() {
+    public ShiftUpdate getShiftUpdate() {
         return shiftUpdate;
     }
 
@@ -66,7 +66,7 @@ public class EmployeeShiftdataItem {
         return id;
     }
 
-    public app.xedigital.ai.model.shiftApprove.Employee getEmployee() {
+    public Employee getEmployee() {
         return employee;
     }
 

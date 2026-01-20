@@ -38,10 +38,10 @@ public class HolidaysViewModel extends ViewModel {
         call.enqueue(new Callback<HolidayModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<HolidayModelResponse> call, @NonNull Response<HolidayModelResponse> response) {
-//                Log.d("HolidaysViewModel", "API call successful: " + response.isSuccessful());
+                Log.d("HolidaysViewModel", "API call successful: " + response.isSuccessful());
                 if (response.isSuccessful() && response.body() != null) {
                     List<HolidaysItem> holidays = response.body().getData().getHolidays();
-//                    Log.d("HolidaysViewModel", "Fetched holidays: " + holidays);
+                    Log.d("HolidaysViewModel", "Fetched holidays: " + holidays);
                     new Handler(Looper.getMainLooper()).post(() -> holidaysList.setValue(holidays));
                 } else {
                     new Handler(Looper.getMainLooper()).post(() -> holidaysList.setValue(null));

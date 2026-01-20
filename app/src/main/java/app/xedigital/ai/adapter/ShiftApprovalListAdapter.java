@@ -35,7 +35,7 @@ import java.util.Locale;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.shiftApprovalList.EmployeeShiftdataItem;
+import app.xedigital.ai.model.shiftApprovalList.EmployeeApproveShiftdataItem;
 import app.xedigital.ai.model.shiftApprove.ShiftApproveRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import okhttp3.ResponseBody;
@@ -47,7 +47,7 @@ import retrofit2.Response;
 public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApprovalListAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<EmployeeShiftdataItem> shiftApprovalDataList;
+    private final List<EmployeeApproveShiftdataItem> shiftApprovalDataList;
     private final ProfileViewModel profileViewModel;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final LifecycleOwner lifecycleOwner;
@@ -55,7 +55,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
     private String lName;
     private String empId;
 
-    public ShiftApprovalListAdapter(Context context, List<EmployeeShiftdataItem> shiftApprovalDataList, LifecycleOwner lifecycleOwner, ProfileViewModel profileViewModel) {
+    public ShiftApprovalListAdapter(Context context, List<EmployeeApproveShiftdataItem> shiftApprovalDataList, LifecycleOwner lifecycleOwner, ProfileViewModel profileViewModel) {
         this.context = context;
         this.shiftApprovalDataList = shiftApprovalDataList;
         this.lifecycleOwner = lifecycleOwner;
@@ -84,7 +84,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        EmployeeShiftdataItem shiftApprovalData = shiftApprovalDataList.get(position);
+        EmployeeApproveShiftdataItem shiftApprovalData = shiftApprovalDataList.get(position);
 
         holder.tvName.setText(shiftApprovalData.getEmployee().getFirstname() + " " + shiftApprovalData.getEmployee().getLastname());
 
@@ -134,7 +134,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         });
     }
 
-    private void showRejectDialog(ViewHolder holder, final String shiftID, EmployeeShiftdataItem shiftApprovalData) {
+    private void showRejectDialog(ViewHolder holder, final String shiftID, EmployeeApproveShiftdataItem shiftApprovalData) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_shift_action, null);
@@ -153,7 +153,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         });
     }
 
-    private void updateShiftStatus(String shiftId, String status, String comment, EmployeeShiftdataItem originalPayload) {
+    private void updateShiftStatus(String shiftId, String status, String comment, EmployeeApproveShiftdataItem originalPayload) {
         Log.d("ShiftStatus", "Shift ID: " + shiftId + ", Status: " + status + ", Comment: " + comment);
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -169,29 +169,17 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         String formattedDate = dateFormat.format(currentDate);
 
-//        requestBody.setApprovedDate(formattedDate);
-//        requestBody.setApprovedByName(fName + " " + lName);
-
-//        requestBody.setId(originalPayload.getId());
-//        requestBody.setAppliedDate(originalPayload.getAppliedDate());
-//        requestBody.setShiftType(originalPayload.getShiftType());
-//        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
-//        requestBody.setReportingManager(originalPayload.getReportingManager());
-//        requestBody.setShift(originalPayload.getShift());
-//        requestBody.setEmployee(originalPayload.getEmployee());
-
         requestBody.setId(originalPayload.getId());
         requestBody.setAppliedDate(originalPayload.getAppliedDate());
         requestBody.setApprovedDate(formattedDate);
         requestBody.setStatus(status);
-        requestBody.setShiftType(originalPayload.getShiftType());
-        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
+//        requestBody.setShiftType(originalPayload.getShiftType());
+//        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
         requestBody.setReportingManager(originalPayload.getReportingManager());
-        requestBody.setShift(originalPayload.getShift());
-        requestBody.setEmployee(originalPayload.getEmployee());
+//        requestBody.setShift(originalPayload.getShift());
+//        requestBody.setEmployee(originalPayload.getEmployee());
         requestBody.setApprovedByName(fName + " " + lName);
         requestBody.setComment(comment);
-
 
 
         APIInterface apiInterface = APIClient.getInstance().getShiftTypes();
@@ -240,6 +228,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
             });
         }
     }
+
     private String formatDate(String dateString) {
         if (dateString == null || dateString.isEmpty()) {
             return "";

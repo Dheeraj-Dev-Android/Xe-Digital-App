@@ -76,12 +76,23 @@ public class ApplyLeaveRequest {
     @SerializedName("status")
     private String status;
 
+    @SerializedName("leavePlanned")
+    private String leavePlanned;
+
     public String getLeaveName() {
         return leaveName;
     }
 
     public void setLeaveName(String leaveName) {
         this.leaveName = leaveName;
+    }
+
+    public String getLeavePlanned() {
+        return leavePlanned;
+    }
+
+    public void setLeavePlanned(String leavePlanned) {
+        this.leavePlanned = leavePlanned;
     }
 
     public String getCrossManagerEmail() {

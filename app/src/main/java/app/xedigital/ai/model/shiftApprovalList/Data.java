@@ -7,9 +7,9 @@ import java.util.List;
 public class Data {
 
     @SerializedName("employeeShiftdata")
-    private List<EmployeeShiftdataItem> employeeShiftdata;
+    private List<EmployeeApproveShiftdataItem> employeeShiftdata;
 
-    public List<EmployeeShiftdataItem> getEmployeeShiftdata() {
+    public List<EmployeeApproveShiftdataItem> getEmployeeShiftdata() {
         return employeeShiftdata;
     }
 }

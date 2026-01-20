@@ -70,8 +70,13 @@
     <string-array name="leaving_stations">
         <item>Yes</item>
         <item>No</item>
-
     </string-array>
+
+    <string-array name="leave_planned">
+        <item>Planned</item>
+        <item>Unplanned</item>
+    </string-array>
+
     <string name="regularize_attendance">Regularize Attendance</string>
     <string name="menu_add_attendance">Add Attendance</string>
     <string name="add_attendance">Add Attendance</string>

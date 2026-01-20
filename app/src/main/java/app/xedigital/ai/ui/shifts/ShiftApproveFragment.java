@@ -23,7 +23,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.ShiftApprovalListAdapter;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
-import app.xedigital.ai.model.shiftApprovalList.EmployeeShiftdataItem;
+import app.xedigital.ai.model.shiftApprovalList.EmployeeApproveShiftdataItem;
 import app.xedigital.ai.model.shiftApprovalList.ShiftApproveListResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import retrofit2.Call;
@@ -79,7 +79,7 @@ public class ShiftApproveFragment extends Fragment {
                     ShiftApproveListResponse shiftList = response.body();
                     // Access data using the correct structure:
                     if (shiftList != null && shiftList.getData() != null && shiftList.getData().getEmployeeShiftdata() != null && !shiftList.getData().getEmployeeShiftdata().isEmpty()) {
-                        List<EmployeeShiftdataItem> shiftApprovalDataList = shiftList.getData().getEmployeeShiftdata();
+                        List<EmployeeApproveShiftdataItem> shiftApprovalDataList = shiftList.getData().getEmployeeShiftdata();
                         ShiftApprovalListAdapter adapter = new ShiftApprovalListAdapter(getContext(), shiftApprovalDataList, getViewLifecycleOwner(), profileViewModel);
                         ShiftApproveRecyclerView.setAdapter(adapter);
                     } else {

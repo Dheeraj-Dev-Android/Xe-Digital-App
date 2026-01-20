@@ -4,7 +4,10 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -179,5 +182,17 @@ public class DateTimeUtils {
     public static void main(String[] args) {
         String currentDate = getCurrentDateInISOFormat();
         System.out.println(currentDate);
+    }
+
+    public static String getMonthDayFromISO(String isoDate) {
+        try {
+            Instant instant = Instant.parse(isoDate);  // parse ISO format
+            LocalDate dob = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+            return dob.format(formatter);  // e.g., "08-23"
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

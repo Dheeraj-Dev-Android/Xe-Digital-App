@@ -62,6 +62,7 @@ import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.ui.holidays.HolidaysViewModel;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.DateTimeUtils;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,6 +91,7 @@ public class LeavesFragment extends Fragment {
     private String hrMail;
     private String empDepartment;
     private String department;
+    private String empBirthday;
     private String selectedLeaveTypeId;
     private String reportingManagerName;
     private String reportingManagerLastname;
@@ -111,6 +113,7 @@ public class LeavesFragment extends Fragment {
 
         holidaysViewModel = new ViewModelProvider(requireActivity()).get(HolidaysViewModel.class);
 
+
         etFromDate = binding.etFromDate;
         etToDate = binding.etToDate;
         binding.balanceLeaveTextView.setText("");
@@ -124,6 +127,8 @@ public class LeavesFragment extends Fragment {
         AutoCompleteTextView leaveCategorySpinnerFrom = binding.spinnerLeaveCategoryFrom;
         AutoCompleteTextView leaveCategorySpinnerTo = binding.spinnerLeaveCategoryTo;
         AutoCompleteTextView leavingStationSpinner = binding.spinnerLeavingStation;
+        AutoCompleteTextView leavePlannedSpinner = binding.spinnerLeavePlanned;
+
 
         AtomicReference<TextInputEditText> leaveStationAddress = new AtomicReference<>(binding.etLeaveStationAddress);
         TextInputLayout leaveStationAddressLayout = binding.tilLeaveStationAddress;
@@ -147,11 +152,15 @@ public class LeavesFragment extends Fragment {
         ArrayAdapter<String> leavingStationsAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, getResources().getStringArray(R.array.leaving_stations));
         leavingStationSpinner.setAdapter(leavingStationsAdapter);
 
+        ArrayAdapter<String> leavePlannedAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, getResources().getStringArray(R.array.leave_planned));
+        leavePlannedSpinner.setAdapter(leavePlannedAdapter);
+
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         String userId = sharedPreferences.getString("userId", "");
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesType();
+        holidaysViewModel.loadHolidays(authToken);
 
 
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
@@ -169,13 +178,41 @@ public class LeavesFragment extends Fragment {
                 empLastname = employee.getLastname();
                 empEmail = employee.getEmail();
                 empDepartment = employee.getDepartment().getName();
-                department = empDepartment.replace("\\u0026", "&");
-                reportingManagerName = employee.getReportingManager().getFirstname();
-                reportingManagerLastname = employee.getReportingManager().getLastname();
-                reportingManagerEmail = employee.getReportingManager().getEmail();
-                crossFunctionalManagerName = employee.getCrossmanager().getFirstname();
-                crossFunctionalManagerEmail = employee.getCrossmanager().getEmail();
-                crossFunctionalManagerId = employee.getCrossmanager().getId();
+                empBirthday = employee.getDateOfBirth();
+                Log.e(TAG, " empBirthday: " + empBirthday);
+
+
+                if (employee.getDepartment() != null) {
+                    empDepartment = employee.getDepartment().getName();
+                    // It's safer to check for null on empDepartment before replacing
+                    if (empDepartment != null) {
+                        department = empDepartment.replace("\\u0026", "&");
+                    }
+                } else {
+                    empDepartment = "N/A";
+                    department = "N/A";
+                }
+                if (employee.getReportingManager() != null) {
+                    reportingManagerName = employee.getReportingManager().getFirstname();
+                    reportingManagerLastname = employee.getReportingManager().getLastname();
+                    reportingManagerEmail = employee.getReportingManager().getEmail();
+                } else {
+
+                    reportingManagerName = "N/A";
+                    reportingManagerLastname = "";
+                    reportingManagerEmail = "";
+                }
+
+                // --- CRITICAL NULL CHECK for Cross Manager ---
+                if (employee.getCrossmanager() != null) {
+                    crossFunctionalManagerName = employee.getCrossmanager().getFirstname();
+                    crossFunctionalManagerEmail = employee.getCrossmanager().getEmail();
+                    crossFunctionalManagerId = employee.getCrossmanager().getId();
+                } else {
+                    crossFunctionalManagerName = "N/A";
+                    crossFunctionalManagerEmail = "";
+                    crossFunctionalManagerId = null;
+                }
             }
         });
 
@@ -191,16 +228,17 @@ public class LeavesFragment extends Fragment {
                 binding.spinnerLeaveType.setAdapter(leaveTypeAdapter);
 
                 List<LeavetypesItem> leaveTypes = leaveTypeResponse.getData().getLeavetypes();
+
                 for (LeavetypesItem leaveType : leaveTypes) {
-                    if ("Restricted holiday".equals(leaveType.getLeavetypeName())) {
+                    if ("Restricted Holidays".equals(leaveType.getLeavetypeName())) {
                         restrictedHolidayId = leaveType.getId();
-                        // Log.w(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
-                        break; // Exit loop once found
+                        Log.e(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
+//                        break;
                     }
                     if ("Loss of Pay (LOP) / Leave Without Pay (LWP)".equals(leaveType.getLeavetypeName())) {
                         lossOfPayId = leaveType.getId();
                         Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
-                        break; // Exit Loop Once Found
+//                        break;
                     }
                 }
 
@@ -231,13 +269,11 @@ public class LeavesFragment extends Fragment {
                 LeavetypesItem selectedLeaveType = leaveTypesList.get(position);
                 selectedLeaveTypeId = selectedLeaveType.getId();
                 selectedLeaveTypeName = selectedLeaveType.getLeavetypeName();
-//                Log.d(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId);
+                String holidayId = restrictedHolidayId;
+                Log.e(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId + ", Holiday: " + holidayId);
 
-//                if (selectedLeaveTypeId.equals("617135e82027d64869450a79")) {
-//                    String selectedDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
-//                    checkRestrictedHoliday(selectedDate);
-//                }
-                if (selectedLeaveTypeName.equals(restrictedHolidayId)) {
+                if (selectedLeaveTypeId.equals(holidayId)) {
+                    Log.e(TAG, "Holiday ID 273: " + holidayId);
                     String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
                     String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
                     checkRestrictedHoliday(fromDate, toDate);
@@ -318,11 +354,8 @@ public class LeavesFragment extends Fragment {
                             if (!Objects.requireNonNull(binding.etFromDate.getText()).toString().isEmpty() && !Objects.requireNonNull(binding.etToDate.getText()).toString().isEmpty()) {
                                 calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
                             }
-//                            if (selectedLeaveTypeId.equals(restrictedHolidayId)) {
-//                                String selectedDate = binding.etFromDate.getText().toString();
-//                                checkRestrictedHoliday(selectedDate);
-//                            }
-                            if (selectedLeaveTypeName.equals(restrictedHolidayId)) {
+                            if (selectedLeaveTypeId != null &&
+                                    selectedLeaveTypeId.equals(restrictedHolidayId)) {
                                 String fromDate = binding.etFromDate.getText().toString();
                                 String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
                                 checkRestrictedHoliday(fromDate, toDate);
@@ -354,41 +387,33 @@ public class LeavesFragment extends Fragment {
                 });
             }
 
-            //             private void checkRestrictedHoliday(String selectedDate) {
-//                holidaysViewModel = new ViewModelProvider(requireActivity()).get(HolidaysViewModel.class);
-//                holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), new Observer<List<HolidaysItem>>() {
-//                    @Override
-//                    public void onChanged(List<HolidaysItem> holidaysItems) {
-//                        if (holidaysItems != null) {
-//                            boolean isRestrictedHoliday = false;
-//                            for (HolidaysItem holiday : holidaysItems) {
-//                                if (holiday.getHolidayDate().equals(selectedDate) && holiday.isIsOptional()) {
-////                                    Log.d(TAG, "Selected date is a restricted holiday");
-//                                    isRestrictedHoliday = true;
-//                                    break;
-//                                }
-//                            }
-//                            if (!isRestrictedHoliday) {
-//                                new AlertDialog.Builder(requireContext()).setTitle("Error").setMessage("Selected date is not a restricted holiday").setPositiveButton("OK", (dialog, which) -> {
-//                                    dialog.dismiss();
-//                                    clearForm();
-//                                }).show();
-//                            }
-//                            holidaysViewModel.getHolidaysList().removeObserver(this);
-//                        } else {
-//                            Toast.makeText(getContext(), "Holiday data not available", Toast.LENGTH_LONG).show();
-//                            Log.e(TAG, "Holiday data not available");
-//                        }
-//                    }
-//                });
-//            }
+            private String getTodayMonthDay() {
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+                return today.format(formatter);  // e.g., "01-19"
+            }
+
             private void checkRestrictedHoliday(String fromDate, String toDate) {
+                Log.e(TAG, "Checking Restricted Holiday for dates: " + fromDate + " to " + toDate);
+
+                // --- Step 1: Check if today is employee's birthday ---
+                String todayMD = LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd"));
+                String empDOBMD = DateTimeUtils.getMonthDayFromISO(empBirthday);
+                Log.e(TAG, "todayMD: " + todayMD + ", empDOBMD: " + empDOBMD);
+
+
+                if (todayMD.equals(empDOBMD)) {
+                    Log.d(TAG, "Today is employee's birthday, restricted leave allowed!");
+                    binding.balanceLeaveTextView.setText("Today is your birthday. Restricted leave allowed!");
+                    return;  // Skip further restricted holiday checks
+                }
+
+                // --- Step 2: Normal restricted holiday check ---
                 holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), new Observer<List<HolidaysItem>>() {
                     @Override
                     public void onChanged(List<HolidaysItem> holidaysItems) {
                         if (holidaysItems != null) {
                             boolean isValidDateRange = true;
-
                             List<String> dateRange = getDatesBetween(fromDate, toDate);
 
                             for (String date : dateRange) {
@@ -402,18 +427,22 @@ public class LeavesFragment extends Fragment {
                                 }
                                 if (!isRestrictedHoliday) {
                                     Log.d(TAG, "Selected date is not a restricted holiday");
-                                    binding.balanceLeaveTextView.setText("Selected Date is not Restricted Holiday " + " Balance Leave: " + balanceLeave);
+                                    binding.balanceLeaveTextView.setText(
+                                            "Selected Date is not Restricted Holiday. Balance Leave: " + balanceLeave
+                                    );
                                     isValidDateRange = false;
                                     break;
                                 }
                             }
 
                             if (!isValidDateRange) {
-                                // Show alert and clear form
-                                new AlertDialog.Builder(requireContext()).setTitle("Error").setMessage("Selected date range contains non-restricted holidays.").setPositiveButton("OK", (dialog, which) -> {
-                                    dialog.dismiss();
-                                    clearForm();
-                                }).show();
+                                new AlertDialog.Builder(requireContext())
+                                        .setTitle("Error")
+                                        .setMessage("Selected date range contains non-restricted holidays.")
+                                        .setPositiveButton("OK", (dialog, which) -> {
+                                            dialog.dismiss();
+                                            clearForm();
+                                        }).show();
                             } else {
                                 Log.d(TAG, "Selected date range is valid");
                             }
@@ -427,6 +456,54 @@ public class LeavesFragment extends Fragment {
                     }
                 });
             }
+
+
+//            private void checkRestrictedHoliday(String fromDate, String toDate) {
+//                Log.e(TAG, "Checking Restricted Holiday for dates: " + fromDate + " to " + toDate);
+//                holidaysViewModel.getHolidaysList().observe(getViewLifecycleOwner(), new Observer<List<HolidaysItem>>() {
+//                    @Override
+//                    public void onChanged(List<HolidaysItem> holidaysItems) {
+//                        if (holidaysItems != null) {
+//                            boolean isValidDateRange = true;
+//
+//                            List<String> dateRange = getDatesBetween(fromDate, toDate);
+//
+//                            for (String date : dateRange) {
+//                                boolean isRestrictedHoliday = false;
+//                                for (HolidaysItem holiday : holidaysItems) {
+//                                    if (holiday.getHolidayDate().equals(date) && holiday.isIsOptional()) {
+//                                        Log.d(TAG, "Selected date is a restricted holiday");
+//                                        isRestrictedHoliday = true;
+//                                        break;
+//                                    }
+//                                }
+//                                if (!isRestrictedHoliday) {
+//                                    Log.d(TAG, "Selected date is not a restricted holiday");
+//                                    binding.balanceLeaveTextView.setText("Selected Date is not Restricted Holiday " + " Balance Leave: " + balanceLeave);
+//                                    isValidDateRange = false;
+//                                    break;
+//                                }
+//                            }
+//
+//                            if (!isValidDateRange) {
+//                                // Show alert and clear form
+//                                new AlertDialog.Builder(requireContext()).setTitle("Error").setMessage("Selected date range contains non-restricted holidays.").setPositiveButton("OK", (dialog, which) -> {
+//                                    dialog.dismiss();
+//                                    clearForm();
+//                                }).show();
+//                            } else {
+//                                Log.d(TAG, "Selected date range is valid");
+//                            }
+//
+//                            holidaysViewModel.getHolidaysList().removeObserver(this);
+//                        } else {
+//                            Log.e(TAG, "Holiday data not available");
+//                            Toast.makeText(getContext(), "Holiday data not available", Toast.LENGTH_LONG).show();
+//                            clearForm();
+//                        }
+//                    }
+//                });
+//            }
 
             // Helper function to get all dates between two dates
             private List<String> getDatesBetween(String startDate, String endDate) {
@@ -461,14 +538,16 @@ public class LeavesFragment extends Fragment {
                 String leaveStationAdd = Objects.requireNonNull(binding.etLeaveStationAddress.getText()).toString();
                 String contactNumber = Objects.requireNonNull(binding.etContactNumber.getText()).toString();
                 String reason = Objects.requireNonNull(binding.etReason.getText()).toString();
+                String leavePlanned = Objects.requireNonNull(binding.spinnerLeavePlanned.getText()).toString();
 
-                applyLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
+
+                applyLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason, leavePlanned);
             }
         });
         return root;
     }
 
-    private void applyLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason) {
+    private void applyLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason, String leavePlanned) {
         applyLeaveRequest = new ApplyLeaveRequest();
 //        Log.d(TAG, "applyLeaveRequest: " + applyLeaveRequest);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
@@ -486,6 +565,7 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setLeavetype(selectedLeaveTypeId);
         applyLeaveRequest.setContactNumber(contactNumber);
         applyLeaveRequest.setReason(reason);
+        applyLeaveRequest.setLeavePlanned(leavePlanned);
 
 //        Employee Data
         applyLeaveRequest.setAppliedDate(appliedDate);
@@ -506,6 +586,7 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setCrossManager(crossFunctionalManagerId);
         applyLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
         applyLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
+
 
         Call<ResponseBody> applyLeave = APIClient.getInstance().LeavesApply().LeavesApply("jwt " + authToken, applyLeaveRequest);
 
@@ -640,6 +721,7 @@ public class LeavesFragment extends Fragment {
         binding.etReason.setText("");
         binding.balanceLeaveTextView.setText("");
         binding.tilLeaveStationAddress.setVisibility(View.GONE);
+        binding.spinnerLeavePlanned.setText("");
     }
 
 
@@ -780,6 +862,13 @@ public class LeavesFragment extends Fragment {
             return false;
         }
 
+        if (binding.spinnerLeavePlanned.getText().toString().isEmpty()) {
+            binding.spinnerLeavePlanned.setError("This field is required");
+            return false;
+        } else {
+            binding.spinnerLeavePlanned.setError(null);
+        }
+
         // Check date range validation
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -848,60 +937,116 @@ public class LeavesFragment extends Fragment {
     }
 
     private void showDatePicker(final EditText editText) {
+
+        // ---------- Date Picker Builder ----------
         MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
         builder.setTitleText("Select date");
         builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
 
+        // ---------- Leave Type ----------
         String selectedLeaveType = binding.spinnerLeaveType.getText().toString();
+
+        // ---------- Today ----------
         long todayInMillis = MaterialDatePicker.todayInUtcMilliseconds();
-        long oneDayBeforeInMillis = todayInMillis - (24 * 60 * 60 * 1000);
-//        Log.d("LeavesFragment", "oneDayBeforeInMillis " + oneDayBeforeInMillis);
+        long yesterdayInMillis = todayInMillis - (24 * 60 * 60 * 1000);
 
 
+        // ---------- Current Year Start ----------
+        Calendar yearStart = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        yearStart.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+        yearStart.set(Calendar.MONTH, Calendar.JANUARY);
+        yearStart.set(Calendar.DAY_OF_MONTH, 1);
+        yearStart.set(Calendar.HOUR_OF_DAY, 0);
+        yearStart.set(Calendar.MINUTE, 0);
+        yearStart.set(Calendar.SECOND, 0);
+
+        // ---------- Current Year End ----------
+        Calendar yearEnd = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        yearEnd.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+        yearEnd.set(Calendar.MONTH, Calendar.DECEMBER);
+        yearEnd.set(Calendar.DAY_OF_MONTH, 31);
+        yearEnd.set(Calendar.HOUR_OF_DAY, 23);
+        yearEnd.set(Calendar.MINUTE, 59);
+        yearEnd.set(Calendar.SECOND, 59);
+
+        long yearStartMillis = yearStart.getTimeInMillis();
+        long yearEndMillis = yearEnd.getTimeInMillis();
+
+        // ---------- Calendar Constraints ----------
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-        // Restrict to current date or future dates, unless it's Sick Leave
-        if (!selectedLeaveType.equals("Sick Leave")) {
-            constraintsBuilder.setStart(oneDayBeforeInMillis);
-//            constraintsBuilder.setEnd(todayInMillis);
-            constraintsBuilder.setOpenAt(oneDayBeforeInMillis);
-            CalendarConstraints.DateValidator dateValidator = new CalendarConstraints.DateValidator() {
-                @Override
-                public boolean isValid(long date) {
-                    return date >= MaterialDatePicker.todayInUtcMilliseconds();
-                }
 
-                @Override
-                public int describeContents() {
-                    return 0;
-                }
+        // Restrict to current year only
+        constraintsBuilder.setStart(yearStartMillis);
+        constraintsBuilder.setEnd(yearEndMillis);
+        constraintsBuilder.setOpenAt(todayInMillis);
 
-                @Override
-                public void writeToParcel(@NonNull Parcel dest, int flags) {
-                }
-            };
-            constraintsBuilder.setValidator(dateValidator);
+        // ---------- Leave Type Validation ----------
+        if (selectedLeaveType.equals("Sick Leave")) {
+
+            // Sick Leave: allow yesterday, today & future dates
+            CalendarConstraints.DateValidator validator =
+                    new CalendarConstraints.DateValidator() {
+                        @Override
+                        public boolean isValid(long date) {
+                            return date >= yesterdayInMillis && date <= yearEndMillis;
+                        }
+
+                        @Override
+                        public int describeContents() {
+                            return 0;
+                        }
+
+                        @Override
+                        public void writeToParcel(@NonNull Parcel dest, int flags) {
+                        }
+                    };
+
+            constraintsBuilder.setValidator(validator);
+
         } else {
-            constraintsBuilder.setStart(todayInMillis);
-            constraintsBuilder.setOpenAt(todayInMillis);
 
+            // Other Leaves: allow today & future dates only
+            CalendarConstraints.DateValidator validator =
+                    new CalendarConstraints.DateValidator() {
+                        @Override
+                        public boolean isValid(long date) {
+                            return date >= todayInMillis && date <= yearEndMillis;
+                        }
+
+                        @Override
+                        public int describeContents() {
+                            return 0;
+                        }
+
+                        @Override
+                        public void writeToParcel(@NonNull Parcel dest, int flags) {
+                        }
+                    };
+
+            constraintsBuilder.setValidator(validator);
         }
 
+
         builder.setCalendarConstraints(constraintsBuilder.build());
+
+        // ---------- Build Picker ----------
         MaterialDatePicker<Long> picker = builder.build();
 
+        // ---------- Date Selection ----------
         picker.addOnPositiveButtonClickListener(selection -> {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             calendar.setTimeInMillis(selection);
             String selectedDate = dateFormat.format(calendar.getTime());
             editText.setText(selectedDate);
 
-            // Validate date range after 'to date' is selected
+            // Validate if To-Date is selected
             if (editText == etToDate) {
                 validateDateRange();
                 calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
             }
         });
 
+        // ---------- Show Picker ----------
         picker.show(requireActivity().getSupportFragmentManager(), "datePicker");
     }
 

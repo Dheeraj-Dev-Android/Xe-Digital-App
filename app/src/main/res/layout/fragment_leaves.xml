@@ -233,6 +233,28 @@
                         android:paddingEnd="5dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!--                Leave Planned-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerLeavePlanned"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Leave Planned"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <!-- Buttons Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

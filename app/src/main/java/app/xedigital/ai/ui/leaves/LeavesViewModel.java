@@ -83,8 +83,9 @@ public class LeavesViewModel extends ViewModel {
                         // Extract Restricted holiday ID
                         List<LeavetypesItem> leaveTypes = response.body().getData().getLeavetypes();
                         for (LeavetypesItem leaveType : leaveTypes) {
-                            if ("Restricted holiday".equals(leaveType.getLeavetypeName())) {
+                            if ("Restricted Holidays".equals(leaveType.getLeavetypeName())) {
                                 restrictedHolidayId = leaveType.getId();
+//                                Log.e("fetchLeavesType", "Restricted holiday ID: " + restrictedHolidayId);
                                 break; // Exit loop once found
                             }
                         }
