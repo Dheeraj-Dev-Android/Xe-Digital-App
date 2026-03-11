@@ -49,11 +49,4 @@
     </style>
 
 
-    <style name="Theme.YourApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorPrimaryDark">@color/colorSecondaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/background</item>
-    </style>
-
 </resources>

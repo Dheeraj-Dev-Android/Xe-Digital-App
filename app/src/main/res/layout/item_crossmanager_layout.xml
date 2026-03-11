@@ -44,7 +44,6 @@
             app:tint="@color/icon_tint" />
 
         <LinearLayout
-            android:id="@+id/contentLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

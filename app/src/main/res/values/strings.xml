@@ -1,28 +1,14 @@
 <resources>
     <string name="app_name">XE Digital</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">XE Digital</string>
     <string name="nav_header_subtitle">ConsultEdge.Global</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_dashboard">Dashboard</string>
     <string name="menu_attendance">Attendance</string>
     <string name="view_attendance">View Attendance</string>
 
-    <string name="holidays">Holidays</string>
-    <string name="leaves">Leaves</string>
-    <string name="dcr">TimeSheet</string>
-    <string name="policy">Policy</string>
-    <string name="shifts">Shifts</string>
-    <string name="claim_management">Claim Management</string>
-    <string name="documents_upload">Documents Upload</string>
-    <string name="payroll">Payroll</string>
     <string name="logout">Logout</string>
-    <string name="attendance">Attendance</string>
-    <string name="account">Account</string>
-    <string name="dashboard">Dashboard</string>
     <string name="menu_leaves">Leaves</string>
     <string name="add_leaves">Apply Leave</string>
     <string name="menu_holidays">Holidays</string>
@@ -31,7 +17,6 @@
     <string name="menu_claim_management">Claim Management</string>
     <string name="menu_documents_upload">Documents Upload</string>
     <string name="menu_payroll">Payroll</string>
-    <string name="menu_logout">Logout</string>
     <string name="menu_dcr">TimeSheet</string>
     <string name="sign_up">Sign Up</string>
     <string name="username">Username</string>
@@ -40,25 +25,11 @@
     <string name="login">Login</string>
     <string name="logo">Logo</string>
     <string name="sign_in">Sign In</string>
-    <string name="register">Register</string>
-    <string name="profile">Profile</string>
-    <string name="formerly_cloudfence_ai">Formerly CloudFence.ai</string>
-    <string name="leaves_data">Leaves Data</string>
     <string name="shift">Shift Timing </string>
     <string name="shift_types">Shift Types</string>
-    <string name="add_your_shift">Add Your Shift</string>
-    <string name="show_password">Show Password\n</string>
-    <string name="regularize">Regularize</string>
-    <string name="view_details">View Details</string>
-    <string name="punch">Punch Your Attendance</string>
-    <string name="switch_camera">Switch Camera</string>
     <string name="punch_image">Punch Image</string>
     <string name="_2024_powered_by_xe_digital">© 2024, Powered by XE Digital</string>
     <string name="date">Date:</string>
-
-    <string name="calendar_button_description">Calendar</string>
-    <string name="shift_icon_description">Shift Icon</string>
-    <string name="address_icon_description">Address Icon</string>
 
 
     <string-array name="leave_categories">
@@ -77,9 +48,7 @@
         <item>Unplanned</item>
     </string-array>
 
-    <string name="regularize_attendance">Regularize Attendance</string>
     <string name="menu_add_attendance">Add Attendance</string>
-    <string name="add_attendance">Add Attendance</string>
     <string name="punch_in_time">Punch In Time</string>
     <string name="punch_out_time">Punch Out Time</string>
     <string name="punch_in_address">Punch In Address</string>
@@ -90,10 +59,8 @@
     <string name="regularize_applied">Regularize Applied</string>
     <string name="total_leaves">Total Leaves</string>
     <string name="regularize_pending_approval">Regularize Pending Approval</string>
-    <string name="user_profile_information">User Profile Information</string>
     <string name="user_profile_picture">User Profile Picture</string>
     <string name="holiday_icon">Holiday Icon</string>
-    <string name="dropdown_menu">Dropdown menu</string>
     <string name="fill_dcr">Add New TimeSheet</string>
     <string name="view_dcr">View TimeSheet</string>
     <string name="timesheet_report">Timesheet Report</string>
@@ -109,22 +76,18 @@
     <string name="error_invalid_date_range">End date must be after start date</string>
     <string name="error_invalid_date_format">Invalid date format</string>
 
-    <string name="select_prompt">Select an option</string>
     <string name="approve_leaves">Approve Leaves</string>
 
     <string name="welcome_title">Welcome to Xe Digital</string>
     <string name="welcome_message">Discover amazing features and experiences</string>
     <string name="get_started">Get Started</string>
-    <string name="app_logo_description">App Logo</string>
     <string name="empty_state_image">Empty State Image</string>
     <string name="no_items_found">No Data Available</string>
-    <string name="no_data_available">No Data Available</string>
     <string name="retry">Retry</string>
     <string name="vms">Visitors</string>
     <string name="cross_manager">Cross Manager</string>
     <string name="guest_name">Guest\n</string>
     <string name="guest_email">xeDigital.ai\n</string>
-    <string name="xedigital_ai">XeDigital.ai</string>
     <string name="captured">Captured</string>
     <string name="leave_details">Leave Details</string>
     <string name="apply_filter">Apply Filter</string>
@@ -132,6 +95,15 @@
     <string name="start_date">Start Date</string>
     <string name="filter_by_date">Filter by Date</string>
     <string name="applied_on">Applied on</string>
+
+    <!-- Biometric Dialog Strings -->
+    <string name="biometric_title">Secure Faster Access</string>
+    <string name="biometric_subtitle">Skip the password next time. Enable biometric login for a seamless and secure experience.</string>
+    <string name="enable_biometric">Enable Now</string>
+    <string name="maybe_later">Maybe Later</string>
+    <string name="menu_settings">Settings</string>
+    <string name="app_permissions">App Permissions</string>
+    <string name="app_information">App Information</string>
 
 
 </resources>

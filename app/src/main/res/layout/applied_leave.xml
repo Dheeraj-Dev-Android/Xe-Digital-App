@@ -51,7 +51,6 @@
             app:constraint_referenced_ids="statusChip,btn_viewAppliedLeave" />
 
         <LinearLayout
-            android:id="@+id/linearLayout4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/content_margin"

@@ -91,7 +91,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/punch_button"
+                        android:id="@+id/punchButton"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -257,7 +257,6 @@
                         app:strokeWidth="4dp">
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/profileImageContainer"
                             android:layout_width="120dp"
                             android:layout_height="120dp"
                             android:layout_gravity="center"
@@ -496,7 +495,6 @@
                     android:padding="10dp">
 
                     <TextView
-                        android:id="@+id/chartTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Leave Statistics : Leave Balance"

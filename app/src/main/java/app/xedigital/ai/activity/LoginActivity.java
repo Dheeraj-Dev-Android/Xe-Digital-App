@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,11 +16,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.biometric.BiometricManager;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,7 +32,6 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.login.LoginModelResponse;
-import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.BioMetric;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,7 +39,6 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
-    private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private ActivityLoginBinding binding;
     private View loadingOverlay;
@@ -54,157 +54,58 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
 
-//        if (isLoggedIn()) {
-//            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-//            finish();
-//            return;
-//        }
+        // --- 1. SESSION LOGIC ---
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = prefs.getString("authToken", null);
+        boolean isBioEnabled = prefs.getBoolean("isBioEnabled", false);
 
-        // Initialize BiometricManager
-        BiometricManager biometricManager = BiometricManager.from(this);
-
-        // Check if biometric is supported and if user is logged in
-//        boolean isBiometricSupported;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS;
+//        if (authToken != null) {
+//            // User has logged in before. Now, how do they get in?
+//            if (isBioEnabled && isBiometricHardwareAvailable()) {
+//                // Option A: Use Biometrics
+//                initializeBiometricAuth();
+//            } else {
+//                showLoginScreen();
+//            }
 //        } else {
-//            isBiometricSupported = biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+//            // Brand new user
+//            showLoginScreen();
 //        }
-        boolean isBiometricSupported;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS;
-        } else {
-            isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS;
-        }
-        boolean isLoggedIn = isLoggedIn();
 
-        // Determine initial state of the activity based on login state
-        if (isLoggedIn) {
-            // User is logged in, attempt biometric login
-            if (isBiometricSupported) {
-                // Biometric is supported, initialize and authenticate
+        // Inside onCreate
+        if (authToken != null) {
+            // Only show biometrics if the activity is being created for the first time
+            // and not due to a system configuration change or internal navigation
+            if (savedInstanceState == null && isBioEnabled && isBiometricHardwareAvailable()) {
                 initializeBiometricAuth();
             } else {
-                // Biometric is not supported, jump directly to MainActivity
-                Log.e(TAG, "Biometric is not supported on this device.");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
+                showLoginScreen();
             }
         } else {
             showLoginScreen();
         }
+
+        // --- 2. UI SETUP ---
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
+
         binding.btnSignIn.setOnClickListener(v -> {
-            String email, password;
-            email = Objects.requireNonNull(binding.editEmail.getText()).toString();
-            password = Objects.requireNonNull(binding.editPassword.getText()).toString();
+            String email = Objects.requireNonNull(binding.editEmail.getText()).toString().trim();
+            String password = Objects.requireNonNull(binding.editPassword.getText()).toString().trim();
 
             if (email.isEmpty() || password.isEmpty()) {
-                binding.editEmail.setError("Please Enter Your Email");
-                binding.editPassword.setError("Please Enter Your Password");
+                if (email.isEmpty()) binding.editEmail.setError("Email Required");
+                if (password.isEmpty()) binding.editPassword.setError("Password Required");
             } else {
                 callLoginApi(email, password);
             }
         });
     }
 
-    private void initializeBiometricAuth() {
-        showLoading(true);
-        // Biometric setup
-        bioMetric = new BioMetric(this, this, new BioMetric.BiometricAuthListener() {
-            @Override
-            public void onAuthenticationSucceeded() {
+    private boolean isBiometricHardwareAvailable() {
+        BiometricManager biometricManager = BiometricManager.from(this);
+        int authenticators = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL : BiometricManager.Authenticators.BIOMETRIC_STRONG;
 
-                runOnUiThread(() -> {
-                    // When biometric is successful, attempt to retrieve data from SharedPreferences
-                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                    String userId = sharedPreferences.getString("userId", null);
-                    String authToken = sharedPreferences.getString("authToken", null);
-                    String empEmail = sharedPreferences.getString("empEmail", null);
-                    String empFirstName = sharedPreferences.getString("empFirstName", null);
-
-                    if (userId != null && authToken != null) {
-                        showLoading(false);
-                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName);
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        showLoading(false);
-                        if (userId == null && authToken == null) {
-                            Log.e(TAG, "No data found for biometric login. Please login with email and password.");
-                            showLoginScreen();
-                        }
-                        // No data found in SharedPreferences, prompt the user to login again
-                        showLoginScreen();
-                        showAlertDialog("No data found for biometric login. Please login with email and password.");
-                    }
-                });
-            }
-
-            @Override
-            public void onAuthenticationError(int errorCode, CharSequence errString) {
-                showLoading(false);
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Authentication Error: Code=" + errorCode + ", Message='" + errString + "'");
-                    Toast.makeText(LoginActivity.this, "Authentication Error", Toast.LENGTH_SHORT).show();
-                    showLoginScreen();
-                });
-            }
-
-            @Override
-            public void onAuthenticationFailed() {
-                showLoading(false);
-                runOnUiThread(() -> {
-                    Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_LONG).show();
-                    clearSharedPreferences();
-                    showLoginScreen();
-                });
-            }
-        });
-        bioMetric.authenticate(true);
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (bioMetric != null) {
-//            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
-            bioMetric.handlePermissionResult(requestCode, permissions, grantResults, true);
-        }
-    }
-
-    private void showLoginScreen() {
-        binding.editEmail.setVisibility(View.VISIBLE);
-        binding.editPassword.setVisibility(View.VISIBLE);
-        binding.btnSignIn.setVisibility(View.VISIBLE);
-        binding.logoImage.setVisibility(View.VISIBLE);
-        binding.editEmail.setText("");
-        binding.editPassword.setText("");
-    }
-
-    private boolean isLoggedIn() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
-        return authToken != null;
-    }
-
-    private void showAlertDialog(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Error");
-        builder.setMessage(message);
-        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void showLoading(boolean show) {
-        if (show) {
-            loadingOverlay.setVisibility(View.VISIBLE);
-        } else {
-            loadingOverlay.setVisibility(View.GONE);
-        }
+        return biometricManager.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS;
     }
 
     private void callLoginApi(String email, String password) {
@@ -215,30 +116,20 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
-
                     LoginModelResponse loginResponse = response.body();
-                    Log.w(TAG, "Response: " + gson.toJson(loginResponse));
-
-                    if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
-                        getIntent().putExtra("userId", loginResponse.getData().getUser().getId());
-                        getIntent().putExtra("authToken", loginResponse.getData().getToken());
-                        getIntent().putExtra("empEmail", loginResponse.getData().getUser().getEmail());
-                        getIntent().putExtra("empFirstName", loginResponse.getData().getUser().getFirstname());
-
+                    if (loginResponse.isSuccess()) {
                         String userId = loginResponse.getData().getUser().getId();
-                        String authToken = loginResponse.getData().getToken();
+                        String token = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
-                        String empFirstName = loginResponse.getData().getUser().getFirstname();
+                        String empName = loginResponse.getData().getUser().getFirstname();
 
-                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName);
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        finish();
+                        // ASK FOR BIOMETRIC PREFERENCE ON FIRST SUCCESSFUL LOGIN
+                        showBiometricOptInDialog(userId, token, empEmail, empName);
                     } else {
                         showAlertDialog(loginResponse.getMessage());
                     }
                 } else {
-                    showAlertDialog("Something went wrong");
+                    showAlertDialog("Invalid Credentials");
                 }
             }
 
@@ -250,29 +141,135 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void clearSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("userId");
-        editor.remove("authToken");
-        editor.remove("empEmail");
-        editor.remove("empFirstName");
-        editor.apply();
+    private void showBiometricOptInDialog(String id, String token, String email, String name) {
+        if (isFinishing() || isDestroyed()) return;
+
+        // 1. Hardware Check
+        if (!isBiometricHardwareAvailable()) {
+            storeInSharedPreferences(id, token, email, name, false);
+            navigateToMain();
+            return;
+        }
+
+        // 2. Inflate the layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_biometric_opt_in, null);
+
+        // 3. Use MaterialAlertDialogBuilder but create an AlertDialog object
+        androidx.appcompat.app.AlertDialog alertDialog = new MaterialAlertDialogBuilder(this, R.style.AppTheme_CustomAlertDialog)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // 4. IMPORTANT: Make background transparent so rounded corners show
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // 5. Initialize UI Components
+        ImageView iconView = dialogView.findViewById(R.id.dialogIcon);
+        Glide.with(this)
+                .asGif()
+                .load(R.raw.biometric_scan)
+                .into(iconView);
+        com.google.android.material.button.MaterialButton btnEnable = dialogView.findViewById(R.id.btnEnable);
+        com.google.android.material.button.MaterialButton btnLater = dialogView.findViewById(R.id.btnLater);
+
+        // Start Pulse Animation
+        Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse);
+        if (iconView != null) iconView.startAnimation(pulse);
+
+        // 6. Listeners
+        btnEnable.setOnClickListener(v -> {
+            vibratePhone();
+            storeInSharedPreferences(id, token, email, name, true);
+            alertDialog.dismiss(); // Prevent Leak
+            navigateToMain();
+        });
+
+        btnLater.setOnClickListener(v -> {
+            storeInSharedPreferences(id, token, email, name, false);
+            alertDialog.dismiss(); // Prevent Leak
+            navigateToMain();
+        });
+
+        alertDialog.show();
     }
 
-    private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName) {
+    private void vibratePhone() {
+        View view = findViewById(android.R.id.content);
+        if (view != null) {
+            view.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM);
+        }
+    }
+
+    private void initializeBiometricAuth() {
+        showLoading(true);
+        bioMetric = new BioMetric(this, this, new BioMetric.BiometricAuthListener() {
+            @Override
+            public void onAuthenticationSucceeded() {
+                runOnUiThread(() -> {
+                    showLoading(false);
+                    navigateToMain();
+                    Toast.makeText(LoginActivity.this, "Welcome Back!", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                showLoading(false);
+                runOnUiThread(() -> {
+                    Toast.makeText(LoginActivity.this, "Biometric Unavailable: " + errString, Toast.LENGTH_SHORT).show();
+                    showLoginScreen();
+                });
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                showLoading(false);
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show());
+            }
+        });
+        bioMetric.authenticate(true);
+    }
+
+    private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName, boolean isBioEnabled) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userId", userId);
         editor.putString("authToken", authToken);
         editor.putString("empEmail", empEmail);
         editor.putString("empFirstName", empFirstName);
+        editor.putBoolean("isBioEnabled", isBioEnabled);
         editor.apply();
     }
 
-    private void storeInViewModel(String userId, String authToken) {
-        ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        profileViewModel.storeLoginData(userId, authToken);
+    private void navigateToMain() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
+    private void showLoginScreen() {
+        binding.editEmail.setVisibility(View.VISIBLE);
+        binding.editPassword.setVisibility(View.VISIBLE);
+        binding.btnSignIn.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoading(boolean show) {
+        loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    private void showAlertDialog(String message) {
+        // Check if the activity is valid to host a dialog
+        if (isFinishing() || isDestroyed() || isChangingConfigurations()) {
+            return;
+        }
+        // 2. Check for configuration changes (rotation, etc.)
+        // We don't want to bind a Dialog to an Activity that is about to be recreated
+        if (isChangingConfigurations()) {
+            return;
+        }
+        new AlertDialog.Builder(this).setTitle("Login Information").setMessage(message).setPositiveButton("OK", null).show();
     }
 }

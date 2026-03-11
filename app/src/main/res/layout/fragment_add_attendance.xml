@@ -62,7 +62,6 @@
                     app:layout_constraintStart_toStartOf="parent" />
                 <!-- Date Input -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/datePunch"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -96,7 +95,6 @@
 
                     <!-- Punch In Time -->
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tPunchIn"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -122,7 +120,6 @@
 
                     <!-- Punch Out Time -->
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tPunchOut"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

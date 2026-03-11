@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base application theme -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Primary brand color -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
-
-        <!-- Secondary brand color -->
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryVariant">@color/secondary_dark</item>
-        <item name="colorOnSecondary">@color/black</item>
-
-        <!-- Status bar color -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-    </style>
 
     <!-- Custom Styles -->
     <style name="CircularImageView" parent="">
@@ -23,32 +9,8 @@
     </style>
 
     <!-- Text Styles -->
-    <style name="TextStyle.Title" parent="TextAppearance.Material3.TitleMedium">
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="fontFamily">@font/quicksand_font_family</item>
-    </style>
-
-    <style name="TextStyle.Body" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:textSize">14sp</item>
-        <item name="fontFamily">@font/quicksand_font_family</item>
-    </style>
-
-    <style name="TextStyle.Caption" parent="TextAppearance.Material3.BodySmall">
-        <item name="android:textColor">@color/text_tertiary</item>
-        <item name="android:textSize">12sp</item>
-        <item name="fontFamily">@font/quicksand_font_family</item>
-    </style>
 
     <!-- Chip Styles -->
-    <style name="ChipStyle.Status" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="chipMinHeight">32dp</item>
-        <item name="android:textAlignment">center</item>
-    </style>
 
     <style name="TextInputLayoutHint" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:textSize">14sp</item>
@@ -59,48 +21,14 @@
         <item name="fontFamily">@font/quicksand_font_family</item>
     </style>
 
-    <style name="ClaimDetailText">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">4dp</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/text_secondary</item>
-    </style>
-
     <!--Claim Details-->
     <!-- Section Title Style -->
-    <style name="DetailsSectionTitle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/text_primary</item>
-    </style>
 
     <!-- Table Row Style -->
-    <style name="DetailsTableRow">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
 
     <!-- Label Style -->
-    <style name="DetailsLabel">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-    </style>
 
     <!-- Value Style -->
-    <style name="DetailsValue">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">14sp</item>
-    </style>
 
     <style name="ClaimDetailTextWithIcon">
         <item name="android:layout_width">match_parent</item>
@@ -136,5 +64,15 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/color_white</item>
     </style>
+
+    <style name="AppTheme.CustomAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ExtraRoundedCorners</item>
+        <item name="dialogPreferredPadding">0dp</item>
+    </style>
+
+    <style name="ExtraRoundedCorners">
+        <item name="cornerSize">28dp</item>
+    </style>
+
 
 </resources>

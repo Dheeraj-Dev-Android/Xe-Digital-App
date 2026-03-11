@@ -5,25 +5,22 @@
 
     <item
         android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_dashboard"
         android:title="@string/menu_dashboard" />
 
     <item
         android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
         android:title="@string/menu_profile" />
 
-    <!--Attendance Group-->
-    <group
-        android:id="@+id/attendance_group"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_attendance_menu"
-            android:icon="@drawable/ic_dropdown_adaptive_fore"
+            android:icon="@drawable/ic_collections_bookmark"
             android:title="@string/menu_attendance" />
     </group>
 
-    <group
-        android:id="@+id/attendance_submenu"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_attendance"
             android:title="@string/view_attendance"
@@ -40,21 +37,17 @@
             android:id="@+id/nav_pendingApprovalFragment"
             android:title="@string/regularize_pending_approval"
             android:visible="false" />
+
     </group>
 
-    <!--Leaves Group-->
-    <group
-        android:id="@+id/leaves_group"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_leaves_menu"
-            android:icon="@drawable/ic_dropdown_adaptive_fore"
+            android:icon="@drawable/ic_calendar_today"
             android:title="@string/menu_leaves" />
     </group>
 
-    <group
-        android:id="@+id/leaves_submenu"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_leaves"
             android:title="@string/add_leaves"
@@ -74,18 +67,14 @@
     </group>
 
     <!--DCR Group-->
-    <group
-        android:id="@+id/dcr_group"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dcr_menu"
-            android:icon="@drawable/ic_dropdown_adaptive_fore"
+            android:icon="@drawable/ic_dcr"
             android:title="@string/menu_dcr" />
     </group>
 
-    <group
-        android:id="@+id/dcr_submenu"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dcr"
             android:title="@string/view_dcr"
@@ -98,34 +87,56 @@
 
     <item
         android:id="@+id/nav_vms"
+        android:icon="@drawable/ic_visitor"
         android:title="@string/vms" />
 
     <item
         android:id="@+id/nav_holidays"
+        android:icon="@drawable/ic_holiday"
         android:title="@string/menu_holidays" />
 
     <item
         android:id="@+id/nav_policy"
+        android:icon="@drawable/ic_policy"
         android:title="@string/menu_policy" />
 
     <item
         android:id="@+id/nav_shifts"
+        android:icon="@drawable/ic_shift"
         android:title="@string/menu_shifts" />
 
     <item
         android:id="@+id/nav_claim_management"
+        android:icon="@drawable/ic_payments"
         android:title="@string/menu_claim_management" />
 
     <item
         android:id="@+id/nav_documents"
+        android:icon="@drawable/ic_document"
         android:title="@string/menu_documents_upload" />
 
+    <!--    <item-->
+    <!--        android:id="@+id/nav_payroll"-->
+    <!--        android:icon="@drawable/ic_payroll"-->
+    <!--        android:title="Payroll (Coming Soon*)" />-->
+
+    <!--    <item-->
+    <!--        android:id="@+id/nav_about_us"-->
+    <!--        android:icon="@drawable/ic_info"-->
+    <!--        android:title="About XeDigital.ai" />-->
+
+    <!--    <item-->
+    <!--        android:id="@+id/nav_permission"-->
+    <!--        android:icon="@drawable/ic_security"-->
+    <!--        android:title="Permissions" />-->
     <item
-        android:id="@+id/nav_payroll"
-        android:title="Payroll (Coming Soon*)" />
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/menu_settings" />
 
     <item
         android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
         android:title="@string/logout" />
 
 </menu>

@@ -45,6 +45,7 @@ import app.xedigital.ai.activity.PunchActivity;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityMainBinding;
 import app.xedigital.ai.model.profile.UserProfileResponse;
+import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.utills.NetworkUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -72,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView profileImage;
     private TextView profileName;
     private TextView profileEmail;
+    private ImageView clientLogo;
+    private Call<UserProfileResponse> profileCall;
+    private Call<UserModelResponse> userCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         if (dismissButton != null) {
             dismissButton.setOnClickListener(v -> {
                 slowInternetLayout.setVisibility(View.GONE);
-                Toast.makeText(MainActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -131,12 +135,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-
         // Initialize header view elements
         View headerView = navigationView.getHeaderView(0);
         profileImage = headerView.findViewById(R.id.imageView);
         profileName = headerView.findViewById(R.id.textView);
         profileEmail = headerView.findViewById(R.id.subtitleText);
+        clientLogo = headerView.findViewById(R.id.clientLogo);
+
 
         if (navigationView != null) {
             fetchUserProfileData();
@@ -160,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
             tvSpeed.setText(speedText);
         } else {
-            Log.e("MainActivity", "FrameLayout for slow internet is null.");
+//            Log.e("MainActivity", "FrameLayout for slow internet is null.");
         }
     }
 
@@ -179,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(newVisibility);
 
         // Change icon based on visibility
-        attendanceItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
+//        attendanceItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isAttendanceSubmenuVisible = newVisibility;
 
         // Refresh the navigation menu to reflect the changes
@@ -197,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
 
         // Change icon based on visibility
-        leavesItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
+//        leavesItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isLeavesSubmenuVisible = newVisibility;
 
         // Refresh the navigation menu to reflect the changes
@@ -213,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
 
         // Change icon based on visibility
-        dcrItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
+//        dcrItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isDcrSubmenuVisible = newVisibility;
 
         // Refresh the navigation menu to reflect the changes
@@ -228,20 +233,11 @@ public class MainActivity extends AppCompatActivity {
 //        editor.putBoolean("isLoggedIn", false);
         editor.apply();
 
-//        Intent intent = new Intent(this, LoginActivity.class);
-//        startActivity(intent);
-//        finish();
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -264,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                 navController.navigate(R.id.nav_dashboard);
             } else {
                 // You might want to check for specific result codes for different errors
-                Toast.makeText(this, "Punch failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Attendance Punch failed", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -276,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
 
-            Toast.makeText(this, "Still no internet connection", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -285,137 +281,44 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 
-    //    private void fetchUserProfileData() {
-//        // Code to fetch user profile data
-//        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-//        String userId = sharedPreferences.getString("userId", "");
-//        String authToken = sharedPreferences.getString("authToken", "");
-//        // Make API call to fetch user profile data using userId and authToken
-//        // Update the UI with the fetched data
-//        fetchUserProfile(userId, authToken, profileImage, profileName, profileEmail);
-//    }
     private void fetchUserProfileData() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
         String authToken = sharedPreferences.getString("authToken", null);
 
         if (userId == null || authToken == null) {
-            Log.e(TAG, "User ID or Auth Token not found in SharedPreferences");
-            handleProfileFetchFailure("User ID or Auth Token not found", profileImage, profileName, profileEmail);
+            handleProfileFetchFailure("User not found", profileImage, profileName, profileEmail, clientLogo);
             return;
         }
         if (profileImage == null || profileName == null || profileEmail == null) {
-            Log.e(TAG, "profileImage or profileName or profileEmail is  null");
             View headerView = navigationView.getHeaderView(0);
             profileImage = headerView.findViewById(R.id.imageView);
             profileName = headerView.findViewById(R.id.textView);
             profileEmail = headerView.findViewById(R.id.subtitleText);
+            clientLogo = headerView.findViewById(R.id.clientLogo);
         }
 
         fetchUserProfile(userId, authToken, profileImage, profileName, profileEmail);
+        fetchUserData(userId, authToken, clientLogo);
     }
 
-    //    private void fetchUserProfile(String userId, String authToken, ImageView profileImage, TextView profileName, TextView profileEmail) {
-//        String authHeaderValue = "jwt " + authToken;
-//
-//        Call<UserProfileResponse> call = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
-//        call.enqueue(new Callback<UserProfileResponse>() {
-//            @Override
-//            public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
-//                if (navigationView == null) {
-//                    Log.e(TAG, "Navigation view is null, cannot update user profile");
-//                    return;
-//                }
-//                View headerView = navigationView.getHeaderView(0);
-//
-//                if (headerView == null) {
-//                    Log.e(TAG, "Header view is null, cannot update user profile");
-//                    return;
-//                }
-//
-////                profileImage = headerView.findViewById(R.id.imageView);
-////                TextView profileName = headerView.findViewById(R.id.textView);
-////                TextView profileEmail = headerView.findViewById(R.id.subtitleText);
-//                if (response.isSuccessful() && response.body() != null) {
-//                    UserProfileResponse userProfileResponse = response.body();
-//                    if (userProfileResponse.isSuccess() && userProfileResponse.getData() != null && userProfileResponse.getData().getEmployee() != null) {
-//                        String firstName = userProfileResponse.getData().getEmployee().getFirstname();
-//                        String lastName = userProfileResponse.getData().getEmployee().getLastname();
-//                        String profileImageUrl = userProfileResponse.getData().getEmployee().getProfileImageUrl();
-//
-//                        String fullName = firstName + " " + lastName;
-//                        // Create a SpannableString
-//                        SpannableString spannableString = new SpannableString(fullName);
-//
-//                        // Apply color to the first letter of the first name
-//                        if (!firstName.isEmpty()) {
-//                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            profileName.setText(spannableString);
-//                        }
-//
-//                        // Apply color to the first letter of the last name
-//                        if (!lastName.isEmpty()) {
-//                            int lastNameStartIndex = firstName.length() + 1;
-//                            spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            profileEmail.setText(userProfileResponse.getData().getEmployee().getEmail());
-//                        }
-//
-////                        profileName.setText(userProfileResponse.getData().getEmployee().getFirstname() + " " + userProfileResponse.getData().getEmployee().getLastname());
-//
-//                        if (profileImageUrl != null && !userProfileResponse.getData().getEmployee().getProfileImageUrl().isEmpty()) {
-//                            Glide.with(MainActivity.this).load(userProfileResponse.getData().getEmployee().getProfileImageUrl()).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-//                        } else {
-//                            Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-//                        }
-//
-//                    } else {
-//                        Toast.makeText(MainActivity.this, "Profile fetch failed: " + userProfileResponse.getMessage(), Toast.LENGTH_SHORT).show();
-//                        profileName.setText(getString(R.string.guest_name));
-//                        profileEmail.setText(getString(R.string.guest_email));
-//                        Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-//                    }
-//
-//                } else {
-//                    Toast.makeText(MainActivity.this, "Profile fetch failed: " + response.code(), Toast.LENGTH_SHORT).show();
-//                    profileName.setText(getString(R.string.guest_name));
-//                    profileEmail.setText(getString(R.string.guest_email));
-//                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
-//                Toast.makeText(MainActivity.this, "Profile fetch failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-//                if (navigationView != null && navigationView.getHeaderView(0) != null && profileImage != null) {
-//                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-//                } else {
-//                    Log.e(TAG, "Cannot load default image, profileImage is null");
-//                }
-//            }
-//        });
-//
-//    }
-//
     private void fetchUserProfile(String userId, String authToken, ImageView profileImage, TextView profileName, TextView profileEmail) {
         String authHeaderValue = "jwt " + authToken;
 
-        Call<UserProfileResponse> call = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
-        call.enqueue(new Callback<UserProfileResponse>() {
+        profileCall = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
+
+//        Call<UserProfileResponse> call = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
+        profileCall.enqueue(new Callback<UserProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) {
-                    handleProfileFetchFailure("Profile fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()), profileImage, profileName, profileEmail);
+                    handleProfileFetchFailure("Profile fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()), profileImage, profileName, profileEmail, clientLogo);
                     return;
                 }
 
                 UserProfileResponse userProfileResponse = response.body();
                 if (!userProfileResponse.isSuccess() || userProfileResponse.getData() == null || userProfileResponse.getData().getEmployee() == null) {
-                    handleProfileFetchFailure("Profile fetch failed: " + userProfileResponse.getMessage(), profileImage, profileName, profileEmail);
+                    handleProfileFetchFailure("Profile fetch failed: " + userProfileResponse.getMessage(), profileImage, profileName, profileEmail, clientLogo);
                     return;
                 }
 
@@ -445,32 +348,81 @@ public class MainActivity extends AppCompatActivity {
                 profileEmail.setText(email);
 
                 // Load profile image, or default if not available
-                if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                    Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-                } else {
-                    Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed()) {
+                    if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                    } else {
+                        Glide.with(MainActivity.this).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                    }
                 }
-
             }
 
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
-                handleProfileFetchFailure("Profile fetch failed: " + t.getMessage(), profileImage, profileName, profileEmail);
+                handleProfileFetchFailure("Profile fetch failed: " + t.getMessage(), profileImage, profileName, profileEmail, clientLogo);
             }
         });
     }
 
-    private void handleProfileFetchFailure(String message, ImageView profileImage, TextView profileName, TextView profileEmail) {
-        Log.e(TAG, message);
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+    private void fetchUserData(String userId, String authToken, ImageView clientLogo) {
+        String authHeaderValue = "jwt " + authToken;
 
-        profileName.setText(getString(R.string.guest_name));
-        profileEmail.setText(getString(R.string.guest_email));
+//        Call<UserModelResponse> call = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
+        userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
+        userCall.enqueue(new Callback<UserModelResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    Log.e(TAG, "User data fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()));
+                    return;
+                }
+
+                UserModelResponse userDataResponse = response.body();
+                if (!userDataResponse.isSuccess() || userDataResponse.getData() == null || userDataResponse.getData().getCompany() == null) {
+                    Log.e(TAG, "User data fetch failed: " + userDataResponse.getMessage());
+                    return;
+                }
+
+                String clientLogoUrl = userDataResponse.getData().getCompany().getLogo();
+//                Log.e(TAG, "Client logo URL: " + clientLogoUrl);
+
+                // Load Client image, or default if not available
+                if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed()) {
+                    if (clientLogoUrl != null && !clientLogoUrl.isEmpty()) {
+                        Glide.with(MainActivity.this).load(clientLogoUrl).into(clientLogo);
+                    } else {
+                        Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(clientLogo);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
+                Log.e(TAG, "User data fetch failed: " + t.getMessage());
+
+            }
+        });
+    }
+
+    private void handleProfileFetchFailure(String message, ImageView profileImage, TextView profileName, TextView profileEmail, ImageView clientLogo) {
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
+        if (profileName != null) {
+            profileName.setText(getString(R.string.guest_name));
+        }
+        if (profileEmail != null) {
+            profileEmail.setText(getString(R.string.guest_email));
+        }
 
         if (profileImage != null) {
-            Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
-        } else {
-            Log.e(TAG, "Cannot load default image, profileImage is null");
+            Glide.with(getApplicationContext()).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+        }
+        if (clientLogo != null) {
+            Glide.with(getApplicationContext()).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(clientLogo);
         }
     }
 
@@ -492,17 +444,11 @@ public class MainActivity extends AppCompatActivity {
                 unregisterReceiver(networkChangeReceiver);
                 isNetworkChangeReceiverRegistered = false;
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Error unregistering NetworkChangeReceiver", e);
+//                Log.e(TAG, "Error unregistering NetworkChangeReceiver", e);
             }
         }
     }
 
-    //    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        unregisterNetworkReceiver();
-//
-//    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -512,6 +458,9 @@ public class MainActivity extends AppCompatActivity {
         if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
             slowNetworkDialog.dismiss();
         }
+        // Cancel active network requests
+        if (profileCall != null) profileCall.cancel();
+        if (userCall != null) userCall.cancel();
     }
 
     @Override
@@ -536,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
                 unregisterReceiver(networkChangeReceiver);
                 isNetworkChangeReceiverRegistered = false;
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Error unregistering receiver: " + e.getMessage());
+//                Log.e(TAG, "Error unregistering receiver: " + e.getMessage());
             }
         }
     }

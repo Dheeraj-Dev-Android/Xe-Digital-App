@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -61,6 +60,8 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     private String currentEndDate = "";
     private ChipGroup chipGroup;
     private boolean isDataLoaded = false;
+    private ApproveLeaveViewModal approveLeaveViewModal;
+
 
     public static ApproveLeaveFragment newInstance() {
         return new ApproveLeaveFragment();
@@ -70,7 +71,8 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Retain the fragment across configuration changes
-        setRetainInstance(true);
+//        setRetainInstance(true);
+        approveLeaveViewModal = new ViewModelProvider(this).get(ApproveLeaveViewModal.class);
     }
 
     public void onFilterApplied(String startDate, String endDate) {
@@ -162,38 +164,29 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         chipGroup.check(clickedChip.getId());
     }
 
-    //
-//    private void filterLeaves(String status) {
-//        if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
-//            List<AppliedLeavesApproveItem> originalList = leavePendingApprovalResponse.getData().getAppliedLeaves();
-//            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
-//
-//            if (status.equals("All")) {
-//                filteredList.addAll(originalList);
-//            } else {
-//                for (AppliedLeavesApproveItem item : originalList) {
-//                    if (item.getStatus().equalsIgnoreCase(status)) {
-//                        filteredList.add(item);
-//                    }
-//                }
-//            }
-//            if (approvalAdapter != null) {
-//                approvalAdapter.updateList(filteredList);
-//            } else {
-//                Log.e("ApproveLeaveFragment", "approvalAdapter is null in filterLeaves");
-//            }
+    private void filterLeaves(String status) {
+        List<AppliedLeavesApproveItem> masterList = approveLeaveViewModal.leaveList.getValue();
+        List<AppliedLeavesApproveItem> listToFilter;
+//        if (!filteredDataByDate.isEmpty()) {
+//            listToFilter = filteredDataByDate;
+//        } else if (!originalLeaveList.isEmpty()) {
+//            listToFilter = originalLeaveList;
+//        } else if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
+//            listToFilter = leavePendingApprovalResponse.getData().getAppliedLeaves();
+//        } else {
+//            listToFilter = new ArrayList<>();
 //        }
-//    }
-//    private void filterLeaves(String status) {
-//        if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
+
+        if (!filteredDataByDate.isEmpty()) {
+            listToFilter = filteredDataByDate;
+        } else if (masterList != null && !masterList.isEmpty()) {
+            listToFilter = masterList;
+        } else {
+            listToFilter = new ArrayList<>();
+        }
+
+//        if (listToFilter != null) {
 //            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
-//            List<AppliedLeavesApproveItem> listToFilter;
-//            if (!originalLeaveList.isEmpty()) {
-//                listToFilter = originalLeaveList;
-//            } else {
-//                listToFilter = leavePendingApprovalResponse.getData().getAppliedLeaves();
-//            }
-//
 //            if (status.equals("All")) {
 //                filteredList.addAll(listToFilter);
 //            } else {
@@ -203,43 +196,31 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
 //                    }
 //                }
 //            }
+//            filteredDataByStatus.clear();
+//            filteredDataByStatus.addAll(filteredList);
 //            if (approvalAdapter != null) {
 //                approvalAdapter.updateList(filteredList);
 //            } else {
 //                Log.e("ApproveLeaveFragment", "approvalAdapter is null in filterLeaves");
 //            }
 //        }
-//    }
 
-    private void filterLeaves(String status) {
-        List<AppliedLeavesApproveItem> listToFilter;
-        if (!filteredDataByDate.isEmpty()) {
-            listToFilter = filteredDataByDate;
-        } else if (!originalLeaveList.isEmpty()) {
-            listToFilter = originalLeaveList;
-        } else if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
-            listToFilter = leavePendingApprovalResponse.getData().getAppliedLeaves();
+        // 3. Apply the Status filter
+        List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
+        if (status.equals("All")) {
+            filteredList.addAll(listToFilter);
         } else {
-            listToFilter = new ArrayList<>();
-        }
-        if (listToFilter != null) {
-            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
-            if (status.equals("All")) {
-                filteredList.addAll(listToFilter);
-            } else {
-                for (AppliedLeavesApproveItem item : listToFilter) {
-                    if (item.getStatus().equalsIgnoreCase(status)) {
-                        filteredList.add(item);
-                    }
+            for (AppliedLeavesApproveItem item : listToFilter) {
+                if (item.getStatus() != null && item.getStatus().equalsIgnoreCase(status)) {
+                    filteredList.add(item);
                 }
             }
-            filteredDataByStatus.clear();
-            filteredDataByStatus.addAll(filteredList);
-            if (approvalAdapter != null) {
-                approvalAdapter.updateList(filteredList);
-            } else {
-                Log.e("ApproveLeaveFragment", "approvalAdapter is null in filterLeaves");
-            }
+        }
+        // 4. Update the UI
+        filteredDataByStatus.clear();
+        filteredDataByStatus.addAll(filteredList);
+        if (approvalAdapter != null) {
+            approvalAdapter.updateList(filteredList);
         }
     }
 
@@ -252,8 +233,10 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
                     loadingProgress.setVisibility(View.GONE);
                     leavePendingApprovalResponse = response.body();
                     List<AppliedLeavesApproveItem> items = leavePendingApprovalResponse.getData().getAppliedLeaves();
-                    originalLeaveList.clear();
-                    originalLeaveList.addAll(items);
+//                    originalLeaveList.clear();
+//                    originalLeaveList.addAll(items);
+
+                    approveLeaveViewModal.leaveList.setValue(items);
                     if (items.isEmpty()) {
                         emptyStateContainer.setVisibility(View.VISIBLE);
 //                        Toast.makeText(getContext(), "No Data Found", Toast.LENGTH_SHORT).show();
@@ -270,68 +253,23 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
                     }
                 } else {
                     Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                    Log.e("API Error", "Response not successful: " + response.code());
+//                    Log.e("API Error", "Response not successful: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<LeavePendingApprovalResponse> call, @NonNull Throwable t) {
                 loadingProgress.setVisibility(View.GONE);
-                Log.e("Approval pending List", "Error: " + t.getMessage());
+//                Log.e("Approval pending List", "Error: " + t.getMessage());
                 Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void loadLeaves() {
-//        if (currentStartDate.isEmpty() && currentEndDate.isEmpty() && currentStatusFilter.equals("All")) {
-//            getLeaveApproval();
-//        } else {
-//            filterLeavesByDate(currentStartDate,currentEndDate);
-//            filterLeaves(currentStatusFilter);
         getLeaveApproval();
-//        }
     }
 
-    //    private void filterLeavesByDate(String fromDate, String toDate) {
-//        if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
-//            List<AppliedLeavesApproveItem> originalList = leavePendingApprovalResponse.getData().getAppliedLeaves();
-//            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
-//
-//            for (AppliedLeavesApproveItem item : originalList) {
-//                String leaveDate = item.getAppliedDate();
-//
-//                // Check if leaveDate is within the specified range
-//                if (leaveDate.compareTo(fromDate) >= 0 && leaveDate.compareTo(toDate) <= 0) {
-//                    filteredList.add(item);
-//                }
-//            }
-//            approvalAdapter.updateList(filteredList);
-//        }
-//    }
-//    private void filterLeavesByDate(String fromDate, String toDate) {
-//        if (leavePendingApprovalResponse != null && leavePendingApprovalResponse.getData() != null && leavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
-//            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
-//            List<AppliedLeavesApproveItem> listToFilter;
-//            if (!originalLeaveList.isEmpty()) {
-//                listToFilter = originalLeaveList;
-//            } else {
-//                listToFilter = leavePendingApprovalResponse.getData().getAppliedLeaves();
-//            }
-//            for (AppliedLeavesApproveItem item : listToFilter) {
-//                String leaveDate = item.getAppliedDate();
-//                if (leaveDate != null) {
-//                    // Check if leaveDate is within the specified range
-//                    if (leaveDate.compareTo(fromDate) >= 0 && leaveDate.compareTo(toDate) <= 0) {
-//                        filteredList.add(item);
-//                    }
-//                }
-//            }
-//            if (approvalAdapter != null) {
-//                approvalAdapter.updateList(filteredList);
-//            }
-//        }
-//    }
     private void filterLeavesByDate(String fromDate, String toDate) {
         List<AppliedLeavesApproveItem> listToFilter;
 
@@ -383,25 +321,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         }
     }
 
-//    private void filterLeavesByDate(String fromDate, String toDate, List<AppliedLeavesApproveItem> listToFilter) {
-//        if (listToFilter != null) {
-//            List<AppliedLeavesApproveItem> filteredList = new ArrayList<>();
-//            for (AppliedLeavesApproveItem item : listToFilter) {
-//                String leaveDate = item.getAppliedDate();
-//                if (leaveDate != null) {
-//                    // Check if leaveDate is within the specified range
-//                    if (leaveDate.compareTo(fromDate) >= 0 && leaveDate.compareTo(toDate) <= 0) {
-//                        filteredList.add(item);
-//                    }
-//                }
-//            }
-//            if (approvalAdapter != null) {
-//                approvalAdapter.updateList(filteredList);
-//            }
-//
-//        }
-//    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -439,26 +358,28 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
             pendingLeaveApproveFragment.handleApprove(item.getId());
         }
 
-        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
-        ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
+//        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+//        ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
         getLeaveApproval();
     }
 
     public void onReject(AttendanceRegularizeAppliedItem item) {
-        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
-        ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
-        if (pendingLeaveApproveFragment != null) {
-            pendingLeaveApproveFragment.handleReject(item.getId(), "");
-        }
+//        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+//        ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
+//        if (pendingLeaveApproveFragment != null) {
+//            pendingLeaveApproveFragment.handleReject(item.getId(), "");
+//        }
         getLeaveApproval();
     }
 
     public void onCancel(AttendanceRegularizeAppliedItem item) {
-        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
-        ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
-        if (pendingLeaveApproveFragment != null) {
-            pendingLeaveApproveFragment.handleCancel(item.getId(), "");
-        }
+//        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+//        ft.detach(pendingLeaveApproveFragment).attach(pendingLeaveApproveFragment).commit();
+//        if (pendingLeaveApproveFragment != null) {
+//            pendingLeaveApproveFragment.handleCancel(item.getId(), "");
+//        }
+        getLeaveApproval();
+
     }
 
 }

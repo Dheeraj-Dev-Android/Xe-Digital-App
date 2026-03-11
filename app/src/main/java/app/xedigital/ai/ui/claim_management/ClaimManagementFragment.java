@@ -351,7 +351,7 @@ public class ClaimManagementFragment extends Fragment {
                             } else {
                                 // Throw an error or display an error message
                                 Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
-                                throw new IllegalStateException("File size exceeds 1MB: " + uri);
+//                                throw new IllegalStateException("File size exceeds 1MB: " + uri);
                             }
                         }
                     } else if (data.getData() != null) {
@@ -361,7 +361,7 @@ public class ClaimManagementFragment extends Fragment {
                         } else {
                             // Throw an error or display an error message
                             Toast.makeText(requireContext(), "File size exceeds 1MB: " + uri.toString(), Toast.LENGTH_LONG).show();
-                            throw new IllegalStateException("File size exceeds 1MB: " + uri);
+//                            throw new IllegalStateException("File size exceeds 1MB: " + uri);
                         }
                     }
                     updateSelectedFileText();
@@ -1115,17 +1115,31 @@ public class ClaimManagementFragment extends Fragment {
         return fileName;
     }
 
+//    private boolean isValidFileSize(Uri uri) {
+//        try {
+//            Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null);
+//            if (cursor != null && cursor.moveToFirst()) {
+//                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+//                long fileSize = cursor.getLong(sizeIndex);
+//                cursor.close();
+//                return fileSize <= 1024 * 1024; // 1MB in bytes
+//            }
+//        } catch (Exception e) {
+//            Log.e("FileSizeCheck", "Error checking file size: " + e.getMessage());
+//        }
+//        return false;
+//    }
+
     private boolean isValidFileSize(Uri uri) {
-        try {
-            Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null);
+        // try-with-resources automatically closes the cursor
+        try (Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
                 long fileSize = cursor.getLong(sizeIndex);
-                cursor.close();
-                return fileSize <= 1024 * 1024; // 1MB in bytes
+                return fileSize <= 1024 * 1024;
             }
         } catch (Exception e) {
-            Log.e("FileSizeCheck", "Error checking file size: " + e.getMessage());
+            Log.e("FileSizeCheck", "Error: " + e.getMessage());
         }
         return false;
     }

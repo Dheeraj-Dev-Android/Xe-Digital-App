@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -232,11 +231,6 @@ public class DashboardFragment extends Fragment {
         profileViewModel.fetchUserProfile();
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
         Calendar calendar = Calendar.getInstance();
-//        Date endDate = calendar.getTime();
-//        endDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(endDate);
-//        calendar.add(Calendar.DAY_OF_MONTH, -30);
-//        Date startDate = calendar.getTime();
-//        startDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(startDate);
         Date endDate = calendar.getTime();
         endDateString = DATE_FORMAT_YYYY_MM_DD.format(endDate);
         calendar.add(Calendar.DAY_OF_MONTH, -30);
@@ -250,17 +244,6 @@ public class DashboardFragment extends Fragment {
         startShimmerAnimations();
 
         handler = new Handler(Looper.getMainLooper());
-//        runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                Date currentDate = new Date();
-//                String todayDateString = new SimpleDateFormat("dd-MMMM-yyyy", Locale.getDefault()).format(currentDate);
-//                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a", Locale.getDefault());
-//                String currentTimeString = timeFormat.format(currentDate);
-//                binding.todayDate.setText(todayDateString + " - " + currentTimeString);
-//                handler.postDelayed(this, 1000);
-//            }
-//        };
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -310,7 +293,7 @@ public class DashboardFragment extends Fragment {
                     if (profileImageUrl != null) {
                         Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
                     } else {
-                        profileImage.setImageResource(R.mipmap.ic_default_profile);
+                        profileImage.setImageResource(R.drawable.ic_profile_placeholder);
                     }
                 } else {
                     // Handle case where employee data is null
@@ -319,7 +302,7 @@ public class DashboardFragment extends Fragment {
                     binding.tvEmployeeShiftValue.setText("N/A");
                     binding.tvEmployeeContactValue.setText("N/A");
                     binding.tvEmployeeEmailValue.setText("N/A");
-                    binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
+                    binding.ivEmployeeProfile.setImageResource(R.drawable.ic_profile_placeholder);
                 }
             } else {
                 // Handle case where userProfileResponse or data is null
@@ -328,7 +311,7 @@ public class DashboardFragment extends Fragment {
                 binding.tvEmployeeShiftValue.setText("N/A");
                 binding.tvEmployeeContactValue.setText("N/A");
                 binding.tvEmployeeEmailValue.setText("N/A");
-                binding.ivEmployeeProfile.setImageResource(R.mipmap.ic_default_profile);
+                binding.ivEmployeeProfile.setImageResource(R.drawable.ic_profile_placeholder);
             }
             isProfileDataLoaded = true;
             checkAllDataLoaded();
@@ -373,11 +356,30 @@ public class DashboardFragment extends Fragment {
             checkAllDataLoaded();
         });
 
+//        leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
+//            if (leavesData != null && leavesData.getData() != null) {
+//                List<LeavesItem> leaves = leavesData.getData().getLeaves();
+//                if (leaves.isEmpty()) {
+//                    Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    binding.leavePieChart.setVisibility(View.VISIBLE);
+//                    updatePieChartData(binding.leavePieChart, leaves);
+//                }
+//            } else {
+//                Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
+//            }
+//            isLeavesDataLoaded = true;
+//            checkAllDataLoaded();
+//            employeeCardShimmer.stopShimmer();
+//            employeeCardShimmer.setVisibility(View.GONE);
+//            employeeCard.setVisibility(View.VISIBLE);
+//        });
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
-                if (leaves.isEmpty()) {
-//                    Log.e("DashboardFragment", "No leaves data available");
+
+                // ADDED null check for 'leaves'
+                if (leaves == null || leaves.isEmpty()) {
                     Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
                 } else {
                     binding.leavePieChart.setVisibility(View.VISIBLE);
@@ -385,8 +387,9 @@ public class DashboardFragment extends Fragment {
                 }
             } else {
                 Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
-//                Log.e("DashboardFragment", "No leaves data available");
             }
+
+            // Ensure these run even if data is null/empty
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
             employeeCardShimmer.stopShimmer();
@@ -476,7 +479,7 @@ public class DashboardFragment extends Fragment {
                 return OUTPUT_SHIFT_FORMAT.format(startTime) + " - " + OUTPUT_SHIFT_FORMAT.format(endTime);
             } catch (ParseException e) {
                 e.printStackTrace();
-                Log.e("DashboardFragment", "Error formatting shift time", e);
+//                Log.e("DashboardFragment", "Error formatting shift time", e);
                 return "";
             }
         }

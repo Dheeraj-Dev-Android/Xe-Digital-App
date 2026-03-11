@@ -29,7 +29,6 @@
 
             <!-- Content Container -->
             <LinearLayout
-                android:id="@+id/contentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -59,7 +58,6 @@
 
                     <!-- Status Container -->
                     <LinearLayout
-                        android:id="@+id/statusContainer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"

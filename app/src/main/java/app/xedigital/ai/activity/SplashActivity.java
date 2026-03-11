@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
@@ -31,10 +32,12 @@ public class SplashActivity extends AppCompatActivity {
     private LottieAnimationView noInternetAnimation;
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
+    private TextView tvAppVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_splash);
 
         // Initialize UI components
@@ -44,6 +47,16 @@ public class SplashActivity extends AppCompatActivity {
         tvSpeed = findViewById(R.id.tvSpeed);
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
 
+        tvAppVersion = findViewById(R.id.tv_app_version);
+        String versionName = "";
+        String versionCode = "";
+        try {
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            versionCode = String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        tvAppVersion.setText("App Version : " + versionCode + "." + versionName);
         // Dismiss button for slow internet layout
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
         if (dismissButton != null) {

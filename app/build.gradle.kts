@@ -12,9 +12,10 @@ android {
     defaultConfig {
         applicationId = "app.xedigital.ai"
         minSdk = 28
-        targetSdk = 35
+        //noinspection OldTargetApi
+        targetSdk = 34
         versionCode = 2
-        versionName = "1.1"
+        versionName = "1.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -35,9 +36,7 @@ android {
         release {
             isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -60,7 +59,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-//    implementation(libs.legacy.support.v4)
     implementation(libs.activity)
     implementation(libs.filament.android)
     implementation(libs.tracing.perfetto.handshake)
@@ -83,7 +81,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.perf)
-//    implementation(libs.firebase.inappmessaging)
+    implementation(libs.legacy.support.v4)
+    implementation(libs.firebase.inappmessaging.display)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -102,7 +101,6 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.play.services.location)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")

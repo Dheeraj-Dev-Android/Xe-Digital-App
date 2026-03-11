@@ -3,7 +3,6 @@ package app.xedigital.ai.ui.leaves;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,14 +83,13 @@ public class AppliedLeaveFragment extends Fragment {
                         recyclerView.setAdapter(AppliedLeaveAdapter);
                     }
                 } else {
-                    Log.e("API Error", "Response not successful or body is null");
+//                    Log.e("API Error", "Response not successful or body is null");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<AppliedLeavesResponse> call, @NonNull Throwable throwable) {
                 loadingProgress.setVisibility(View.GONE);
-                Log.e("API Error", "Request failed: " + throwable.getMessage());
             }
         });
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);

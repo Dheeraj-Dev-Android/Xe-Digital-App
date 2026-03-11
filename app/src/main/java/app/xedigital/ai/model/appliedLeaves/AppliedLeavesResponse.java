@@ -2,7 +2,9 @@ package app.xedigital.ai.model.appliedLeaves;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AppliedLeavesResponse {
+import java.io.Serializable;
+
+public class AppliedLeavesResponse implements Serializable {
 
     @SerializedName("data")
     private Data data;

@@ -49,6 +49,7 @@
         android:elevation="4dp"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
+        app:itemIconTint="@color/gradient_start"
         app:itemTextAppearance="@style/NavigationViewTextAppearance"
         app:menu="@menu/activity_main_drawer" />
 

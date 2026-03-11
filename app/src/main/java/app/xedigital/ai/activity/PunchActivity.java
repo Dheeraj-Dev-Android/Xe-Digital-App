@@ -112,7 +112,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_punch);
         progressBar = findViewById(R.id.loadingPanel);
-//        biometricManager = BiometricManager.from(this);
         bioMetric = new BioMetric(this, this, this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -137,12 +136,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         preview = new Preview.Builder().build();
         cameraSelector = new CameraSelector.Builder().build();
-
-//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-//            new AlertDialog.Builder(this).setTitle("Camera Permission Required").setMessage("This app needs access to the camera to capture your punch.").setPositiveButton("OK", (dialog, which) -> requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS)).setNegativeButton("Cancel", null).show();
-//        } else {
-//            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
-//        }
     }
 
     private boolean allPermissionsGranted() {
@@ -155,7 +148,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     }
 
     private void startCamera() {
-        Log.d(TAG, "Camera Started");
         PreviewView viewFinder = findViewById(R.id.viewFinder);
         cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
@@ -170,15 +162,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 try {
                     Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                     if (camera == null) {
-                        Log.e(TAG, "Camera is null");
                         showRetryAlert();
                         return;
-
                     }
 
                     CameraInfo cameraInfo = camera.getCameraInfo();
-                    Log.d(TAG, "Camera Info: " + cameraInfo);
-                    Log.d(TAG, "Camera State: " + cameraInfo.getCameraState());
                     TextView captureText = findViewById(R.id.CaptureText);
 
                     new CountDownTimer(3000, 1000) {
@@ -191,7 +179,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         @Override
                         public void onFinish() {
                             Toast.makeText(PunchActivity.this, "Captured", Toast.LENGTH_SHORT).show();
-                            Log.i(TAG, "Captured");
                             captureImage();
                             progressBar.setVisibility(View.VISIBLE);
                             captureText.setEnabled(true);
@@ -257,7 +244,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                         String base64Image = convertImageToBase64(bitmap.get());
                         if (base64Image.length() >= 10) {
-                            Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
+//                            Log.d(TAG, "Base64 Image: " + base64Image.substring(0, 10) + "...");
                         }
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("collection_name", CollectionName);
@@ -268,12 +255,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 //                   API CALL
                         sendImageToApi(requestBody);
                     } catch (Exception e) {
-                        Log.e(TAG, "Error processing image: " + e.getMessage(), e);
                         handleError("Error processing image: " + e.getMessage());
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Error processing image: " + e.getMessage(), e);
-                    Log.e(TAG, "Error during face detection: " + e.getMessage(), e);
                     handleError("Error detecting faces. Please try again.");
                     progressBar.setVisibility(View.GONE);
                 }
@@ -281,7 +265,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-                Log.e(TAG, "Photo capture failed: " + exception.getMessage(), exception);
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
@@ -289,7 +272,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     //    API TO SEND IMAGE TO DB
     private void sendImageToApi(RequestBody requestBody) {
-        Log.d(TAG, "Recognize API Called");
         APIInterface imageApiService = APIClient.getInstance().getImage();
         retrofit2.Call<ResponseBody> recognize = imageApiService.FaceRecognitionApi(requestBody);
 
@@ -300,8 +282,13 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                     try {
                         String responseBody = response.body().string();
                         String responseJson = gson.toJson(responseBody);
-                        Log.d(TAG, "Recognize Response Body:\n " + responseJson);
                         JSONObject jsonResponse = new JSONObject(responseBody);
+
+                        // ADD THIS CHECK:
+                        if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
+                            handleError("Error: Data field is missing or null.");
+                            return;
+                        }
                         JSONObject dataObject = jsonResponse.getJSONObject("data");
 
                         Intent intent = getIntent();
@@ -315,7 +302,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         callFaceDetailApi(token, requestBodyFacee);
 
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "Error reading response body: " + e.getMessage(), e);
                         throw new RuntimeException(e);
                     }
                 } else {
@@ -328,7 +314,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading error body: " + e.getMessage(), e);
                     }
-                    Log.e(TAG, "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     // Handle the error based on the response code and error body
                     handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
@@ -336,7 +321,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Log.e(TAG, "Recognize Error: " + throwable.getMessage(), throwable);
                 // Handle network or other errors
                 handleError("Network Error: " + throwable.getMessage());
             }
@@ -348,7 +332,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             if (isFinishing() || isDestroyed()) {
                 return;
             }
-
             AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(errorMessage.contains("There are no faces in the image") ? "No faces detected in the image. Please try again with a clear image showing your face." : errorMessage).setPositiveButton("Retry", null).setNegativeButton("Cancel", (dialog, which) -> {
                 dialog.dismiss();
                 setResult(Activity.RESULT_CANCELED);
@@ -384,7 +367,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     }
 
     private void callFaceDetailApi(String token, RequestBody requestBodyFacee) {
-        Log.d(TAG, "Face Detail API Called");
         APIInterface faceApiService = APIClient.getInstance().getFace();
         retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetailApi(token, requestBodyFacee);
 
@@ -398,7 +380,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                         // Check if "data" key exists and is not null before proceeding
                         if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
-                            Log.e(TAG, "Face data not found in response.");
                             showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
                             return;
                         }
@@ -407,37 +388,27 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                             JSONObject employeeObject = dataObject.getJSONObject("employee");
                             String id = employeeObject.getString("_id");
                             String firstName = employeeObject.getString("firstname");
-
-                            Log.d(TAG, "ID: " + id + ", First Name: " + firstName);
-
                             String responseJson = gson.toJson(responseBody);
-                            Log.d(TAG, "Face Detail Response Body:\n" + responseJson);
-
                             SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
                             userId = sharedPreferences.getString("userId", null);
-                            Log.e(TAG, "User ID: " + userId + ", ID: " + id);
                             if (userId != null && userId.equals(id)) {
                                 callAttendanceApi(id, firstName);
                             } else {
                                 showAttendanceFailedAlert("Attendance failed: User Id Mismatch.");
                             }
                         } else {
-                            Log.e(TAG, "Face data not found in response.");
                             showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
                         }
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "Error processing face detail response: " + e.getMessage(), e);
                         showAttendanceFailedAlert("Attendance failed: An error occurred.");
                     }
                 } else {
-                    Log.e(TAG, "Face Detail Response Error: " + response.code() + " - " + response.message());
                     showAttendanceFailedAlert("Attendance failed: Server error.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Log.e(TAG, "Face Detail Error: " + throwable.getMessage(), throwable);
                 showAttendanceFailedAlert("Attendance failed: Network or API error.");
             }
         });
@@ -447,7 +418,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
         if (userId != null && userId.equals(employeeId)) {
-            Log.d(TAG, "Attendance API Called");
             Intent intent = getIntent();
             if (intent != null) {
                 authToken = intent.getStringExtra("authToken");
@@ -456,8 +426,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
             getCurrentLocation(address -> {
                 currentAddress = address;
-//                Log.d(TAG, "Current Address (Received): " + currentAddress);
-
                 String currentTime = getCurrentTime();
                 try {
                     JSONObject requestBody = new JSONObject();
@@ -481,15 +449,12 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                                     String responseBody = response.body().string();
                                     JSONObject responseJson = new JSONObject(responseBody);
                                     String message = responseJson.getString("message");
-                                    Log.d(TAG, "Attendance Response Message: " + message);
                                     showAttendanceSuccessAlert(responseBody);
                                     progressBar.setVisibility(View.GONE);
 
                                     String responseJsonn = gson.toJson(responseBody);
-                                    Log.d(TAG, "Attendance Response Body:\n" + responseJsonn);
                                 } catch (IOException | JSONException e) {
                                     progressBar.setVisibility(View.GONE);
-                                    Log.e(TAG, "Error reading response body: " + e.getMessage(), e);
                                     throw new RuntimeException(e);
                                 }
                             }
@@ -497,19 +462,25 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                         @Override
                         public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                            Log.e(TAG, "Attendance Error: " + throwable.getMessage(), throwable);
-                            progressBar.setVisibility(View.GONE);
-                            throw new RuntimeException(throwable);
+                            if (isFinishing() || isDestroyed()) return;
+
+                            ProgressBar progressBar = findViewById(R.id.progressBar);
+                            if (progressBar != null) progressBar.setVisibility(View.GONE);
+                            if (throwable instanceof java.net.SocketTimeoutException) {
+                                showAttendanceFailedAlert("Connection timed out. Please check your internet and try again.");
+                            } else {
+                                showAttendanceFailedAlert("Network error: " + throwable.getMessage());
+                            }
+
                         }
+
                     });
                 } catch (JSONException e) {
-                    Log.e(TAG, "Error creating request body: " + e.getMessage(), e);
                     progressBar.setVisibility(View.GONE);
                     throw new RuntimeException(e);
                 }
             });
         } else {
-            Log.e(TAG, "User Id Mismatch");
             showAttendanceFailedAlert("Attendance failed: User Id Mismatch.");
         }
     }
@@ -522,7 +493,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             String message = responseJson.getString("message");
             if (success) {
                 JSONObject data = responseJson.getJSONObject("data");
-                Log.d(TAG, "Attendance Data: " + data);
                 String punchInAddress = data.getString("punchInAddress");
                 String punchOutAddress = data.getString("punchOutAddress");
 
@@ -563,7 +533,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 });
             }
         } catch (JSONException e) {
-            Log.e("PunchActivity", "Error parsing JSON response", e);
             throw new RuntimeException(e);
         }
     }
@@ -596,34 +565,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return dateFormat.format(new Date());
     }
 
-    //    private void getCurrentLocation(AddressCallback callback) {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
-//            locationCallback = new LocationCallback() {
-//                @Override
-//                public void onLocationResult(@NonNull LocationResult locationResult) {
-//                    Location location = locationResult.getLastLocation();
-//                    if (location != null) {
-//                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
-//                    } else {
-//                        Log.e(TAG, "Location is null in onLocationResult");
-//                        callback.onAddressReceived("Location not found");
-//                    }
-//                }
-//            };
-//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-//        } else {
-//            Log.e(TAG, "Location permission not granted");
-//            callback.onAddressReceived("Location not found");
-//        }
-//    }
     private void getCurrentLocation(AddressCallback callback) {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
-            // Location permission granted and location services enabled
-//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
             LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(false).setMaxUpdateDelayMillis(15000).build();
             locationCallback = new LocationCallback() {
                 @Override
@@ -632,7 +578,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                     if (location != null) {
                         getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
                     } else {
-                        Log.e(TAG, "Location is null in onLocationResult");
                         callback.onAddressReceived("Location not found");
                     }
                 }
@@ -643,14 +588,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             if (!isLocationEnabled) {
                 // Show alert to enable location services
                 new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to use this feature.").setPositiveButton("Ok", (dialog, which) -> {
-//                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-//                }).setNegativeButton("Cancel", (dialog, which) -> {
                     dialog.dismiss();
                     setResult(Activity.RESULT_CANCELED);
                     finish();
                 }).show();
             } else {
-                Log.e(TAG, "Location permission not granted");
                 callback.onAddressReceived("Location not found");
             }
         }
@@ -719,9 +661,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     }
 
     private void usePhoneBiometric() {
-        Log.d(TAG, "Use Device Biometric");
         progressBar.setVisibility(View.VISIBLE);
-        Log.d(TAG, "usePhoneBiometric: bioMetric - " + bioMetric);
         if (bioMetric != null) {
             bioMetric.authenticate(false);
         } else {
@@ -731,13 +671,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     @Override
     public void onAuthenticationSucceeded() {
-        Log.d(TAG, "AuthenticationSucceeded");
         // Call your attendance API here
         runOnUiThread(() -> {
             SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String employeeId = sharedPreferences.getString("userId", "");
             String employeeName = sharedPreferences.getString("empFirstName", "");
-//        progressBar.setVisibility(View.GONE);
             callAttendanceApi(employeeId, employeeName);
         });
     }
@@ -758,16 +696,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
     }
 
-    //    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        int REQUEST_CODE_PERMISSIONS = 10;
-//        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-//            if (allPermissionsGranted()) {
-//                startCamera();
-//            }
-//        }
-//    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -778,7 +706,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         }
         if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE) {
-//            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
             bioMetric.handlePermissionResult(requestCode, permissions, grantResults, false);
         }
     }
@@ -800,11 +727,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
             attendanceSuccessDialog.dismiss();
         }
-
     }
 
     interface AddressCallback {
         void onAddressReceived(String address);
     }
-
 }

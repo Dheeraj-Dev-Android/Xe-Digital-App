@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -75,6 +76,7 @@ public class LeavesFragment extends Fragment {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private FragmentLeavesBinding binding;
     private EditText etFromDate, etToDate;
+    private AlertDialog loadingDialog;
     private SimpleDateFormat dateFormat;
     private double balanceLeave;
     private double totalDays;
@@ -179,7 +181,7 @@ public class LeavesFragment extends Fragment {
                 empEmail = employee.getEmail();
                 empDepartment = employee.getDepartment().getName();
                 empBirthday = employee.getDateOfBirth();
-                Log.e(TAG, " empBirthday: " + empBirthday);
+//                Log.e(TAG, " empBirthday: " + empBirthday);
 
 
                 if (employee.getDepartment() != null) {
@@ -232,12 +234,16 @@ public class LeavesFragment extends Fragment {
                 for (LeavetypesItem leaveType : leaveTypes) {
                     if ("Restricted Holidays".equals(leaveType.getLeavetypeName())) {
                         restrictedHolidayId = leaveType.getId();
-                        Log.e(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
+//                        Log.e(TAG, "Restricted Holiday ID: " + restrictedHolidayId);
 //                        break;
                     }
                     if ("Loss of Pay (LOP) / Leave Without Pay (LWP)".equals(leaveType.getLeavetypeName())) {
                         lossOfPayId = leaveType.getId();
-                        Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
+//                        Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
+//                        break;
+                    } else if ("LOP".equals(leaveType.getLeavetypeName())) {
+                        lossOfPayId = leaveType.getId();
+//                        Log.w(TAG, "Loss of Pay (LOP) / Leave Without Pay (LWP) ID: " + lossOfPayId);
 //                        break;
                     }
                 }
@@ -270,10 +276,10 @@ public class LeavesFragment extends Fragment {
                 selectedLeaveTypeId = selectedLeaveType.getId();
                 selectedLeaveTypeName = selectedLeaveType.getLeavetypeName();
                 String holidayId = restrictedHolidayId;
-                Log.e(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId + ", Holiday: " + holidayId);
+//                Log.e(TAG, "Selected Leave Type ID: " + selectedLeaveTypeId + ", Holiday: " + holidayId);
 
                 if (selectedLeaveTypeId.equals(holidayId)) {
-                    Log.e(TAG, "Holiday ID 273: " + holidayId);
+//                    Log.e(TAG, "Holiday ID 273: " + holidayId);
                     String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
                     String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
                     checkRestrictedHoliday(fromDate, toDate);
@@ -530,6 +536,7 @@ public class LeavesFragment extends Fragment {
         binding.btnSubmit.setOnClickListener(view -> {
 
             if (validateForm()) {
+                binding.btnSubmit.setEnabled(false);
                 String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
                 String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
                 String leaveCategoryFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
@@ -549,7 +556,6 @@ public class LeavesFragment extends Fragment {
 
     private void applyLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason, String leavePlanned) {
         applyLeaveRequest = new ApplyLeaveRequest();
-//        Log.d(TAG, "applyLeaveRequest: " + applyLeaveRequest);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
         String appliedDate = formatter.format(Instant.now());
 
@@ -594,28 +600,59 @@ public class LeavesFragment extends Fragment {
 
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+//                try {
+//                    if (response.isSuccessful() && response.body() != null) {
+//                        String responseBody = response.body().string();
+//                        JSONObject jsonObject = new JSONObject(responseBody);
+////                        Condition to not deduct leave if its LOP
+//                        if (!Objects.equals(selectedLeaveTypeId, lossOfPayId)) {
+//                            debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
+//                        }
+//
+//                        String message = jsonObject.getString("message");
+//                        clearForm();
+//                        showAlertDialog("Leave Applied", message);
+//                    } else {
+//                        showAlertDialog("Leave Error ", response.message());
+//                        Log.e(TAG, "Error: " + response.code());
+//                    }
+//                } catch (IOException | JSONException e) {
+//                    e.printStackTrace();
+//                    showAlertDialog("Error", "Failed to apply leave");
+//                }
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
-//                        Log.d(TAG, "Response: " + responseBody);
-//                        Condition to not deduct leave if its LOP
-                        if (!Objects.equals(selectedLeaveTypeId, lossOfPayId)) {
-                            debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
-                        }
-
                         JSONObject jsonObject = new JSONObject(responseBody);
-                        String message = jsonObject.getString("message");
-//                        Log.d(TAG, "Message: " + message);
-                        clearForm();
-                        showAlertDialog("Leave Applied", message);
+
+                        // VERIFICATION: Check for success flag and the Database ID (_id)
+                        boolean isSuccess = jsonObject.optBoolean("success", false);
+                        JSONObject data = jsonObject.optJSONObject("data");
+                        String databaseId = (data != null) ? data.optString("_id") : null;
+
+                        if (isSuccess && databaseId != null) {
+                            // Success: Database record confirmed.
+                            if (!Objects.equals(selectedLeaveTypeId, lossOfPayId)) {
+                                // Proceed to Debit (keep loading screen visible)
+                                debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
+                            } else {
+                                showLoading(false);
+                                showAlertDialog("Success", "Leave applied successfully.");
+                                clearForm();
+                            }
+                        } else {
+                            showLoading(false);
+                            showErrorAlert("Application failed: Server did not return a valid record ID.");
+                        }
                     } else {
-                        showAlertDialog("Leave Error ", response.message());
-                        Log.e(TAG, "Error: " + response.code());
+                        showLoading(false);
+                        showErrorAlert("Server error: " + response.code());
                     }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                    showAlertDialog("Error", "Failed to apply leave");
+                } catch (Exception e) {
+                    showLoading(false);
+                    showErrorAlert("Error parsing response: " + e.getMessage());
                 }
+
             }
 
             @Override
@@ -625,15 +662,17 @@ public class LeavesFragment extends Fragment {
 
             }
 
-            private void showAlertDialog(String title, String message) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setTitle(title).setMessage(message).setPositiveButton("OK", (dialog, which) -> {
-                    clearForm();
-                    dialog.dismiss();
-                }).show();
-            }
+
         });
 
+    }
+
+    private void showAlertDialog(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(title).setMessage(message).setPositiveButton("OK", (dialog, which) -> {
+            clearForm();
+            dialog.dismiss();
+        }).show();
     }
 
     private void showAlertDialog1() {
@@ -676,7 +715,6 @@ public class LeavesFragment extends Fragment {
         debitLeaveRequest.setReportingManager(reportingManagerEmail);
         debitLeaveRequest.setReportingManagerName(reportingManagerName);
         debitLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
-//        Log.e("debit API", "totalDays: " + totalDays + "finalUsedDays: " + finalUsedDays);
         debitLeaveRequest.setTDays(totalDays);
         debitLeaveRequest.setFUsedDays(finalUsedDays);
 
@@ -686,14 +724,17 @@ public class LeavesFragment extends Fragment {
         debitLeave.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                showLoading(false);
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseBody = response.body().string();
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
+                        showAlertDialog("Success", "Leave applied and balance updated.");
                         clearForm();
+
                     } else {
-                        Log.e(TAG, "Debit Error: " + response.code());
+                        showErrorAlert("Leave recorded, but balance update failed. Please contact HR.");
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -703,7 +744,8 @@ public class LeavesFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Log.e(TAG, "onFailure: " + throwable.getMessage());
+                showLoading(false);
+                showErrorAlert("Leave recorded, but network error occurred during balance update.");
             }
         });
 
@@ -1048,6 +1090,31 @@ public class LeavesFragment extends Fragment {
 
         // ---------- Show Picker ----------
         picker.show(requireActivity().getSupportFragmentManager(), "datePicker");
+    }
+
+    private void showLoading(boolean show) {
+        if (show) {
+            if (loadingDialog == null) {
+                // Create a simple spinning loader view
+                ProgressBar progressBar = new ProgressBar(requireContext());
+                progressBar.setPadding(50, 50, 50, 50);
+
+                loadingDialog = new AlertDialog.Builder(requireContext())
+                        .setView(progressBar)
+                        .setCancelable(false) // This is the key "safety lock"
+                        .create();
+
+                // Make the background transparent so only the spinner shows
+                if (loadingDialog.getWindow() != null) {
+                    loadingDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                }
+            }
+            loadingDialog.show();
+        } else {
+            if (loadingDialog != null && loadingDialog.isShowing()) {
+                loadingDialog.dismiss();
+            }
+        }
     }
 
     private void showErrorAlert(String message) {

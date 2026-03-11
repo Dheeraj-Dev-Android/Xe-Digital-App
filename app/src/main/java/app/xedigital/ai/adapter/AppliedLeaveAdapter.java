@@ -72,38 +72,55 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
         ColorStateList colorStateList = ColorStateList.valueOf(chipColor);
         holder.statusChip.setChipBackgroundColor(colorStateList);
 
-        holder.btn_viewAppliedLeave.setOnClickListener(v -> {
-            if (position != RecyclerView.NO_POSITION) {
-                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
-                String leaveId = appliedLeaveItem.getId();
-                if (leaveId != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
-                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
+//        holder.btn_viewAppliedLeave.setOnClickListener(v -> {
+//            if (position != RecyclerView.NO_POSITION) {
+//                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
+//                String leaveId = appliedLeaveItem.getId();
+//                if (leaveId != null) {
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
+//                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
+//
+//                } else {
+//                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        holder.appliedLeaveCard.setOnClickListener(v -> {
+//            if (position != RecyclerView.NO_POSITION) {
+//                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
+//                String leaveId = appliedLeaveItem.getId();
+//                if (leaveId != null) {
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
+//                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
+//
+//                } else {
+//                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
+        // Create a single listener variable
+        View.OnClickListener listener = v -> {
+            if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                AppliedLeavesItem item = appliedLeaves.get(holder.getBindingAdapterPosition());
+                if (item.getId() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ARG_APPLIED_LEAVE, item);
+                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
                 } else {
                     Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
-        });
-        holder.appliedLeaveCard.setOnClickListener(v -> {
-            if (position != RecyclerView.NO_POSITION) {
-                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
-                String leaveId = appliedLeaveItem.getId();
-                if (leaveId != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
-                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
+        };
 
-                } else {
-                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
+        holder.btn_viewAppliedLeave.setOnClickListener(listener);
+        holder.appliedLeaveCard.setOnClickListener(listener);
 
     }
 
