@@ -14,11 +14,16 @@ import android.view.animation.DecelerateInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.bumptech.glide.Glide;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adminActivity.AdminCheckOutActivity;
 import app.xedigital.ai.adminActivity.AdminManualCheckIn;
 import app.xedigital.ai.adminActivity.AdminPunchActivity;
+import app.xedigital.ai.databinding.FragmentVisitorCheckInBinding;
+import app.xedigital.ai.utills.UserViewModel;
 
 public class VisitorCheckInFragment extends Fragment {
 
@@ -28,6 +33,7 @@ public class VisitorCheckInFragment extends Fragment {
     private View punchInButton;
     private View punchOutButton;
     private View manualCheckInButton;
+    private FragmentVisitorCheckInBinding binding;
 
     public static VisitorCheckInFragment newInstance() {
         return new VisitorCheckInFragment();
@@ -38,13 +44,33 @@ public class VisitorCheckInFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_visitor_check_in, container, false);
+        binding = FragmentVisitorCheckInBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+//        return inflater.inflate(R.layout.fragment_visitor_check_in, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Use 'requireActivity()' to get the SAME instance of the ViewModel
+        UserViewModel viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+
+        viewModel.getUserDetails().observe(getViewLifecycleOwner(), userDetails -> {
+            if (userDetails != null && userDetails.getData() != null) {
+                // 1. Update Company Name
+                String companyName = userDetails.getData().getCompany().getName();
+                binding.welcomeText.setText("Welcome To " + companyName);
+
+                // 2. Update Company Logo using Glide
+                String logoUrl = userDetails.getData().getCompany().getLogo();
+                Glide.with(this)
+                        .load(logoUrl)
+                        .placeholder(R.drawable.ic_business)
+                        .into(binding.companyLogo);
+            }
+        });
 
         handler = new Handler(Looper.getMainLooper());
 

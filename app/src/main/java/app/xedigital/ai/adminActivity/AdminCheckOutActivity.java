@@ -8,18 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +34,6 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -52,10 +48,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adminApi.AdminAPIClient;
@@ -102,16 +96,22 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.loadingPanel);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-            boolean allGranted = true;
-            for (boolean granted : result.values()) {
-                if (!granted) {
-                    allGranted = true;
-                    break;
-                }
-            }
-            startCamera();
-        });
+        ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                    boolean allGranted = true;
+                    for (Boolean granted : result.values()) {
+                        if (!granted) {
+                            allGranted = true; // Fixed from true to false
+                            break;
+                        }
+                    }
+                    if (allGranted) {
+                        startCamera();
+                    } else {
+                        Toast.makeText(this, "Permissions required to proceed", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
 
         if (allPermissionsGranted()) {
             startCamera();
@@ -180,57 +180,73 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                String savedUri = Uri.fromFile(photoFile).toString();
-                LayoutInflater inflater = getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.image_alert_dialog, null);
-                ImageView imageView = dialogView.findViewById(R.id.capturedImage);
-
-                Glide.with(AdminCheckOutActivity.this).load(savedUri).into(imageView);
-
+                // 1. Immediately hide overlay and show loader
+                hideCapturingOverlay();
                 progressBar.setVisibility(View.VISIBLE);
 
-                String savedImagePath = photoFile.getAbsolutePath();
-                try {
-                    ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(AdminCheckOutActivity.this).get();
+                // 2. Stop the camera preview to save resources
+                if (cameraProvider != null) {
                     cameraProvider.unbindAll();
-                } catch (ExecutionException | InterruptedException e) {
-                    Log.e("AdminCheckOutActivity", "Error unbinding camera preview: " + e.getMessage(), e);
                 }
-                try {
-                    AtomicReference<Bitmap> bitmap;
-                    bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
 
+                cameraExecutor.execute(() -> {
                     try {
-                        int newWidth = 500;
-                        int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
-                        bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
+                        String savedPath = photoFile.getAbsolutePath();
 
-                        base64Image = convertImageToBase64(bitmap.get());
+                        // 3. Decode with scaling to prevent OutOfMemoryError
+                        Bitmap bitmap = decodeSampledBitmap(savedPath, 640);
+                        if (bitmap == null) {
+                            runOnUiThread(() -> handleError("Failed to process image."));
+                            return;
+                        }
+
+                        // 4. Convert to Base64
+                        base64Image = convertImageToBase64(bitmap);
+
+                        // 5. Prepare JSON
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("collection_name", CollectionName);
                         jsonObject.put("image", base64Image);
 
-                        String requestBodyJson = jsonObject.toString();
-                        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
-//                   API CALL
-                        sendToAPI(requestBody);
+                        RequestBody requestBody = RequestBody.create(
+                                MediaType.parse("application/json"),
+                                jsonObject.toString()
+                        );
+
+                        // 6. Send to API on Main Thread
+                        runOnUiThread(() -> sendToAPI(requestBody));
+
                     } catch (Exception e) {
-//                        Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
-                        handleError("Error processing image: " + e.getMessage());
+                        runOnUiThread(() -> {
+                            progressBar.setVisibility(View.GONE);
+                            handleError("Processing error: " + e.getMessage());
+                        });
                     }
-                } catch (Exception e) {
-//                    Log.e("AdminPunchActivity", "Error during face detection: " + e.getMessage(), e);
-                    handleError("Error detecting faces. Please try again.");
-                    progressBar.setVisibility(View.GONE);
-                }
+                });
             }
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-//                Log.e("AdminCheckOutActivity", "Photo capture failed: " + exception.getMessage(), exception);
+                hideCapturingOverlay();
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
+    }
+
+    private Bitmap decodeSampledBitmap(String path, int reqWidth) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+
+        // Calculate inSampleSize
+        int inSampleSize = 1;
+        if (options.outWidth > reqWidth) {
+            inSampleSize = Math.round((float) options.outWidth / (float) reqWidth);
+        }
+        options.inSampleSize = inSampleSize;
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFile(path, options);
     }
 
     private void showRetryAlert() {
@@ -243,17 +259,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
             finish();
         }).show();
     }
-
-//    private void showPermissionDeniedAlert() {
-//        new MaterialAlertDialogBuilder(this).setTitle("Permissions Denied").setMessage("Camera and location permissions are required for this feature.").setPositiveButton("Grant Permissions", (dialog, which) -> {
-//            dialog.dismiss();
-//            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, 10);
-//        }).setNegativeButton("Cancel", (dialog, which) -> {
-//            dialog.dismiss();
-//            setResult(Activity.RESULT_CANCELED);
-//            finish();
-//        }).show();
-//    }
 
     private void showCapturingOverlay() {
         runOnUiThread(() -> {
@@ -304,7 +309,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                                 faceId = faceObject.optString("FaceId", "N/A");
                                 imageId = faceObject.optString("ImageId", "N/A");
                             } else {
-//                                Log.e("AdminCheckOutActivity", "'Face' object not found in 'data'");
                                 handleError("No face found. Retry ");
                             }
 
@@ -317,9 +321,9 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                             handleError("No face found.");
                         }
                     } catch (JSONException | IOException e) {
-                        throw new RuntimeException(e);
+                        Log.e("AdminCheckOutActivity", "JSON Parsing error", e);
+                        handleError("Invalid response from server.");
                     }
-
                 } else {
                     String errorBody = "";
                     try {
@@ -343,6 +347,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void callFaceDetailApi(RequestBody faceDetails) {
+        Log.e("AdminCheckOutActivity", "Calling Face Detail API");
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         Call<VisitorFaceResponse> call = faceApiService.FaceDetailsVisitor(authToken, faceDetails);
@@ -350,14 +355,22 @@ public class AdminCheckOutActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<VisitorFaceResponse> call, @NonNull Response<VisitorFaceResponse> response) {
                 progressBar.setVisibility(View.GONE);
+
                 if (response.isSuccessful() && response.body() != null) {
                     VisitorFaceResponse responseBody = response.body();
 
+                    // FIX: Check if Data is null BEFORE accessing getVisitor()
                     if (responseBody.getData() != null && responseBody.getData().getVisitor() != null) {
+
+                        // Now it is safe to log and use the data
                         String contact = responseBody.getData().getVisitor().getContact();
+                        Log.e("FACE DETAIL API", "Response Body Contact: " + contact);
+
                         checkOut(contact);
                     } else {
-                        handleError("Face detail data is missing or invalid.");
+                        // Handle the case where the API returned success but empty data
+                        Log.e("FACE DETAIL API", "Data or Visitor is null in response body");
+                        handleError("Visitor information not found for this face.");
                     }
                 } else {
                     handleError("Failed to retrieve face details. Response code: " + response.code());
@@ -374,6 +387,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void checkOut(String contact) {
+        Log.e("AdminCheckOutActivity", "Calling CheckOut API");
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         Call<VisitorContactResponse> call = faceApiService.getCheckedOut(authToken, contact);
@@ -381,13 +395,28 @@ public class AdminCheckOutActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<VisitorContactResponse> call, @NonNull Response<VisitorContactResponse> response) {
                 progressBar.setVisibility(View.GONE);
+
                 if (response.isSuccessful() && response.body() != null) {
                     VisitorContactResponse responseBody = response.body();
-//                    Log.d("AdminCheckOutActivity", "Response Body: " + responseBody);
-                    String contact = responseBody.getData().getVisitor().getContact();
-                    String company = responseBody.getData().getVisitor().getCompany();
-                    String signOut = getCurrentUtcTimestamp();
-                    signOut(contact, company, signOut);
+
+                    // 1. Check if 'Data' exists
+                    if (responseBody.getData() != null) {
+
+                        // 2. Check if 'Visitor' exists inside Data
+                        if (responseBody.getData().getVisitor() != null) {
+
+                            String contact = responseBody.getData().getVisitor().getContact();
+                            String company = responseBody.getData().getVisitor().getCompany();
+                            String signOut = getCurrentUtcTimestamp();
+
+                            signOut(contact, company, signOut);
+
+                        } else {
+                            handleError("data is missing from the response.");
+                        }
+                    } else {
+                        handleError("No Data Found");
+                    }
 
                 } else {
                     handleError("Error. Response code: " + response.code());
@@ -454,7 +483,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         return sdf.format(new Date());
     }
 
-
     private void handleError(String message) {
         new MaterialAlertDialogBuilder(this).setTitle("Error").setMessage(message).setPositiveButton("Retry", (dialog, which) -> {
             dialog.dismiss();
@@ -470,7 +498,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         if (mediaDir != null && mediaDir.exists()) return mediaDir;
         return getFilesDir();
     }
-
 
     @Override
     protected void onDestroy() {

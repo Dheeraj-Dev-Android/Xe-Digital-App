@@ -111,6 +111,10 @@ public class VisitorsItem {
         return approvalDate;
     }
 
+    public void setApprovalDate(String approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
     public String getGovernmentIdUploadedImagePath() {
         return governmentIdUploadedImagePath;
     }
@@ -121,6 +125,10 @@ public class VisitorsItem {
 
     public String getMeetingOverStatus() {
         return meetingOverStatus;
+    }
+
+    public void setMeetingOverStatus(String meetingOverStatus) {
+        this.meetingOverStatus = meetingOverStatus;
     }
 
     public String getCreatedAt() {
@@ -159,6 +167,11 @@ public class VisitorsItem {
         return approvalStatus;
     }
 
+    // Setters
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
     public boolean isIsRequired() {
         return isRequired;
     }
@@ -169,6 +182,10 @@ public class VisitorsItem {
 
     public String getMeetingOverDate() {
         return meetingOverDate;
+    }
+
+    public void setMeetingOverDate(String meetingOverDate) {
+        this.meetingOverDate = meetingOverDate;
     }
 
     public boolean isIsVisitorVisited() {

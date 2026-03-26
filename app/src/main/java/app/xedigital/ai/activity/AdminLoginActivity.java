@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
@@ -35,10 +36,13 @@ public class AdminLoginActivity extends AppCompatActivity {
     private MaterialButton loginButton;
     private FrameLayout loadingOverlay;
     private boolean isEmployee;
+    private MaterialCheckBox rememberMeCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_admin_login);
 
@@ -50,6 +54,23 @@ public class AdminLoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.edit_password);
         loginButton = findViewById(R.id.btn_signin);
         loadingOverlay = findViewById(R.id.loadingOverlay);
+        rememberMeCheckBox = findViewById(R.id.cb_remember_me);
+        // Load saved credentials
+        SharedPreferences pref = getSharedPreferences("AdminCred", MODE_PRIVATE);
+        boolean isRemembered = pref.getBoolean("remember_me", false);
+
+        if (isRemembered) {
+            String savedEmail = pref.getString("saved_email", "");
+            String savedPass = pref.getString("saved_password", "");
+
+            if (!savedEmail.isEmpty() && !savedPass.isEmpty()) {
+                emailEditText.setText(savedEmail);
+                passwordEditText.setText(savedPass);
+                rememberMeCheckBox.setChecked(true);
+                // 2. Trigger Auto-Login
+                performLogin();
+            }
+        }
 
         loginButton.setOnClickListener(v -> performLogin());
     }
@@ -70,7 +91,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
-                showLoading(false);
+//                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     LoginModelResponse loginResponse = response.body();
 
@@ -80,20 +101,20 @@ public class AdminLoginActivity extends AppCompatActivity {
                         getIntent().putExtra("empEmail", loginResponse.getData().getUser().getEmail());
                         getIntent().putExtra("empFirstName", loginResponse.getData().getUser().getFirstname());
 
+                        handleRememberMe(email, password);
                         String userId = loginResponse.getData().getUser().getId();
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
                         String empFirstName = loginResponse.getData().getUser().getFirstname();
-                        GetEmployee(authToken, userId, empEmail, empFirstName);
-//                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, isEmployee);
-//                        startActivity(new Intent(AdminLoginActivity.this, VisitorActivity.class));
 
-//                        Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-//                        finish();
+                        GetEmployee(authToken, userId, empEmail, empFirstName);
+
                     } else {
+                        showLoading(false);
                         showAlertDialog(loginResponse.getMessage());
                     }
                 } else {
+                    showLoading(false);
                     Toast.makeText(AdminLoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -130,7 +151,14 @@ public class AdminLoginActivity extends AppCompatActivity {
 
                             if ("branchadmin".equalsIgnoreCase(roleName) || "humanresource".equalsIgnoreCase(roleName)) {
                                 storeInSharedPreferences(userId, authToken, empEmail, empFirstName, currentCompany, false);
-                                startActivity(new Intent(AdminLoginActivity.this, AdminMainActivity.class));
+//                                startActivity(new Intent(AdminLoginActivity.this, AdminMainActivity.class));
+                                Intent intent = new Intent(AdminLoginActivity.this, AdminMainActivity.class);
+
+                                // This is the "Magic" line: it clears everything before starting the Dashboard
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                                startActivity(intent);
+                                finish(); // Closes the current Login activity
                                 Toast.makeText(AdminLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                             } else if ("employee".equalsIgnoreCase(roleName)) {
                                 showAlertDialogWithLogout();
@@ -157,13 +185,29 @@ public class AdminLoginActivity extends AppCompatActivity {
         });
     }
 
+    private void handleRememberMe(String email, String password) {
+        SharedPreferences preferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        if (rememberMeCheckBox.isChecked()) {
+            editor.putString("saved_email", email);
+            editor.putString("saved_password", password);
+            editor.putBoolean("remember_me", true);
+        } else {
+            // Clear them if the user unchecked the box
+            editor.remove("saved_email");
+            editor.remove("saved_password");
+            editor.putBoolean("remember_me", false);
+        }
+        editor.apply();
+    }
 
     private void logoutUser() {
         SharedPreferences preferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.apply();
-        startActivity(new Intent(AdminLoginActivity.this, LoginSelectionActivity.class));
+        startActivity(new Intent(AdminLoginActivity.this, AdminLoginActivity.class));
         finish();
     }
 
@@ -171,7 +215,7 @@ public class AdminLoginActivity extends AppCompatActivity {
     private void showAlertDialogWithLogout() {
         if (isFinishing() || isDestroyed()) return;
 
-        new AlertDialog.Builder(this).setTitle("Access Denied").setMessage("Please login with Admin or HR credentials, or try employee login.").setCancelable(false).setPositiveButton("OK", (dialog, which) -> {
+        new AlertDialog.Builder(this).setTitle("Access Denied").setMessage("Please login with Admin or HR credentials").setCancelable(false).setPositiveButton("OK", (dialog, which) -> {
             dialog.dismiss();
             logoutUser();
         }).show();

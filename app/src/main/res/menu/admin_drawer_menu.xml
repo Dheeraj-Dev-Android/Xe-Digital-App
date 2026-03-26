@@ -26,18 +26,18 @@
             android:id="@+id/nav_visitorDetailsFragment"
             android:title="Visitor Details"
             android:visible="false" />
-        <item
-            android:id="@+id/nav_employees"
-            android:title="Employees"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_partners"
-            android:title="Partners"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_allUsers"
-            android:title="Users"
-            android:visible="false" />
+        <!--        <item-->
+        <!--            android:id="@+id/nav_employees"-->
+        <!--            android:title="Employees"-->
+        <!--            android:visible="false" />-->
+        <!--        <item-->
+        <!--            android:id="@+id/nav_partners"-->
+        <!--            android:title="Partners"-->
+        <!--            android:visible="false" />-->
+        <!--        <item-->
+        <!--            android:id="@+id/nav_allUsers"-->
+        <!--            android:title="Users"-->
+        <!--            android:visible="false" />-->
     </group>
 
     <item

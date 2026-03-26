@@ -68,7 +68,6 @@ public class AdminDashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", "");
-
         return inflater.inflate(R.layout.fragment_admin_dashboard, container, false);
     }
 
@@ -159,13 +158,7 @@ public class AdminDashboardFragment extends Fragment {
                 scrollHandler.removeCallbacks(scrollRunnable);
             }
         });
-//        mViewModel.getLeavesGraphData().observe(getViewLifecycleOwner(), leaveGraphResponse -> {
-//            if (leaveGraphResponse != null) {
-//                updatePieChart(leaveGraphResponse);
-//            } else {
-//                Toast.makeText(getContext(), "Failed to fetch leave graph data", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
         mViewModel.getLeavesGraphData().observe(getViewLifecycleOwner(), response -> {
             if (response != null && response.getData() != null) {
                 updatePieChart(response.getData());
@@ -281,6 +274,11 @@ public class AdminDashboardFragment extends Fragment {
         pieChart.invalidate();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        scrollHandler.removeCallbacks(scrollRunnable);
+    }
 
     @Override
     public void onDestroyView() {

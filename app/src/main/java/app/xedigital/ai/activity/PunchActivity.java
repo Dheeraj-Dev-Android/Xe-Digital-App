@@ -596,27 +596,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return dateFormat.format(new Date());
     }
 
-    //    private void getCurrentLocation(AddressCallback callback) {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//            LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(10000).setFastestInterval(5000);
-//            locationCallback = new LocationCallback() {
-//                @Override
-//                public void onLocationResult(@NonNull LocationResult locationResult) {
-//                    Location location = locationResult.getLastLocation();
-//                    if (location != null) {
-//                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
-//                    } else {
-//                        Log.e(TAG, "Location is null in onLocationResult");
-//                        callback.onAddressReceived("Location not found");
-//                    }
-//                }
-//            };
-//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-//        } else {
-//            Log.e(TAG, "Location permission not granted");
-//            callback.onAddressReceived("Location not found");
-//        }
-//    }
     private void getCurrentLocation(AddressCallback callback) {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);

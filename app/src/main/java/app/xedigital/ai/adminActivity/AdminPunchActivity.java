@@ -83,6 +83,7 @@ import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
+import app.xedigital.ai.model.Admin.visitorContact.VisitorContactResponse;
 import app.xedigital.ai.model.Admin.visitorFace.VisitorFaceResponse;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -93,7 +94,7 @@ import retrofit2.Response;
 
 public class AdminPunchActivity extends AppCompatActivity {
 
-    private final Handler handler = new Handler();
+    private final Handler handler;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION};
     private PreviewView previewView;
@@ -113,6 +114,10 @@ public class AdminPunchActivity extends AppCompatActivity {
     private String faceId, imageId;
     private MaterialCardView progressBar;
     private CountDownTimer qrCountDownTimer;
+
+    public AdminPunchActivity() {
+        handler = new Handler();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,12 +149,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         } else {
             requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
         }
-
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-//            startCamera();
-//        } else {
-//            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
-//        }
 
     }
 
@@ -186,20 +185,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
                 cameraProvider.unbindAll();
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
-//                try {
-//                    camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
-//                    if (camera == null) {
-//                        Log.e("AdminPunchActivity", "Camera is null");
-//                        showRetryAlert();
-//                    } else {
-//                        showCapturingOverlay();
-//                        handler.postDelayed(captureRunnable, 3000);
-//                    }
-//
-//                } catch (IllegalArgumentException e) {
-//                    Log.e("AdminPunchActivity", "Error binding camera: " + e.getMessage(), e);
-//                    showRetryAlert();
-//                }
                 showCapturingOverlay();
                 handler.postDelayed(captureRunnable, 3000);
 
@@ -261,14 +246,11 @@ public class AdminPunchActivity extends AppCompatActivity {
 
                         String requestBodyJson = jsonObject.toString();
                         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
-//                   API CALL
                         sendToAPI(requestBody);
                     } catch (Exception e) {
-//                        Log.e("AdminPunchActivity", "Error processing image: " + e.getMessage(), e);
                         handleError("Error processing image: " + e.getMessage());
                     }
                 } catch (Exception e) {
-//                    Log.e("AdminPunchActivity", "Error during face detection: " + e.getMessage(), e);
                     handleError("Error detecting faces. Please try again.");
                     progressBar.setVisibility(View.GONE);
                 }
@@ -276,7 +258,6 @@ public class AdminPunchActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-//                Log.e("AdminPunchActivity", "Photo capture failed: " + exception.getMessage(), exception);
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
@@ -285,7 +266,6 @@ public class AdminPunchActivity extends AppCompatActivity {
     private void sendToAPI(RequestBody requestBody) {
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase1();
         String authToken = "jwt " + token;
-        // Make the API call
         Call<ResponseBody> call = apiService.recognizeFace(authToken, requestBody);
 
         call.enqueue(new Callback<ResponseBody>() {
@@ -295,7 +275,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String responseBody = response.body().string();
-                        String responseJson = gson.toJson(responseBody);
+//                        String responseJson = gson.toJson(responseBody);
                         JSONObject jsonResponse = new JSONObject(responseBody);
                         // Check if "data" exists and is not null
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
@@ -317,9 +297,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                             // API CALL
                             callFaceDetailApi(FaceDetails);
                         } else {
-//                            Log.e("AdminPunchActivity", "Null or missing 'data' in API response: " + responseBody);
-                            Toast.makeText(AdminPunchActivity.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
-                            handleError("No face found.");
+                            handleError("Face Details Not Found");
                         }
                     } catch (JSONException | IOException e) {
                         throw new RuntimeException(e);
@@ -335,7 +313,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("AdminPunchActivity", "Error reading error body: " + e.getMessage(), e);
                     }
-//                    Log.e("AdminPunchActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
+                    Log.e("AdminPunchActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     // Handle the error based on the response code and error body
                     handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
                 }
@@ -352,7 +330,6 @@ public class AdminPunchActivity extends AppCompatActivity {
     }
 
     private void callFaceDetailApi(RequestBody FaceDetails) {
-//        Log.d("AdminPunchActivity", "Face Detail API Called");
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         retrofit2.Call<ResponseBody> faceDetails = faceApiService.FaceDetails(authToken, FaceDetails);
@@ -364,10 +341,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
-                        Log.e("Face Response", "Face Detail Response Body:" + responseBody);
-//                        int statusCode = jsonResponse.optInt("statusCode", 0);
-//                        String message = jsonResponse.optString("message", "");
-
+//                        Log.e("Face Response", "Face Detail Response Body:" + responseBody);
                         // Check for specific message and null data
                         if (jsonResponse.has("data") && jsonResponse.isNull("data")) {
                             Log.e("AdminPunchActivity", "Face not found or data missing, calling Visitor Face API...");
@@ -379,43 +353,46 @@ public class AdminPunchActivity extends AppCompatActivity {
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
                             Log.e("AdminPunchActivity", "Face data found in response: " + dataObject);
-                            JSONObject employeeObject = dataObject.getJSONObject("employee");
-                            String id = employeeObject.getString("_id");
-                            String firstName = employeeObject.getString("firstname");
-                            if (id != null && firstName != null) {
-                                callAttendanceApi(id, firstName);
+
+                            // Check if "employee" key exists before calling getJSONObject
+                            if (dataObject.has("employee") && !dataObject.isNull("employee")) {
+                                JSONObject employeeObject = dataObject.getJSONObject("employee");
+                                String id = employeeObject.optString("_id", null);
+                                String firstName = employeeObject.optString("firstname", null);
+
+                                if (id != null && firstName != null) {
+                                    callAttendanceApi(id, firstName, null);
+                                } else {
+                                    showAttendanceFailedAlert("Attendance failed: Missing employee details.");
+                                }
                             } else {
-                                showAttendanceFailedAlert("Attendance failed: User not Found.");
+                                Log.e("AdminPunchActivity", "Face recognized but no employee record found.");
+                                callVisitorFace(FaceDetails);
                             }
                         } else {
-//                            Log.e("AdminPunchActivity", "Face data not found in response.");
                             showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
                         }
-
                     } catch (IOException | JSONException e) {
-//                        Log.e("AdminPunchActivity", "Error processing face detail response: " + e.getMessage(), e);
                         showAttendanceFailedAlert("Attendance failed: An error occurred.");
                     }
                 } else {
-//                    Log.e("AdminPunchActivity", "Face Detail Response Error: " + response.code() + " - " + response.message());
                     showAttendanceFailedAlert("Error processing face detail");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-//                Log.e("AdminPunchActivity", "Face Detail Error: " + throwable.getMessage(), throwable);
                 showAttendanceFailedAlert("Error processing face detail.");
             }
         });
     }
 
-    private void callAttendanceApi(String employeeId, String employeeName) {
+    private void callAttendanceApi(String employeeId, String employeeName, Location location) {
         if (employeeId != null && !employeeId.isEmpty()) {
 
-            getCurrentLocation(address -> {
+            getCurrentLocation((address, loc) -> {
                 currentAddress = address;
-                String currentTime = getCurrentTime();
+                String currentTime = getCurrentTime(loc);
                 try {
                     JSONObject requestBody = new JSONObject();
                     requestBody.put("employee", employeeId);
@@ -475,39 +452,42 @@ public class AdminPunchActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<VisitorFaceResponse> call, @NonNull Response<VisitorFaceResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
-                        VisitorFaceResponse responseBody = response.body();
-//                        JSONObject jsonResponse = new JSONObject(String.valueOf(responseBody));
-
-                        String responseJson = gson.toJson(responseBody);
-
-                        // Parse that string to a JSONObject
+                        String responseJson = gson.toJson(response.body());
                         JSONObject jsonResponse = new JSONObject(responseJson);
-                        // Check if "data" key exists and is not null before proceeding
+
                         if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
-                            Log.e("AdminPunchActivity", "Face data not found in response.");
                             addBucket(base64Image);
                             return;
                         }
-                        if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
-                            JSONObject dataObject = jsonResponse.getJSONObject("data");
-                            Log.e("AdminPunchActivity", "Face data found in response: " + dataObject);
+
+                        JSONObject dataObject = jsonResponse.getJSONObject("data");
+
+                        //  Check for "visitor" key instead of "employee"
+                        if (dataObject.has("visitor") && !dataObject.isNull("visitor")) {
+                            JSONObject visitorObject = dataObject.getJSONObject("visitor");
+
+                            String id = visitorObject.optString("_id", "N/A");
+                            String name = visitorObject.optString("name", "Visitor");
+                            String visitorContact = visitorObject.optString("contact", "");
+                            if (!visitorContact.isEmpty()) {
+                                // NEW API CALL HERE
+                                callGetCheckedInApi(visitorContact);
+                            } else {
+                                Log.e("AdminPunchActivity", "Visitor contact not found in data.");
+                                addBucket(base64Image);
+                            }
+
+                        } else if (dataObject.has("employee")) {
+                            // Fallback if the API sometimes returns employee here
                             JSONObject employeeObject = dataObject.getJSONObject("employee");
-                            String id = employeeObject.getString("_id");
-                            String firstName = employeeObject.getString("firstname");
-                            Log.e("AdminPunchActivity", "Face data found in response: " + id + " " + firstName);
-
-
-//                            String responseJson = gson.toJson(responseBody);
-//                            matchVisitor();
-
+                            callAttendanceApi(employeeObject.getString("_id"), employeeObject.getString("firstname"), null);
                         } else {
-                            Log.e("AdminPunchActivity", "Face data not found in response.");
+                            addBucket(base64Image);
                         }
                     } catch (JSONException e) {
-                        Log.e("AdminPunchActivity", "Error processing face detail response: " + e.getMessage(), e);
+                        Log.e("AdminPunchActivity", "JSON Error: " + e.getMessage());
+                        addBucket(base64Image);
                     }
-                } else {
-                    Log.e("AdminPunchActivity", "Face Detail Response Error: " + response.code() + " - " + response.message());
                 }
             }
 
@@ -516,11 +496,47 @@ public class AdminPunchActivity extends AppCompatActivity {
                 Log.e("AdminPunchActivity", "Face Detail Error: " + throwable.getMessage(), throwable);
             }
         });
+    }
 
+    private void callGetCheckedInApi(String visitorContact) {
+        String authToken = "jwt " + token;
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+
+        apiService.getCheckedIn(authToken, visitorContact).enqueue(new Callback<VisitorContactResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<VisitorContactResponse> call, @NonNull Response<VisitorContactResponse> response) {
+                // Hide loading since we are showing a result
+                progressBar.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    VisitorContactResponse responseBody = response.body();
+                    String message = responseBody.getMessage();
+
+                    if (message != null && message.equalsIgnoreCase("Visitor not check-in!!!")) {
+                        // Logic: Known visitor, but needs a new QR/Check-in session
+                        addBucket(base64Image);
+                    } else if (responseBody.isSuccess() && responseBody.getData() != null && responseBody.getData().getVisitor() != null) {
+                        // Logic: Visitor is currently active inside
+                        showAlert("Active Visit", "Visitor is already checked in.");
+                    } else {
+                        // Logic: Default fallback (e.g. data is null)
+                        addBucket(base64Image);
+                    }
+                } else {
+                    handleError("Status Check Failed. Please try again.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<VisitorContactResponse> call, @NonNull Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                handleError("Network Error: " + t.getMessage());
+            }
+        });
     }
 
     private void addBucket(String base64Image) {
-        AddBucketRequest request = new AddBucketRequest(base64Image, "visitors-profile-images", "");
+        AddBucketRequest request = new AddBucketRequest(base64Image, "xe-digital-bucket/visitors-profile-images", "");
         String authToken = "jwt " + token;
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
         retrofit2.Call<ResponseBody> call = apiService.addBucket(authToken, request);
@@ -539,7 +555,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                             String imageUrl = data.optString("imageUrl");
                             String imageKey = data.optString("imageKey");
 
-
                             // IMPORTANT: build URL with proper encoding & params
                             String url = "https://app.xedigital.ai/checkin/profile?" + "access_token=" + token + "&faceId=" + faceId + "&imageId=" + imageId + "&profileImagePath=" + Uri.encode(imageUrl) + "&profileImageKey=" + imageKey + "&isVisitorNew=true" + "&isGovernmentIdUpload=false" + "&isItemImageUpload=false" + "&time=" + System.currentTimeMillis();
 
@@ -553,9 +568,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                         }
 
                         // Convert JSON to pretty printed string for better readability
-                        String prettyJson = jsonResponse.toString(4); // 4 = number of spaces for indent
-//                        showAlert("API Response", prettyJson);
-
+//                        String prettyJson = jsonResponse.toString(4);
                     } catch (IOException | JSONException e) {
                         e.printStackTrace();
                         showAlert("Error", "Failed to parse response.");
@@ -590,10 +603,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                         // Check if success is true and status code is 200
                         if (jsonObject.optBoolean("success") && jsonObject.optInt("statusCode") == 200) {
                             String tinyUrl = jsonObject.optString("data");
-
-                            // Optional: Show alert with the URL
-//                            showAlert("Short URL", tinyUrl);
-
                             // Generate QR Code from the URL
                             runOnUiThread(() -> {
                                 generateQRCode(tinyUrl);
@@ -647,8 +656,6 @@ public class AdminPunchActivity extends AppCompatActivity {
 
                 public void onFinish() {
                     qrLayout.setVisibility(View.GONE);
-
-                    // ✅ Return to previous activity
                     finish();
                 }
             };
@@ -695,12 +702,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-//    private void navigateToDashboard() {
-//        Intent intent = new Intent(AdminPunchActivity.this, VisitorActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//        startActivity(intent);
-//        finish();
-//    }
 
     private void showAttendanceSuccessAlert(String responseBody) {
         progressBar.setVisibility(View.GONE);
@@ -710,7 +711,6 @@ public class AdminPunchActivity extends AppCompatActivity {
             String message = responseJson.getString("message");
             if (success) {
                 JSONObject data = responseJson.getJSONObject("data");
-//                Log.d("AdminPunchActivity", "Attendance Data: " + data);
                 String punchInAddress = data.getString("punchInAddress");
                 String punchOutAddress = data.getString("punchOutAddress");
 
@@ -781,16 +781,30 @@ public class AdminPunchActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
             // Location permission granted and location services enabled
             LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(false).setMaxUpdateDelayMillis(15000).build();
+//            locationCallback = new LocationCallback() {
+//                @Override
+//                public void onLocationResult(@NonNull LocationResult locationResult) {
+//                    Location location = locationResult.getLastLocation();
+//                    if (location != null) {
+//                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
+//                    } else {
+//                        callback.onAddressReceived("Location not found");
+//                    }
+//                }
+//            };
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
                     Location location = locationResult.getLastLocation();
                     if (location != null) {
-                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), callback);
-//                        Log.d("AdminPunchActivity", "Location: " + location.getLatitude() + ", " + location.getLongitude());
+                        // Pass the 'location' object to the geocoder wrapper
+                        getAddressFromLocation(location.getLatitude(), location.getLongitude(), (address, loc) -> {
+                            callback.onAddressReceived(address, location);
+                        });
+                        // Stop updates after getting the first accurate location to save battery
+                        fusedLocationClient.removeLocationUpdates(this);
                     } else {
-//                        Log.e("AdminPunchActivity", "Location is null in onLocationResult");
-                        callback.onAddressReceived("Location not found");
+                        callback.onAddressReceived("Location not found", null);
                     }
                 }
             };
@@ -800,15 +814,12 @@ public class AdminPunchActivity extends AppCompatActivity {
             if (!isLocationEnabled) {
                 // Show alert to enable location services
                 new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to use this feature.").setPositiveButton("Ok", (dialog, which) -> {
-//                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-//                }).setNegativeButton("Cancel", (dialog, which) -> {
                     dialog.dismiss();
                     setResult(Activity.RESULT_CANCELED);
                     finish();
                 }).show();
             } else {
-//                Log.e("AdminPunchActivity", "Location permission not granted");
-                callback.onAddressReceived("Location not found");
+                callback.onAddressReceived("Location not found", null);
             }
         }
     }
@@ -828,7 +839,6 @@ public class AdminPunchActivity extends AppCompatActivity {
                         break; // Exit the loop if an address is found
                     }
                 } catch (IOException e) {
-//                    Log.e("AdminPunchActivity", "Error getting address:", e);
                     retryCount++;
                     try {
                         Thread.sleep((long) (Math.pow(2, retryCount) * 1000));
@@ -848,20 +858,44 @@ public class AdminPunchActivity extends AppCompatActivity {
                 addressResult = completeAddress.toString();
             } else {
                 addressResult = "Location not found";
-//                Log.e("AdminPunchActivity", "No address found for location or max retries reached");
                 Toast.makeText(AdminPunchActivity.this, "No address found for location", Toast.LENGTH_SHORT).show();
             }
 
+//            runOnUiThread(() -> {
+//                currentAddress = addressResult;
+//                callback.onAddressReceived(addressResult);
+//            });
             runOnUiThread(() -> {
                 currentAddress = addressResult;
-                callback.onAddressReceived(addressResult);
+
+                // Create a temporary location object to hold the coordinates and time
+                Location tempLocation = new Location("serviceProvider");
+                tempLocation.setLatitude(latitude);
+                tempLocation.setLongitude(longitude);
+                tempLocation.setTime(System.currentTimeMillis());
+
+                // Pass BOTH arguments to satisfy the new Interface
+                callback.onAddressReceived(addressResult, tempLocation);
             });
         }).start();
     }
 
-    private String getCurrentTime() {
+//    private String getCurrentTime() {
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+//        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        return dateFormat.format(new Date());
+//    }
+
+    private String getCurrentTime(Location location) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // If we have a location, use the GPS/Network provided time (Tamper-proof)
+        if (location != null) {
+            return dateFormat.format(new Date(location.getTime()));
+        }
+
+        // Fallback if location is null (though in your flow, it shouldn't be)
         return dateFormat.format(new Date());
     }
 
@@ -943,7 +977,7 @@ public class AdminPunchActivity extends AppCompatActivity {
     }
 
     interface AddressCallback {
-        void onAddressReceived(String address);
+        void onAddressReceived(String address, Location location);
     }
 
     private final Runnable captureRunnable = this::captureImage;

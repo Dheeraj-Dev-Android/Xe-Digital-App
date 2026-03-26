@@ -11,6 +11,7 @@ import app.xedigital.ai.model.Admin.Role.UserRoleResponse;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.Admin.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
+import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsItem;
 import app.xedigital.ai.model.Admin.addBucket.AddBucketRequest;
 import app.xedigital.ai.model.Admin.addFace.AddFaceResponse;
 import app.xedigital.ai.model.Admin.assignLeave.AssignLeaveRequest;
@@ -86,6 +87,9 @@ public interface AdminAPIInterface {
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<ResponseBody> getVisitorCategories(@Header("Authorization") String authToken);
 
+    @GET("visitors/checkedin/{visitorContact}")
+    retrofit2.Call<VisitorContactResponse> getCheckedIn(@Header("Authorization") String authToken, @Path("visitorContact") String visitorContact);
+
     @GET("visitors/checkedout/{contact}")
     retrofit2.Call<VisitorContactResponse> getCheckedOut(@Header("Authorization") String authToken, @Path("contact") String contact);
 
@@ -125,8 +129,8 @@ public interface AdminAPIInterface {
     @POST("otp/tinyurl")
     retrofit2.Call<ResponseBody> getTinyUrl(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
-    @POST("/visitors/signout")
-    retrofit2.Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+    @POST("https://app.xedigital.ai/api/v1/visitors/signout")
+    Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @POST("face/add")
     retrofit2.Call<AddFaceResponse> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
@@ -147,5 +151,11 @@ public interface AdminAPIInterface {
     @PUT("employees/profile/{employeeId}")
     retrofit2.Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
 
+    //Check IN
+    @PUT("visitors/signoutmanual/{visitorId}")
+    retrofit2.Call<ResponseBody> checkInManual(@Header("Authorization") String authToken, @Path("visitorId") String visitorId, @Body VisitorsItem visitorData);
+
+    @PUT("visitors/signout/{VisitorId}")
+    retrofit2.Call<ResponseBody> checkOut(@Header("Authorization") String authToken, @Path("VisitorId") String VisitorId, @Body VisitorsItem visitorData);
 
 }

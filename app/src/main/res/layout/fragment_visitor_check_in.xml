@@ -53,7 +53,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/welcome_text_margin_top"
                         android:gravity="center"
-                        android:text="Welcome To Consultedge Global"
+                        android:text="Welcome To"
                         android:textColor="#2C3E50"
                         android:textSize="@dimen/welcome_text_size"
                         android:textStyle="bold" />
@@ -206,7 +206,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/loading_text_margin_top"
-            android:text="Loading Dashboard..."
+            android:text="Loading..."
             android:textColor="#2C3E50"
             android:textSize="@dimen/loading_text_size" />
     </LinearLayout>

@@ -1,13 +1,17 @@
 package app.xedigital.ai.adminAdapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,10 +28,13 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
 
     private final List<VisitorsItem> visitorList;
     private final Context context;
+    private final OnVisitorActionListener listener;
+    ProgressBar progressLoader;
 
-    public VisitorAdapter(Context context, List<VisitorsItem> visitorList) {
+    public VisitorAdapter(Context context, List<VisitorsItem> visitorList, OnVisitorActionListener listener) {
         this.context = context;
         this.visitorList = visitorList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -44,10 +51,19 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
         String fullName = visitor.getWhomToMeet().getFirstname() + " " + visitor.getWhomToMeet().getLastname();
         holder.visName.setText(visitor.getName());
         holder.visWhomToMeet.setText(visitor.getWhomToMeet() != null ? fullName : "N/A");
-        holder.visContact.setText(visitor.getContact());
-        holder.visEmail.setText(visitor.getEmail());
+        holder.visContact.setText(visitor.getContact() != null ? visitor.getContact() : "N/A");
+        holder.visEmail.setText(visitor.getEmail() != null ? visitor.getEmail() : "N/A");
         holder.visCheckInDate.setText(DateTimeUtils.getDayOfWeekAndDate(visitor.getSignIn()));
-//        holder.visApprovalStatus.setText(visitor.getApprovalStatus());
+        //        holder.visApprovalStatus.setText(visitor.getApprovalStatus());
+
+        SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        boolean isFirstTime = prefs.getBoolean("show_visitor_hints", true);
+
+        if (position == 0 && isFirstTime) {
+            showWorkaroundTooltips(holder);
+            // Save that we've shown it
+            prefs.edit().putBoolean("show_visitor_hints", false).apply();
+        }
 
 
         String approvalStatus = visitor.getApprovalStatus();
@@ -72,7 +88,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             chipBackgroundColorResourceId = R.color.status_default;
         }
 
-// Set the text and background color based on approvalStatus
+        // Set the text and background color based on approvalStatus
         holder.visApprovalStatus.setText(statusText);
         holder.visApprovalStatus.setChipBackgroundColorResource(chipBackgroundColorResourceId);
         // Load profile image using Glide (fallback to placeholder)
@@ -82,13 +98,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             holder.visProfile.setImageResource(R.drawable.ic_user_placeholder);
         }
 
-//        holder.btnViewMoreVisitor.setOnClickListener(v -> {
-//            Toast.makeText(context, "View More", Toast.LENGTH_SHORT).show();
-//        });
-
-        holder.btnPrintVisitor.setOnClickListener(v -> {
-            Toast.makeText(context, "Available Soon :)", Toast.LENGTH_SHORT).show();
-        });
+        holder.btnPrintVisitor.setOnClickListener(v -> Toast.makeText(context, "Available Soon :)", Toast.LENGTH_SHORT).show());
 
         holder.btnViewMoreVisitor.setOnClickListener(v -> {
             View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_visitor_details, null);
@@ -145,19 +155,69 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             android.app.AlertDialog dialog = builder.create();
             dialog.show();
         });
+        // 1. Get Statuses
+        String meetingStatus = visitor.getMeetingOverStatus();
 
+        if (approvalStatus != null && approvalStatus.equalsIgnoreCase("Approved")) {
+            holder.CheckInContainer.setVisibility(View.GONE);
+        } else {
+            holder.CheckInContainer.setVisibility(View.VISIBLE);
+        }
+        if (meetingStatus != null && meetingStatus.equalsIgnoreCase("Done")) {
+            holder.CheckOutContainer.setVisibility(View.GONE);
+        } else {
+            holder.CheckOutContainer.setVisibility(View.VISIBLE);
+        }
+
+        holder.btnCheckInVisitor.setOnClickListener(view -> {
+            if (listener != null) {
+                listener.onCheckInClick(visitor, position);
+            }
+            Toast.makeText(context, "Check In", Toast.LENGTH_SHORT).show();
+        });
+        holder.btnCheckOutVisitor.setOnClickListener(view -> {
+            Toast.makeText(context, "Check Out", Toast.LENGTH_SHORT).show();
+            if (listener != null) {
+                listener.onCheckOutClick(visitor, position);
+            }
+        });
 
     }
+
+    public void showWorkaroundTooltips(VisitorViewHolder holder) {
+        // This helps the user see what the buttons do
+        TooltipCompat.setTooltipText(holder.btnCheckInVisitor, "Check In");
+        TooltipCompat.setTooltipText(holder.btnCheckOutVisitor, "Check Out");
+        TooltipCompat.setTooltipText(holder.btnViewMoreVisitor, "View Details");
+        TooltipCompat.setTooltipText(holder.btnPrintVisitor, "Print Badge");
+
+        // To make it "pop up" automatically once:
+        holder.btnCheckInVisitor.postDelayed(() -> {
+            if (holder.btnCheckInVisitor.isAttachedToWindow()) {
+                // Simulating a long click triggers the tooltip visually
+                holder.btnCheckInVisitor.performLongClick();
+            }
+        }, 500);
+    }
+    // Inside VisitorAdapter.java
 
     @Override
     public int getItemCount() {
         return visitorList.size();
     }
 
+    public interface OnVisitorActionListener {
+        void onCheckInClick(VisitorsItem visitor, int position);
+
+        void onCheckOutClick(VisitorsItem visitor, int position);
+    }
+
     public class VisitorViewHolder extends RecyclerView.ViewHolder {
         TextView visName, visWhomToMeet, visContact, visEmail, visCheckInDate;
         Chip visApprovalStatus;
-        ShapeableImageView visProfile, btnViewMoreVisitor, btnPrintVisitor;
+        ShapeableImageView visProfile, btnViewMoreVisitor, btnPrintVisitor, btnCheckInVisitor, btnCheckOutVisitor;
+        LinearLayout CheckOutContainer, CheckInContainer;
+
 
         public VisitorViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -170,6 +230,12 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             visProfile = itemView.findViewById(R.id.visProfile);
             btnViewMoreVisitor = itemView.findViewById(R.id.btnViewMoreVisitor);
             btnPrintVisitor = itemView.findViewById(R.id.btnPrintVisitor);
+            btnCheckInVisitor = itemView.findViewById(R.id.btnCheckInVisitor);
+            btnCheckOutVisitor = itemView.findViewById(R.id.btnCheckOutVisitor);
+            progressLoader = itemView.findViewById(R.id.progressLoader);
+            CheckInContainer = itemView.findViewById(R.id.checkInContainer);
+            CheckOutContainer = itemView.findViewById(R.id.checkOutContainer);
+
         }
     }
 }

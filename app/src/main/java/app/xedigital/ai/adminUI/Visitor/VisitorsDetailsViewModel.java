@@ -12,6 +12,7 @@ import app.xedigital.ai.adminApi.AdminAPIClient;
 import app.xedigital.ai.adminApi.AdminAPIInterface;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
 import app.xedigital.ai.model.Admin.VisitorsAdminDetails.VisitorsItem;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,6 +43,55 @@ public class VisitorsDetailsViewModel extends ViewModel {
         });
 
         return liveData;
+    }
+
+    public LiveData<Boolean> checkInVisitor(String token, String visitorId, VisitorsItem visitorData) {
+        MutableLiveData<Boolean> status = new MutableLiveData<>();
+
+        // Quick safety check
+        if (visitorId == null || visitorId.isEmpty()) {
+            status.setValue(false);
+            return status;
+        }
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        // Ensure this method name matches your AdminAPIInterface exactly
+        apiService.checkInManual(token, visitorId, visitorData).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                status.postValue(response.isSuccessful());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                status.postValue(false);
+            }
+        });
+
+        return status;
+    }
+
+    public LiveData<Boolean> checkOutVisitor(String token, String visitorId, VisitorsItem visitorData) {
+        MutableLiveData<Boolean> status = new MutableLiveData<>();
+        // Quick safety check
+        if (visitorId == null || visitorId.isEmpty()) {
+            status.setValue(false);
+            return status;
+        }
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+
+        apiService.checkOut(token, visitorId, visitorData).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                status.postValue(response.isSuccessful());
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                status.postValue(false);
+            }
+        });
+        return status;
     }
 
 }

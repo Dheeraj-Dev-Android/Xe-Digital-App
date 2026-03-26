@@ -29,8 +29,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/CircularImageView" />
 
-
-        <!-- Employee details below -->
+        <!-- Visitor details below -->
         <LinearLayout
             android:id="@+id/VisitorDetailsLayout"
             android:layout_width="0dp"
@@ -68,7 +67,6 @@
                     android:textStyle="bold" />
 
             </LinearLayout>
-
 
             <!-- Whom to Meet Row -->
             <LinearLayout
@@ -186,6 +184,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -200,43 +199,152 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/visApprovalStatus"
                     style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:checkable="false"
                     android:clickable="false"
+                    android:layout_weight="2"
                     android:text="Approved"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     app:chipBackgroundColor="@color/success_light"
                     app:chipCornerRadius="12dp"
                     app:chipMinHeight="24dp" />
-                <!-- View Button -->
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/btnViewMoreVisitor"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+
+            </LinearLayout>
+
+            <!-- Action Buttons Row -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!--Check-In-->
+                <LinearLayout
+                    android:id="@+id/checkInContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:background="@drawable/circular_background"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_eye"
-                    app:shapeAppearanceOverlay="@style/CircularImageView"
-                    app:tint="@color/icon_tint" />
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/btnCheckInVisitor"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/circular_background"
+                        android:contentDescription="Check In Visitor"
+                        android:padding="8dp"
+                        android:src="@mipmap/ic_check_in"
+                        app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Check In"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!--Check-Out-->
+                <LinearLayout
+                    android:id="@+id/checkOutContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/btnCheckOutVisitor"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/circular_background"
+                        android:contentDescription="Check Out Visitor"
+                        android:padding="8dp"
+                        android:src="@mipmap/ic_check_out"
+                        app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Check Out"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- View Button -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/btnViewMoreVisitor"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/circular_background"
+                        android:contentDescription="View Details"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_eye"
+                        app:shapeAppearanceOverlay="@style/CircularImageView"
+                        app:tint="@color/icon_tint" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="View"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp" />
+                </LinearLayout>
 
                 <!-- Print Button -->
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/btnPrintVisitor"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/circular_background"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_print"
-                    app:shapeAppearanceOverlay="@style/CircularImageView"
-                    app:tint="@color/icon_tint" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/btnPrintVisitor"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/circular_background"
+                        android:contentDescription="Print Visitor Details"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_print"
+                        app:shapeAppearanceOverlay="@style/CircularImageView"
+                        app:tint="@color/icon_tint" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Print"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp" />
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressLoader"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

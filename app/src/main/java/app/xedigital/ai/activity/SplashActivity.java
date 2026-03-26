@@ -82,7 +82,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void navigateToLogin() {
-        Intent mainIntent = new Intent(SplashActivity.this, LoginSelectionActivity.class);
+        Intent mainIntent = new Intent(SplashActivity.this, AdminLoginActivity.class);
         startActivity(mainIntent);
         finish();
     }
