@@ -20,6 +20,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <app.xedigital.ai.utills.FaceOverlayView
+        android:id="@+id/faceOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/faceGuide"
+        android:layout_width="380dp"
+        android:layout_height="380dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/scannerLine"
+        android:layout_width="280dp"
+        android:layout_height="2dp"
+        android:background="#4CAF50"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/faceGuide"
+        app:layout_constraintStart_toStartOf="@id/faceGuide"
+        app:layout_constraintTop_toTopOf="@id/faceGuide" />
+
     <!-- Loading Panel with Material CardView -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/loadingPanel"
@@ -74,7 +98,8 @@
         app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/faceGuide">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/CaptureText"
@@ -83,7 +108,8 @@
             android:fontFamily="@font/quicksand_font_family"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

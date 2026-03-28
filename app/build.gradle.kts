@@ -36,7 +36,10 @@ android {
         release {
             isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -82,7 +85,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.perf)
     implementation(libs.legacy.support.v4)
-    implementation(libs.firebase.inappmessaging.display)
+//    implementation(libs.firebase.inappmessaging.display)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -108,9 +111,11 @@ dependencies {
     implementation("org.jsoup:jsoup:1.18.1")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
-    implementation("com.airbnb.android:lottie:5.2.0")
+    implementation("com.airbnb.android:lottie:6.0.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
     implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+    // Add this to your dependencies block
+    implementation("com.google.mlkit:face-detection:16.1.7")
 }
