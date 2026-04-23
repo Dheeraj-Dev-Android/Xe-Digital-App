@@ -87,13 +87,6 @@ public class BioMetric {
     }
 
     public void authenticate(boolean forLogin) {
-//        if (!hasBiometricPermission()) {
-//            Log.e("Biometric", "Biometric permission not granted");
-//            requestBiometricPermission();
-//        }
-//        BiometricManager biometricManager = BiometricManager.from(context);
-//        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
-
         if (!hasBiometricPermission()) {
             Log.e("Biometric", "Biometric permission not granted");
             requestBiometricPermission();
@@ -110,11 +103,6 @@ public class BioMetric {
         }
         if (result == BiometricManager.BIOMETRIC_SUCCESS) {
             Log.d("MY_APP_TAG", "App can authenticate using biometrics");
-//            if(forLogin){
-//                biometricPrompt.authenticate(promptInfoLogin);
-//            }else{
-//                biometricPrompt.authenticate(promptInfoAttendance);
-//            }
             biometricPrompt.authenticate(forLogin ? promptInfoLogin : promptInfoAttendance);
         } else if (result == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE) {
             Log.e("MY_APP_TAG", "No biometric features available on this device");
@@ -156,17 +144,6 @@ public class BioMetric {
         }
     }
 
-//    private void authenticateAfterPermission(boolean forLogin) {
-//        BiometricManager biometricManager = BiometricManager.from(context);
-//        int result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL | BiometricManager.Authenticators.BIOMETRIC_WEAK);
-//        if (result == BiometricManager.BIOMETRIC_SUCCESS) {
-//            biometricPrompt.authenticate(forLogin ? promptInfoLogin : promptInfoAttendance);
-//        } else {
-//            Log.e("Biometric", "Biometric authentication not available");
-//            Toast.makeText(context, "Biometric authentication not available", Toast.LENGTH_LONG).show();
-//        }
-//    }
-
     private void authenticateAfterPermission(boolean forLogin) {
         BiometricManager biometricManager = BiometricManager.from(context);
         int result;
@@ -182,6 +159,19 @@ public class BioMetric {
             Log.e("Biometric", "Biometric authentication not available");
             Toast.makeText(context, "Biometric authentication not available", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public boolean isBiometricAvailable() {
+        BiometricManager biometricManager = BiometricManager.from(context);
+        int result;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+        } else {
+            result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+        }
+
+        return result == BiometricManager.BIOMETRIC_SUCCESS;
     }
 
 

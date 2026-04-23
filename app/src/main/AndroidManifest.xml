@@ -71,6 +71,12 @@
             android:theme="@style/Theme.XEDigital.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".activity.FaceLoginActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".MainActivity"
             android:enableOnBackInvokedCallback="true"
             android:exported="true"

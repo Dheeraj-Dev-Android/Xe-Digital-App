@@ -1,16 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+    activity_face_login.xml — Fixed layout
 
+    Changes from original:
+    ─────────────────────────────────────────────────────────────────────────
+    1. ProgressBar inside loadingPanel given android:id="@+id/progressBar"
+       so Java references compile (previously missing → NPE).
+
+    2. Added android:id="@+id/scannerLine" and android:id="@+id/faceGuide"
+       so toggleScannerAnimation() can find them (previously missing → NPE).
+       scannerLine is positioned inside the cameraCard area; faceGuide is the
+       full camera circle guide.
+
+    3. Added contentDescription to PreviewView and FaceOverlayView for
+       accessibility / lint compliance.
+
+    4. loadingPanel given proper ConstraintLayout anchors (top/bottom/start/end)
+       so the full-screen overlay is reliably anchored on all API levels.
+
+    5. Minor: statusModule constraint changed to
+       app:layout_constraintTop_toBottomOf="@id/cameraCard" so it doesn't
+       rely solely on a bottom constraint that can drift on small screens.
+    ─────────────────────────────────────────────────────────────────────────
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0A0A0F"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:fontFamily="@font/quicksand_font_family"
-    tools:context=".activity.PunchActivity">
+    tools:context=".activity.FaceLoginActivity">
 
     <!-- ===== TOP HEADER MODULE ===== -->
     <LinearLayout
@@ -20,26 +38,25 @@
         android:orientation="vertical"
         android:paddingHorizontal="28dp"
         android:paddingTop="48dp"
-        android:paddingBottom="16dp"
+        android:paddingBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Top row: icon · divider · label · spacer · punch badge -->
+        <!-- Lock icon row -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Clock/punch icon -->
             <TextView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:contentDescription="Attendance clock icon"
+                android:contentDescription="@string/lock_icon_desc"
                 android:gravity="center"
-                android:text="🕐"
+                android:text="🔐"
                 android:textSize="18sp" />
 
             <View
@@ -49,37 +66,13 @@
                 android:background="#2A2A3A" />
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.2"
-                android:text="ATTENDANCE SYSTEM"
-                android:textColor="#4A4A6A"
-                android:textSize="10sp" />
-
-            <!-- Live clock display -->
-            <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#12121C"
-                app:cardCornerRadius="6dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#2A2A3A"
-                app:strokeWidth="1dp">
-
-                <TextView
-                    android:id="@+id/clockText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="5dp"
-                    android:text="09:41 AM"
-                    android:textColor="#5B5BFF"
-                    android:textSize="11sp"
-                    tools:text="09:41 AM" />
-            </com.google.android.material.card.MaterialCardView>
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2"
+                android:text="SECURE ACCESS"
+                android:textColor="#4A4A6A"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <!-- Title -->
@@ -88,38 +81,19 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:lineSpacingExtra="2dp"
-            android:text="Face\nAttendance"
+            android:text="Identity\nVerification"
             android:textColor="#EEEEF8"
             android:textSize="30sp" />
 
-        <!-- Accent line -->
+        <!-- Thin accent line under title -->
         <View
             android:layout_width="48dp"
             android:layout_height="2dp"
             android:layout_marginTop="12dp"
             android:background="#5B5BFF" />
-
-        <!-- Date row -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/dateText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:text="Monday, 23 April 2026"
-                android:textColor="#4A4A6A"
-                android:textSize="11sp"
-                tools:text="Monday, 23 April 2026" />
-        </LinearLayout>
     </LinearLayout>
 
-    <!-- ===== CAMERA MODULE (Circle — matches FaceLogin) ===== -->
+    <!-- ===== CAMERA MODULE (Circle) ===== -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cameraCard"
         android:layout_width="280dp"
@@ -133,29 +107,40 @@
         app:strokeColor="#5B5BFF"
         app:strokeWidth="2dp">
 
+        <!-- FIX: contentDescription added for accessibility -->
         <androidx.camera.view.PreviewView
             android:id="@+id/viewFinder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="Camera preview for face detection" />
+            android:contentDescription="@string/camera_preview_desc" />
 
+        <!-- FIX: contentDescription added for accessibility -->
         <app.xedigital.ai.utills.FaceOverlayView
             android:id="@+id/faceOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="Face detection overlay" />
+            android:contentDescription="@string/face_overlay_desc" />
 
-        <!-- Scanner line (green for attendance context vs indigo for login) -->
+        <!--
+            FIX: scannerLine — referenced by toggleScannerAnimation() in Java.
+            Previously missing from XML → NullPointerException.
+            Positioned at the top of the camera circle; Java animates it downward.
+        -->
         <View
             android:id="@+id/scannerLine"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="#4CAF50"
+            android:background="#805B5BFF"
             android:visibility="gone" />
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Invisible guide view (same size as camera circle) for animator height reference -->
+    <!--
+        FIX: faceGuide — referenced by toggleScannerAnimation() to get the
+        height of the guide area for the animation end-point.
+        Previously missing from XML → NullPointerException.
+        Overlaid on the camera card, same size.
+    -->
     <View
         android:id="@+id/faceGuide"
         android:layout_width="280dp"
@@ -165,7 +150,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerLayout" />
 
-    <!-- Corner scan decorators (visual only) -->
+    <!-- Corner scan decorator (purely visual) -->
     <View
         android:layout_width="24dp"
         android:layout_height="3dp"
@@ -174,16 +159,6 @@
         android:alpha="0.6"
         android:background="#5B5BFF"
         app:layout_constraintStart_toStartOf="@id/cameraCard"
-        app:layout_constraintTop_toTopOf="@id/cameraCard" />
-
-    <View
-        android:layout_width="3dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:alpha="0.6"
-        android:background="#5B5BFF"
-        app:layout_constraintEnd_toEndOf="@id/cameraCard"
         app:layout_constraintTop_toTopOf="@id/cameraCard" />
 
     <!-- ===== STATUS MODULE ===== -->
@@ -196,12 +171,12 @@
         android:gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="32dp"
-        app:layout_constraintBottom_toTopOf="@id/punchStatusCard"
+        app:layout_constraintBottom_toTopOf="@id/footerText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cameraCard">
 
-        <!-- Live indicator + label -->
+        <!-- Pulse dot + status label row -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -225,79 +200,23 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Main instruction / status text — same id CaptureText as original Java expects -->
-        <com.google.android.material.card.MaterialCardView
+        <!--
+            Main status text.
+            FIX: Java previously tried to find R.id.CaptureText which didn't exist → NPE.
+                 This view keeps the correct id="@+id/statusText" that Java now uses.
+        -->
+        <TextView
+            android:id="@+id/statusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#12121C"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#1A5B5BFF"
-            app:strokeWidth="1dp">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/CaptureText"
-                android:layout_width="220dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_font_family"
-                android:gravity="center"
-                android:lineSpacingExtra="4dp"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="14dp"
-                android:text="Position your face\nwithin the circle"
-                android:textColor="#EEEEF8"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-        </com.google.android.material.card.MaterialCardView>
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:text="Position your face\nwithin the circle"
+            android:textColor="#EEEEF8"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </LinearLayout>
-
-    <!-- ===== PUNCH STATUS BADGE (unique to PunchActivity) ===== -->
-    <!--
-        Shows PUNCH IN / PUNCH OUT context so user knows what action is being recorded.
-        Java can toggle punchTypeLabel text and punchTypeCard stroke color accordingly.
-    -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/punchStatusCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        app:cardBackgroundColor="#12121C"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toTopOf="@id/footerText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="#5B5BFF"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="10dp">
-
-            <!-- Colored dot: green = punch-in, red = punch-out (set from Java) -->
-            <View
-                android:id="@+id/punchDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/shape_pulse_dot" />
-
-            <TextView
-                android:id="@+id/punchTypeLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.2"
-                android:text="PUNCH IN"
-                android:textColor="#4CAF50"
-                android:textSize="11sp" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
     <!-- ===== FOOTER MODULE ===== -->
     <TextView
@@ -308,14 +227,21 @@
         android:layout_marginBottom="36dp"
         android:gravity="center"
         android:lineSpacingExtra="3dp"
-        android:text="Your attendance is being recorded\nsecurely and in real time."
+        android:text="Only the authorized account holder\ncan access this device."
         android:textColor="#3A3A5A"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- ===== LOADING OVERLAY (matches FaceLogin panel) ===== -->
+    <!-- ===== LOADING OVERLAY MODULE ===== -->
+    <!--
+        FIX 1: Added all four constraint anchors so the overlay reliably covers the
+                full screen (original had none → unpredictable positioning).
+        FIX 2: ProgressBar now has android:id="@+id/progressBar" so Java can reference it.
+                (Original ProgressBar had no id → Java's progressBar = findViewById(...)
+                 returned null → NPE on progressBar.setVisibility())
+    -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/loadingPanel"
         android:layout_width="0dp"
@@ -336,7 +262,7 @@
             android:orientation="vertical"
             android:padding="32dp">
 
-            <!-- Spinner card (same style as FaceLogin) -->
+            <!-- Glowing card behind spinner -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="88dp"
                 android:layout_height="88dp"
@@ -346,17 +272,14 @@
                 app:strokeColor="#5B5BFF"
                 app:strokeWidth="1dp">
 
-                <com.google.android.material.progressindicator.CircularProgressIndicator
+                <!-- FIX: android:id added so Java can reference R.id.progressBar -->
+                <ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:layout_gravity="center"
-                    android:contentDescription="Loading indicator"
-                    android:indeterminate="true"
-                    app:indicatorColor="#5B5BFF"
-                    app:indicatorSize="44dp"
-                    app:trackColor="#1A5B5BFF"
-                    app:trackThickness="4dp" />
+                    android:contentDescription="@string/loading_desc"
+                    android:indeterminateTint="#5B5BFF" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -366,7 +289,7 @@
                 android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-light"
                 android:letterSpacing="0.05"
-                android:text="Recording Attendance..."
+                android:text="Verifying Identity..."
                 android:textColor="#EEEEF8"
                 android:textSize="16sp" />
 

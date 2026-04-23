@@ -58,32 +58,22 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefs.getString("authToken", null);
         boolean isBioEnabled = prefs.getBoolean("isBioEnabled", false);
-
+        if (authToken != null) {
+            // RE-OPENING APP: If session exists, skip ID/Pass and go to Face Login
+            navigateToFaceLogin(authToken);
+        }
+        // Inside onCreate
 //        if (authToken != null) {
-//            // User has logged in before. Now, how do they get in?
-//            if (isBioEnabled && isBiometricHardwareAvailable()) {
-//                // Option A: Use Biometrics
+//            // Only show biometrics if the activity is being created for the first time
+//            // and not due to a system configuration change or internal navigation
+//            if (savedInstanceState == null && isBioEnabled && isBiometricHardwareAvailable()) {
 //                initializeBiometricAuth();
 //            } else {
 //                showLoginScreen();
 //            }
 //        } else {
-//            // Brand new user
 //            showLoginScreen();
 //        }
-
-        // Inside onCreate
-        if (authToken != null) {
-            // Only show biometrics if the activity is being created for the first time
-            // and not due to a system configuration change or internal navigation
-            if (savedInstanceState == null && isBioEnabled && isBiometricHardwareAvailable()) {
-                initializeBiometricAuth();
-            } else {
-                showLoginScreen();
-            }
-        } else {
-            showLoginScreen();
-        }
 
         // --- 2. UI SETUP ---
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
@@ -118,13 +108,17 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginModelResponse loginResponse = response.body();
                     if (loginResponse.isSuccess()) {
+                        // Extract user details
                         String userId = loginResponse.getData().getUser().getId();
                         String token = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
                         String empName = loginResponse.getData().getUser().getFirstname();
 
-                        // ASK FOR BIOMETRIC PREFERENCE ON FIRST SUCCESSFUL LOGIN
-                        showBiometricOptInDialog(userId, token, empEmail, empName);
+                        // 1. Store credentials locally
+                        storeInSharedPreferences(userId, token, empEmail, empName, true);
+
+                        // 2. IMMEDIATELY redirect to Face Verification for first-time/every login
+                        navigateToFaceLogin(token);
                     } else {
                         showAlertDialog(loginResponse.getMessage());
                     }
@@ -140,6 +134,46 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void navigateToFaceLogin(String token) {
+        Intent intent = new Intent(this, FaceLoginActivity.class);
+        intent.putExtra("authToken", token);
+        startActivity(intent);
+        finish();
+    }
+
+//    private void callLoginApi(String email, String password) {
+//        showLoading(true);
+//        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password);
+//        call.enqueue(new Callback<LoginModelResponse>() {
+//            @Override
+//            public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
+//                showLoading(false);
+//                if (response.isSuccessful() && response.body() != null) {
+//                    LoginModelResponse loginResponse = response.body();
+//                    if (loginResponse.isSuccess()) {
+//                        String userId = loginResponse.getData().getUser().getId();
+//                        String token = loginResponse.getData().getToken();
+//                        String empEmail = loginResponse.getData().getUser().getEmail();
+//                        String empName = loginResponse.getData().getUser().getFirstname();
+//
+//                        // ASK FOR BIOMETRIC PREFERENCE ON FIRST SUCCESSFUL LOGIN
+//                        showBiometricOptInDialog(userId, token, empEmail, empName);
+//                    } else {
+//                        showAlertDialog(loginResponse.getMessage());
+//                    }
+//                } else {
+//                    showAlertDialog("Invalid Credentials");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<LoginModelResponse> call, @NonNull Throwable t) {
+//                showLoading(false);
+//                showAlertDialog(t.getMessage());
+//            }
+//        });
+//    }
 
     private void showBiometricOptInDialog(String id, String token, String email, String name) {
         if (isFinishing() || isDestroyed()) return;
