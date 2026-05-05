@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:scrollbars="none">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Liveness Detection Instructions"
+            android:textColor="#212121"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Security Warning -->
+        <TextView
+            android:id="@+id/tvChallengePrompt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#FFF5F5"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="These challenges will prompt below on the screen during the verification process to ensure security."
+            android:textColor="#D32F2F"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toBottomOf="@id/tvChallengePrompt" />
+
+        <!-- Row 1: Blink -->
+        <ImageView
+            android:id="@+id/imgBlink"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerInside"
+            android:src="@raw/facial_recognization1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+
+        <TextView
+            android:id="@+id/txtBlink"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="1. Blink your eyes naturally."
+            android:textColor="#424242"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/imgBlink"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgBlink"
+            app:layout_constraintTop_toTopOf="@id/imgBlink" />
+
+        <!-- Row 2: Turn Left -->
+        <ImageView
+            android:id="@+id/imgTurnLeft"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerInside"
+            android:src="@raw/facial_recognization2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgBlink" />
+
+        <TextView
+            android:id="@+id/txtTurnLeft"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="2. Slowly turn your face to the left."
+            android:textColor="#424242"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/imgTurnLeft"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgTurnLeft"
+            app:layout_constraintTop_toTopOf="@id/imgTurnLeft" />
+
+        <!-- Row 3: Turn Right -->
+        <ImageView
+            android:id="@+id/imgTurnRight"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerInside"
+            android:src="@raw/facial_recognization3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgTurnLeft" />
+
+        <TextView
+            android:id="@+id/txtTurnRight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="3. Slowly turn your face to the right."
+            android:textColor="#424242"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/imgTurnRight"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgTurnRight"
+            app:layout_constraintTop_toTopOf="@id/imgTurnRight" />
+
+        <!-- Row 4: Tilt Up -->
+        <ImageView
+            android:id="@+id/imgTiltUp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerInside"
+            android:src="@raw/facial_recognization4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgTurnRight" />
+
+        <TextView
+            android:id="@+id/txtTiltUp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="4. Look upwards slightly."
+            android:textColor="#424242"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/imgTiltUp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgTiltUp"
+            app:layout_constraintTop_toTopOf="@id/imgTiltUp" />
+
+        <!-- Row 5: Tilt Down -->
+        <ImageView
+            android:id="@+id/imgTiltDown"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:scaleType="centerInside"
+            android:src="@raw/facial_recognization5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgTiltUp" />
+
+        <TextView
+            android:id="@+id/txtTiltDown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="5. Look downwards slightly."
+            android:textColor="#424242"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/imgTiltDown"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgTiltDown"
+            app:layout_constraintTop_toTopOf="@id/imgTiltDown" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
