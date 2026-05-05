@@ -118,4 +118,8 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     // Add this to your dependencies block
     implementation("com.google.mlkit:face-detection:16.1.7")
+    // WorkManager (Java version)
+    implementation("androidx.work:work-runtime:2.9.0")
+    // Google Play Services for Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }

@@ -120,9 +120,9 @@ public class FaceLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_face_login);
 
         // ── Bind views ────────────────────────────────────────────────────────
-        statusText = findViewById(R.id.statusText);   // FIX: was R.id.CaptureText (didn't exist → NPE)
+        statusText = findViewById(R.id.statusText);
         faceOverlay = findViewById(R.id.faceOverlay);
-        loadingPanel = findViewById(R.id.loadingPanel); // FIX: was R.id.progressBar (didn't exist → NPE)
+        loadingPanel = findViewById(R.id.loadingPanel);
         previewView = findViewById(R.id.viewFinder);
 
         // ── Auth data ─────────────────────────────────────────────────────────
@@ -146,15 +146,10 @@ public class FaceLoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        // FIX: Shut down executor to prevent thread/context leak
         backgroundExecutor.shutdownNow();
-
-        // FIX: Close ML Kit detector to release native resources
         if (detector != null) {
             detector.close();
         }
-
-        // FIX: Cancel animator to avoid holding a reference to the View (and thus Activity)
         if (scannerAnimator != null) {
             scannerAnimator.cancel();
             scannerAnimator = null;
@@ -170,7 +165,7 @@ public class FaceLoginActivity extends AppCompatActivity {
 
         future.addListener(() -> {
             try {
-                cameraProvider = future.get(); // FIX: store reference; reuse in safeUnbindCamera()
+                cameraProvider = future.get();
 
                 preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
@@ -179,7 +174,6 @@ public class FaceLoginActivity extends AppCompatActivity {
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .build();
 
-                // FIX: Run analysis on backgroundExecutor, not the main thread
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
@@ -199,10 +193,6 @@ public class FaceLoginActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
 
-    /**
-     * FIX: safeUnbindCamera now reuses the already-resolved cameraProvider reference
-     * instead of creating two separate getInstance() futures (old code leaked a future).
-     */
     private void safeUnbindCamera() {
         if (cameraProvider != null) {
             try {
@@ -271,8 +261,6 @@ public class FaceLoginActivity extends AppCompatActivity {
                         isBlinking = false;
                     } else {
                         faceOverlay.setFaceDetected(true);
-                        // FIX: captureImage() is ONLY triggered from processChallenge()
-                        // — removed the duplicate challengeSatisfied check that was here before.
                         processChallenge(faces.get(0));
                         if (!challengeSatisfied) {
                             updateStatus(getInstructionText(currentChallenge));
@@ -291,10 +279,6 @@ public class FaceLoginActivity extends AppCompatActivity {
     // Frame analysis
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Evaluates the current liveness challenge against the detected face angles/probabilities.
-     * FIX: captureImage() is triggered here ONLY — the duplicate call in analyzeFace() has been removed.
-     */
     private void processChallenge(@NonNull Face face) {
         float headY = face.getHeadEulerAngleY();
         float headX = face.getHeadEulerAngleX();
@@ -366,7 +350,6 @@ public class FaceLoginActivity extends AppCompatActivity {
                                 bitmap.recycle();
                                 scaled.recycle();
 
-                                // FIX: Delete temp file after reading — prevents disk accumulation
                                 deleteQuietly(photoFile);
 
                                 runOnUiThread(() -> {
@@ -461,14 +444,12 @@ public class FaceLoginActivity extends AppCompatActivity {
                         }
 
                         JSONObject dataObject = json.getJSONObject("data");
-                        // FIX: authToken already read once in onCreate(); re-use field value
                         String token = "jwt " + authToken;
                         RequestBody faceBody = RequestBody.create(
                                 MediaType.parse("application/json"), dataObject.toString());
                         callFaceDetailApi(token, faceBody);
 
                     } catch (IOException | JSONException e) {
-                        // FIX: was throw new RuntimeException(e) → crashed the app; now routed to handleError
                         Log.e(TAG, "Response parse error", e);
                         handleError("Error parsing server response: " + e.getMessage());
                     }
@@ -506,19 +487,31 @@ public class FaceLoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call,
                                    @NonNull Response<ResponseBody> response) {
-                // FIX: guard added (was missing in original) — prevents crash if activity is gone
                 if (isFinishing() || isDestroyed()) return;
 
                 setLoadingVisible(false);
 
                 if (response.isSuccessful() && response.body() != null) {
+                    // Inside callFaceDetailApi -> onResponse
                     try {
                         String bodyStr = response.body().string();
                         JSONObject res = new JSONObject(bodyStr);
-                        String recognizedId = res
-                                .getJSONObject("data")
-                                .getJSONObject("employee")
-                                .getString("_id");
+
+                        JSONObject dataObject = res.optJSONObject("data");
+
+                        if (dataObject == null) {
+                            handleError("Face details not found. Please try again.");
+                            return;
+                        }
+
+                        // Safely traverse the nested structure
+                        JSONObject employee = dataObject.optJSONObject("employee");
+                        if (employee == null) {
+                            handleError("Employee profile missing in response.");
+                            return;
+                        }
+
+                        String recognizedId = employee.optString("_id");
 
                         if (storedUserId != null && storedUserId.equals(recognizedId)) {
                             handleSuccess();
@@ -555,27 +548,53 @@ public class FaceLoginActivity extends AppCompatActivity {
     // Result handlers
     // ─────────────────────────────────────────────────────────────────────────
 
+//    private void handleError(String errorMessage) {
+//        isProcessingLiveness = false;
+//        challengeSatisfied = false;
+//        isAnalyzing.set(false);
+//
+//        runOnUiThread(() -> {
+//            if (isFinishing() || isDestroyed()) return;
+//
+//            setLoadingVisible(false);
+//            setRandomChallenge();
+//
+//            String userMessage = errorMessage != null && errorMessage.contains("There are no faces in the image")
+//                    ? "No face detected. Please position your face clearly in the circle."
+//                    : errorMessage;
+//
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Verification Failed")
+//                    .setMessage(userMessage)
+//                    .setPositiveButton("Retry", (dialog, which) -> {
+//                        safeUnbindCamera();
+//                        startCamera();
+//                    })
+//                    .setNegativeButton("Cancel", (dialog, which) -> finish())
+//                    .setCancelable(false)
+//                    .show();
+//
+//            safeUnbindCamera();
+//        });
+//    }
+
     private void handleError(String errorMessage) {
+        // Reset all liveness flags immediately
         isProcessingLiveness = false;
         challengeSatisfied = false;
+        isBlinking = false; // Added this
         isAnalyzing.set(false);
 
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
 
             setLoadingVisible(false);
-            setRandomChallenge();
-
-            String userMessage = errorMessage != null && errorMessage.contains("There are no faces in the image")
-                    ? "No face detected. Please position your face clearly in the circle."
-                    : errorMessage;
-
             new AlertDialog.Builder(this)
                     .setTitle("Verification Failed")
-                    .setMessage(userMessage)
+                    .setMessage(errorMessage)
                     .setPositiveButton("Retry", (dialog, which) -> {
-                        safeUnbindCamera();
-                        startCamera();
+                        setRandomChallenge(); // Reset challenge here
+                        startCamera();        // Rebind
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> finish())
                     .setCancelable(false)
@@ -585,11 +604,6 @@ public class FaceLoginActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Thread-safe status text update.
-     * FIX: references R.id.statusText (field cached in onCreate) — old code used
-     * R.id.CaptureText which didn't exist, causing a NullPointerException every frame.
-     */
     private void updateStatus(String text) {
         runOnUiThread(() -> {
             if (statusText != null) statusText.setText(text);
@@ -600,9 +614,6 @@ public class FaceLoginActivity extends AppCompatActivity {
     // UI helpers
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Shows/hides the loading overlay panel.
-     */
     private void setLoadingVisible(boolean visible) {
         runOnUiThread(() -> {
             if (loadingPanel != null) {
@@ -612,7 +623,7 @@ public class FaceLoginActivity extends AppCompatActivity {
     }
 
     /**
-     * FIX: toggleScannerAnimation() previously tried to find R.id.scannerLine and
+     * toggleScannerAnimation() previously tried to find R.id.scannerLine and
      * R.id.faceGuide which don't exist in the current XML layout, causing NPEs.
      * <p>
      * The method is retained as a no-op stub so call sites compile; re-implement

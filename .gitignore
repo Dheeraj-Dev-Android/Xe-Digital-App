@@ -15,4 +15,7 @@
 local.properties
 /app/src/google-services.json
 .gradle/key.jks
+echo "*.apk" >> .gitignore
+*.apk
+.idea/shelf/
 
