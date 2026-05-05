@@ -10,6 +10,7 @@ public class User {
     private String email;
     private String lastname;
 
+    @SerializedName("firstname")
     public String getFirstname() {
         return firstname;
     }
@@ -22,10 +23,12 @@ public class User {
         return id;
     }
 
+    @SerializedName("email")
     public String getEmail() {
         return email;
     }
 
+    @SerializedName("lastname")
     public String getLastname() {
         return lastname;
     }

@@ -116,6 +116,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
+                    setRandomChallenge();
                     startCamera();
                 } else {
                     showPermissionDeniedAlert();
@@ -215,6 +216,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        // Add a target resolution to ensure the AI gets a clear, standard frame
+                        .setTargetResolution(new android.util.Size(480, 640))
                         .build();
                 imageAnalysis.setAnalyzer(backgroundExecutor, this::analyzeFace);
 

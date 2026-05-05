@@ -27,3 +27,17 @@
 # Keep Sceneform and Filament classes from being stripped
 -keep class com.google.android.filament.** { *; }
 -keep class com.google.ar.sceneform.** { *; }
+
+# Keep your data models so GSON can map them
+-keep class app.xedigital.ai.model.** { *; }
+
+# Keep Retrofit and OkHttp internal classes
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepattributes RuntimeVisibleTypeAnnotations
+
+# Keep GSON specific attributes
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.reflect.TypeToken
+-keep class * extends com.google.gson.TypeAdapter
