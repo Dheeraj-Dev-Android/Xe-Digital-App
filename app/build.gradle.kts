@@ -34,8 +34,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -63,7 +63,6 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.activity)
-    implementation(libs.filament.android)
     implementation(libs.tracing.perfetto.handshake)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.protolite.well.known.types)
@@ -74,13 +73,10 @@ dependencies {
     implementation(libs.compiler)
     implementation(libs.transport.api)
     implementation(libs.core.i18n)
-    implementation(libs.leanback)
     implementation(libs.rendering)
     implementation(libs.ui.text.android)
     implementation(libs.firebase.vertexai)
-    implementation(libs.impress)
     implementation(libs.engage.core)
-    implementation(libs.car.ui.lib)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.perf)
@@ -103,6 +99,7 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.play.services.location)
+    implementation(platform(libs.firebase.bom))
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
@@ -113,13 +110,10 @@ dependencies {
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.airbnb.android:lottie:6.0.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+//    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
-    // Add this to your dependencies block
-    implementation("com.google.mlkit:face-detection:16.1.7")
-    // WorkManager (Java version)
+//    implementation("com.google.mlkit:face-detection:16.1.7")
+    implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
     implementation("androidx.work:work-runtime:2.9.0")
-    // Google Play Services for Location
-    implementation("com.google.android.gms:play-services-location:21.0.1")
 }

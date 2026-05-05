@@ -948,36 +948,84 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     // Result dialogs
     // ─────────────────────────────────────────────────────────────────────────
 
+    //    private void showAttendanceFailedAlert(@NonNull String message) {
+//        toggleScannerAnimation(false);
+//        setRandomChallenge();
+//
+//        runOnUiThread(() -> {
+//            if (!isActivityAlive()) return; // [18]
+//
+//            setLoadingVisible(false);
+//            isProcessingLiveness = false;
+//
+//            dismissDialog(failedDialog); // dismiss any existing one first
+//            failedDialog = new AlertDialog.Builder(this)
+//                    .setTitle("Attendance Failed")
+//                    .setMessage(message)
+//                    .setPositiveButton("Retry", (d, id) -> {
+//                        d.dismiss();
+//                        setRandomChallenge();
+//                        if (isActivityAlive()) startCamera(); // [18]
+//                    })
+//                    .setNegativeButton("Cancel", (d, id) -> {
+//                        d.dismiss();
+//                        setResult(Activity.RESULT_CANCELED);
+//                        finish();
+//                    })
+//                    .setNeutralButton("Use Biometric", (d, id) -> {
+//                        d.dismiss();
+//                        if (isActivityAlive()) usePhoneBiometric(); // [18]
+//                    })
+//                    .setCancelable(false)
+//                    .show();
+//        });
+//    }
     private void showAttendanceFailedAlert(@NonNull String message) {
         toggleScannerAnimation(false);
         setRandomChallenge();
 
         runOnUiThread(() -> {
-            if (!isActivityAlive()) return; // [18]
+            // Lifecycle Check: prevent crashes if the user is already navigating away
+            if (isFinishing() || isDestroyed()) return;
 
             setLoadingVisible(false);
             isProcessingLiveness = false;
 
-            dismissDialog(failedDialog); // dismiss any existing one first
-            failedDialog = new AlertDialog.Builder(this)
-                    .setTitle("Attendance Failed")
-                    .setMessage(message)
-                    .setPositiveButton("Retry", (d, id) -> {
-                        d.dismiss();
-                        setRandomChallenge();
-                        if (isActivityAlive()) startCamera(); // [18]
-                    })
-                    .setNegativeButton("Cancel", (d, id) -> {
-                        d.dismiss();
-                        setResult(Activity.RESULT_CANCELED);
-                        finish();
-                    })
-                    .setNeutralButton("Use Biometric", (d, id) -> {
-                        d.dismiss();
-                        if (isActivityAlive()) usePhoneBiometric(); // [18]
-                    })
-                    .setCancelable(false)
-                    .show();
+            // Initialize the builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Attendance Failed");
+            builder.setMessage(message);
+            builder.setCancelable(false);
+
+            // 1. Retry Button
+            builder.setPositiveButton("Retry", (d, id) -> {
+                d.dismiss();
+                setRandomChallenge();
+                if (!isFinishing() && !isDestroyed()) startCamera();
+            });
+
+            // 2. Cancel Button
+            builder.setNegativeButton("Cancel", (d, id) -> {
+                d.dismiss();
+                setResult(Activity.RESULT_CANCELED);
+                finish();
+            });
+
+            // 3. Conditional Biometric Button: Only show if hardware is available and enrolled
+            if (bioMetric != null && bioMetric.isBiometricAvailable()) {
+                builder.setNeutralButton("Use Biometric", (d, id) -> {
+                    d.dismiss();
+                    if (!isFinishing() && !isDestroyed()) {
+                        // Use false to trigger the Attendance specific prompt info
+                        bioMetric.authenticate(false);
+                    }
+                });
+            }
+
+            // Final safety check before showing the UI
+            if (!isFinishing() && !isDestroyed()) {
+                builder.show();
+            }
         });
     }
 

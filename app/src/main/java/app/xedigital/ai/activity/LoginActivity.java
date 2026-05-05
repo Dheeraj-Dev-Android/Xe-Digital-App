@@ -58,9 +58,19 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefs.getString("authToken", null);
         boolean isBioEnabled = prefs.getBoolean("isBioEnabled", false);
-        if (authToken != null) {
-            // RE-OPENING APP: If session exists, skip ID/Pass and go to Face Login
+//        if (authToken != null) {
+//            // RE-OPENING APP: If session exists, skip ID/Pass and go to Face Login
+//            navigateToFaceLogin(authToken);
+//        }
+        boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
+
+        if (authToken != null && !isFallback) {
+            // Only auto-navigate if the user isn't being sent here due to a failure
             navigateToFaceLogin(authToken);
+        } else if (isFallback) {
+            // If it's a fallback, show the login screen so they can manually enter creds
+            showLoginScreen();
+            Toast.makeText(this, "Please sign in manually.", Toast.LENGTH_LONG).show();
         }
         // Inside onCreate
 //        if (authToken != null) {
@@ -109,6 +119,8 @@ public class LoginActivity extends AppCompatActivity {
                     LoginModelResponse loginResponse = response.body();
                     if (loginResponse.isSuccess()) {
                         // Extract user details
+                        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                        prefs.edit().clear().apply(); // Clear any existing session data before storing new credentials
                         String userId = loginResponse.getData().getUser().getId();
                         String token = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
