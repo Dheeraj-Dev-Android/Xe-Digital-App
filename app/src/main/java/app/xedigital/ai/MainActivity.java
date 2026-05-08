@@ -135,6 +135,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        MenuItem teamAttendanceItem = navigationView.getMenu().findItem(R.id.navManager_attendance_menu);
+        teamAttendanceItem.setOnMenuItemClickListener(item -> {
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.navManager_attendance_menu);
+            return true;
+        });
+
         // Initialize header view elements
         View headerView = navigationView.getHeaderView(0);
         profileImage = headerView.findViewById(R.id.imageView);

@@ -16,28 +16,75 @@ import java.util.TimeZone;
 
 public class DateTimeUtils {
 
-    public static String calculateTotalTime(String punchInTime, String punchOutTime) {
-        if (punchInTime == null || punchOutTime == null || punchInTime.equals("N/A") || punchOutTime.equals("N/A")) {
-            return "N/A";
+    //    public static String calculateTotalTime(String punchInTime, String punchOutTime) {
+//        if (punchInTime == null || punchOutTime == null || punchInTime.equals("N/A") || punchOutTime.equals("N/A")) {
+//            return "N/A";
+//        }
+//
+//        SimpleDateFormat format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//        format.setTimeZone(TimeZone.getDefault());
+//        try {
+//            Date punchIn = format.parse(punchInTime);
+//            Date punchOut = format.parse(punchOutTime);
+//
+//            if (punchOut != null && punchIn != null) {
+//                long differenceInMillis = punchOut.getTime() - punchIn.getTime();
+//                long diffHours = differenceInMillis / (60 * 60 * 1000);
+//                long diffMinutes = (differenceInMillis % (60 * 60 * 1000)) / (60 * 1000);
+//
+//                return String.format(Locale.getDefault(), "%02d:%02d Hrs", diffHours, diffMinutes);
+//            }
+//        } catch (ParseException e) {
+//            Log.e("DateTimeUtils", "Error calculating total time: " + e.getMessage());
+//        }
+//        return "N/A";
+//    }
+    public static String calculateTotalTime(String punchIn, String punchOut) {
+        if (punchIn == null || punchOut == null || punchIn.isEmpty() || punchOut.isEmpty()) {
+            return "00:00";
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-        format.setTimeZone(TimeZone.getDefault());
+        // This matches: 2026-02-13T06:16:39.801Z
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // API dates with 'Z' are usually UTC
+
         try {
-            Date punchIn = format.parse(punchInTime);
-            Date punchOut = format.parse(punchOutTime);
+            Date d1 = sdf.parse(punchIn);
+            Date d2 = sdf.parse(punchOut);
 
-            if (punchOut != null && punchIn != null) {
-                long differenceInMillis = punchOut.getTime() - punchIn.getTime();
-                long diffHours = differenceInMillis / (60 * 60 * 1000);
-                long diffMinutes = (differenceInMillis % (60 * 60 * 1000)) / (60 * 1000);
+            long diff = d2.getTime() - d1.getTime();
+            long hours = diff / (60 * 60 * 1000);
+            long minutes = (diff / (60 * 1000)) % 60;
 
-                return String.format(Locale.getDefault(), "%02d:%02d Hrs", diffHours, diffMinutes);
-            }
-        } catch (ParseException e) {
-            Log.e("DateTimeUtils", "Error calculating total time: " + e.getMessage());
+            return String.format(Locale.getDefault(), "%02d:%02d Hrs", hours, minutes);
+        } catch (Exception e) {
+            Log.e("DateTimeUtils", "Error parsing ISO date: " + e.getMessage());
+            return "00:00";
         }
-        return "N/A";
+    }
+
+    public static Date parseAnyDate(String dateStr) {
+        if (dateStr == null) return null;
+
+        // Try ISO format with milliseconds
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(dateStr);
+        } catch (Exception ignored) {
+        }
+
+        // Try ISO format without milliseconds
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).parse(dateStr);
+        } catch (Exception ignored) {
+        }
+
+        // Try standard format
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateStr);
+        } catch (Exception ignored) {
+        }
+
+        return null;
     }
 
     public static String extractTime(String dateTimeString) {
@@ -52,43 +99,90 @@ public class DateTimeUtils {
     }
 
     public static String calculateLateTime(String punchInTime, String shiftStartTime) {
-        if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
-            return "N/A";
+        if (punchInTime == null || shiftStartTime == null ||
+                punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
+            return "0 Min's";
         }
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat shiftFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        SimpleDateFormat time12Format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
         try {
-            Date punchInISO = isoFormat.parse(punchInTime);
-            if (punchInISO != null) {
-                String punchIn12 = time12Format.format(punchInISO);
+            SimpleDateFormat punchFormat;
+            // Check if the input is ISO format or already formatted 12h time
+            if (punchInTime.contains("T")) {
+                punchFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                punchFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            } else {
+                punchFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            }
 
-                Date shiftStart = shiftFormat.parse(shiftStartTime);
-                Date punchIn = time12Format.parse(punchIn12);
+            SimpleDateFormat shiftFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-                if (punchIn != null && punchIn.after(shiftStart)) {
-                    if (shiftStart != null) {
-                        long lateInMillis = punchIn.getTime() - shiftStart.getTime();
-                        long lateMinutes = lateInMillis / (60 * 1000);
+            Date punchInDate = punchFormat.parse(punchInTime);
+            Date shiftStartDate = shiftFormat.parse(shiftStartTime);
 
-                        if (lateMinutes < 60) {
-                            return lateMinutes + " Min's";
-                        } else {
-                            long lateHours = lateMinutes / 60;
-                            long remainingMinutes = lateMinutes % 60;
-                            return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, remainingMinutes);
-                        }
+            if (punchInDate != null && shiftStartDate != null) {
+                // Normalize both to the same reference date for accurate comparison
+                Calendar calPunch = Calendar.getInstance();
+                calPunch.setTime(punchInDate);
+
+                Calendar calShift = Calendar.getInstance();
+                calShift.setTime(shiftStartDate);
+                // Match the year/month/day so we only compare hours and minutes
+                calShift.set(calPunch.get(Calendar.YEAR), calPunch.get(Calendar.MONTH), calPunch.get(Calendar.DAY_OF_MONTH));
+
+                if (calPunch.after(calShift)) {
+                    long lateInMillis = calPunch.getTimeInMillis() - calShift.getTimeInMillis();
+                    long lateMinutes = lateInMillis / (60 * 1000);
+
+                    if (lateMinutes < 60) {
+                        return lateMinutes + " Min's";
+                    } else {
+                        return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateMinutes / 60, lateMinutes % 60);
                     }
-                } else {
-                    return "0 Min's";
                 }
             }
         } catch (ParseException e) {
-            Log.e("DateTimeUtils", "Error calculating late time: " + e.getMessage());
+            Log.e("DateTimeUtils", "Error calculating late time: " + e.getMessage() + " for input: " + punchInTime);
         }
-        return "N/A";
+        return "0 Min's";
     }
+//    public static String calculateLateTime(String punchInTime, String shiftStartTime) {
+//        if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
+//            return "N/A";
+//        }
+//        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+//        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        SimpleDateFormat shiftFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+//        SimpleDateFormat time12Format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//        try {
+//            Date punchInISO = isoFormat.parse(punchInTime);
+//            if (punchInISO != null) {
+//                String punchIn12 = time12Format.format(punchInISO);
+//
+//                Date shiftStart = shiftFormat.parse(shiftStartTime);
+//                Date punchIn = time12Format.parse(punchIn12);
+//
+//                if (punchIn != null && punchIn.after(shiftStart)) {
+//                    if (shiftStart != null) {
+//                        long lateInMillis = punchIn.getTime() - shiftStart.getTime();
+//                        long lateMinutes = lateInMillis / (60 * 1000);
+//
+//                        if (lateMinutes < 60) {
+//                            return lateMinutes + " Min's";
+//                        } else {
+//                            long lateHours = lateMinutes / 60;
+//                            long remainingMinutes = lateMinutes % 60;
+//                            return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, remainingMinutes);
+//                        }
+//                    }
+//                } else {
+//                    return "0 Min's";
+//                }
+//            }
+//        } catch (ParseException e) {
+//            Log.e("DateTimeUtils", "Error calculating late time: " + e.getMessage());
+//        }
+//        return "N/A";
+//    }
 
 
     public static String calculateOvertime(String totalTime) {

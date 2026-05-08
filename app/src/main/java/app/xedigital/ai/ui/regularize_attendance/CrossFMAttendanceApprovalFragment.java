@@ -119,22 +119,46 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
         chipGroup.check(clickedChip.getId());
     }
 
+    //    private void filterRequests(String status) {
+//        if (regularizeApprovalResponse != null && regularizeApprovalResponse.getData() != null) {
+//            List<AttendanceRegItem> originalList = (List<AttendanceRegItem>) regularizeApprovalResponse.getData();
+//            List<AttendanceRegItem> filteredList = new ArrayList<>();
+//
+//            if (status.equals("All")) {
+//                filteredList.addAll(originalList);
+//            } else {
+//                for (AttendanceRegItem item : originalList) {
+//                    if (item.getStatus().equalsIgnoreCase(status)) {
+//                        filteredList.add(item);
+//                    }
+//                }
+//            }
+//            adapter.updateList(filteredList);
+//        }
+//    }
     private void filterRequests(String status) {
         if (regularizeApprovalResponse != null && regularizeApprovalResponse.getData() != null) {
-            List<AttendanceRegItem> originalList = (List<AttendanceRegItem>) regularizeApprovalResponse.getData();
+            // Get the list from the Data object, not by casting the Data object itself
+            List<AttendanceRegItem> originalList = regularizeApprovalResponse.getData().getAttendanceReg();
             List<AttendanceRegItem> filteredList = new ArrayList<>();
+
+            if (originalList == null) return;
 
             if (status.equals("All")) {
                 filteredList.addAll(originalList);
             } else {
                 for (AttendanceRegItem item : originalList) {
-                    if (item.getStatus().equalsIgnoreCase(status)) {
+                    // Check for null status to avoid NullPointerException
+                    if (item.getStatus() != null && item.getStatus().equalsIgnoreCase(status)) {
                         filteredList.add(item);
                     }
                 }
             }
+
+            if (adapter != null) {
             adapter.updateList(filteredList);
         }
+    }
     }
 
     private void getRegularizeApproval() {
@@ -148,7 +172,7 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
             public void onResponse(@NonNull Call<CfRegularizeApprovalResponse> call, @NonNull Response<CfRegularizeApprovalResponse> response) {
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful()) {
-                    CfRegularizeApprovalResponse regularizeApprovalResponse = response.body();
+                    regularizeApprovalResponse = response.body();
                     if (regularizeApprovalResponse != null) { // CHECK IF BODY IS NULL
                         // Access the Data object correctly
                         Data data = regularizeApprovalResponse.getData();

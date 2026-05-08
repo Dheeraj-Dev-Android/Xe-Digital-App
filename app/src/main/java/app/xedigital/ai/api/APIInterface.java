@@ -1,5 +1,8 @@
 package app.xedigital.ai.api;
 
+import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
+import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
+import app.xedigital.ai.model.TeamUnderManagerResponse.TeamUnderManagerResponse;
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
 import app.xedigital.ai.model.addAttendanceRequest.AddedAttendanceCancelRequest;
 import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
@@ -160,6 +163,23 @@ public interface APIInterface {
 
     @GET("leaves/applied/report/crmanager/{employeeId}")
     Call<CMLeavePendingResponse> getPendingApprovalLeavesCR(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+
+    //    @GET("employees/attendancePunch/reportingManager")
+//    Call<AttandanceByManagerResponse> getAttendanceByManager(@Header("Authorization") String authToken, @Query("managerId") String managerId);
+    @GET("employees/attendancePunch/reportingManager")
+    Call<AttandanceByManagerResponse> getAttendanceByManager(
+            @Header("Authorization") String authToken,
+            @Query("managerId") String managerId,
+            @Query("start") String startDate,       // format: yyyy-MM-dd
+            @Query("end") String endDate,           // format: yyyy-MM-dd
+            @Query("employee") String employeeId    // _id of employee, null = omitted (all employees)
+    );
+
+    @GET("employees/reportingManager/{UserId}")
+    Call<TeamMemberResponse> getEmployeesByManager(@Header("Authorization") String authToken, @Path("UserId") String managerId);
+
+    @GET("employees/employeeUnderManager/{userId}")
+    Call<TeamUnderManagerResponse> getEmployeesUnderManager(@Header("Authorization") String authToken, @Path("userId") String userId);
 
     //    POST APIs
     @POST("face/recognize")

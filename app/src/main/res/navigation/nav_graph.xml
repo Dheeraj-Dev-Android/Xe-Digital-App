@@ -483,6 +483,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navManager_attendance_menu"
+        android:name="app.xedigital.ai.ui.AttendanceByManager.AttendanceByManagerFragment"
+        android:label="Manager Attendance Menu"
+        tools:layout="@layout/fragment_attendance_by_manager" />
+
+    <fragment
         android:id="@+id/nav_settings"
         android:name="app.xedigital.ai.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"

@@ -1,19 +1,26 @@
 package app.xedigital.ai.ui.timesheet;
 
+import static app.xedigital.ai.utills.DateTimeUtils.formatTime;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -40,7 +47,10 @@ import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentDcrFormBinding;
+import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
+import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
@@ -78,6 +88,7 @@ public class TimesheetFormFragment extends Fragment {
     private MaterialButton btnDcrClear;
     private FragmentDcrFormBinding binding;
     private boolean isSubmitting = false;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -160,9 +171,17 @@ public class TimesheetFormFragment extends Fragment {
             MaterialDatePicker<Long> materialDatePicker = materialDatePickerBuilder.build();
             materialDatePicker.show(getParentFragmentManager(), "DATE_PICKER");
 
+//            materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//                dcrDate.setText(simpleDateFormat.format(selection));
+//            });
             materialDatePicker.addOnPositiveButtonClickListener(selection -> {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                dcrDate.setText(simpleDateFormat.format(selection));
+                String selectedDateStr = simpleDateFormat.format(selection);
+                dcrDate.setText(selectedDateStr); //[cite: 1]
+
+                // Trigger the auto-fill
+                fetchEmployeeAttendanceForDate(selectedDateStr);
             });
         });
 
@@ -188,6 +207,56 @@ public class TimesheetFormFragment extends Fragment {
                 String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
                 outTime.setText(selectedTime);
             });
+        });
+    }
+
+    public void fetchEmployeeAttendanceForDate(String date) {
+        Context context = getContext(); // Use getContext() which returns null if detached
+        if (context == null) return;
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", "");
+        String authHeaderValue = "jwt " + authToken;
+
+        APIInterface apiInterface = APIClient.getInstance().getAttendance();
+        apiInterface.getAttendance(authHeaderValue, date, date, "", "", "", "", "", "").enqueue(new Callback<EmployeeAttendanceResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EmployeeAttendanceResponse> call, @NonNull Response<EmployeeAttendanceResponse> response) {
+                if (!isAdded() || binding == null) return;
+                if (response.isSuccessful() && response.body() != null) {
+                    EmployeeAttendanceResponse responseBody = response.body();
+
+                    // Check if data and the list are not null/empty
+                    if (responseBody.getData() != null &&
+                            responseBody.getData().getEmployeePunchData() != null &&
+                            !responseBody.getData().getEmployeePunchData().isEmpty()) {
+
+                        // Get the first entry for the selected date
+                        EmployeePunchDataItem punchData = responseBody.getData().getEmployeePunchData().get(0);
+
+                        String pIn = punchData.getPunchIn();
+                        String pOut = punchData.getPunchOut();
+
+                        // Null & Empty Check for Punch In
+                        if (pIn != null && !pIn.trim().isEmpty() && !pIn.equalsIgnoreCase("null")) {
+                            inTime.setText(formatTime(pIn));
+                        } else {
+                            Log.d(TAG, "Punch In is null or empty for this date");
+                        }
+
+                        // Null & Empty Check for Punch Out
+                        if (pOut != null && !pOut.trim().isEmpty() && !pOut.equalsIgnoreCase("null")) {
+                            outTime.setText(formatTime(pOut));
+                        } else {
+                            Log.d(TAG, "Punch Out is null or empty for this date");
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EmployeeAttendanceResponse> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "Error fetching attendance: " + throwable.getMessage());
+            }
         });
     }
 
@@ -224,13 +293,15 @@ public class TimesheetFormFragment extends Fragment {
                         String responseBody = response.body().string();
                         JSONObject jsonObject = new JSONObject(responseBody);
                         String message = jsonObject.getString("message");
-                        showAlertDialog("Timesheet Submitted", message);
+                        showAlertDialog(true, "Submitted!", "Your DCR form has been successfully submitted.");
                     } else {
-                        showAlertDialog("Error submitting timesheet", response.message());
+
+                        showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
-                    showAlertDialog("Error", "Error submitting timesheet");
+
+                    showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                 }
             }
 
@@ -238,36 +309,61 @@ public class TimesheetFormFragment extends Fragment {
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 setLoading(false); // Stop the spinner even on failure
                 if (!isAdded()) return;
-                showAlertDialog("Error", throwable.getMessage());
-            }
 
-            private void showAlertDialog(String title, String message) {
-                // 1. Check if fragment is still attached to activity
-                if (!isAdded() || getContext() == null) {
-                    return;
-                }
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(title)
-                        .setMessage(message)
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            dialog.dismiss();
-
-                            // 2. Safely check view and navigation
-                            View view = getView();
-                            if (view != null) {
-                                clearForm();
-                                try {
-                                    NavController navController = Navigation.findNavController(view);
-                                    navController.navigate(R.id.action_nav_dcr_form_to_nav_dcr);
-                                } catch (IllegalArgumentException e) {
-                                    Log.e(TAG, "Navigation error: " + e.getMessage());
-
-                                }
-                            }
-                        }).show();
+                showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
             }
         });
+    }
+
+    private void showAlertDialog(boolean isSuccess, String title, String message) {
+        if (!isAdded() || getContext() == null) {
+            return;
+        }
+
+        // Inflate custom layout
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_custom_alert, null);
+
+        ImageView icon = dialogView.findViewById(R.id.dialog_icon);
+        TextView tvTitle = dialogView.findViewById(R.id.dialog_title);
+        TextView tvMessage = dialogView.findViewById(R.id.dialog_message);
+
+        if (isSuccess) {
+            icon.setImageResource(R.drawable.ic_check_circle);   // green check icon
+            icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.approved_color));
+        } else {
+            icon.setImageResource(R.drawable.ic_cancel_circle);  // red cross icon
+            icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.rejected_color));
+        }
+
+        tvTitle.setText(title);
+        tvMessage.setText(message);
+
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialogView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
+            dialog.dismiss();
+            if (isSuccess) {
+                View view = getView();
+                if (view != null) {
+                    clearForm();
+                    try {
+                        NavController navController = Navigation.findNavController(view);
+                        navController.navigate(R.id.action_nav_dcr_form_to_nav_dcr);
+                    } catch (IllegalArgumentException e) {
+                        Log.e(TAG, "Navigation error: " + e.getMessage());
+                    }
+                }
+            }
+        });
+
+        dialog.show();
     }
 
     private void clearForm() {
@@ -294,7 +390,7 @@ public class TimesheetFormFragment extends Fragment {
         try {
             dateFormat.parse(Objects.requireNonNull(dcrDate.getText()).toString());
         } catch (ParseException e) {
-            dcrDate.setError("Invalid date format. Use dd-MM-yyyy");
+            dcrDate.setError("Invalid date format. Use yyyy-MM-dd");
             Toast.makeText(getContext(), "Invalid date format. Use yyyy-MM-dd", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -405,8 +501,16 @@ public class TimesheetFormFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        // 1. Disable the back button callback to prevent it from holding onto the fragment/activity reference
+        if (backPressedCallback != null) {
+            backPressedCallback.setEnabled(false);
+            backPressedCallback.remove();
+        }
+
+        // 2. Clear the binding reference to avoid memory leaks
+        binding = null;
+
         super.onDestroyView();
-        binding = null; // Clean up the reference
     }
 
 }

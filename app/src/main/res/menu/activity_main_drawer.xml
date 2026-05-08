@@ -42,6 +42,13 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/navManager_attendance_menu"
+            android:icon="@drawable/ic_collections_bookmark"
+            android:title="Team Attendance" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
             android:id="@+id/nav_leaves_menu"
             android:icon="@drawable/ic_calendar_today"
             android:title="@string/menu_leaves" />

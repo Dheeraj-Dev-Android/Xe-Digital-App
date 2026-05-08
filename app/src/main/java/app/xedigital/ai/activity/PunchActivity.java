@@ -190,56 +190,74 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     private static final String TAG = "PunchActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
-    // NOTE: Move this to BuildConfig or retrieve from server — do not ship hardcoded in production.
     private static final String COLLECTION_NAME = "consultedgeglobalpvtltd_5e970n";
 
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
-            // WRITE_EXTERNAL_STORAGE is not needed on API 29+ (scoped storage); remove if minSdk >= 29
+
     };
-    // ── Liveness state ────────────────────────────────────────────────────────
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
-    // ── Threading ─────────────────────────────────────────────────────────────
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
-    // [22] explicit Looper — no implicit Activity capture
     private final Handler handler = new Handler(Looper.getMainLooper());
-    // ── Camera ────────────────────────────────────────────────────────────────
     private PreviewView previewView;
     private Preview preview;
     private ImageCapture imageCapture;
     private CameraSelector cameraSelector;
-    private ProcessCameraProvider cameraProvider; // [21] stored to avoid double future
-    // ── ML Kit ────────────────────────────────────────────────────────────────
+    private ProcessCameraProvider cameraProvider;
     private FaceDetector detector;
     private volatile boolean isProcessingLiveness = false;
     private boolean isBlinking = false;
     private boolean challengeSatisfied = false;
     private LivenessChallenge currentChallenge;
-    // ── UI ────────────────────────────────────────────────────────────────────
-    private TextView captureText;           // cached — no repeated findViewById per frame
+    private TextView captureText;
     private FaceOverlayView faceOverlay;
     private MaterialCardView loadingPanel;
     private ObjectAnimator scannerAnimator;
-    // ── Dialogs (all tracked to prevent window leaks) ─────────────────────────
-    private AlertDialog attendanceSuccessDialog; // [7]  success auto-dismiss
-    private AlertDialog failedDialog;            // [8]  attendance failed / biometric failed
-    private AlertDialog errorDialog;             // [9]  generic camera/api errors
-    private AlertDialog securityDialog;          // [10] VPN, mock-location, auto-time, location off
-    // ── Auth ──────────────────────────────────────────────────────────────────
-    private String authToken;    // set once in onCreate, reused everywhere [36]
-    private String userId;       // loaded from SharedPreferences in onCreate
-    // ── Location ──────────────────────────────────────────────────────────────
+    private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean isGranted = true;
+                for (boolean granted : result.values()) {
+                    if (!granted) {
+                        isGranted = false;
+                        break;
+                    }
+                }
+                if (isGranted) {
+                    setRandomChallenge();
+                    startCamera();
+                } else {
+                    showPermissionDeniedAlert();
+                }
+            });
+    private AlertDialog attendanceSuccessDialog;
+    private AlertDialog failedDialog;
+    private AlertDialog errorDialog;
+    private AlertDialog securityDialog;
+    private String authToken;
+    private String userId;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private String currentAddress = "";
-    // ── Biometric ─────────────────────────────────────────────────────────────
+    // ── Permissions ───────────────────────────────────────────────────────
+//    ActivityResultLauncher<String[]> requestPermissionsLauncher =
+//            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+//                boolean allGranted = true;
+//                for (boolean granted : result.values()) {
+//                    if (!granted) {
+//                        allGranted = false;
+//                        break;
+//                    }
+//                }
+//                if (allGranted) {
+//                    startCamera();
+//                } else {
+//                    Toast.makeText(this, "Permissions required for attendance", Toast.LENGTH_LONG).show();
+//                    finish();
+//                }
+//            });
     private BioMetric bioMetric;
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Lifecycle
-    // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -251,14 +269,13 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         previewView = findViewById(R.id.viewFinder);
         faceOverlay = findViewById(R.id.faceOverlay);
         loadingPanel = findViewById(R.id.loadingPanel);
-        captureText = findViewById(R.id.CaptureText); // cached once [updateStatus fix]
+        captureText = findViewById(R.id.CaptureText);
 
-        // ── Auth / user data — read once, reused everywhere [36] ─────────────
+        // ── Auth / user data — read once, reused everywhere  ─────────────
         authToken = getIntent().getStringExtra("authToken");
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         userId = prefs.getString("userId", null);
 
-// ADD THIS: Save authToken to SharedPreferences for the Worker
         if (authToken != null) {
             prefs.edit().putString("authToken", authToken).apply();
         }
@@ -277,30 +294,29 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         // ── Location ──────────────────────────────────────────────────────────
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        setRandomChallenge();
+//        setRandomChallenge();
 
-        // ── Permissions ───────────────────────────────────────────────────────
-        ActivityResultLauncher<String[]> requestPermissionsLauncher =
-                registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                    boolean allGranted = true;
-                    for (boolean granted : result.values()) {
-                        if (!granted) {
-                            allGranted = false;
-                            break;
-                        }
-                    }
-                    if (allGranted) {
-                        startCamera();
-                    } else {
-                        Toast.makeText(this, "Permissions required for attendance", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                });
 
-        if (allPermissionsGranted()) {
-            startCamera();
+//        if (allPermissionsGranted()) {
+//            startCamera();
+//        } else {
+//            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
+//        }
+
+        // Get SharedPreferences
+        boolean instructionsSeen = prefs.getBoolean("instructionsSeenAttendance", false);
+
+        if (!instructionsSeen) {
+            // Show instructions only if they haven't been seen yet
+            showLivenessInstructions();
         } else {
-            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
+            // Skip instructions and start camera logic immediately
+            if (allPermissionsGranted()) {
+                setRandomChallenge();
+                startCamera();
+            } else {
+                requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
+            }
         }
     }
 
@@ -350,6 +366,37 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     // ─────────────────────────────────────────────────────────────────────────
     // Lifecycle guard helpers
     // ─────────────────────────────────────────────────────────────────────────
+    private void showLivenessInstructions() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_liveness_instructions, null);
+
+        AlertDialog infoDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setPositiveButton("I'm Ready", (dialog, which) -> {
+                    // Save the preference so this doesn't show again
+                    SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    prefs.edit().putBoolean("instructionsSeenAttendance", true).apply();
+
+                    if (allPermissionsGranted()) {
+                        setRandomChallenge();
+                        startCamera();
+                    } else {
+                        requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
+                    }
+                })
+                .setCancelable(false)
+                .create();
+
+        infoDialog.show();
+    }
+
+    private void showPermissionDeniedAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Camera Access Required")
+                .setMessage("To login to your account using face recognition, you must grant camera access. Please enable it in settings.")
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
+    }
 
     /**
      * Central lifecycle guard used before EVERY dialog show, UI update,
@@ -398,10 +445,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             bioMetric.handlePermissionResult(requestCode, permissions, grantResults, false);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Camera
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void startCamera() {
         if (!isActivityAlive()) return; // [17]
@@ -637,10 +680,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Image capture & processing
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void prepareJsonAndSend(@NonNull String base64Image) {
         try {
             JSONObject json = new JSONObject();
@@ -672,9 +711,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return dir;
     }
 
-    /**
-     * Deletes a file quietly; logs on failure.
-     */
     private void deleteQuietly(@NonNull File file) {
         if (file.exists() && !file.delete()) {
             Log.w(TAG, "Could not delete temp file: " + file.getAbsolutePath());
@@ -733,7 +769,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // API — Face recognition
+    // API —
     // ─────────────────────────────────────────────────────────────────────────
 
     private void callFaceDetailApi(@NonNull String token, @NonNull RequestBody requestBody) {
@@ -788,10 +824,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         });
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // API — Face detail (identity match)
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void callAttendanceApi(@NonNull String employeeId, @NonNull String employeeName) {
         if (!isActivityAlive()) return; // [18]
@@ -877,10 +909,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // API — Attendance punch
-    // ─────────────────────────────────────────────────────────────────────────
-
     private boolean isAutomaticTimeEnabled() {
         return android.provider.Settings.Global.getInt(
                 getContentResolver(), android.provider.Settings.Global.AUTO_TIME, 0) == 1;
@@ -944,42 +972,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Result dialogs
-    // ─────────────────────────────────────────────────────────────────────────
-
-    //    private void showAttendanceFailedAlert(@NonNull String message) {
-//        toggleScannerAnimation(false);
-//        setRandomChallenge();
-//
-//        runOnUiThread(() -> {
-//            if (!isActivityAlive()) return; // [18]
-//
-//            setLoadingVisible(false);
-//            isProcessingLiveness = false;
-//
-//            dismissDialog(failedDialog); // dismiss any existing one first
-//            failedDialog = new AlertDialog.Builder(this)
-//                    .setTitle("Attendance Failed")
-//                    .setMessage(message)
-//                    .setPositiveButton("Retry", (d, id) -> {
-//                        d.dismiss();
-//                        setRandomChallenge();
-//                        if (isActivityAlive()) startCamera(); // [18]
-//                    })
-//                    .setNegativeButton("Cancel", (d, id) -> {
-//                        d.dismiss();
-//                        setResult(Activity.RESULT_CANCELED);
-//                        finish();
-//                    })
-//                    .setNeutralButton("Use Biometric", (d, id) -> {
-//                        d.dismiss();
-//                        if (isActivityAlive()) usePhoneBiometric(); // [18]
-//                    })
-//                    .setCancelable(false)
-//                    .show();
-//        });
-//    }
     private void showAttendanceFailedAlert(@NonNull String message) {
         toggleScannerAnimation(false);
         setRandomChallenge();
@@ -1035,7 +1027,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         isAnalyzing.set(false);
 
         runOnUiThread(() -> {
-            if (!isActivityAlive()) return; // [18]
+            if (!isActivityAlive()) return;
 
             setLoadingVisible(false);
             setRandomChallenge();
@@ -1050,7 +1042,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                     .setMessage(userMessage)
                     .setPositiveButton("Retry", (d, w) -> {
                         safeUnbindCamera();
-                        if (isActivityAlive()) startCamera(); // [18]
+                        if (isActivityAlive()) startCamera();
                     })
                     .setNegativeButton("Cancel", (d, w) -> finish())
                     .setCancelable(false)
@@ -1063,7 +1055,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     @Override
     public void onAuthenticationSucceeded() {
         runOnUiThread(() -> {
-            if (!isActivityAlive()) return; // [18]
+            if (!isActivityAlive()) return;
             SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String employeeId = prefs.getString("userId", "");
             String employeeName = prefs.getString("empFirstName", "");
@@ -1246,7 +1238,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     }
 
     private void showLocationNotFoundAlert() {
-        if (!isActivityAlive()) return; // [18]
+        if (!isActivityAlive()) return;
         dismissDialog(securityDialog);
         securityDialog = new AlertDialog.Builder(this)
                 .setTitle("Location Not Found")
@@ -1296,7 +1288,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     private void startShiftTracking() {
         Log.d("SHIFT_TRACKING", "Method startShiftTracking() has been triggered!");
-        // 1. Define Constraints (Optional: e.g., only run if connected to Internet)
+
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
@@ -1357,10 +1349,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private enum LivenessChallenge {
         BLINK, TURN_LEFT, TURN_RIGHT, TILT_UP, TILT_DOWN
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Interface
-    // ─────────────────────────────────────────────────────────────────────────
 
     interface AddressCallback {
         void onAddressReceived(String address, Location location);

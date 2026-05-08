@@ -17,20 +17,15 @@
         android:required="false" />
     <uses-feature
         android:name="android.hardware.location.gps"
-        android:required="false" />
-    <!-- Permissions -->
+        android:required="false" /> <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-
-    <!-- Required for location access while the app is closed -->
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" /> <!-- Required for location access while the app is closed -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
-    <!-- Needed for WorkManager to keep running after a reboot -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> <!-- Needed for WorkManager to keep running after a reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
@@ -45,31 +40,39 @@
         android:theme="@style/Theme.XEDigital"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.AttendanceByManager.AttendanceDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.XEDigital" />
+
         <receiver
             android:name=".NetworkChangeReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action
+                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".activity.PDFViewActivity"
-            android:exported="false" />
-        <!-- Activities -->
+            android:exported="false" /> <!-- Activities -->
         <activity
             android:name=".activity.PunchActivity"
-            android:exported="true" />
-        <!-- Launcher Activity -->
+            android:exported="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            android:windowSoftInputMode="adjustResize" /> <!-- Launcher Activity -->
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.XEDigital.NoActionBar.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true"
