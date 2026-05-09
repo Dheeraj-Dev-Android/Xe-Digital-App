@@ -39,27 +39,78 @@ public class DateTimeUtils {
 //        }
 //        return "N/A";
 //    }
+//    public static String calculateTotalTime(String punchIn, String punchOut) {
+//        if (punchIn == null || punchOut == null || punchIn.isEmpty() || punchOut.isEmpty()) {
+//            return "00:00";
+//        }
+//
+//        // This matches: 2026-02-13T06:16:39.801Z
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+//        sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // API dates with 'Z' are usually UTC
+//
+//        try {
+//            Date d1 = sdf.parse(punchIn);
+//            Date d2 = sdf.parse(punchOut);
+//
+//            long diff = d2.getTime() - d1.getTime();
+//            long hours = diff / (60 * 60 * 1000);
+//            long minutes = (diff / (60 * 1000)) % 60;
+//
+//            return String.format(Locale.getDefault(), "%02d:%02d Hrs", hours, minutes);
+//        } catch (Exception e) {
+//            Log.e("DateTimeUtils", "Error parsing ISO date: " + e.getMessage());
+//            return "00:00";
+//        }
+//    }
     public static String calculateTotalTime(String punchIn, String punchOut) {
-        if (punchIn == null || punchOut == null || punchIn.isEmpty() || punchOut.isEmpty()) {
-            return "00:00";
+        // 1. Safety check for null, empty, or "N/A"
+        if (punchIn == null || punchOut == null ||
+                punchIn.isEmpty() || punchOut.isEmpty() ||
+                punchIn.equalsIgnoreCase("N/A") || punchOut.equalsIgnoreCase("N/A")) {
+            return "00:00 Hrs";
         }
 
-        // This matches: 2026-02-13T06:16:39.801Z
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // API dates with 'Z' are usually UTC
-
         try {
-            Date d1 = sdf.parse(punchIn);
-            Date d2 = sdf.parse(punchOut);
+            Date d1 = parseFlexibleDate(punchIn);
+            Date d2 = parseFlexibleDate(punchOut);
+
+            if (d1 == null || d2 == null) return "00:00 Hrs";
 
             long diff = d2.getTime() - d1.getTime();
+
+            // If punch out is technically 'before' punch in (e.g. overnight shift),
+            // you might need to add 24 hours logic here.
+
             long hours = diff / (60 * 60 * 1000);
             long minutes = (diff / (60 * 1000)) % 60;
 
-            return String.format(Locale.getDefault(), "%02d:%02d Hrs", hours, minutes);
+            return String.format(Locale.getDefault(), "%02d:%02d Hrs", Math.abs(hours), Math.abs(minutes));
         } catch (Exception e) {
-            Log.e("DateTimeUtils", "Error parsing ISO date: " + e.getMessage());
-            return "00:00";
+            Log.e("DateTimeUtils", "Error calculating total time: " + e.getMessage());
+            return "00:00 Hrs";
+        }
+    }
+
+    /**
+     * Helper to determine which format the string is in and parse it
+     */
+    private static Date parseFlexibleDate(String dateStr) {
+        if (dateStr.contains("T")) {
+            // It's ISO Format
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                return sdf.parse(dateStr);
+            } catch (ParseException e) {
+                return null;
+            }
+        } else {
+            // It's 12-hour format like "10:59 am"
+            try {
+                return new SimpleDateFormat("hh:mm a", Locale.getDefault()).parse(dateStr);
+            } catch (ParseException e) {
+                return null;
+            }
         }
     }
 

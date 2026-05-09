@@ -20,6 +20,7 @@
             android:title="@string/menu_attendance" />
     </group>
 
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_attendance"
@@ -39,6 +40,11 @@
             android:visible="false" />
 
     </group>
+
+    <item
+        android:id="@+id/navTeam_member"
+        android:icon="@drawable/ic_person"
+        android:title="Team Member" />
 
     <group android:checkableBehavior="single">
         <item

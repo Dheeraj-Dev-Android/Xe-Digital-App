@@ -19,14 +19,17 @@ public class ComponentsItem {
     @SerializedName("_id")
     private String id;
 
+    // Changed from Object to double
     @SerializedName("fixedAmount")
-    private Object fixedAmount;
+    private double fixedAmount;
 
+    // Changed from Object to double
     @SerializedName("monthlyAmount")
-    private Object monthlyAmount;
+    private double monthlyAmount;
 
+    // CRITICAL FIX: Changed from int to double
     @SerializedName("yearlyAmount")
-    private int yearlyAmount;
+    private double yearlyAmount;
 
     @SerializedName("earningname")
     private String earningname;
@@ -51,15 +54,15 @@ public class ComponentsItem {
         return id;
     }
 
-    public Object getFixedAmount() {
+    public double getFixedAmount() {
         return fixedAmount;
     }
 
-    public Object getMonthlyAmount() {
+    public double getMonthlyAmount() {
         return monthlyAmount;
     }
 
-    public int getYearlyAmount() {
+    public double getYearlyAmount() {
         return yearlyAmount;
     }
 

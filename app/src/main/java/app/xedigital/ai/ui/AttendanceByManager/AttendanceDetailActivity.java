@@ -47,7 +47,7 @@ public class AttendanceDetailActivity extends AppCompatActivity {
         // 1. Header Date
         dateTextView.setText(item.getPunchDateFormat());
 
-        // 2. Punch Timings (formatted using your Utility)
+        // 2. Punch Timings - Format time and handle nulls
         punchInTime.setText(DateTimeUtils.formatTime(item.getPunchIn()));
 
         String pOut = item.getPunchOut();

@@ -45,7 +45,6 @@ public class AttendanceByManagerFragment extends Fragment {
     private AttendanceByManagerViewModel mViewModel;
     private TextView tvFromDate, tvToDate, tvSelectedEmployee;
     private View layoutEmployeePicker;
-    private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefresh;
     private View layoutEmptyState;
     private View layoutLoading;
@@ -66,8 +65,8 @@ public class AttendanceByManagerFragment extends Fragment {
         tvSelectedEmployee = view.findViewById(R.id.tvSelectedEmployee);
         layoutEmployeePicker = view.findViewById(R.id.layoutEmployeePicker);
         Button btnSearch = view.findViewById(R.id.btnSearch);
-        Button btnRetry = view.findViewById(R.id.btnRetry);
-        recyclerView = view.findViewById(R.id.rvAttendance);
+//        Button btnRetry = view.findViewById(R.id.btnRetry);
+        RecyclerView recyclerView = view.findViewById(R.id.rvAttendance);
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
         layoutLoading = view.findViewById(R.id.layoutLoading);
@@ -94,10 +93,10 @@ public class AttendanceByManagerFragment extends Fragment {
             showLoading();
             triggerSearch();
         });
-        btnRetry.setOnClickListener(v -> {
-            showLoading();
-            triggerSearch();
-        });
+//        btnRetry.setOnClickListener(v -> {
+//            showLoading();
+//            triggerSearch();
+//        });
 
         // Observers
         mViewModel.getTeamMemberData().observe(getViewLifecycleOwner(), response -> {
@@ -154,33 +153,6 @@ public class AttendanceByManagerFragment extends Fragment {
         }
     }
 
-    /**
-     * ONLY ONE showData method allowed.
-     * This handles UI visibility, Pre-processing calculations, and updating the adapter.
-     */
-//    private void showData(List<EmployeePunchDataItem> data) {
-//        layoutLoading.setVisibility(View.GONE);
-//        layoutEmptyState.setVisibility(View.GONE);
-//        swipeRefresh.setVisibility(View.VISIBLE);
-//
-//        for (EmployeePunchDataItem punchData : data) {
-//            if (punchData == null) continue;
-//
-//            // Pre-calculate using RAW strings
-//            String total = DateTimeUtils.calculateTotalTime(punchData.getPunchIn(), punchData.getPunchOut());
-//            String over = DateTimeUtils.calculateOvertime(total);
-//
-//            // Store in model (requires the fields added in Step 1)
-//            punchData.setTotalTime(total);
-//            punchData.setOvertime(over);
-//
-//            if (punchData.getShift() != null) {
-//                String late = DateTimeUtils.calculateLateTime(punchData.getPunchIn(), punchData.getShift().getStartTime());
-//                punchData.setLateTime(late);
-//            }
-//        }
-//        managerAdapter.updateList(data);
-//    }
     private void showData(List<EmployeePunchDataItem> data) {
         layoutLoading.setVisibility(View.GONE);
         layoutEmptyState.setVisibility(View.GONE);

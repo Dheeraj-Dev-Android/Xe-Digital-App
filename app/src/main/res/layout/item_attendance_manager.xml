@@ -52,7 +52,7 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="16sp"
                 android:textStyle="bold|italic"
-                app:drawableStartCompat="@drawable/ic_calendar"
+                app:drawableStartCompat="@drawable/ic_person"
                 app:drawableTint="@color/colorPrimaryDark" />
 
             <!-- Date -->
