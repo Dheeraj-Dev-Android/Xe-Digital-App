@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -191,6 +194,8 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        // Call the monitor method
+        observeShiftTracking();
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
         initializeViews(root);
@@ -356,24 +361,6 @@ public class DashboardFragment extends Fragment {
             checkAllDataLoaded();
         });
 
-//        leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
-//            if (leavesData != null && leavesData.getData() != null) {
-//                List<LeavesItem> leaves = leavesData.getData().getLeaves();
-//                if (leaves.isEmpty()) {
-//                    Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    binding.leavePieChart.setVisibility(View.VISIBLE);
-//                    updatePieChartData(binding.leavePieChart, leaves);
-//                }
-//            } else {
-//                Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
-//            }
-//            isLeavesDataLoaded = true;
-//            checkAllDataLoaded();
-//            employeeCardShimmer.stopShimmer();
-//            employeeCardShimmer.setVisibility(View.GONE);
-//            employeeCard.setVisibility(View.VISIBLE);
-//        });
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
@@ -426,6 +413,28 @@ public class DashboardFragment extends Fragment {
         punchCardView.setVisibility(View.GONE);
         employeeCard.setVisibility(View.GONE);
         leavePieChartContainer.setVisibility(View.GONE);
+    }
+
+    private void observeShiftTracking() {
+        WorkManager.getInstance(requireContext())
+                .getWorkInfosForUniqueWorkLiveData("EmployeeTracking")
+                .observe(getViewLifecycleOwner(), workInfos -> {
+                    if (workInfos != null && !workInfos.isEmpty()) {
+                        WorkInfo workInfo = workInfos.get(0);
+
+                        String status = workInfo.getState().name();
+                        Log.d("WorkManagerStatus", "Tracking Status: " + status);
+
+                        // Example: Update a TextView on your dashboard to show tracking status
+                        // binding.textStatus.setText("Tracking: " + status);
+
+                        if (workInfo.getState() == WorkInfo.State.FAILED) {
+                            Log.e("WorkManagerStatus", "Worker failed. Check logs for exceptions.");
+                        }
+                    } else {
+                        Log.d("WorkManagerStatus", "No tracking work currently scheduled.");
+                    }
+                });
     }
 
     private void stopShimmerAnimations() {

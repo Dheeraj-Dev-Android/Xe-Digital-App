@@ -83,9 +83,22 @@ public interface APIInterface {
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     Call<UserProfileResponse> getUserProfile(@Path("userId") String id, @Header("Authorization") String authToken);
 
+    //    @GET("employees/attendance/punch")
+//    @Headers({"Content-Type: application/json", "Accept: application/json"})
+//    Call<EmployeeAttendanceResponse> getAttendance(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
     @GET("employees/attendance/punch")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
-    Call<EmployeeAttendanceResponse> getAttendance(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
+    Call<EmployeeAttendanceResponse> getAttendance(
+            @Header("Authorization") String authToken,
+            @Query("start") String startDate,
+            @Query("end") String endDate,
+            @Query("sorting") String sorting,
+            @Query("employee") String employee,
+            @Query("page") String page,
+            @Query("limit") String limit,
+            @Query("branch") String branch,
+            @Query("prefix") String prefix
+    );
 
     @GET("holidays")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
