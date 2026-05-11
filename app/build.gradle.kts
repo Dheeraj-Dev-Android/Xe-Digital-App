@@ -22,9 +22,10 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
+
     signingConfigs {
         create("release") {
-            //Replace path, password and alias with your credentials
+            // Replace with your actual keystore credentials
             storeFile = file("C:\\Users\\Dheeraj.t\\AndroidStudioProjects\\Xe Digital\\key.jks")
             storePassword = "xedigital"
             keyAlias = "key"
@@ -42,12 +43,18 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
         }
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
         isCoreLibraryDesugaringEnabled = true
     }
+
     buildFeatures {
         viewBinding = true
     }
@@ -81,7 +88,6 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.perf)
     implementation(libs.legacy.support.v4)
-//    implementation(libs.firebase.inappmessaging.display)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -96,8 +102,6 @@ dependencies {
     implementation(libs.camera.video)
     implementation(libs.camera.view)
     implementation(libs.camera.extensions)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
     implementation(libs.play.services.location)
     implementation(platform(libs.firebase.bom))
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
@@ -110,10 +114,10 @@ dependencies {
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.airbnb.android:lottie:6.0.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
-//    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
-//    implementation("com.google.mlkit:face-detection:16.1.7")
     implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
-    implementation("androidx.work:work-runtime:2.9.0")
+
+    // ── WorkManager — updated from 2.9.0 to fix R8/release build issues ──────
+    implementation("androidx.work:work-runtime:2.10.1")
 }

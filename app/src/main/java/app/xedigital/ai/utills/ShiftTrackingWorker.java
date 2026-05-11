@@ -39,158 +39,113 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class ShiftTrackingWorker extends Worker {
+
     private static final String TAG = "ShiftTrackingWorker";
 
+    // Required constructor — must be public and exact signature for WorkManager reflection
     public ShiftTrackingWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
 
-    //    @NonNull
-//    @Override
-//    public Result doWork() {
-//        Context context = getApplicationContext();
-//        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-//
-//        String userId = prefs.getString("userId", null);
-//        String authToken = prefs.getString("authToken", null);
-//
-//        if (userId == null || authToken == null) {
-//            Log.e(TAG, "Worker failed: Missing credentials.");
-//            return Result.failure();
-//        }
-//
-//        String authHeader = "jwt " + authToken;
-//
-//        try {
-//            // 1. Fetch User Profile with Null Safety
-//            APIInterface apiInterface = APIClient.getInstance().getLogin();
-//            Response<UserProfileResponse> profileResponse = apiInterface.getUserProfile(userId, authHeader).execute();
-//
-//            if (profileResponse.isSuccessful() && profileResponse.body() != null) {
-//                UserProfileResponse res = profileResponse.body();
-//
-//                // Deep null-check for nested shift data
-//                if (res.getData() != null &&
-//                        res.getData().getEmployee() != null &&
-//                        res.getData().getEmployee().getShift() != null) {
-//
-//                    String startTime = res.getData().getEmployee().getShift().getStartTime();
-//                    String endTime = res.getData().getEmployee().getShift().getEndTime();
-//
-//                    if (!isWithinShift(startTime, endTime)) {
-//                        Log.d(TAG, "Shift ended. Terminating worker.");
-//                        WorkManager.getInstance(context).cancelUniqueWork("EmployeeTracking");
-//                        return Result.success();
-//                    }
-//                }
-//            }
-//
-//            // 2. Permission Check
-//            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                Log.e(TAG, "Location permission missing.");
-//                return Result.failure();
-//            }
-//
-//            // 3. Get Location with a 30-second timeout to prevent hanging in production
-//            Location location = Tasks.await(
-//                    LocationServices.getFusedLocationProviderClient(context)
-//                            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null),
-//                    30, TimeUnit.SECONDS);
-//
-//            if (location != null) {
-//                return sendAttendance(context, authHeader, userId, location);
-//            }
-//
-//        } catch (Exception e) {
-//            Log.e(TAG, "Worker execution failed: " + e.getMessage());
-//            return Result.retry();
-//        }
-//
-//        return Result.retry();
-//    }
     @NonNull
     @Override
     public Result doWork() {
         Context context = getApplicationContext();
         SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
-        // 1. Credentials Check
+        // ── Step 1: Credentials Check ─────────────────────────────────────────
         String userId = prefs.getString("userId", null);
         String authToken = prefs.getString("authToken", null);
 
         if (userId == null || authToken == null) {
-            Log.e(TAG, "Worker failed: No credentials found. Stopping.");
+            Log.e(TAG, "No credentials found in SharedPreferences. Stopping worker.");
+            // Return failure to stop retrying — no point without credentials
             return Result.failure();
         }
 
         String authHeader = "jwt " + authToken;
 
         try {
-            // 2. Shift Timing Check (API Call with Null Safety)
+            // ── Step 2: Shift Timing Check ────────────────────────────────────
             APIInterface apiInterface = APIClient.getInstance().getLogin();
-            Response<UserProfileResponse> profileResponse = apiInterface.getUserProfile(userId, authHeader).execute();
+            Response<UserProfileResponse> profileResponse =
+                    apiInterface.getUserProfile(userId, authHeader).execute();
 
             if (profileResponse.isSuccessful() && profileResponse.body() != null) {
                 UserProfileResponse res = profileResponse.body();
 
-                // Safe navigation through the nested JSON structure
-                if (res.getData() != null &&
-                        res.getData().getEmployee() != null &&
-                        res.getData().getEmployee().getShift() != null) {
+                // Safe null-traversal through nested response
+                if (res.getData() != null
+                        && res.getData().getEmployee() != null
+                        && res.getData().getEmployee().getShift() != null) {
 
                     String startTime = res.getData().getEmployee().getShift().getStartTime();
                     String endTime = res.getData().getEmployee().getShift().getEndTime();
 
-                    // If shift has ended, stop the worker permanently until next manual punch
                     if (!isWithinShift(startTime, endTime)) {
-                        Log.d(TAG, "Shift window closed (" + endTime + "). Terminating worker.");
+                        Log.d(TAG, "Shift window closed (" + endTime + "). Cancelling worker.");
                         WorkManager.getInstance(context).cancelUniqueWork("EmployeeTracking");
                         return Result.success();
                     }
                 }
+            } else {
+                Log.w(TAG, "Profile API failed or returned empty body. Code: " + profileResponse.code());
+                // Don't stop — retry next cycle in case it's a transient network issue
             }
 
-            // 3. Silent Permission Check (Crucial for Production)
-            boolean hasFineLocation = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-            boolean hasBackgroundLocation = true; // Default true for older Android versions
+            // ── Step 3: Location Permission Check ────────────────────────────
+            boolean hasFineLocation = ActivityCompat.checkSelfPermission(
+                    context, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED;
 
+            boolean hasBackgroundLocation = true; // Default true for Android < Q
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                hasBackgroundLocation = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                hasBackgroundLocation = ActivityCompat.checkSelfPermission(
+                        context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED;
             }
 
             if (!hasFineLocation || !hasBackgroundLocation) {
-                Log.e(TAG, "Permissions missing (Fine: " + hasFineLocation + ", Back: " + hasBackgroundLocation + ")");
-                // We retry in case the user grants permission later, rather than failing permanently
+                Log.e(TAG, "Location permissions missing. Fine=" + hasFineLocation
+                        + " Background=" + hasBackgroundLocation);
+                // Retry — user may grant permission later
                 return Result.retry();
             }
 
-            // 4. Fetch Location with 30-Second Timeout
-            // This prevents the worker from hanging and draining battery if GPS signal is weak (e.g. indoors)
+            // ── Step 4: Fetch Location (30s timeout) ─────────────────────────
+            // Timeout prevents the worker from hanging and draining battery
+            // when GPS is weak (e.g. indoors)
             Location location = null;
             try {
                 location = Tasks.await(
                         LocationServices.getFusedLocationProviderClient(context)
                                 .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null),
-                        30, TimeUnit.SECONDS);
+                        30, TimeUnit.SECONDS
+                );
             } catch (Exception timeoutException) {
-                Log.e(TAG, "Location fetch timed out after 30s");
+                Log.e(TAG, "Location fetch timed out or failed: " + timeoutException.getMessage());
             }
 
             if (location != null) {
-                // 5. Send Attendance to Server
+                // ── Step 5: Send Attendance ───────────────────────────────────
                 return sendAttendance(context, authHeader, userId, location);
             } else {
-                Log.w(TAG, "Location is null after timeout. Retrying next cycle.");
+                Log.w(TAG, "Location is null after timeout. Will retry next cycle.");
                 return Result.retry();
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Critical Worker Error: " + e.getMessage());
+            Log.e(TAG, "Critical worker error: " + e.getMessage(), e);
             return Result.retry();
         }
     }
 
-    private Result sendAttendance(Context context, String authHeader, String userId, Location loc) throws Exception {
+    // ─────────────────────────────────────────────────────────────────────────
+    // Sends attendance punch to the server
+    // ─────────────────────────────────────────────────────────────────────────
+    private Result sendAttendance(Context context, String authHeader, String userId, Location loc)
+            throws Exception {
+
         String preciseAddress = getAddressFromLocation(context, loc.getLatitude(), loc.getLongitude());
 
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -201,9 +156,11 @@ public class ShiftTrackingWorker extends Worker {
         body.put("employee", userId);
         body.put("address", preciseAddress);
         body.put("punchTime", currentTime);
-        // Fallback: Add raw coordinates for server-side verification if address fails
+        // Raw coordinates as fallback for server-side verification
         body.put("latitude", loc.getLatitude());
         body.put("longitude", loc.getLongitude());
+
+        Log.d(TAG, "Sending attendance: " + currentTime + " | " + preciseAddress);
 
         RequestBody requestBody = RequestBody.create(
                 MediaType.parse("application/json"), body.toString());
@@ -211,9 +168,18 @@ public class ShiftTrackingWorker extends Worker {
         APIInterface service = APIClient.getInstance().getAttendance();
         Response<ResponseBody> response = service.AttendanceApi(authHeader, requestBody).execute();
 
-        return response.isSuccessful() ? Result.success() : Result.retry();
+        if (response.isSuccessful()) {
+            Log.d(TAG, "Attendance sent successfully.");
+            return Result.success();
+        } else {
+            Log.e(TAG, "Attendance API failed. Code: " + response.code());
+            return Result.retry();
+        }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Reverse geocode coordinates to a human-readable address
+    // ─────────────────────────────────────────────────────────────────────────
     private String getAddressFromLocation(Context context, double lat, double lon) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         try {
@@ -222,13 +188,21 @@ public class ShiftTrackingWorker extends Worker {
                 return addresses.get(0).getAddressLine(0);
             }
         } catch (IOException e) {
-            Log.e(TAG, "Geocoder failed");
+            Log.e(TAG, "Geocoder failed: " + e.getMessage());
         }
-        return "Lat: " + lat + ", Lon: " + lon; // Fallback to coordinates
+        // Fallback to raw coordinates if geocoding fails
+        return "Lat: " + lat + ", Lon: " + lon;
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Checks if current time is within the employee's shift window
+    // Handles overnight shifts (e.g. 22:00 – 06:00)
+    // ─────────────────────────────────────────────────────────────────────────
     private boolean isWithinShift(String startStr, String endStr) {
-        if (startStr == null || endStr == null) return true;
+        if (startStr == null || endStr == null) {
+            // If shift data is unavailable, allow tracking to continue
+            return true;
+        }
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
             Date now = sdf.parse(sdf.format(new Date()));
@@ -237,11 +211,15 @@ public class ShiftTrackingWorker extends Worker {
 
             if (now == null || start == null || end == null) return true;
 
-            if (end.before(start)) { // Overnight shift check
+            if (end.before(start)) {
+                // Overnight shift: e.g. 22:00 → 06:00
                 return now.after(start) || now.before(end);
             }
             return now.after(start) && now.before(end);
+
         } catch (ParseException e) {
+            Log.e(TAG, "Shift time parse error: " + e.getMessage());
+            // Default to allowing tracking if parsing fails
             return true;
         }
     }
