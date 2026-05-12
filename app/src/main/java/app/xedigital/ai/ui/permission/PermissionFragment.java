@@ -58,21 +58,46 @@ public class PermissionFragment extends Fragment {
             refreshPermissionStatus();
         });
     }
-
     private void handlePermissionClick(PermissionItem item) {
-        if ("BIOMETRIC".equals(item.getTag())) {
-            if (item.isGranted()) {
-                // If already on, show the dialog to disable it
-                showDisableBiometricDialog();
+        String tag = item.getTag();
+
+        // 1. Handle Biometrics
+        if ("BIOMETRIC".equals(tag)) {
+            if (item.isGranted()) showDisableBiometricDialog();
+            else triggerBiometricActivation();
+            return;
+        }
+
+        // 2. Handle Background Location (Critical Fix)
+        if ("BACKGROUND_LOCATION".equals(tag)) {
+            if (!item.isGranted()) {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Background Location Access")
+                        .setMessage("To track attendance accurately when the app is closed, please set location access to 'Allow all the time' in the next screen.")
+                        .setPositiveButton("Go to Settings", (dialog, which) -> openAppSettings())
+                        .setNegativeButton("Cancel", null)
+                        .show();
             } else {
-                // If off, trigger the scan to enable it right here!
-                triggerBiometricActivation();
+                openAppSettings();
             }
             return;
         }
 
-        // Standard logic for Camera/Location remains same
+        // 3. Handle Notifications (Android 13+)
+        if ("NOTIFICATION".equals(tag)) {
+            if (!item.isGranted()) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+                }
+            } else {
+                openAppSettings();
+            }
+            return;
+        }
+
+        // 4. Standard logic for Camera/Precise Location
         if (item.getManifestPermission() == null) return;
+
         if (!item.isGranted()) {
             requestPermissionLauncher.launch(item.getManifestPermission());
         } else {

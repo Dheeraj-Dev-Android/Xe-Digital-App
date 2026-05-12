@@ -871,11 +871,65 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return android.provider.Settings.Global.getInt(getContentResolver(), android.provider.Settings.Global.AUTO_TIME, 0) == 1;
     }
 
+    //    private void showAttendanceSuccessAlert(@NonNull String responseBody) throws JSONException, IOException {
+//        toggleScannerAnimation(false);
+//        setLoadingVisible(false);
+//
+//        if (!isActivityAlive()) return; // [18]
+//
+//        JSONObject responseJson = new JSONObject(responseBody);
+//        boolean success = responseJson.optBoolean("success", false);
+//        String message = responseJson.optString("message", "Attendance recorded.");
+//
+//        if (!success) {
+//            showAttendanceFailedAlert("Attendance not recorded: " + message);
+//            return;
+//        }
+//        JSONObject data = responseJson.optJSONObject("data");
+//        if (data != null) {
+//            String punchInTime = data.optString("punchInTime", "");
+//            String punchOutTime = data.optString("punchOutTime", "");
+//
+//            // If we have a Punch In but NO Punch Out, start tracking
+//            if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
+//                Log.d(TAG, "Punch In confirmed. Starting Tracker.");
+//                startShiftTracking();
+//                // This will prompt the user to "Optimize Sync" immediately after punching in
+//                checkAndOptimize();
+//            }
+//        }
+//
+//        String punchInAddress = data != null ? data.optString("punchInAddress", "") : "";
+//        String punchOutAddress = data != null ? data.optString("punchOutAddress", "") : "";
+//        String displayAddress = punchOutAddress.isEmpty() ? punchInAddress : punchOutAddress;
+//
+//        String htmlMsg = "<b>" + message + "</b><br><br>Address: " + displayAddress;
+//
+//        runOnUiThread(() -> {
+//            if (!isActivityAlive() || isChangingConfigurations()) return; // [18]
+//
+//            dismissDialog(attendanceSuccessDialog);
+//
+//            attendanceSuccessDialog = new MaterialAlertDialogBuilder(this).setTitle("Attendance Success").setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (d, w) -> {
+//                d.dismiss();
+//                setResult(Activity.RESULT_OK);
+//                finish();
+//            }).setCancelable(false).show();
+//
+//            // Auto-dismiss after 5 seconds
+//            handler.postDelayed(() -> {
+//                if (!isActivityAlive()) return; // [18]
+//                dismissDialog(attendanceSuccessDialog);
+//                setResult(Activity.RESULT_OK);
+//                finish();
+//            }, 5000);
+//        });
+//    }
     private void showAttendanceSuccessAlert(@NonNull String responseBody) throws JSONException, IOException {
         toggleScannerAnimation(false);
         setLoadingVisible(false);
 
-        if (!isActivityAlive()) return; // [18]
+        if (!isActivityAlive()) return;
 
         JSONObject responseJson = new JSONObject(responseBody);
         boolean success = responseJson.optBoolean("success", false);
@@ -885,19 +939,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             showAttendanceFailedAlert("Attendance not recorded: " + message);
             return;
         }
-        JSONObject data = responseJson.optJSONObject("data");
-        if (data != null) {
-            String punchInTime = data.optString("punchInTime", "");
-            String punchOutTime = data.optString("punchOutTime", "");
 
-            // If we have a Punch In but NO Punch Out, start tracking
-            if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
-                Log.d(TAG, "Punch In confirmed. Starting Tracker.");
-                startShiftTracking();
-                // This will prompt the user to "Optimize Sync" immediately after punching in
-                checkAndOptimize();
-            }
-        }
+        JSONObject data = responseJson.optJSONObject("data");
+        String punchInTime = data != null ? data.optString("punchInTime", "") : "";
+        String punchOutTime = data != null ? data.optString("punchOutTime", "") : "";
 
         String punchInAddress = data != null ? data.optString("punchInAddress", "") : "";
         String punchOutAddress = data != null ? data.optString("punchOutAddress", "") : "";
@@ -906,26 +951,63 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         String htmlMsg = "<b>" + message + "</b><br><br>Address: " + displayAddress;
 
         runOnUiThread(() -> {
-            if (!isActivityAlive() || isChangingConfigurations()) return; // [18]
+            if (!isActivityAlive() || isChangingConfigurations()) return;
 
             dismissDialog(attendanceSuccessDialog);
 
-            attendanceSuccessDialog = new MaterialAlertDialogBuilder(this).setTitle("Attendance Success").setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (d, w) -> {
-                d.dismiss();
-                setResult(Activity.RESULT_OK);
-                finish();
-            }).setCancelable(false).show();
+            attendanceSuccessDialog = new MaterialAlertDialogBuilder(this)
+                    .setTitle("Attendance Success")
+                    .setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY))
+                    .setCancelable(false)
+                    .setPositiveButton("OK", (d, w) -> {
+                        d.dismiss();
 
-            // Auto-dismiss after 5 seconds
+                        // --- START OF CENTRALIZED PERMISSION LOGIC ---
+                        if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
+
+                            // Check for Background Location (Android 10+)
+                            boolean hasBackgroundLoc = true;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                                hasBackgroundLoc = androidx.core.content.ContextCompat.checkSelfPermission(this,
+                                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+                            }
+
+                            if (!hasBackgroundLoc) {
+                                Toast.makeText(this, "Enable 'Allow all the time' for tracking.", Toast.LENGTH_LONG).show();
+
+                                // NAVIGATION: Since you only have a Fragment, navigate to it using your NavController
+                                // Replace 'R.id.permissionFragment' with the actual ID in your nav_graph.xml
+                                try {
+                                    androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                                            .navigate(R.id.nav_permission);
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Navigation failed: " + e.getMessage());
+                                }
+
+                                finish();
+                                return;
+                            }
+
+                            // If permissions are okay, start tracking
+                            Log.d(TAG, "Starting Tracker.");
+                            startShiftTracking();
+                            checkAndOptimize();
+                        }
+                        // --- END OF PERMISSION LOGIC ---
+
+                        setResult(Activity.RESULT_OK);
+                        finish();
+                    })
+                    .show();
+
             handler.postDelayed(() -> {
-                if (!isActivityAlive()) return; // [18]
-                dismissDialog(attendanceSuccessDialog);
-                setResult(Activity.RESULT_OK);
-                finish();
+                if (!isActivityAlive()) return;
+                if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
+                    attendanceSuccessDialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
+                }
             }, 5000);
         });
     }
-
     private void showAttendanceFailedAlert(@NonNull String message) {
         toggleScannerAnimation(false);
         setRandomChallenge();
@@ -1198,30 +1280,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     // UI helpers
     // ─────────────────────────────────────────────────────────────────────────
 
-    // Inside your PunchActivity class
-
-    //    private void startShiftTracking() {
-//        Log.d("SHIFT_TRACKING", "Method startShiftTracking() has been triggered!");
-//
-//        Constraints constraints = new Constraints.Builder()
-//                .setRequiredNetworkType(NetworkType.CONNECTED)
-//                .build();
-//
-//        // 2. Create a Periodic Request (15 min is the minimum interval allowed by Android)
-//        PeriodicWorkRequest trackingRequest = new PeriodicWorkRequest.Builder(
-//                ShiftTrackingWorker.class,
-//                15, TimeUnit.MINUTES)
-//                .setConstraints(constraints)
-//                .addTag("SHIFT_WORK_TAG")
-//                .build();
-//
-//        // 3. Enqueue the work as 'Unique' to avoid duplicate workers
-//        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-//                "EmployeeTracking",
-//                ExistingPeriodicWorkPolicy.KEEP, // Keep existing if already running
-//                trackingRequest
-//        );
-//    }
     private void startShiftTracking() {
         Log.d(TAG, "Starting Shift Tracking Worker...");
 

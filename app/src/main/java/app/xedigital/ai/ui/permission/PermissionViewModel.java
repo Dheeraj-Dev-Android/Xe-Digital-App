@@ -1,6 +1,7 @@
 package app.xedigital.ai.ui.permission;
 
 import android.Manifest;
+import android.os.Build;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,44 +22,28 @@ public class PermissionViewModel extends ViewModel {
 
     private void loadPermissions() {
         List<PermissionItem> list = new ArrayList<>();
-        // 1. Camera
-        list.add(new PermissionItem(
-                "Camera Access",
-                "Required for capturing images within the app to Mark Your Attendance Inside the Punch Activity.",
-                Manifest.permission.CAMERA,
-                true,
-                "CAMERA"));
-        // 2. Location
-        list.add(new PermissionItem(
-                "Precise Location",
-                "Used to verify your work location during the Punch Activity.",
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                true,
-                "LOCATION"));
 
-        // 3. Biometric
-        list.add(new PermissionItem(
-                "Biometric Authentication",
-                "Allows you to log in securely using your fingerprint or your Pin.",
-                Manifest.permission.USE_BIOMETRIC,
-                false,
-                "BIOMETRIC"));
+        // 1. Camera (Mandatory for Face Login/Punch)
+        list.add(new PermissionItem("Camera Access", "Required for capturing images to verify identity.", Manifest.permission.CAMERA, true, "CAMERA"));
 
-        // 4. Internet
-        list.add(new PermissionItem(
-                "Internet Access",
-                "Allows the app to sync your data with our secure servers.",
-                null,
-                true,
-                "INTERNET"));
+        // 2. Precise Location (Mandatory for Punch Activity)
+        list.add(new PermissionItem("Precise Location", "Used to verify your work location during attendance.", Manifest.permission.ACCESS_FINE_LOCATION, true, "LOCATION"));
 
-        // 5. Network Status
-        list.add(new PermissionItem(
-                "Network Status",
-                "Helps the app detect when you are offline to prevent data loss.",
-                null,
-                true,
-                "NETWORK"));
+        // 3. Background Location (Mandatory for Shift Tracking)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            list.add(new PermissionItem("Always-on Location", "Allows tracking even when the app is closed. Select 'Allow all the time'.", Manifest.permission.ACCESS_BACKGROUND_LOCATION, true, "BACKGROUND_LOCATION"));
+        }
+
+        // 4. Notifications (Mandatory for Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            list.add(new PermissionItem("Notifications", "Required to keep the shift tracking service active in the background.", Manifest.permission.POST_NOTIFICATIONS, true, "NOTIFICATION"));
+        }
+
+        // 5. Biometric (Optional)
+        list.add(new PermissionItem("Biometric Login", "Secure login using fingerprint or PIN.", Manifest.permission.USE_BIOMETRIC, false, "BIOMETRIC"));
+
+        // 6. System Status (Informational)
+        list.add(new PermissionItem("Internet Access", "Required to sync data with servers.", null, true, "INTERNET"));
 
         permissions.setValue(list);
     }

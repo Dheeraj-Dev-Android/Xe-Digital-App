@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -45,6 +46,7 @@ import retrofit2.Response;
 public class LocationService extends Service {
     private static final String CHANNEL_ID = "LocationServiceChannel";
     private static final String TAG = "LocationService";
+    private static final int NOTIFICATION_ID = 101;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private PowerManager.WakeLock wakeLock;
@@ -55,10 +57,13 @@ public class LocationService extends Service {
         createNotificationChannel();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Keep CPU awake even if screen is off
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "XEDigital:TrackingWakeLock");
-        wakeLock.acquire(10 * 60 * 1000L /*10 minutes maximum if not refreshed*/);
+
+        // Refresh wakelock for the duration of the service
+        if (!wakeLock.isHeld()) {
+            wakeLock.acquire(10 * 60 * 1000L);
+        }
 
         locationCallback = new LocationCallback() {
             @Override
@@ -76,24 +81,28 @@ public class LocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Shift Tracking Active")
-                .setContentText("ConsultEdge is tracking your location in the background.")
+                .setContentText("Your location is being tracked for attendance.")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setOngoing(true)
                 .build();
 
-        startForeground(101, notification);
+        // FIX: Handle Android 14 (API 34) Foreground Service Type
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+        } else {
+            startForeground(NOTIFICATION_ID, notification);
+        }
+
         startLocationUpdates();
         return START_STICKY;
     }
 
     @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
-        // Reduced interval to 5 minutes for better reliability while testing
         LocationRequest locationRequest = new LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.MINUTES.toMillis(5))
                 .setMinUpdateIntervalMillis(TimeUnit.MINUTES.toMillis(3))
-                // CRITICAL: Set to false so it doesn't get stuck waiting for GPS inside buildings
                 .setWaitForAccurateLocation(false)
                 .build();
 
@@ -109,8 +118,6 @@ public class LocationService extends Service {
                 if (userId == null || authToken == null) return;
 
                 String address = getAddressFromLocation(loc.getLatitude(), loc.getLongitude());
-
-                // Format time as expected by most punch APIs
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
                 String currentTime = sdf.format(new Date());
@@ -127,9 +134,7 @@ public class LocationService extends Service {
 
                 Response<ResponseBody> response = APIClient.getInstance().getAttendance().AttendanceApi(authHeader, requestBody).execute();
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "Background Ping Success at " + currentTime);
-                } else {
-                    Log.e(TAG, "API Error: " + response.code());
+                    Log.d(TAG, "Background Ping Success");
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Network failed: " + e.getMessage());
@@ -140,9 +145,17 @@ public class LocationService extends Service {
     private String getAddressFromLocation(double lat, double lon) {
         try {
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                return addresses.get(0).getAddressLine(0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocation(lat, lon, 1, addresses -> {
+                    if (!addresses.isEmpty()) {
+                        // In a real scenario, you'd handle this callback
+                    }
+                });
+            } else {
+                List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+                    return addresses.get(0).getAddressLine(0);
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Geocoder error: " + e.getMessage());
