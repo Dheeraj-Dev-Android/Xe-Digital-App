@@ -13,12 +13,13 @@ public class MyApplication extends Application implements Configuration.Provider
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Application started. WorkManager initialized via Configuration.Provider.");
+        Log.d(TAG, "Application runtime environment online. Custom configuration structure compiled.");
     }
 
     @NonNull
     @Override
     public Configuration getWorkManagerConfiguration() {
+        // Enforces customized initialization parameter scopes and expands framework error logging details
         return new Configuration.Builder()
                 .setMinimumLoggingLevel(Log.DEBUG)
                 .build();

@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +37,8 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private View loadingOverlay;
+    private boolean isRedirectInProgress = false;
+    private String cachedTokenForPermission = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +47,15 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
+
         checkBatteryOptimization();
+
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefs.getString("authToken", null);
+        boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
 
-        if (authToken != null && !getIntent().getBooleanExtra("isFallback", false)) {
+        if (authToken != null && !isFallback && !isRedirectInProgress) {
+            showLoginScreen();
             checkPermissionsAndNavigate(authToken);
         } else {
             showLoginScreen();
@@ -68,6 +76,53 @@ public class LoginActivity extends AppCompatActivity {
                 callLoginApi(email, password);
             }
         });
+    }    // Launcher for foreground location permissions required before asking for background location
+    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+
+                if (fineGranted || coarseGranted) {
+                    if (cachedTokenForPermission != null) {
+                        checkPermissionsAndNavigate(cachedTokenForPermission);
+                    }
+                } else {
+                    showLoginScreen();
+                    showAlertDialog("Foreground location permission is required for shift tracking.");
+                }
+            });
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isRedirectInProgress = false;
+
+        // Auto-resume check if user is returning from the OS Settings configuration page
+        if (cachedTokenForPermission != null && !getIntent().getBooleanExtra("isFallback", false)) {
+            if (hasForegroundLocationPermission() && hasBackgroundLocationPermission()) {
+                navigateToFaceLogin(cachedTokenForPermission);
+            }
+        }
+    }
+
+    private void checkPermissionsAndNavigate(String token) {
+        cachedTokenForPermission = token;
+
+        // Step 1: Ensure Foreground Location is granted first
+        if (!hasForegroundLocationPermission()) {
+            foregroundPermissionLauncher.launch(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+            return;
+        }
+
+        // Step 2: Evaluate background location status
+        if (hasBackgroundLocationPermission()) {
+            navigateToFaceLogin(token);
+        } else {
+            showBackgroundPermissionDialog(token);
+        }
     }
 
     private void callLoginApi(String email, String password) {
@@ -101,12 +156,30 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void checkPermissionsAndNavigate(String token) {
-        if (hasBackgroundLocationPermission()) {
-            navigateToFaceLogin(token);
-        } else {
-            showBackgroundPermissionDialog(token);
-        }
+    private boolean hasForegroundLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void showBackgroundPermissionDialog(String token) {
+        if (isFinishing() || isDestroyed()) return;
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Background Location Required")
+                .setMessage("To track your shift accurately while the app is closed, please change location access permissions to 'Allow all the time' in the system settings screen.")
+                .setCancelable(false)
+                .setPositiveButton("Configure", (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Logout", (dialog, which) -> {
+                    cachedTokenForPermission = null;
+                    getSharedPreferences("MyPrefs", MODE_PRIVATE).edit().clear().apply();
+                    showLoginScreen();
+                })
+                .show();
     }
 
     private boolean hasBackgroundLocationPermission() {
@@ -117,22 +190,13 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    private void showBackgroundPermissionDialog(String token) {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Background Location Required")
-                .setMessage("To track your shift accurately while the app is closed, please set location permission to 'Allow all the time' in the next screen.")
-                .setCancelable(false)
-                .setPositiveButton("Configure", (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                    intent.setData(uri);
-                    startActivity(intent);
-                })
-                .setNegativeButton("Logout", (dialog, which) -> {
-                    getSharedPreferences("MyPrefs", MODE_PRIVATE).edit().clear().apply();
-                    recreate();
-                })
-                .show();
+    private void navigateToFaceLogin(String token) {
+        if (isFinishing() || isDestroyed()) return;
+        isRedirectInProgress = true;
+        Intent intent = new Intent(this, FaceLoginActivity.class);
+        intent.putExtra("authToken", token);
+        startActivity(intent);
+        finish();
     }
 
     private void storeInSharedPreferences(String userId, String authToken) {
@@ -142,11 +206,12 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private void navigateToFaceLogin(String token) {
-        Intent intent = new Intent(this, FaceLoginActivity.class);
-        intent.putExtra("authToken", token);
-        startActivity(intent);
-        finish();
+    private void showLoginScreen() {
+        runOnUiThread(() -> {
+            binding.editEmail.setVisibility(View.VISIBLE);
+            binding.editPassword.setVisibility(View.VISIBLE);
+            binding.btnSignIn.setVisibility(View.VISIBLE);
+        });
     }
 
     private void checkBatteryOptimization() {
@@ -167,19 +232,19 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void showLoginScreen() {
-        binding.editEmail.setVisibility(View.VISIBLE);
-        binding.editPassword.setVisibility(View.VISIBLE);
-        binding.btnSignIn.setVisibility(View.VISIBLE);
+    private void showAlertDialog(String message) {
+        if (!isFinishing() && !isDestroyed()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Login Info")
+                    .setMessage(message)
+                    .setPositiveButton("OK", null)
+                    .show();
+        }
     }
 
     private void showLoading(boolean show) {
         loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void showAlertDialog(String message) {
-        if (!isFinishing()) {
-            new AlertDialog.Builder(this).setTitle("Login Info").setMessage(message).setPositiveButton("OK", null).show();
-        }
-    }
+
 }

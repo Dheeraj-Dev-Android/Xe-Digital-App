@@ -17,16 +17,16 @@ public class BootReceiver extends BroadcastReceiver {
             return;
         }
 
-        Log.d(TAG, "Device Boot Completed. Initializing Shift Tracking Safety Net...");
+        Log.d(TAG, "Hardware Boot Broadcast Received. Activating Shift Tracking Initialization Blueprint...");
 
         SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefs.getString("authToken", null);
 
-        // DO NOT start Foreground Service directly here.
-        // Instead, schedule the WorkManager task.
         if (authToken != null) {
             ShiftCheckHelper.startShiftTracking(context);
-            Log.d(TAG, "WorkManager scheduled successfully from Boot.");
+            Log.d(TAG, "Unique background tasks registry parsed and initialized from Boot.");
+        } else {
+            Log.w(TAG, "No valid authorization credentials detected during boot configuration. Aborting initialization.");
         }
     }
 }

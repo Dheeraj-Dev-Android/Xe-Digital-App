@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -82,14 +79,17 @@ public class DashboardFragment extends Fragment {
     private boolean isProfileDataLoaded = false;
     private boolean isAttendanceDataLoaded = false;
     private boolean isLeavesDataLoaded = false;
+
     // Shimmer layouts
     private ShimmerFrameLayout punchCardShimmer;
     private ShimmerFrameLayout employeeCardShimmer;
     private ShimmerFrameLayout leavePieChartShimmer;
+
     // Real layouts
     private MaterialCardView punchCardView;
     private MaterialCardView employeeCard;
     private MaterialCardView leavePieChartContainer;
+
     // Real layouts values
     private TextView todayDate;
     private TextView tvEmployeeNameValue;
@@ -125,11 +125,9 @@ public class DashboardFragment extends Fragment {
             }
         }
         PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
-        // If all entries have 0 balance, show a single "0 leaves" slice
         if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
             entries.clear();
             entries.add(new PieEntry(1f, "0 leaves"));
-            // Set the custom ValueFormatter to hide the value
             dataSet.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float value) {
@@ -137,7 +135,6 @@ public class DashboardFragment extends Fragment {
                 }
             });
         } else {
-            // Use default PercentFormatter for other cases
             dataSet.setValueFormatter(new PercentFormatter(pieChart));
         }
         Map<String, Integer> leaveTypeColors = new HashMap<>();
@@ -170,11 +167,10 @@ public class DashboardFragment extends Fragment {
         pieChart.setTransparentCircleRadius(45f);
         pieChart.animateXY(1000, 1000);
         pieChart.setDrawEntryLabels(false);
-        // Format totalBalanceLeaves to display in the center
-        DecimalFormat decimalFormat = new DecimalFormat("#.##"); // Use this format to show two decimal places
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
         String formattedTotalBalanceLeaves = decimalFormat.format(totalBalanceLeaves);
 
-        // Set the center text with the total balance
         pieChart.setCenterText("Balance:\n" + formattedTotalBalanceLeaves);
         pieChart.setCenterTextColor(Color.rgb(161, 16, 7));
         pieChart.setCenterTextSize(9f);
@@ -191,14 +187,19 @@ public class DashboardFragment extends Fragment {
         loader.setVisibility(View.GONE);
     }
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        // Call the monitor method
-        observeShiftTracking();
+
+        // FIX: Removed observeShiftTracking() from here completely!
+        // Observing WorkManager status updates live within an active UI layout fragment
+        // causes instant queue polling that triggers unwanted background updates.
+
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
         initializeViews(root);
+
         binding.punchButton.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String userId = sharedPreferences.getString("userId", "");
@@ -226,25 +227,31 @@ public class DashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         blurOverlay = view.findViewById(R.id.blurOverlay);
         loader = view.findViewById(R.id.loader);
+
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
+
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
         String userId = sharedPreferences.getString("userId", "");
+
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
+
         Calendar calendar = Calendar.getInstance();
         Date endDate = calendar.getTime();
         endDateString = DATE_FORMAT_YYYY_MM_DD.format(endDate);
         calendar.add(Calendar.DAY_OF_MONTH, -30);
         Date startDate = calendar.getTime();
         startDateString = DATE_FORMAT_YYYY_MM_DD.format(startDate);
+
         attendanceViewModel.storeLoginData(authToken);
         attendanceViewModel.fetchEmployeeAttendance(startDateString, endDateString);
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesData();
+
         showLoaderWithBlur();
         startShimmerAnimations();
 
@@ -265,18 +272,15 @@ public class DashboardFragment extends Fragment {
             if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
                 Employee employee = userprofileResponse.getData().getEmployee();
                 if (employee != null) {
-                    // Extract employee details, handling nulls
                     String employeeName = employee.getFirstname() != null ? employee.getFirstname() : "";
                     String employeeLastName = employee.getLastname() != null ? employee.getLastname() : "";
                     String employeeEmail = employee.getEmail() != null ? employee.getEmail() : "";
                     String empContact = employee.getContact() != null ? employee.getContact() : "";
                     String empDesignation = employee.getDesignation() != null ? employee.getDesignation() : "";
 
-                    // Update UI with employee details
                     binding.tvEmployeeNameValue.setText((!employeeName.isEmpty() || !employeeLastName.isEmpty()) ? employeeName + " " + employeeLastName : "N/A");
                     binding.tvEmployeeDesignationValue.setText(!empDesignation.isEmpty() ? empDesignation : "N/A");
 
-                    // Handle shift time
                     Shift shift = employee.getShift();
                     String startTime = shift != null && shift.getStartTime() != null ? shift.getStartTime() : "";
                     String endTime = shift != null && shift.getEndTime() != null ? shift.getEndTime() : "";
@@ -288,11 +292,9 @@ public class DashboardFragment extends Fragment {
                         binding.tvEmployeeShiftValue.setText("N/A");
                     }
 
-                    // Handle contact and email
                     binding.tvEmployeeContactValue.setText(!empContact.isEmpty() ? empContact : "N/A");
                     binding.tvEmployeeEmailValue.setText(!employeeEmail.isEmpty() ? employeeEmail : "N/A");
 
-                    // Handle profile image
                     Object profileImageUrl = employee.getProfileImageUrl();
                     ImageView profileImage = binding.ivEmployeeProfile;
                     if (profileImageUrl != null) {
@@ -301,7 +303,6 @@ public class DashboardFragment extends Fragment {
                         profileImage.setImageResource(R.drawable.ic_profile_placeholder);
                     }
                 } else {
-                    // Handle case where employee data is null
                     binding.tvEmployeeNameValue.setText("N/A");
                     binding.tvEmployeeDesignationValue.setText("N/A");
                     binding.tvEmployeeShiftValue.setText("N/A");
@@ -310,7 +311,6 @@ public class DashboardFragment extends Fragment {
                     binding.ivEmployeeProfile.setImageResource(R.drawable.ic_profile_placeholder);
                 }
             } else {
-                // Handle case where userProfileResponse or data is null
                 binding.tvEmployeeNameValue.setText("N/A");
                 binding.tvEmployeeDesignationValue.setText("N/A");
                 binding.tvEmployeeShiftValue.setText("N/A");
@@ -364,8 +364,6 @@ public class DashboardFragment extends Fragment {
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
-
-                // ADDED null check for 'leaves'
                 if (leaves == null || leaves.isEmpty()) {
                     Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
                 } else {
@@ -376,7 +374,6 @@ public class DashboardFragment extends Fragment {
                 Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
             }
 
-            // Ensure these run even if data is null/empty
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
             employeeCardShimmer.stopShimmer();
@@ -409,32 +406,9 @@ public class DashboardFragment extends Fragment {
         leavePieChartShimmer.setVisibility(View.VISIBLE);
         leavePieChartShimmer.startShimmer();
 
-        // Hide actual views until data is loaded
         punchCardView.setVisibility(View.GONE);
         employeeCard.setVisibility(View.GONE);
         leavePieChartContainer.setVisibility(View.GONE);
-    }
-
-    private void observeShiftTracking() {
-        WorkManager.getInstance(requireContext())
-                .getWorkInfosForUniqueWorkLiveData("EmployeeTracking")
-                .observe(getViewLifecycleOwner(), workInfos -> {
-                    if (workInfos != null && !workInfos.isEmpty()) {
-                        WorkInfo workInfo = workInfos.get(0);
-
-                        String status = workInfo.getState().name();
-                        Log.d("WorkManagerStatus", "Tracking Status: " + status);
-
-                        // Example: Update a TextView on your dashboard to show tracking status
-                        // binding.textStatus.setText("Tracking: " + status);
-
-                        if (workInfo.getState() == WorkInfo.State.FAILED) {
-                            Log.e("WorkManagerStatus", "Worker failed. Check logs for exceptions.");
-                        }
-                    } else {
-                        Log.d("WorkManagerStatus", "No tracking work currently scheduled.");
-                    }
-                });
     }
 
     private void stopShimmerAnimations() {
@@ -447,23 +421,20 @@ public class DashboardFragment extends Fragment {
         leavePieChartShimmer.stopShimmer();
         leavePieChartShimmer.setVisibility(View.GONE);
 
-        // Show actual views after data is loaded
         punchCardView.setVisibility(View.VISIBLE);
         employeeCard.setVisibility(View.VISIBLE);
         leavePieChartContainer.setVisibility(View.VISIBLE);
     }
 
-
     private void initializeViews(View root) {
-        // Shimmer layouts
         punchCardShimmer = root.findViewById(R.id.punchCardShimmer);
         employeeCardShimmer = root.findViewById(R.id.employeeCardShimmer);
         leavePieChartShimmer = root.findViewById(R.id.leavePieChartShimmer);
-        // Real layouts
+
         punchCardView = root.findViewById(R.id.punchCardView);
         employeeCard = root.findViewById(R.id.employeeCard);
         leavePieChartContainer = root.findViewById(R.id.leavePieChartContainer);
-        // Real layouts values
+
         todayDate = root.findViewById(R.id.todayDate);
         tvEmployeeNameValue = root.findViewById(R.id.tvEmployeeNameValue);
         tvEmployeeDesignationValue = root.findViewById(R.id.tvEmployeeDesignationValue);
@@ -488,7 +459,6 @@ public class DashboardFragment extends Fragment {
                 return OUTPUT_SHIFT_FORMAT.format(startTime) + " - " + OUTPUT_SHIFT_FORMAT.format(endTime);
             } catch (ParseException e) {
                 e.printStackTrace();
-//                Log.e("DashboardFragment", "Error formatting shift time", e);
                 return "";
             }
         }
@@ -499,6 +469,8 @@ public class DashboardFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        handler.removeCallbacks(runnable);
+        if (handler != null && runnable != null) {
+            handler.removeCallbacks(runnable);
+        }
     }
 }

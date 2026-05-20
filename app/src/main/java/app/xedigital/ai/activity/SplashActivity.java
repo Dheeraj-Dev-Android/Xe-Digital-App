@@ -47,17 +47,7 @@ public class SplashActivity extends AppCompatActivity {
         tvSpeed = findViewById(R.id.tvSpeed);
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
 
-//        tvAppVersion = findViewById(R.id.tv_app_version);
-//        String versionName = "";
-//        String versionCode = "";
-//        try {
-//            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-//            versionCode = String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        tvAppVersion.setText("App Version : " + versionCode + "." + versionName);
-//        tvAppVersion = findViewById(R.id.tv_app_version);
+        tvAppVersion = findViewById(R.id.tv_app_version);
 
 // Add a null check to prevent crashes if the ID isn't found
         if (tvAppVersion != null) {
@@ -91,7 +81,7 @@ public class SplashActivity extends AppCompatActivity {
         slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
 
         // Simulate splash screen delay and check network status
-        new Handler().postDelayed(this::checkNetworkAndNavigate, 3000);
+        new Handler().postDelayed(this::checkNetworkAndNavigate, 2500);
     }
 
     private void checkNetworkAndNavigate() {

@@ -101,6 +101,9 @@
 
 # ── Biometric ─────────────────────────────────────────────────────────────────
 -keep class androidx.biometric.** { *; }
+-dontwarn androidx.biometric.**
+# Keep specialized internal cryptographic and biometric callback descriptors
+-keepclassmembers class androidx.biometric.** { *; }
 
 
 # ── General Android / Reflection Safety ──────────────────────────────────────
