@@ -39,6 +39,7 @@ public class RegularizeAppliedFragment extends Fragment {
     private TextView emptyStateText;
     private RegularizeAppliedAdapter regularizeAppliedAdapter;
     private RegularizeAppliedResponse apiResponse;
+    private String currentFilterStatus = "All";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class RegularizeAppliedFragment extends Fragment {
                         emptyStateText.setVisibility(View.GONE);
                         regularizeAppliedAdapter = new RegularizeAppliedAdapter(items);
                         recyclerView.setAdapter(regularizeAppliedAdapter);
+                        filterLeaves(currentFilterStatus);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
@@ -90,21 +92,31 @@ public class RegularizeAppliedFragment extends Fragment {
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
         chipGroup.setSingleSelection(true);
 
+//        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+//            // Handle chip selection
+//            if (checkedIds.contains(R.id.chipAll)) {
+//                filterLeaves("All");
+//            } else if (checkedIds.contains(R.id.chipApproved)) {
+//                filterLeaves("Approved");
+//            } else if (checkedIds.contains(R.id.chipUnapproved)) {
+//                filterLeaves("Unapproved");
+//            } else if (checkedIds.contains(R.id.chipRejected)) {
+//                filterLeaves("Rejected");
+//            } else if (checkedIds.contains(R.id.chipCancelled)) {
+//                filterLeaves("Cancelled");
+//            } else {
+//                filterLeaves("All");
+//            }
+//        });
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            // Handle chip selection
-            if (checkedIds.contains(R.id.chipAll)) {
-                filterLeaves("All");
-            } else if (checkedIds.contains(R.id.chipApproved)) {
-                filterLeaves("Approved");
-            } else if (checkedIds.contains(R.id.chipUnapproved)) {
-                filterLeaves("Unapproved");
-            } else if (checkedIds.contains(R.id.chipRejected)) {
-                filterLeaves("Rejected");
-            } else if (checkedIds.contains(R.id.chipCancelled)) {
-                filterLeaves("Cancelled");
-            } else {
-                filterLeaves("All");
-            }
+            if (checkedIds.contains(R.id.chipAll)) currentFilterStatus = "All";
+            else if (checkedIds.contains(R.id.chipApproved)) currentFilterStatus = "Approved";
+            else if (checkedIds.contains(R.id.chipUnapproved)) currentFilterStatus = "Unapproved";
+            else if (checkedIds.contains(R.id.chipRejected)) currentFilterStatus = "Rejected";
+            else if (checkedIds.contains(R.id.chipCancelled)) currentFilterStatus = "Cancelled";
+            else currentFilterStatus = "All";
+
+            filterLeaves(currentFilterStatus);
         });
         // Attach click listeners to chips
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
@@ -125,8 +137,31 @@ public class RegularizeAppliedFragment extends Fragment {
         chipGroup.check(clickedChip.getId());
     }
 
+    //    private void filterLeaves(String status) {
+//        if (apiResponse != null && apiResponse.getData() != null && apiResponse.getData().getAttendanceRegularizeApplied() != null) {
+//            List<AttendanceRegularizeAppliedItem> originalList = apiResponse.getData().getAttendanceRegularizeApplied();
+//            List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
+//
+//            if (status.equals("All")) {
+//                filteredList.addAll(originalList);
+//            } else {
+//                for (AttendanceRegularizeAppliedItem item : originalList) {
+//                    if (item.getStatus().equalsIgnoreCase(status)) {
+//                        filteredList.add(item);
+//                    }
+//                }
+//            }
+//            regularizeAppliedAdapter.updateList(filteredList);
+//        }
+//    }
     private void filterLeaves(String status) {
         if (apiResponse != null && apiResponse.getData() != null && apiResponse.getData().getAttendanceRegularizeApplied() != null) {
+
+            // ADD THIS NULL CHECK HERE
+            if (regularizeAppliedAdapter == null) {
+                return;
+            }
+
             List<AttendanceRegularizeAppliedItem> originalList = apiResponse.getData().getAttendanceRegularizeApplied();
             List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
 

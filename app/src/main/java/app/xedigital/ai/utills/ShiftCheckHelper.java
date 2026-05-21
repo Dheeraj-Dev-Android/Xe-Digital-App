@@ -32,9 +32,14 @@ public class ShiftCheckHelper {
 
         // CRITICAL REPAIR: Policy.KEEP checks if the workspace ID already exists.
         // If it exists, it leaves it alone, keeping its schedule intact and stopping unexpected immediate runs.
+//        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+//                WORK_NAME,
+//                ExistingPeriodicWorkPolicy.KEEP,
+//                trackingRequest
+//        );
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE, // Safely modifies parameters without losing track of execution
                 trackingRequest
         );
 

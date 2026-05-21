@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PowerManager;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -48,11 +47,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -85,7 +79,6 @@ import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.xedigital.ai.R;
@@ -93,7 +86,6 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.utills.BioMetric;
 import app.xedigital.ai.utills.FaceOverlayView;
-import app.xedigital.ai.utills.ShiftTrackingWorker;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -101,159 +93,58 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * PunchActivity — Face-based attendance punch with liveness detection.
- * <p>
- * ── Fix log ──────────────────────────────────────────────────────────────────
- * CRASHES
- * [1]  captureImage() called twice: once in analyzeFace() and once in
- * processChallenge(). Removed the duplicate call from analyzeFace().
- * [2]  RuntimeException thrown in sendImageToApi Retrofit callback → crashes
- * the app. Routed to handleError() instead.
- * [3]  RuntimeException thrown in callAttendanceApi catch block → crashes
- * the app. Routed to showAttendanceFailedAlert() instead.
- * [4]  RuntimeException thrown in showAttendanceSuccessAlert catch block.
- * Routed to showAttendanceFailedAlert() instead.
- * [5]  ImageAnalysis running on main thread (getMainExecutor) → ANR risk.
- * Moved to backgroundExecutor.
- * <p>
- * CRITICAL LOGIC
- * [6]  Permission result set allGranted=true on denial (line 148 original).
- * Fixed: allGranted=false on any denied permission.
- * <p>
- * WINDOW LEAKS (new in this fix)
- * [7]  showAttendanceFailedAlert dialog had no field reference — could not
- * be dismissed in onDestroy → WindowManager$BadTokenException on rotation
- * or background kill. Added failedDialog field, dismissed in onDestroy().
- * [8]  handleError AlertDialog also had no field reference → same window leak.
- * Added errorDialog field, dismissed in onDestroy().
- * [9]  Mock-location alert dialog in getCurrentLocation had no field
- * reference. Added securityDialog field, dismissed in onDestroy().
- * [10] callAttendanceApi auto-time alert had no field reference. Tracked via
- * securityDialog field.
- * [11] VPN alert dialog had no field reference. Tracked via securityDialog.
- * [12] Location-disabled alert had no field reference. Tracked via
- * securityDialog.
- * <p>
- * LIFECYCLE GUARDS (isFinishing / isDestroyed checks added everywhere)
- * [13] updateStatus() — now guards before setText.
- * [14] onAuthenticationError / onAuthenticationFailed — added guard before
- * showing dialog and toast.
- * [15] showAttendanceFailedAlert — moved progressBar.setVisibility() inside
- * runOnUiThread after the lifecycle check.
- * [16] callAttendanceApi — added isFinishing guard before the auto-time
- * dialog and before every UI update.
- * [17] startCamera() — added guard at top so it's a no-op if activity is gone.
- * [18] All new AlertDialog.show() calls wrapped in isActivityAlive() helper.
- * <p>
- * MEMORY / RESOURCE LEAKS
- * [19] Photo files not deleted after Bitmap is read. deleteQuietly() called
- * after successful encoding and on all error paths.
- * [20] LocationCallback not removed on all error paths. onDestroy() already
- * had the removal; added explicit removal inside onLocationResult before
- * every early return so the callback is always unregistered.
- * [21] safeUnbindCamera() created two ProcessCameraProvider futures.
- * Refactored to store cameraProvider as a field and reuse it.
- * [22] Handler created without explicit Looper → implicit Activity capture.
- * Changed to new Handler(Looper.getMainLooper()).
- * [23] Bitmap.createScaledBitmap filter=false → poor quality for face recog.
- * Changed to true.
- * [24] backgroundExecutor was already shut down in onDestroy — confirmed kept.
- * [25] FaceDetector already closed in onDestroy — confirmed kept.
- * [26] scannerAnimator already cancelled in onDestroy — confirmed kept.
- * <p>
- * DEAD CODE REMOVED
- * [27] isProcessing (final boolean, always false) — removed.
- * [28] livenessDetected (final boolean, always false) — removed.
- * [29] myAlertDialog (declared, never assigned) — removed.
- * [30] CameraManager field (declared, never used) — removed.
- * [31] BiometricManager field (declared, never used) — removed.
- * [32] fragmentManager (assigned mid-method, never used) — removed.
- * [33] gson.toJson(responseBody) unused result — removed.
- * [34] Orphan imageCapture/preview/cameraSelector built in onCreate outside
- * startCamera(); redundant — removed (startCamera() builds them).
- * [35] Commented-out code block in callFaceDetailApi — removed.
- * <p>
- * LOGIC ERRORS
- * [36] authToken re-fetched from getIntent() inside Retrofit callbacks.
- * Removed; field value set once in onCreate() is reused throughout.
- * [37] LocationRequest passed null Looper to requestLocationUpdates →
- * IllegalStateException if called from a background thread.
- * Changed to Looper.getMainLooper().
- * [38] userId field shadowed by local variable in callAttendanceApi.
- * Removed local; use class field directly.
- * <p>
- * SECURITY
- * [39] CollectionName hardcoded in source → moved to static final constant
- * with comment to migrate to BuildConfig.
- */
 public class PunchActivity extends AppCompatActivity implements BioMetric.BiometricAuthListener {
 
     private static final String TAG = "PunchActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
     private static final String COLLECTION_NAME = "consultedgeglobalpvtltd_5e970n";
 
-    private static final String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION
-
+    private static final String[] REQUIRED_PERMISSIONS = {
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private volatile ActivityState currentState = ActivityState.IDLE;
     private PreviewView previewView;
-    private Preview preview;
+    private FaceOverlayView faceOverlay;
+    private MaterialCardView loadingPanel;
+    private TextView captureText;
     private ImageCapture imageCapture;
-    private CameraSelector cameraSelector;
     private ProcessCameraProvider cameraProvider;
     private FaceDetector detector;
-    private volatile boolean isProcessingLiveness = false;
     private boolean isBlinking = false;
     private boolean challengeSatisfied = false;
     private LivenessChallenge currentChallenge;
-    private TextView captureText;
-    private FaceOverlayView faceOverlay;
-    private MaterialCardView loadingPanel;
     private ObjectAnimator scannerAnimator;
-    private final ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-        boolean isGranted = true;
-        for (boolean granted : result.values()) {
-            if (!granted) {
-                isGranted = false;
-                break;
-            }
-        }
-        if (isGranted) {
-            setRandomChallenge();
-            startCamera();
-        } else {
-            showPermissionDeniedAlert();
-        }
-    });
+    private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean isGranted = true;
+                for (boolean granted : result.values()) {
+                    if (!granted) {
+                        isGranted = false;
+                        break;
+                    }
+                }
+                if (isGranted) {
+                    initiateVerificationFlow();
+                } else {
+                    showPermissionDeniedAlert();
+                }
+            });
     private AlertDialog attendanceSuccessDialog;
     private AlertDialog failedDialog;
     private AlertDialog errorDialog;
     private AlertDialog securityDialog;
+
     private String authToken;
     private String userId;
+    private String employeeFirstName;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private String currentAddress = "";
-    // ── Permissions ───────────────────────────────────────────────────────
-//    ActivityResultLauncher<String[]> requestPermissionsLauncher =
-//            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-//                boolean allGranted = true;
-//                for (boolean granted : result.values()) {
-//                    if (!granted) {
-//                        allGranted = false;
-//                        break;
-//                    }
-//                }
-//                if (allGranted) {
-//                    startCamera();
-//                } else {
-//                    Toast.makeText(this, "Permissions required for attendance", Toast.LENGTH_LONG).show();
-//                    finish();
-//                }
-//            });
     private BioMetric bioMetric;
 
     @Override
@@ -262,91 +153,72 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_punch);
 
-        // ── Bind views ────────────────────────────────────────────────────────
         previewView = findViewById(R.id.viewFinder);
         faceOverlay = findViewById(R.id.faceOverlay);
         loadingPanel = findViewById(R.id.loadingPanel);
         captureText = findViewById(R.id.CaptureText);
 
-        // ── Auth / user data — read once, reused everywhere  ─────────────
         authToken = getIntent().getStringExtra("authToken");
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         userId = prefs.getString("userId", null);
+        employeeFirstName = prefs.getString("empFirstName", "");
 
         if (authToken != null) {
             prefs.edit().putString("authToken", authToken).apply();
         }
 
-        // ── ML Kit ────────────────────────────────────────────────────────────
-        FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL).setMinFaceSize(0.35f).build();
+        FaceDetectorOptions options = new FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+                .setMinFaceSize(0.35f)
+                .build();
         detector = FaceDetection.getClient(options);
 
-        // ── Biometric ─────────────────────────────────────────────────────────
         bioMetric = new BioMetric(this, this, this);
-
-        // ── Location ──────────────────────────────────────────────────────────
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-//        setRandomChallenge();
-
-
-//        if (allPermissionsGranted()) {
-//            startCamera();
-//        } else {
-//            requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
-//        }
-
-        // Get SharedPreferences
         boolean instructionsSeen = prefs.getBoolean("instructionsSeenAttendance", false);
 
         if (!instructionsSeen) {
-            // Show instructions only if they haven't been seen yet
             showLivenessInstructions();
         } else {
-            // Skip instructions and start camera logic immediately
             if (allPermissionsGranted()) {
-                setRandomChallenge();
-                startCamera();
+                initiateVerificationFlow();
             } else {
                 requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
             }
         }
     }
 
+    private void initiateVerificationFlow() {
+        currentState = ActivityState.SCANNING;
+        setRandomChallenge();
+        startCamera();
+    }
+
     @Override
     protected void onDestroy() {
-        // FIX [19+]: cancel handler callbacks before anything else
         handler.removeCallbacksAndMessages(null);
 
-        // FIX [7–12]: dismiss ALL tracked dialogs to prevent WindowManager leaks
         dismissDialog(attendanceSuccessDialog);
         dismissDialog(failedDialog);
         dismissDialog(errorDialog);
         dismissDialog(securityDialog);
 
-        // [26] Cancel animator
         if (scannerAnimator != null) {
             scannerAnimator.cancel();
             scannerAnimator = null;
         }
-
-        // Remove location updates if still registered
         if (locationCallback != null && fusedLocationClient != null) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
             locationCallback = null;
         }
-
-        // [25] Close ML Kit detector
         if (detector != null) {
             detector.close();
             detector = null;
         }
-
-        // [24] Shut down background executor
         backgroundExecutor.shutdownNow();
-
         safeUnbindCamera();
-
         super.onDestroy();
     }
 
@@ -356,44 +228,40 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         safeUnbindCamera();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Lifecycle guard helpers
-    // ─────────────────────────────────────────────────────────────────────────
     private void showLivenessInstructions() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_liveness_instructions, null);
 
-        AlertDialog infoDialog = new AlertDialog.Builder(this).setView(dialogView).setPositiveButton("I'm Ready", (dialog, which) -> {
-            // Save the preference so this doesn't show again
-            SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-            prefs.edit().putBoolean("instructionsSeenAttendance", true).apply();
+        AlertDialog infoDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setPositiveButton("I'm Ready", (dialog, which) -> {
+                    SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    prefs.edit().putBoolean("instructionsSeenAttendance", true).apply();
 
-            if (allPermissionsGranted()) {
-                setRandomChallenge();
-                startCamera();
-            } else {
-                requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
-            }
-        }).setCancelable(false).create();
+                    if (allPermissionsGranted()) {
+                        initiateVerificationFlow();
+                    } else {
+                        requestPermissionsLauncher.launch(REQUIRED_PERMISSIONS);
+                    }
+                })
+                .setCancelable(false)
+                .create();
 
         infoDialog.show();
     }
 
     private void showPermissionDeniedAlert() {
-        new AlertDialog.Builder(this).setTitle("Camera Access Required").setMessage("To login to your account using face recognition, you must grant camera access. Please enable it in settings.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).show();
+        new AlertDialog.Builder(this)
+                .setTitle("Camera Access Required")
+                .setMessage("To login to your account using face recognition, you must grant camera access. Please enable it in settings.")
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
-    /**
-     * Central lifecycle guard used before EVERY dialog show, UI update,
-     * startCamera(), or startActivity() call.
-     * Returns true when the activity is alive and safe to interact with.
-     */
     private boolean isActivityAlive() {
         return !isFinishing() && !isDestroyed();
     }
 
-    /**
-     * Safely dismisses a dialog only if it is showing, preventing BadTokenException.
-     */
     private void dismissDialog(AlertDialog dialog) {
         if (dialog != null && dialog.isShowing()) {
             try {
@@ -403,10 +271,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Permissions
-    // ─────────────────────────────────────────────────────────────────────────
 
     private boolean allPermissionsGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
@@ -420,37 +284,41 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        final int REQUEST_CODE_PERMISSIONS = 10;
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) startCamera();
-        }
         if (requestCode == BIOMETRIC_PERMISSION_REQUEST_CODE && bioMetric != null) {
             bioMetric.handlePermissionResult(requestCode, permissions, grantResults, false);
         }
     }
 
     private void startCamera() {
-        if (!isActivityAlive()) return; // [17]
+        if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
 
         toggleScannerAnimation(true);
 
         ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(this);
         future.addListener(() -> {
             try {
-                cameraProvider = future.get(); // [21] stored as field
+                if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
 
-                preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                cameraProvider = future.get();
 
-                imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build();
+                Preview previewComp = new Preview.Builder().build();
+                previewComp.setSurfaceProvider(previewView.getSurfaceProvider());
 
-                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
+                imageCapture = new ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .build();
+
+                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
                 imageAnalysis.setAnalyzer(backgroundExecutor, this::analyzeFace);
 
-                cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
+                CameraSelector cameraSelectorComp = new CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                        .build();
 
                 cameraProvider.unbindAll();
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+                cameraProvider.bindToLifecycle(this, cameraSelectorComp, previewComp, imageCapture, imageAnalysis);
 
             } catch (ExecutionException | InterruptedException e) {
                 Log.e(TAG, "Camera binding failed", e);
@@ -468,10 +336,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Liveness challenge
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void setRandomChallenge() {
         LivenessChallenge[] challenges = LivenessChallenge.values();
@@ -501,10 +365,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void analyzeFace(@NonNull ImageProxy imageProxy) {
-        if (isAnalyzing.get() || isProcessingLiveness || currentChallenge == null) {
+        if (isAnalyzing.get() || currentState != ActivityState.SCANNING || currentChallenge == null) {
             imageProxy.close();
             return;
         }
+
         double avgLuminance = calculateLuminance(imageProxy);
         if (avgLuminance < 45) {
             updateStatus("Too dark! Move to a brighter area.");
@@ -522,31 +387,32 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
 
         InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
-        detector.process(image).addOnSuccessListener(faces -> {
-            if (faces.isEmpty()) {
-                faceOverlay.setFaceDetected(false);
-                updateStatus("Position face in frame");
-                isBlinking = false;
-            } else if (faces.size() > 1) {
-                faceOverlay.setFaceDetected(false);
-                updateStatus("Multiple faces detected! Ensure only you are in frame.");
-                isBlinking = false;
-            } else {
-                faceOverlay.setFaceDetected(true);
-                processChallenge(faces.get(0));
-                if (!challengeSatisfied) {
-                    updateStatus(getInstructionText(currentChallenge));
-                }
-            }
-        }).addOnFailureListener(e -> Log.e(TAG, "Face detection failed", e)).addOnCompleteListener(task -> {
-            imageProxy.close();
-            isAnalyzing.set(false);
-        });
-    }
+        detector.process(image)
+                .addOnSuccessListener(faces -> {
+                    if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Frame analysis
-    // ─────────────────────────────────────────────────────────────────────────
+                    if (faces.isEmpty()) {
+                        faceOverlay.setFaceDetected(false);
+                        updateStatus("Position face in frame");
+                        isBlinking = false;
+                    } else if (faces.size() > 1) {
+                        faceOverlay.setFaceDetected(false);
+                        updateStatus("Multiple faces detected! Ensure only you are in frame.");
+                        isBlinking = false;
+                    } else {
+                        faceOverlay.setFaceDetected(true);
+                        processChallenge(faces.get(0));
+                        if (!challengeSatisfied) {
+                            updateStatus(getInstructionText(currentChallenge));
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Face detection failed", e))
+                .addOnCompleteListener(task -> {
+                    imageProxy.close();
+                    isAnalyzing.set(false);
+                });
+    }
 
     private void processChallenge(@NonNull Face face) {
         float headY = face.getHeadEulerAngleY();
@@ -573,11 +439,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 break;
         }
 
-        if (challengeSatisfied && !isProcessingLiveness) {
-            isProcessingLiveness = true;
+        if (challengeSatisfied && currentState == ActivityState.SCANNING) {
+            currentState = ActivityState.PROCESSING_LIVENESS;
             updateStatus("Verified! Capturing...");
             toggleScannerAnimation(false);
-            captureImage(); // [1] single call site
+            captureImage();
         }
     }
 
@@ -589,7 +455,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
         long sum = 0;
         for (byte b : data) {
-            sum += (b & 0xFF); // Convert to unsigned int
+            sum += (b & 0xFF);
         }
         return sum / (double) data.length;
     }
@@ -599,7 +465,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
-
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults results) {
                 if (!isActivityAlive()) {
@@ -630,6 +495,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                         runOnUiThread(() -> {
                             if (!isActivityAlive()) return;
+                            currentState = ActivityState.UPLOADING;
                             loadingPanel.setVisibility(View.VISIBLE);
                             prepareJsonAndSend(base64);
                         });
@@ -644,8 +510,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
                 deleteQuietly(photoFile);
-                isProcessingLiveness = false;
-                setRandomChallenge();
                 handleError("Capture failed: " + exception.getMessage());
             }
         });
@@ -660,9 +524,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             sendImageToApi(requestBody);
         } catch (JSONException e) {
             Log.e(TAG, "JSON encoding error", e);
-            isProcessingLiveness = false;
-            setRandomChallenge();
-            setLoadingVisible(false);
             handleError("Failed to prepare image data for server.");
         }
     }
@@ -690,10 +551,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private void sendImageToApi(@NonNull RequestBody requestBody) {
         APIInterface service = APIClient.getInstance().getImage();
         service.FaceRecognitionApi(requestBody).enqueue(new Callback<ResponseBody>() {
-
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (!isActivityAlive()) return; // [18]
+                if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     try {
@@ -701,8 +561,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         JSONObject json = new JSONObject(bodyStr);
 
                         if (!json.has("data") || json.isNull("data")) {
-                            isProcessingLiveness = false;
-                            setRandomChallenge();
                             handleError("Server response is missing required data.");
                             return;
                         }
@@ -729,23 +587,18 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                isProcessingLiveness = false;
+                if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
                 handleError("Network Error: " + t.getMessage());
             }
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // API —
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void callFaceDetailApi(@NonNull String token, @NonNull RequestBody requestBody) {
         APIInterface service = APIClient.getInstance().getFace();
         service.FaceDetailApi(token, requestBody).enqueue(new Callback<ResponseBody>() {
-
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (!isActivityAlive()) return; // [18]
+                if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     try {
@@ -784,24 +637,24 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                if (!isActivityAlive()) return;
-                isProcessingLiveness = false;
+                if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
                 showAttendanceFailedAlert("Attendance failed: Network or API error.");
             }
         });
     }
 
     private void callAttendanceApi(@NonNull String employeeId, @NonNull String employeeName) {
-        if (!isActivityAlive()) return; // [18]
+        if (!isActivityAlive()) return;
 
         if (!isAutomaticTimeEnabled()) {
-            if (isActivityAlive()) {
-                dismissDialog(securityDialog);
-                securityDialog = new AlertDialog.Builder(this).setTitle("Security Check").setMessage("Please enable 'Automatic Date and Time' in your device settings to continue.").setPositiveButton("Settings", (d, w) -> {
-                    if (isActivityAlive())
-                        startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
-                }).setNegativeButton("Cancel", (d, w) -> finish()).setCancelable(false).show();
-            }
+            dismissDialog(securityDialog);
+            securityDialog = new AlertDialog.Builder(this)
+                    .setTitle("Security Check")
+                    .setMessage("Please enable 'Automatic Date and Time' in your device settings to continue.")
+                    .setPositiveButton("Settings", (d, w) -> startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS)))
+                    .setNegativeButton("Cancel", (d, w) -> finish())
+                    .setCancelable(false)
+                    .show();
             return;
         }
 
@@ -813,7 +666,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         String token = "jwt " + authToken;
 
         getCurrentLocation((address, loc) -> {
-            if (!isActivityAlive()) return;
+            if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
             currentAddress = address;
             String currentTime = getCurrentTime(loc);
             try {
@@ -827,10 +680,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                 APIInterface service = APIClient.getInstance().getAttendance();
                 service.AttendanceApi(token, requestBody).enqueue(new Callback<ResponseBody>() {
-
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                        if (!isActivityAlive()) return; // [18]
+                        if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
                         setLoadingVisible(false);
 
                         if (response.isSuccessful() && response.body() != null) {
@@ -848,8 +700,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                     @Override
                     public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                        isProcessingLiveness = false;
-                        if (!isActivityAlive()) return; // [18]
+                        if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
                         setLoadingVisible(false);
                         if (t instanceof java.net.SocketTimeoutException) {
                             showAttendanceFailedAlert("Connection timed out. Please check your internet.");
@@ -871,60 +722,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return android.provider.Settings.Global.getInt(getContentResolver(), android.provider.Settings.Global.AUTO_TIME, 0) == 1;
     }
 
-    //    private void showAttendanceSuccessAlert(@NonNull String responseBody) throws JSONException, IOException {
-//        toggleScannerAnimation(false);
-//        setLoadingVisible(false);
-//
-//        if (!isActivityAlive()) return; // [18]
-//
-//        JSONObject responseJson = new JSONObject(responseBody);
-//        boolean success = responseJson.optBoolean("success", false);
-//        String message = responseJson.optString("message", "Attendance recorded.");
-//
-//        if (!success) {
-//            showAttendanceFailedAlert("Attendance not recorded: " + message);
-//            return;
-//        }
-//        JSONObject data = responseJson.optJSONObject("data");
-//        if (data != null) {
-//            String punchInTime = data.optString("punchInTime", "");
-//            String punchOutTime = data.optString("punchOutTime", "");
-//
-//            // If we have a Punch In but NO Punch Out, start tracking
-//            if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
-//                Log.d(TAG, "Punch In confirmed. Starting Tracker.");
-//                startShiftTracking();
-//                // This will prompt the user to "Optimize Sync" immediately after punching in
-//                checkAndOptimize();
-//            }
-//        }
-//
-//        String punchInAddress = data != null ? data.optString("punchInAddress", "") : "";
-//        String punchOutAddress = data != null ? data.optString("punchOutAddress", "") : "";
-//        String displayAddress = punchOutAddress.isEmpty() ? punchInAddress : punchOutAddress;
-//
-//        String htmlMsg = "<b>" + message + "</b><br><br>Address: " + displayAddress;
-//
-//        runOnUiThread(() -> {
-//            if (!isActivityAlive() || isChangingConfigurations()) return; // [18]
-//
-//            dismissDialog(attendanceSuccessDialog);
-//
-//            attendanceSuccessDialog = new MaterialAlertDialogBuilder(this).setTitle("Attendance Success").setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY)).setPositiveButton("OK", (d, w) -> {
-//                d.dismiss();
-//                setResult(Activity.RESULT_OK);
-//                finish();
-//            }).setCancelable(false).show();
-//
-//            // Auto-dismiss after 5 seconds
-//            handler.postDelayed(() -> {
-//                if (!isActivityAlive()) return; // [18]
-//                dismissDialog(attendanceSuccessDialog);
-//                setResult(Activity.RESULT_OK);
-//                finish();
-//            }, 5000);
-//        });
-//    }
     private void showAttendanceSuccessAlert(@NonNull String responseBody) throws JSONException, IOException {
         toggleScannerAnimation(false);
         setLoadingVisible(false);
@@ -950,154 +747,118 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
         String htmlMsg = "<b>" + message + "</b><br><br>Address: " + displayAddress;
 
-        runOnUiThread(() -> {
-            if (!isActivityAlive() || isChangingConfigurations()) return;
+        dismissDialog(attendanceSuccessDialog);
 
-            dismissDialog(attendanceSuccessDialog);
+        attendanceSuccessDialog = new MaterialAlertDialogBuilder(this)
+                .setTitle("Attendance Success")
+                .setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY))
+                .setCancelable(false)
+                .setPositiveButton("OK", (d, w) -> {
+                    d.dismiss();
 
-            attendanceSuccessDialog = new MaterialAlertDialogBuilder(this)
-                    .setTitle("Attendance Success")
-                    .setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY))
-                    .setCancelable(false)
-                    .setPositiveButton("OK", (d, w) -> {
-                        d.dismiss();
-
-                        // --- START OF CENTRALIZED PERMISSION LOGIC ---
-                        if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
-
-                            // Check for Background Location (Android 10+)
-                            boolean hasBackgroundLoc = true;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                                hasBackgroundLoc = androidx.core.content.ContextCompat.checkSelfPermission(this,
-                                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED;
-                            }
-
-                            if (!hasBackgroundLoc) {
-                                Toast.makeText(this, "Enable 'Allow all the time' for tracking.", Toast.LENGTH_LONG).show();
-
-                                // NAVIGATION: Since you only have a Fragment, navigate to it using your NavController
-                                // Replace 'R.id.permissionFragment' with the actual ID in your nav_graph.xml
-                                try {
-                                    androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
-                                            .navigate(R.id.nav_permission);
-                                } catch (Exception e) {
-                                    Log.e(TAG, "Navigation failed: " + e.getMessage());
-                                }
-
-                                finish();
-                                return;
-                            }
-
-                            // If permissions are okay, start tracking
-                            Log.d(TAG, "Starting Tracker.");
-                            startShiftTracking();
-                            checkAndOptimize();
+                    if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
+                        boolean hasBackgroundLoc = true;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                            hasBackgroundLoc = androidx.core.content.ContextCompat.checkSelfPermission(this,
+                                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED;
                         }
-                        // --- END OF PERMISSION LOGIC ---
 
-                        setResult(Activity.RESULT_OK);
-                        finish();
-                    })
-                    .show();
+                        if (!hasBackgroundLoc) {
+                            Toast.makeText(this, "Enable 'Allow all the time' for Precise Location.", Toast.LENGTH_LONG).show();
+                            try {
+                                androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                                        .navigate(R.id.nav_permission);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Navigation failed: " + e.getMessage());
+                            }
+                            finish();
+                            return;
+                        }
+                    }
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                })
+                .show();
 
-            handler.postDelayed(() -> {
-                if (!isActivityAlive()) return;
-                if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
-                    attendanceSuccessDialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
-                }
-            }, 5000);
-        });
+        handler.postDelayed(() -> {
+            if (!isActivityAlive()) return;
+            if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
+                attendanceSuccessDialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
+            }
+        }, 5000);
     }
+
     private void showAttendanceFailedAlert(@NonNull String message) {
         toggleScannerAnimation(false);
-        setRandomChallenge();
+        setLoadingVisible(false);
 
-        runOnUiThread(() -> {
-            // Lifecycle Check: prevent crashes if the user is already navigating away
-            if (isFinishing() || isDestroyed()) return;
+        if (!isActivityAlive()) return;
 
-            setLoadingVisible(false);
-            isProcessingLiveness = false;
+        dismissDialog(failedDialog);
 
-            // Initialize the builder
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Attendance Failed");
-            builder.setMessage(message);
-            builder.setCancelable(false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Attendance Failed");
+        builder.setMessage(message);
+        builder.setCancelable(false);
 
-            // 1. Retry Button
-            builder.setPositiveButton("Retry", (d, id) -> {
-                d.dismiss();
-                setRandomChallenge();
-                if (!isFinishing() && !isDestroyed()) startCamera();
-            });
-
-            // 2. Cancel Button
-            builder.setNegativeButton("Cancel", (d, id) -> {
-                d.dismiss();
-                setResult(Activity.RESULT_CANCELED);
-                finish();
-            });
-
-            // 3. Conditional Biometric Button: Only show if hardware is available and enrolled
-            if (bioMetric != null && bioMetric.isBiometricAvailable()) {
-                builder.setNeutralButton("Use Biometric", (d, id) -> {
-                    d.dismiss();
-                    if (!isFinishing() && !isDestroyed()) {
-                        // Use false to trigger the Attendance specific prompt info
-                        bioMetric.authenticate(false);
-                    }
-                });
-            }
-
-            // Final safety check before showing the UI
-            if (!isFinishing() && !isDestroyed()) {
-                builder.show();
-            }
+        builder.setPositiveButton("Retry", (d, id) -> {
+            d.dismiss();
+            safeUnbindCamera();
+            initiateVerificationFlow();
         });
+
+        builder.setNegativeButton("Cancel", (d, id) -> {
+            d.dismiss();
+            setResult(Activity.RESULT_CANCELED);
+            finish();
+        });
+
+        if (bioMetric != null && bioMetric.isBiometricAvailable()) {
+            builder.setNeutralButton("Use Biometric", (d, id) -> {
+                d.dismiss();
+                currentState = ActivityState.BIOMETRIC_FALLBACK;
+                bioMetric.authenticate(false);
+            });
+        }
+
+        failedDialog = builder.create();
+        failedDialog.show();
     }
 
     private void handleError(@NonNull String errorMessage) {
-        isProcessingLiveness = false;
-        challengeSatisfied = false;
         isAnalyzing.set(false);
+        setLoadingVisible(false);
+        safeUnbindCamera();
 
-        runOnUiThread(() -> {
-            if (!isActivityAlive()) return;
+        if (!isActivityAlive()) return;
 
-            setLoadingVisible(false);
-            setRandomChallenge();
+        String userMessage = errorMessage.contains("There are no faces in the image")
+                ? "No face detected. Please position your face clearly in the circle."
+                : errorMessage;
 
-            String userMessage = errorMessage.contains("There are no faces in the image") ? "No face detected. Please position your face clearly in the circle." : errorMessage;
+        dismissDialog(errorDialog);
+        errorDialog = new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage(userMessage)
+                .setPositiveButton("Retry", (d, w) -> initiateVerificationFlow())
+                .setNegativeButton("Cancel", (d, w) -> finish())
+                .setCancelable(false)
+                .create();
 
-            dismissDialog(errorDialog); // dismiss any existing one first
-            errorDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(userMessage).setPositiveButton("Retry", (d, w) -> {
-                safeUnbindCamera();
-                if (isActivityAlive()) startCamera();
-            }).setNegativeButton("Cancel", (d, w) -> finish()).setCancelable(false).show();
-
-            safeUnbindCamera();
-        });
+        errorDialog.show();
     }
 
     @Override
     public void onAuthenticationSucceeded() {
-        runOnUiThread(() -> {
-            if (!isActivityAlive()) return;
-            SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-            String employeeId = prefs.getString("userId", "");
-            String employeeName = prefs.getString("empFirstName", "");
-            if (!employeeId.isEmpty()) {
-                callAttendanceApi(employeeId, employeeName);
-            } else {
-                showAttendanceFailedAlert("Biometric authentication succeeded but no user found.");
-            }
-        });
+        if (!isActivityAlive()) return;
+        if (!userId.isEmpty()) {
+            currentState = ActivityState.UPLOADING;
+            setLoadingVisible(true);
+            callAttendanceApi(userId, employeeFirstName);
+        } else {
+            showAttendanceFailedAlert("Biometric authentication succeeded but no user found.");
+        }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Biometric callbacks
-    // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     public void onAuthenticationError(int errorCode, CharSequence errString) {
@@ -1115,36 +876,38 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
     }
 
-    private void usePhoneBiometric() {
-        if (!isActivityAlive()) return; // [18]
-        setLoadingVisible(true);
-        if (bioMetric != null) {
-            bioMetric.authenticate(false);
-        } else {
-            Log.e(TAG, "BioMetric helper is null");
-            setLoadingVisible(false);
-        }
-    }
-
     private void getCurrentLocation(@NonNull AddressCallback callback) {
-        if (!isActivityAlive()) return; // [18]
+        if (!isActivityAlive()) return;
 
         if (isVpnActive()) {
             dismissDialog(securityDialog);
-            securityDialog = new AlertDialog.Builder(this).setTitle("Security Alert").setMessage("VPN detected. Please disconnect to continue.").setPositiveButton("OK", (d, w) -> finish()).setCancelable(false).show();
+            securityDialog = new AlertDialog.Builder(this)
+                    .setTitle("Security Alert")
+                    .setMessage("VPN detected. Please disconnect to continue.")
+                    .setPositiveButton("OK", (d, w) -> finish())
+                    .setCancelable(false)
+                    .show();
             return;
         }
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean isLocationEnabled = locationManager != null && (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+        boolean isLocationEnabled = locationManager != null &&
+                (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && isLocationEnabled) {
 
-            LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(true).setMaxUpdateDelayMillis(15000).build();
+            LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+                    .setMinUpdateIntervalMillis(5000)
+                    .setWaitForAccurateLocation(true)
+                    .setMaxUpdateDelayMillis(15000)
+                    .build();
 
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult result) {
+                    if (!isActivityAlive()) return;
+
                     Location location = result.getLastLocation();
                     if (location == null) {
                         fusedLocationClient.removeLocationUpdates(this);
@@ -1154,15 +917,17 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                     if (isMockLocation(location)) {
                         fusedLocationClient.removeLocationUpdates(this);
-                        runOnUiThread(() -> {
-                            if (!isActivityAlive()) return;
-                            dismissDialog(securityDialog);
-                            securityDialog = new AlertDialog.Builder(PunchActivity.this).setTitle("Security Alert").setMessage("Fake location detected. Please disable mock location apps to proceed.").setPositiveButton("OK", (d, w) -> finish()).setCancelable(false).show();
-                        });
+                        dismissDialog(securityDialog);
+                        securityDialog = new AlertDialog.Builder(PunchActivity.this)
+                                .setTitle("Security Alert")
+                                .setMessage("Fake location detected. Please disable mock location apps to proceed.")
+                                .setPositiveButton("OK", (d, w) -> finish())
+                                .setCancelable(false)
+                                .show();
                         return;
                     }
 
-                    fusedLocationClient.removeLocationUpdates(this); // [20]
+                    fusedLocationClient.removeLocationUpdates(this);
                     getAddressFromLocation(location.getLatitude(), location.getLongitude(), (address, loc) -> callback.onAddressReceived(address, location));
                 }
             };
@@ -1171,19 +936,20 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
         } else if (!isLocationEnabled) {
             dismissDialog(securityDialog);
-            securityDialog = new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to record attendance.").setPositiveButton("OK", (d, w) -> {
-                d.dismiss();
-                setResult(Activity.RESULT_CANCELED);
-                finish();
-            }).setCancelable(false).show();
+            securityDialog = new AlertDialog.Builder(this)
+                    .setTitle("Location Services Disabled")
+                    .setMessage("Please enable location services to record attendance.")
+                    .setPositiveButton("OK", (d, w) -> {
+                        d.dismiss();
+                        setResult(Activity.RESULT_CANCELED);
+                        finish();
+                    })
+                    .setCancelable(false)
+                    .show();
         } else {
             callback.onAddressReceived("Location not found", null);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Location
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void getAddressFromLocation(double latitude, double longitude, @NonNull AddressCallback callback) {
         if (!isActivityAlive()) return;
@@ -1239,13 +1005,47 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         });
     }
 
+    //    private void showLocationNotFoundAlert() {
+//        if (!isActivityAlive()) return;
+//        dismissDialog(securityDialog);
+//        securityDialog = new AlertDialog.Builder(this)
+//                .setTitle("Location Not Found")
+//                .setMessage("We couldn't determine your location. Please check your GPS settings.")
+//                .setPositiveButton("Retry", (d, w) -> {
+//                    d.dismiss();
+//                    initiateVerificationFlow();
+//                })
+//                .setNegativeButton("Exit", (d, w) -> finish())
+//                .setCancelable(false)
+//                .show();
+//    }
     private void showLocationNotFoundAlert() {
-        if (!isActivityAlive()) return;
+
+        if (!isActivityAlive()) {
+            Log.w(TAG, "Activity is not alive. Skipping Location NotFound Alert.");
+            return;
+        }
+
         dismissDialog(securityDialog);
-        securityDialog = new AlertDialog.Builder(this).setTitle("Location Not Found").setMessage("We couldn't determine your location. Please check your GPS settings.").setPositiveButton("Retry", (d, w) -> {
-            d.dismiss();
-            if (isActivityAlive()) startCamera();
-        }).setNegativeButton("Exit", (d, w) -> finish()).setCancelable(false).show();
+
+        try {
+            securityDialog = new AlertDialog.Builder(this)
+                    .setTitle("Location Not Found")
+                    .setMessage("We couldn't determine your location. Please check your GPS settings.")
+                    .setPositiveButton("Retry", (d, w) -> {
+                        d.dismiss();
+                        initiateVerificationFlow();
+                    })
+                    .setNegativeButton("Exit", (d, w) -> finish())
+                    .setCancelable(false)
+                    .create();
+
+            if (isActivityAlive()) {
+                securityDialog.show();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to show Location NotFound Dialog safely", e);
+        }
     }
 
     private boolean isMockLocation(@NonNull Location location) {
@@ -1276,62 +1076,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // UI helpers
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private void startShiftTracking() {
-        Log.d(TAG, "Starting Shift Tracking Worker...");
-
-        // Constraint: Requires internet to sync with server
-        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
-
-        PeriodicWorkRequest trackingRequest = new PeriodicWorkRequest.Builder(ShiftTrackingWorker.class, 15, TimeUnit.MINUTES) // Minimum interval
-                .setConstraints(constraints).addTag("SHIFT_WORK_TAG").build();
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork("EmployeeTracking", ExistingPeriodicWorkPolicy.KEEP, // Don't reset the timer if already enqueued
-                trackingRequest);
-    }
-
-    private void checkAndOptimize() {
-        // Check if we need to request "Allow all the time" or "Battery Optimization"
-        boolean needsBackgroundLocation = false;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            needsBackgroundLocation = ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED;
-        }
-
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        boolean needsBatteryExemption = (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName()));
-
-        if (needsBackgroundLocation || needsBatteryExemption) {
-            showSmoothOptimizationDialog(needsBackgroundLocation, needsBatteryExemption);
-        }
-    }
-
-    private void showSmoothOptimizationDialog(boolean location, boolean battery) {
-        String message = "To ensure your attendance is synced accurately and prevent shift tracking from pausing, please enable high-accuracy sync in the next steps.";
-
-        new AlertDialog.Builder(this)
-                .setTitle("Optimize Sync")
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("Proceed", (dialog, which) -> {
-                    if (location) {
-                        // Open App Info settings so they can click Permissions -> Location -> Allow all the time
-                        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        intent.setData(android.net.Uri.fromParts("package", getPackageName(), null));
-                        startActivity(intent);
-                        Toast.makeText(this, "Select Permissions > Location > Allow all the time", Toast.LENGTH_LONG).show();
-                    } else if (battery) {
-                        // Open Battery Optimization settings
-                        Intent intent = new Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                        startActivity(intent);
-                    }
-                })
-                .show();
-    }
-
     private void setLoadingVisible(boolean visible) {
         runOnUiThread(() -> {
             if (!isActivityAlive()) return;
@@ -1351,7 +1095,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             if (show) {
                 scannerLine.setVisibility(View.VISIBLE);
                 faceGuide.post(() -> {
-                    if (!isActivityAlive()) return;
+                    if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
                     if (scannerAnimator == null) {
                         scannerAnimator = ObjectAnimator.ofFloat(scannerLine, "translationY", 0f, faceGuide.getHeight());
                         scannerAnimator.setDuration(1500);
@@ -1366,6 +1110,14 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 if (scannerAnimator != null) scannerAnimator.cancel();
             }
         });
+    }
+
+    private enum ActivityState {
+        IDLE,
+        SCANNING,
+        PROCESSING_LIVENESS,
+        UPLOADING,
+        BIOMETRIC_FALLBACK
     }
 
     private enum LivenessChallenge {

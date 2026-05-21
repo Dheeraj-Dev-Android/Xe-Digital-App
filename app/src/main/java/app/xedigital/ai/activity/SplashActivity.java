@@ -1,10 +1,13 @@
 package app.xedigital.ai.activity;
 
-import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -21,18 +25,21 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 
-import app.xedigital.ai.NetworkChangeReceiver;
 import app.xedigital.ai.R;
 import app.xedigital.ai.utills.NetworkUtils;
 
 public class SplashActivity extends AppCompatActivity {
-    private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
-    private AlertDialog noInternetDialog;
-    private AlertDialog slowNetworkDialog;
+    private static final String TAG = "SplashActivity";
+    private final Handler splashHandler = new Handler(Looper.getMainLooper());
+    private Runnable splashRunnable;
+
     private LottieAnimationView noInternetAnimation;
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
     private TextView tvAppVersion;
+
+    private ConnectivityManager connectivityManager;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,55 +47,74 @@ public class SplashActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_splash);
 
-        // Initialize UI components
         noInternetAnimation = findViewById(R.id.noInternetAnimation);
-        Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
+        Glide.with(this)
+                .load(R.mipmap.ic_launcher)
+                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                .into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
 
         tvSpeed = findViewById(R.id.tvSpeed);
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
-
         tvAppVersion = findViewById(R.id.tv_app_version);
 
-// Add a null check to prevent crashes if the ID isn't found
         if (tvAppVersion != null) {
             try {
                 String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-                int versionCode = android.os.Build.VERSION.SDK_INT >= 28
+                int versionCode = Build.VERSION.SDK_INT >= 28
                         ? (int) getPackageManager().getPackageInfo(getPackageName(), 0).getLongVersionCode()
                         : getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
 
                 tvAppVersion.setText("App Version : " + versionCode + "." + versionName);
             } catch (Exception e) {
-                Log.e("Splash", "Version error", e);
+                Log.e(TAG, "Version error", e);
             }
         }
-        // Dismiss button for slow internet layout
+
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
         if (dismissButton != null) {
-            dismissButton.setOnClickListener(v -> {
-                slowInternetContainer.setVisibility(View.GONE);
-                Toast.makeText(SplashActivity.this, "Slow internet message dismissed", Toast.LENGTH_SHORT).show();
-            });
+            dismissButton.setOnClickListener(v -> hideSlowInternetLayout());
         }
-        // Handle "Get Started" button
+
         ImageButton btnGetStarted = findViewById(R.id.btn_get_started);
-        btnGetStarted.setOnClickListener(v -> navigateToLogin());
+        if (btnGetStarted != null) {
+            btnGetStarted.setOnClickListener(v -> navigateToLogin());
+        }
 
-        // No internet dialog
-        noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        setupNetworkCallback();
 
-        // Slow network dialog
-        slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
+        splashRunnable = this::checkNetworkAndNavigate;
+        splashHandler.postDelayed(splashRunnable, 2500);
+    }
 
-        // Simulate splash screen delay and check network status
-        new Handler().postDelayed(this::checkNetworkAndNavigate, 2500);
+    private void setupNetworkCallback() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(@NonNull Network network) {
+                    runOnUiThread(() -> {
+                        hideNoInternetLayout();
+                        // Clear slow internet banners if full network health changes
+                        if (NetworkUtils.isNetworkSpeedGood(SplashActivity.this, 80)) {
+                            hideSlowInternetLayout();
+                        }
+                    });
+                }
+
+                @Override
+                public void onLost(@NonNull Network network) {
+                    runOnUiThread(() -> showNoInternetLayout());
+                }
+            };
+        }
     }
 
     private void checkNetworkAndNavigate() {
+        if (isFinishing() || isDestroyed()) return;
+
         if (NetworkUtils.isNetworkAvailable(this)) {
-            // Check for slow internet
             NetworkUtils.NetworkSpeed networkSpeed = NetworkUtils.getNetworkSpeed(this);
-            Log.d("SplashActivity", "Download Speed: " + networkSpeed.downSpeedKbps + " Kbps");
+            Log.d(TAG, "Download Speed: " + networkSpeed.downSpeedKbps + " Kbps");
             if (networkSpeed.downSpeedKbps < 80) {
                 showSlowInternetLayout(networkSpeed.downSpeedKbps);
             } else {
@@ -100,19 +126,22 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void navigateToLogin() {
+        splashHandler.removeCallbacksAndMessages(null);
         Intent mainIntent = new Intent(SplashActivity.this, LoginActivity.class);
         startActivity(mainIntent);
         finish();
     }
 
     public void showNoInternetLayout() {
-        findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
-        noInternetAnimation.playAnimation();
+        View layout = findViewById(R.id.noInternetLayout);
+        if (layout != null) layout.setVisibility(View.VISIBLE);
+        if (noInternetAnimation != null) noInternetAnimation.playAnimation();
     }
 
     public void hideNoInternetLayout() {
-        findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
-        noInternetAnimation.pauseAnimation();
+        View layout = findViewById(R.id.noInternetLayout);
+        if (layout != null) layout.setVisibility(View.GONE);
+        if (noInternetAnimation != null) noInternetAnimation.pauseAnimation();
     }
 
     public void showSlowInternetLayout(double speed) {
@@ -120,11 +149,12 @@ public class SplashActivity extends AppCompatActivity {
             if (slowInternetContainer != null) {
                 slowInternetContainer.setVisibility(View.VISIBLE);
                 String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
-                tvSpeed.setText(speedText);
+                if (tvSpeed != null) tvSpeed.setText(speedText);
             }
         });
     }
 
+    // Fix: Re-implemented method to clear target error across receiver bindings safely
     public void hideSlowInternetLayout() {
         runOnUiThread(() -> {
             if (slowInternetContainer != null) {
@@ -136,24 +166,48 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(networkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && connectivityManager != null && networkCallback != null) {
+            connectivityManager.registerDefaultNetworkCallback(networkCallback);
+        }
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
             showNoInternetLayout();
         } else {
             hideNoInternetLayout();
+            if (NetworkUtils.isNetworkSpeedGood(this, 80)) {
+                hideSlowInternetLayout();
+            }
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(networkChangeReceiver);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && connectivityManager != null && networkCallback != null) {
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback);
+            } catch (Exception e) {
+                Log.w(TAG, "Network callback was not registered", e);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        splashHandler.removeCallbacks(splashRunnable);
+        super.onDestroy();
     }
 
     public void onRetryButtonClicked(View view) {
         if (NetworkUtils.isNetworkAvailable(this)) {
             hideNoInternetLayout();
+            if (NetworkUtils.isNetworkSpeedGood(this, 80)) {
+                hideSlowInternetLayout();
+                navigateToLogin();
+            } else {
+                NetworkUtils.NetworkSpeed networkSpeed = NetworkUtils.getNetworkSpeed(this);
+                showSlowInternetLayout(networkSpeed.downSpeedKbps);
+            }
         } else {
             Toast.makeText(this, "Still no internet connection", Toast.LENGTH_SHORT).show();
         }

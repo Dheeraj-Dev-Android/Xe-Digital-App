@@ -45,7 +45,6 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public void fetchUserProfile() {
-//        Log.d(TAG, "Fetching user profile...");
         if (userId != null && authToken != null) {
             new Thread(() -> {
                 String authHeaderValue = "jwt " + authToken;
@@ -57,7 +56,6 @@ public class ProfileViewModel extends ViewModel {
                         if (response.isSuccessful()) {
                             mainHandler.post(() -> _userProfile.setValue(response.body()));
                             String responseJson = gson.toJson(response.body());
-//                            Log.d(TAG, "Response JSON: " + responseJson);
                         } else {
                             Log.e("ProfileViewModel", "Error: userId or authToken is null. Cannot fetch profile.");
                             System.err.println("API Error: " + response.code());

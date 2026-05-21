@@ -58,6 +58,7 @@ public class PermissionFragment extends Fragment {
             refreshPermissionStatus();
         });
     }
+
     private void handlePermissionClick(PermissionItem item) {
         String tag = item.getTag();
 

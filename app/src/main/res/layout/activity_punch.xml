@@ -68,17 +68,17 @@
                 app:strokeColor="#2A2A3A"
                 app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/clockText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="5dp"
-                    android:text="09:41 AM"
-                    android:textColor="#5B5BFF"
-                    android:textSize="11sp"
-                    tools:text="09:41 AM" />
+                <!--                <TextView-->
+                <!--                    android:id="@+id/clockText"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:fontFamily="monospace"-->
+                <!--                    android:paddingHorizontal="10dp"-->
+                <!--                    android:paddingVertical="5dp"-->
+                <!--                    android:text="09:41 AM"-->
+                <!--                    android:textColor="#5B5BFF"-->
+                <!--                    android:textSize="11sp"-->
+                <!--                    tools:text="09:41 AM" />-->
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
