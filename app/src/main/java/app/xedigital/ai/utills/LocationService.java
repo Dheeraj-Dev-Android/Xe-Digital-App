@@ -54,10 +54,10 @@ public class LocationService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+        startForegroundServiceWithNotification();
 
         // Thread pool to handle Geocoder requests asynchronously without blocking or dropping lookups
         geocoderExecutor = Executors.newSingleThreadExecutor();
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Standard setup for high accuracy background updates
@@ -92,7 +92,6 @@ public class LocationService extends Service {
             }
         };
 
-        startForegroundServiceWithNotification();
         requestLocationUpdates(locationRequest);
     }
 
