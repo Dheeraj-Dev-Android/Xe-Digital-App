@@ -121,9 +121,7 @@
     <color name="ic_biometric_background">#FFFFFF</color>
     <color name="ic_calender_background">#FFFFFF</color>
     <color name="cross_menu_background">#FFFFFF</color>
-
-    <!-- Indigo -->
-
-    <!-- Dark Theme Colors -->
+    <color name="gray_hint">#888888</color>
+    <color name="divider_color">#EEEEEE</color>
 
 </resources>

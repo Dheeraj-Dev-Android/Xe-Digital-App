@@ -12,175 +12,266 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:paddingBottom="15dp">
+        android:paddingBottom="24dp">
 
-        <!-- Role and Status Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
+
+            <FrameLayout
+                android:id="@+id/frameAvatar"
+                android:layout_width="96dp"
+                android:layout_height="96dp">
+
+                <View
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:background="@drawable/bg_avatar_ring" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imageViewProfile"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:src="@mipmap/ic_default_profile"
+                    app:civ_border_color="@color/white"
+                    app:civ_border_width="2dp" />
+
+                <FrameLayout
+                    android:id="@+id/btnPickImage"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_camera_badge"
+                    android:clickable="true"
+                    android:contentDescription="Change profile photo"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:src="@android:drawable/ic_menu_camera"
+                        app:tint="@color/gradient_start" />
+                </FrameLayout>
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Profile Photo"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/divider_color" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:letterSpacing="0.08"
+            android:text="ACCOUNT"
+            android:textColor="@color/gray_hint"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
-            <!-- Role Section -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="6dp"
                     android:labelFor="@id/spinnerRole"
                     android:text="Role"
                     android:textColor="@android:color/black"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="14dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/spinnerRole"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Please select"
+                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:hint="Select role"
                         android:inputType="none"
-                        android:textColor="@color/_000000" />
+                        android:textColor="@color/_000000"
+                        android:textSize="14sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Status Section -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="6dp"
                     android:text="Status"
                     android:textColor="@android:color/black"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="Status">
+                    android:layout_marginBottom="14dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/spinnerStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:hint="Select status"
                         android:inputType="none"
-                        android:textColor="@color/_000000" />
+                        android:textColor="@color/_000000"
+                        android:textSize="14sp" />
+
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- First Name and Last Name Row -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/divider_color" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:letterSpacing="0.08"
+            android:text="PERSONAL"
+            android:textColor="@color/gray_hint"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
-            <!-- First Name Section -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="First Name"
+                    android:layout_marginBottom="6dp"
+                    android:text="First name"
                     android:textColor="@android:color/black"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="14dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextFirstName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Enter first name"
+                        android:hint="First name"
                         android:inputType="textPersonName"
-                        android:textColor="@color/_000000" />
+                        android:textColor="@color/_000000"
+                        android:textSize="14sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Last Name Section -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Last Name"
+                    android:layout_marginBottom="6dp"
+                    android:text="Last name"
                     android:textColor="@android:color/black"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="14dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextLastName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Enter last name"
+                        android:hint="Last name"
                         android:inputType="textPersonName"
-                        android:textColor="@color/_000000" />
+                        android:textColor="@color/_000000"
+                        android:textSize="14sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Email Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="6dp"
             android:text="Email"
             android:textColor="@android:color/black"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="14dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextEmail"
@@ -188,18 +279,34 @@
                 android:layout_height="wrap_content"
                 android:hint="Enter email address"
                 android:inputType="textEmailAddress"
-                android:textColor="@color/_000000" />
+                android:textColor="@color/_000000"
+                android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Password Section -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/divider_color" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
+            android:letterSpacing="0.08"
+            android:text="SECURITY"
+            android:textColor="@color/gray_hint"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
             android:text="Password"
             android:textColor="@android:color/black"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -207,7 +314,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="14dp"
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -217,18 +324,18 @@
                 android:hint="Enter password"
                 android:inputType="textPassword"
                 android:maxLength="16"
-                android:textColor="@color/_000000" />
+                android:textColor="@color/_000000"
+                android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Confirm Password Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Confirm Password"
+            android:layout_marginBottom="6dp"
+            android:text="Confirm password"
             android:textColor="@android:color/black"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -246,46 +353,46 @@
                 android:hint="Confirm your password"
                 android:inputType="textPassword"
                 android:maxLength="16"
-                android:textColor="@color/_000000" />
+                android:textColor="@color/_000000"
+                android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal">
-            <!-- Clear Button -->
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/clearForm"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:text="Clear Form"
+                android:text="Clear form"
                 android:textAllCaps="false"
                 android:textColor="@color/_000000"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 app:cornerRadius="8dp"
                 app:strokeColor="@color/_000000"
-                app:strokeWidth="2dp" />
+                app:strokeWidth="1dp" />
 
-            <!-- Update Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonUpdate"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/_000000"
-                android:text="Update Profile"
+                android:text="Update profile"
                 android:textAllCaps="false"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 app:cornerRadius="8dp"
-                app:elevation="4dp" />
+                app:elevation="2dp" />
         </LinearLayout>
 
         <ProgressBar
@@ -294,5 +401,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone" />
+
     </LinearLayout>
 </ScrollView>

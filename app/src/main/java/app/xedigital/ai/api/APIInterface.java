@@ -1,8 +1,10 @@
 package app.xedigital.ai.api;
 
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
+import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
 import app.xedigital.ai.model.TeamUnderManagerResponse.TeamUnderManagerResponse;
+import app.xedigital.ai.model.UpdateProfile.UpdateProfileImageResponse;
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
 import app.xedigital.ai.model.addAttendanceRequest.AddedAttendanceCancelRequest;
 import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
@@ -110,6 +112,10 @@ public interface APIInterface {
 
     @GET("employees/attendance/regularize/applied")
     retrofit2.Call<RegularizeAppliedResponse> getRegularizeApplied(@Header("Authorization") String authToken);
+
+    //    https://app.xedigital.ai/api/v1/employees/attendance/punch/logs/667d37233138d05f34b2c0ab?pDate=2026-05-22T00:00:00.000Z
+    @GET("employees/attendance/punch/logs/{attendanceId}")
+    retrofit2.Call<AttendanceLogResponse> getAttendanceLogs(@Header("Authorization") String authToken, @Path("attendanceId") String attendanceId, @Query("pDate") String pDate);
 
     @GET("leaves/employee")
     retrofit2.Call<LeavesResponse> getLeaves(@Header("Authorization") String authToken);
@@ -230,6 +236,14 @@ public interface APIInterface {
 
 //    PUT API
 
+    @PUT("employees/profile/image/{userId}")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<UpdateProfileImageResponse> updateProfileImage(@Header("Authorization") String token, @Path("userId") String userId, @Body RequestBody requestBody);
+
+    @PUT("users/profile/{userId}")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    retrofit2.Call<ResponseBody> editUserProfile(@Path("userId") String id, @Header("Authorization") String authToken, @Body RequestBody requestBody);
+
     @PUT("employees/attendance/regularize/applied/status/{attendanceId}")
     Call<ResponseBody> RegularizeAttendanceStatus(@Header("Authorization") String authToken, @Path("attendanceId") String attendanceId, @Body RegularizeUpdateRequest requestBody);
 
@@ -295,10 +309,6 @@ public interface APIInterface {
 
     @POST("visitors/preapproved")
     retrofit2.Call<ResponseBody> PreApprovedVisitor(@Header("Authorization") String authToken, @Body PreApprovedVisitorRequest requestBody);
-
-    @PUT("users/profile/{userId}")
-    @Headers({"Content-Type: application/json", "Accept: application/json"})
-    retrofit2.Call<ResponseBody> editUserProfile(@Path("userId") String id, @Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @GET("employees/attendance/regularize/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})

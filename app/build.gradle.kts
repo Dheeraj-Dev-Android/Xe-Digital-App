@@ -7,15 +7,15 @@ plugins {
 
 android {
     namespace = "app.xedigital.ai"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.xedigital.ai"
         minSdk = 28
         //noinspection OldTargetApi
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 2
-        versionName = "1.12"
+        versionName = "1.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -117,6 +117,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 
     // ── WorkManager — updated from 2.9.0 to fix R8/release build issues ──────
     implementation("androidx.work:work-runtime:2.10.1")

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -93,6 +94,22 @@ public class ViewAttendanceFragment extends Fragment {
             addressDetailIn.setText(attendanceItem.getPunchInAddress());
             TextView addressDetailOut = view.findViewById(R.id.addressDetailOut);
             addressDetailOut.setText(attendanceItem.getPunchOutAddress());
+            ImageButton viewAttendanceLogButton = view.findViewById(R.id.btn_viewAttendanceLog);
+            viewAttendanceLogButton.setOnClickListener(v -> {
+                if (attendanceItem != null) {
+                    String id = attendanceItem.getId();
+                    String pDate = attendanceItem.getPunchDateFormat();
+
+                    if (pDate != null && !pDate.contains("T")) {
+                        pDate = pDate + "T00:00:00.000Z";
+                    }
+
+                    if (id != null && pDate != null) {
+                        AttendanceLogBottomSheet bottomSheet = AttendanceLogBottomSheet.newInstance(id, pDate);
+                        bottomSheet.show(getChildFragmentManager(), "AttendanceLogBottomSheet");
+                    }
+                }
+            });
 
         }
         return view;
