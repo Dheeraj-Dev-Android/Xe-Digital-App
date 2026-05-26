@@ -1,5 +1,7 @@
 package app.xedigital.ai.api;
 
+import com.airbnb.lottie.BuildConfig;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -17,12 +19,34 @@ public class APIClient {
 
     private APIClient() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(loggingInterceptor).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).build();
 
-//        OkHttpClient okHttpClient = new OkHttpClient.Builder().retryOnConnectionFailure(true).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).build();
-        retrofit1 = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
-        retrofit2 = new Retrofit.Builder().baseUrl(BASE_URL_2).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
+        // FIX: Only log the full body in DEBUG builds.
+        // In production, use BASIC (only logs URL, method, and response code) or NONE.
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        }
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .retryOnConnectionFailure(true)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build();
+
+        retrofit1 = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+
+        retrofit2 = new Retrofit.Builder()
+                .baseUrl(BASE_URL_2)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
     }
 
     public static synchronized APIClient getInstance() {
@@ -31,6 +55,10 @@ public class APIClient {
         }
         return instance;
     }
+
+    // --- API Interfaces ---
+    // Note: To keep memory footprints optimal, consider using separate
+    // OkHttpClients without logging interceptors specifically for getImage/getFace if needed.
 
     public APIInterface getApi() {
         return retrofit2.create(APIInterface.class);
@@ -99,7 +127,6 @@ public class APIClient {
     public APIInterface getEmployeeClaim() {
         return retrofit2.create(APIInterface.class);
     }
-
 
     public APIInterface UpdateRegularizeListApproval() {
         return retrofit2.create(APIInterface.class);
@@ -189,6 +216,3 @@ public class APIClient {
         return retrofit2.create(APIInterface.class);
     }
 }
-
-
-

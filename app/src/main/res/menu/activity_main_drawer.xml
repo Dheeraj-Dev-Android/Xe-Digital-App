@@ -70,6 +70,10 @@
             android:title="@string/total_leaves"
             android:visible="false" />
         <item
+            android:id="@+id/nav_team_member_leave"
+            android:title="@string/team_leaves"
+            android:visible="false" />
+        <item
             android:id="@+id/nav_applied_leaves"
             android:title="@string/leaves_applied"
             android:visible="false" />

@@ -111,6 +111,7 @@
     <string name="camera_preview_desc">Camera preview for face detection</string>
     <string name="face_overlay_desc">Face detection overlay</string>
     <string name="loading_desc">Loading indicator</string>
+    <string name="team_leaves">Team Leaves</string>
 
 
 </resources>

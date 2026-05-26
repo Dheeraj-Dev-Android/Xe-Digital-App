@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Base64;
@@ -59,7 +58,6 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.utills.BioMetric;
 import app.xedigital.ai.utills.FaceOverlayView;
-import app.xedigital.ai.utills.LocationService;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -445,7 +443,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
-                        // FIXED: Removed silent re-trigger; pushes directly to systematic failure layout
                         handleError("Face capture failed: " + exception.getMessage());
                     }
                 });
@@ -610,12 +607,12 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         safeUnbindCamera();
         toggleScannerAnimation(false);
 
-        Intent serviceIntent = new Intent(this, LocationService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
-        }
+//        Intent serviceIntent = new Intent(this, LocationService.class);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(serviceIntent);
+//        } else {
+//            startService(serviceIntent);
+//        }
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

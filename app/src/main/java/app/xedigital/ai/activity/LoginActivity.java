@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
     private View loadingOverlay;
     private boolean isRedirectInProgress = false;
 
-    // Retain dialog references to cleanly dismiss them on destroy/navigation
     private AlertDialog backgroundDialog;
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
@@ -57,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Inform them why they are seeing the settings dialog layout or notice block
                     showAlertDialog("Shift tracking requires background location 'Allow all the time' to run properly when closed.");
                 }
-            });    // Launcher for Notification Permission (Android 13+)
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         loadingOverlay = binding.loadingOverlay;
 
         hideLoginScreen();
-        checkBatteryOptimization();
+//        checkBatteryOptimization();
 
         Glide.with(this).load(R.mipmap.ic_launcher)
                 .apply(RequestOptions.bitmapTransform(new CircleCrop()))
@@ -85,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                 callLoginApi(email, password);
             }
         });
-    }    // Launcher for Foreground Location (Fine/Coarse)    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+    }
 
     @Override
     protected void onResume() {
@@ -125,10 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             showBackgroundPermissionDialog(token);
         }
-    }    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                evaluateSessionWorkflow();
-            });
+    }
 
     private void evaluateSessionWorkflow() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -164,7 +160,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                evaluateSessionWorkflow();
+            });
 
     private void showBackgroundPermissionDialog(String token) {
         if (isFinishing() || isDestroyed()) return;
@@ -207,24 +206,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
-                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
-
-                SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                String cachedToken = prefs.getString("cachedTokenPermission", null);
-
-                if (fineGranted || coarseGranted) {
-                    if (cachedToken != null) {
-                        checkPermissionsAndNavigate(cachedToken);
-                    }
-                } else {
-                    showLoginScreen();
-                    showAlertDialog("Foreground location permission is required for shift tracking.");
-                }
-            });
-
     private void callLoginApi(String email, String password) {
         showLoading(true);
         Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password);
@@ -261,6 +242,24 @@ public class LoginActivity extends AppCompatActivity {
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+
+                SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                String cachedToken = prefs.getString("cachedTokenPermission", null);
+
+                if (fineGranted || coarseGranted) {
+                    if (cachedToken != null) {
+                        checkPermissionsAndNavigate(cachedToken);
+                    }
+                } else {
+                    showLoginScreen();
+                    showAlertDialog("Foreground location permission is required for shift tracking.");
+                }
+            });
+
     private void hideLoginScreen() {
         binding.editEmail.setVisibility(View.GONE);
         binding.editPassword.setVisibility(View.GONE);
@@ -292,32 +291,6 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private void checkBatteryOptimization() {
-        if (isFinishing() || isDestroyed()) return;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String packageName = getPackageName();
-            android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
-            if (pm != null && !pm.isIgnoringBatteryOptimizations(packageName)) {
-
-                if (batteryDialog != null && batteryDialog.isShowing()) return;
-
-                batteryDialog = new MaterialAlertDialogBuilder(this)
-                        .setTitle("Keep App Running")
-                        .setMessage("To ensure tracking works while your screen is off, please disable battery optimization for this app.")
-                        .setPositiveButton("Allow", (dialog, which) -> {
-                            dialog.dismiss();
-                            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                            intent.setData(Uri.parse("package:" + packageName));
-                            startActivity(intent);
-                        })
-                        .create();
-
-                batteryDialog.show();
-            }
-        }
-    }
-
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
 
@@ -339,6 +312,36 @@ public class LoginActivity extends AppCompatActivity {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
+
+//    private void checkBatteryOptimization() {
+//        if (isFinishing() || isDestroyed()) return;
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            String packageName = getPackageName();
+//            android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+//            if (pm != null && !pm.isIgnoringBatteryOptimizations(packageName)) {
+//
+//                if (batteryDialog != null && batteryDialog.isShowing()) return;
+//
+//                batteryDialog = new MaterialAlertDialogBuilder(this)
+//                        .setTitle("Keep App Running")
+//                        .setMessage("To ensure tracking works while your screen is off, please disable battery optimization for this app.")
+//                        .setPositiveButton("Allow", (dialog, which) -> {
+//                            dialog.dismiss();
+//                            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+//                            intent.setData(Uri.parse("package:" + packageName));
+//                            startActivity(intent);
+//                        })
+//                        .create();
+//
+//                batteryDialog.show();
+//            }
+//        }
+//    }
+
+
+
+
 
 
 }

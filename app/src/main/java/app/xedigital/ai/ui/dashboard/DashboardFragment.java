@@ -192,10 +192,6 @@ public class DashboardFragment extends Fragment {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // FIX: Removed observeShiftTracking() from here completely!
-        // Observing WorkManager status updates live within an active UI layout fragment
-        // causes instant queue polling that triggers unwanted background updates.
-
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
         initializeViews(root);

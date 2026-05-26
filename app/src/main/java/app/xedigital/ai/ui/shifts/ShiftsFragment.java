@@ -30,6 +30,8 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentShiftsBinding;
+import app.xedigital.ai.model.profile.Data;
+import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.shiftTime.ShiftTypesItem;
 import app.xedigital.ai.model.shiftUpdate.ReportingManager;
 import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
@@ -93,7 +95,6 @@ public class ShiftsFragment extends Fragment {
                         }
                     }
                     if (selectedShiftId != null) {
-//                        Log.d("ShiftsFragment", "Selected shift ID: " + selectedShiftId);
                         shiftsViewModel.fetchShiftTimes(selectedShiftId);
                     } else {
                         Log.e("ShiftsFragment", "Selected shift type not found in shiftDataList");
@@ -119,26 +120,59 @@ public class ShiftsFragment extends Fragment {
                 binding.hrEmailEditText.setText(hrMail);
             }
         });
-        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
-            if (userProfile != null) {
-//                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
-                fName = userProfile.getData().getEmployee().getFirstname();
-                lName = userProfile.getData().getEmployee().getLastname();
-                email = userProfile.getData().getEmployee().getEmail();
-                contact = userProfile.getData().getEmployee().getContact();
-                binding.firstNameEditText.setText(fName);
-                binding.lastNameEditText.setText(lName);
-                binding.emailEditText.setText(email);
-                binding.contactEditText.setText(contact);
-                EmployeeId = userProfile.getData().getEmployee().getId();
-                EmployeeCode = userProfile.getData().getEmployee().getEmployeeCode();
-                EmployeeDepartment = userProfile.getData().getEmployee().getDepartment().getName();
-                EmpReportingManagerId = userProfile.getData().getEmployee().getReportingManager().getId();
-                EmpReportingManagerEmail = userProfile.getData().getEmployee().getReportingManager().getEmail();
-                EmpReportingManagerFName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
-                EmpReportingManagerLName = userProfile.getData().getEmployee().getReportingManager().getLastname();
-                EmpReportingManagerName = EmpReportingManagerFName + " " + EmpReportingManagerLName;
 
+        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
+            // 1. Check if the root profile response object or its inner 'data' block is null
+            if (userProfile == null || userProfile.getData() == null) {
+                Log.e("ShiftsFragment", "UserProfileResponse or Data object is completely null");
+                return;
+            }
+
+            Data profileData = userProfile.getData();
+
+            // 2. Check if the 'employee' object exists inside the data payload
+            if (profileData.getEmployee() == null) {
+                Log.e("ShiftsFragment", "Data exists, but the 'Employee' object field is null");
+                return;
+            }
+
+            Employee employee = profileData.getEmployee();
+
+            // Safely retrieve primary employee info strings
+            fName = employee.getFirstname();
+            lName = employee.getLastname();
+            email = employee.getEmail();
+            contact = employee.getContact();
+
+            binding.firstNameEditText.setText(fName);
+            binding.lastNameEditText.setText(lName);
+            binding.emailEditText.setText(email);
+            binding.contactEditText.setText(contact);
+
+            EmployeeId = employee.getId();
+            EmployeeCode = employee.getEmployeeCode();
+
+            // 3. Null-safe check for Department nested object
+            if (employee.getDepartment() != null) {
+                EmployeeDepartment = employee.getDepartment().getName();
+            } else {
+                EmployeeDepartment = "N/A";
+            }
+
+            // 4. Null-safe check for Reporting Manager nested object
+            if (employee.getReportingManager() != null) {
+                app.xedigital.ai.model.profile.ReportingManager manager = employee.getReportingManager();
+                EmpReportingManagerId = manager.getId();
+                EmpReportingManagerEmail = manager.getEmail();
+                EmpReportingManagerFName = manager.getFirstname();
+                EmpReportingManagerLName = manager.getLastname();
+                EmpReportingManagerName = (EmpReportingManagerFName != null ? EmpReportingManagerFName : "")
+                        + " " + (EmpReportingManagerLName != null ? EmpReportingManagerLName : "");
+            } else {
+                Log.w("ShiftsFragment", "Reporting Manager details are missing for this employee instance");
+                EmpReportingManagerId = "";
+                EmpReportingManagerEmail = "";
+                EmpReportingManagerName = "No Manager Assigned";
             }
         });
 
@@ -179,7 +213,6 @@ public class ShiftsFragment extends Fragment {
         });
 
 
-        // Add TextWatchers to shift type and shift time spinners to remove errors when they are filled
         binding.shiftTypeSpinner.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -223,7 +256,6 @@ public class ShiftsFragment extends Fragment {
                 String shiftTime = shiftTimeSpinner.getText().toString();
                 String hrEmail = hrEmailEditText.getText().toString();
 
-                // Assuming ShiftsItem is the data class corresponding to the shift type
                 ShiftsItem selectedShiftItem = null;
                 if (shiftsViewModel.getShiftTypes().getValue() != null) {
                     for (ShiftsItem shift : shiftsViewModel.getShiftTypes().getValue()) {
@@ -237,7 +269,6 @@ public class ShiftsFragment extends Fragment {
                 if (selectedShiftItem != null) {
                     String shiftTypeId = selectedShiftItem.getId();
 
-                    // Assuming ShiftTypesItem is the data class corresponding to the shift time
                     ShiftTypesItem selectedShiftTimeItem = null;
                     if (shiftsViewModel.getShiftTimes().getValue() != null) {
                         for (ShiftTypesItem shift : shiftsViewModel.getShiftTimes().getValue()) {
@@ -251,7 +282,6 @@ public class ShiftsFragment extends Fragment {
                     if (selectedShiftTimeItem != null) {
                         String shiftTimeId = selectedShiftTimeItem.getId();
 
-                        // Create ShiftUpdateRequest object
                         ShiftUpdateRequest requestBody = new ShiftUpdateRequest();
                         requestBody.setContact(contact);
                         requestBody.setEmail(email);
@@ -266,7 +296,6 @@ public class ShiftsFragment extends Fragment {
                         requestBody.setReportingManagerEmail(EmpReportingManagerEmail);
                         requestBody.setReportingManagerName(EmpReportingManagerName);
                         requestBody.setStatus("");
-
 
                         ReportingManager reportingManager = new ReportingManager();
                         reportingManager.setId(EmpReportingManagerId);
@@ -284,10 +313,8 @@ public class ShiftsFragment extends Fragment {
                                 if (response.isSuccessful()) {
                                     shiftTypeSpinner.setText("");
                                     shiftTimeSpinner.setText("");
-                                    // Handle success
                                     Toast.makeText(requireContext(), "Shift change request submitted successfully", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    // Handle error
                                     Toast.makeText(requireContext(), "Failed to submit shift change request", Toast.LENGTH_SHORT).show();
                                     Log.e("ShiftsFragment", "API Error: " + response.errorBody());
                                 }
@@ -295,7 +322,6 @@ public class ShiftsFragment extends Fragment {
 
                             @Override
                             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                                // Handle network failure
                                 Toast.makeText(requireContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                                 Log.e("ShiftsFragment", "Network Error: " + t.getMessage());
                             }
@@ -317,7 +343,6 @@ public class ShiftsFragment extends Fragment {
     private boolean validateForm() {
         boolean isValid = true;
 
-        // Validate shift type
         if (binding.shiftTypeSpinner.getText().toString().isEmpty()) {
             binding.shiftTypeTextInputLayout.setError("Shift type is required");
             isValid = false;
@@ -325,7 +350,6 @@ public class ShiftsFragment extends Fragment {
             binding.shiftTypeTextInputLayout.setError(null);
         }
 
-        // Validate shift time
         if (binding.shiftTimeSpinner.getText().toString().isEmpty()) {
             binding.shiftTimeTextInputLayout.setError("Shift time is required");
             isValid = false;
@@ -341,5 +365,4 @@ public class ShiftsFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 }

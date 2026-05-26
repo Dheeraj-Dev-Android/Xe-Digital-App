@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,6 +19,8 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -59,6 +64,7 @@ public class AttendanceByManagerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setHasOptionsMenu(true);
 
         tvFromDate = view.findViewById(R.id.tvFromDate);
         tvToDate = view.findViewById(R.id.tvToDate);
@@ -252,5 +258,27 @@ public class AttendanceByManagerFragment extends Fragment {
         layoutLoading.setVisibility(View.GONE);
         layoutEmptyState.setVisibility(View.VISIBLE);
         swipeRefresh.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_pending_regularize_attendance, menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (super.onOptionsItemSelected(item)) {
+            return true;
+        }
+        int id = item.getItemId();
+        if (id == R.id.action_pendingApproval_attendance) {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_navManager_attendance_menu_to_nav_pendingApprovalFragment);
+            return true;
+        }
+        return false;
     }
 }

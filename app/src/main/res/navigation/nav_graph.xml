@@ -485,13 +485,24 @@
     <fragment
         android:id="@+id/navManager_attendance_menu"
         android:name="app.xedigital.ai.ui.AttendanceByManager.AttendanceByManagerFragment"
-        android:label="Manager Attendance Menu"
-        tools:layout="@layout/fragment_attendance_by_manager" />
+        android:label="Team Attendance"
+        tools:layout="@layout/fragment_attendance_by_manager">
+        <action
+            android:id="@+id/action_navManager_attendance_menu_to_nav_pendingApprovalFragment"
+            app:destination="@+id/nav_pendingApprovalFragment" />
+
+    </fragment>
     <fragment
         android:id="@+id/navTeam_member"
         android:name="app.xedigital.ai.ui.TeamMember.TeamMemberFragment"
         android:label="Team Members"
         tools:layout="@layout/fragment_team_member" />
+
+    <fragment
+        android:id="@+id/nav_team_member_leave"
+        android:name="app.xedigital.ai.ui.TeamLeaves.TeamLeavesFragment"
+        android:label="Team Leaves"
+        tools:layout="@layout/fragment_team_leaves" />
 
     <fragment
         android:id="@+id/nav_settings"

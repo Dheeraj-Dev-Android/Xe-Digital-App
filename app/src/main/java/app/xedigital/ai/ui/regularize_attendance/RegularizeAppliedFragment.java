@@ -32,7 +32,6 @@ import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-
 public class RegularizeAppliedFragment extends Fragment {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private ProgressBar loadingProgress;
@@ -44,7 +43,6 @@ public class RegularizeAppliedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -53,8 +51,10 @@ public class RegularizeAppliedFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.regularize_applied_recycler_view);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
+
         loadingProgress.setVisibility(View.VISIBLE);
         APIInterface apiInterface = APIClient.getInstance().getRegularizeApplied();
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -65,17 +65,24 @@ public class RegularizeAppliedFragment extends Fragment {
 
             @Override
             public void onResponse(@NonNull Call<RegularizeAppliedResponse> call, @NonNull retrofit2.Response<RegularizeAppliedResponse> response) {
+                // LIFECYCLE GUARD: If Xiaomi OS destroyed the fragment/view context while network was in-flight, exit gracefully.
+                if (!isAdded() || getContext() == null || getView() == null) {
+                    return;
+                }
+
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     apiResponse = response.body();
-//                    Log.d("RegularizeApplied", gson.toJson(apiResponse));
                     List<AttendanceRegularizeAppliedItem> items = apiResponse.getData().getAttendanceRegularizeApplied();
-                    if (items.isEmpty()) {
+
+                    if (items == null || items.isEmpty()) {
                         emptyStateText.setVisibility(View.VISIBLE);
                     } else {
                         emptyStateText.setVisibility(View.GONE);
                         regularizeAppliedAdapter = new RegularizeAppliedAdapter(items);
                         recyclerView.setAdapter(regularizeAppliedAdapter);
+
+                        // Apply whatever chip filter the user selected while the network request was executing
                         filterLeaves(currentFilterStatus);
                     }
                 } else {
@@ -85,29 +92,15 @@ public class RegularizeAppliedFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<RegularizeAppliedResponse> call, @NonNull Throwable t) {
+                if (!isAdded() || getContext() == null) return;
                 Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
                 loadingProgress.setVisibility(View.GONE);
             }
         });
+
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
         chipGroup.setSingleSelection(true);
 
-//        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-//            // Handle chip selection
-//            if (checkedIds.contains(R.id.chipAll)) {
-//                filterLeaves("All");
-//            } else if (checkedIds.contains(R.id.chipApproved)) {
-//                filterLeaves("Approved");
-//            } else if (checkedIds.contains(R.id.chipUnapproved)) {
-//                filterLeaves("Unapproved");
-//            } else if (checkedIds.contains(R.id.chipRejected)) {
-//                filterLeaves("Rejected");
-//            } else if (checkedIds.contains(R.id.chipCancelled)) {
-//                filterLeaves("Cancelled");
-//            } else {
-//                filterLeaves("All");
-//            }
-//        });
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.contains(R.id.chipAll)) currentFilterStatus = "All";
             else if (checkedIds.contains(R.id.chipApproved)) currentFilterStatus = "Approved";
@@ -116,8 +109,12 @@ public class RegularizeAppliedFragment extends Fragment {
             else if (checkedIds.contains(R.id.chipCancelled)) currentFilterStatus = "Cancelled";
             else currentFilterStatus = "All";
 
-            filterLeaves(currentFilterStatus);
+            // RACE CONDITION GUARD: Only execute filtering logic if the API response has successfully populated the adapter
+            if (regularizeAppliedAdapter != null) {
+                filterLeaves(currentFilterStatus);
+            }
         });
+
         // Attach click listeners to chips
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             View child = chipGroup.getChildAt(i);
@@ -129,53 +126,41 @@ public class RegularizeAppliedFragment extends Fragment {
     }
 
     public void onChipClicked(View view) {
-        // Get the ChipGroup and the clicked chip
+        if (getView() == null) return;
         ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
-
-        // Check the clicked chip
-        chipGroup.check(clickedChip.getId());
-    }
-
-    //    private void filterLeaves(String status) {
-//        if (apiResponse != null && apiResponse.getData() != null && apiResponse.getData().getAttendanceRegularizeApplied() != null) {
-//            List<AttendanceRegularizeAppliedItem> originalList = apiResponse.getData().getAttendanceRegularizeApplied();
-//            List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
-//
-//            if (status.equals("All")) {
-//                filteredList.addAll(originalList);
-//            } else {
-//                for (AttendanceRegularizeAppliedItem item : originalList) {
-//                    if (item.getStatus().equalsIgnoreCase(status)) {
-//                        filteredList.add(item);
-//                    }
-//                }
-//            }
-//            regularizeAppliedAdapter.updateList(filteredList);
-//        }
-//    }
-    private void filterLeaves(String status) {
-        if (apiResponse != null && apiResponse.getData() != null && apiResponse.getData().getAttendanceRegularizeApplied() != null) {
-
-            // ADD THIS NULL CHECK HERE
-            if (regularizeAppliedAdapter == null) {
-                return;
-            }
-
-            List<AttendanceRegularizeAppliedItem> originalList = apiResponse.getData().getAttendanceRegularizeApplied();
-            List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
-
-            if (status.equals("All")) {
-                filteredList.addAll(originalList);
-            } else {
-                for (AttendanceRegularizeAppliedItem item : originalList) {
-                    if (item.getStatus().equalsIgnoreCase(status)) {
-                        filteredList.add(item);
-                    }
-                }
-            }
-            regularizeAppliedAdapter.updateList(filteredList);
+        if (chipGroup != null && clickedChip != null) {
+            chipGroup.check(clickedChip.getId());
         }
     }
 
+    private void filterLeaves(String status) {
+        // ADAPTER INITIALIZATION GUARD: Exit early if adapter doesn't exist yet to avoid V1.f.e NPE
+        if (regularizeAppliedAdapter == null) {
+            return;
+        }
+
+        // DATA CONSISTENCY GUARD: Verify API datasets are fully intact before running calculations
+        if (apiResponse == null || apiResponse.getData() == null || apiResponse.getData().getAttendanceRegularizeApplied() == null) {
+            return;
+        }
+
+        List<AttendanceRegularizeAppliedItem> originalList = apiResponse.getData().getAttendanceRegularizeApplied();
+        List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
+
+        if ("All".equalsIgnoreCase(status)) {
+            // Null-check individual inner array objects within the response loop
+            for (AttendanceRegularizeAppliedItem item : originalList) {
+                if (item != null) filteredList.add(item);
+            }
+        } else {
+            for (AttendanceRegularizeAppliedItem item : originalList) {
+                if (item != null && item.getStatus() != null && item.getStatus().equalsIgnoreCase(status)) {
+                    filteredList.add(item);
+                }
+            }
+        }
+
+        regularizeAppliedAdapter.updateList(filteredList);
+    }
 }

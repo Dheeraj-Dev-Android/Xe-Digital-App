@@ -124,4 +124,32 @@
     <color name="gray_hint">#888888</color>
     <color name="divider_color">#EEEEEE</color>
 
+
+    <!-- Backgrounds -->
+    <color name="background_page">#F4F3EF</color>
+    <color name="background_surface">#FFFFFF</color>
+
+    <color name="text_hint">#9E9D99</color>
+
+    <!-- Divider -->
+    <color name="divider">#ECEAE4</color>
+
+    <!-- Avatar -->
+    <color name="avatar_bg">#E6F1FB</color>
+    <color name="avatar_text">#0C447C</color>
+
+    <!-- Badge (employee ID) -->
+    <color name="badge_bg">#F1EFE8</color>
+    <color name="badge_text">#5F5E5A</color>
+
+    <!-- Leave status -->
+    <color name="leave_used">#D85A30</color>
+    <color name="leave_balance_positive">#0F6E56</color>
+    <color name="leave_balance_zero">#D85A30</color>
+
+    <!-- Progress bar -->
+    <color name="progress_track">#ECEAE4</color>
+    <color name="progress_fill">#1D9E75</color>
+    <color name="progress_fill_warn">#EF9F27</color>
+    <color name="progress_fill_danger">#D85A30</color>
 </resources>

@@ -50,19 +50,15 @@ public class AttendanceViewModel extends ViewModel {
 
     public void fetchAttendance(String startDate, String endDate) {
         if (startDate == null || startDate.isEmpty() || endDate == null || endDate.isEmpty()) {
-            // If start or end date is not provided, default to the last 30 days
             Calendar calendar = Calendar.getInstance();
             endDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
             calendar.add(Calendar.DAY_OF_MONTH, -30);
             startDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
 
-            // Make API call for default date range
             fetchEmployeeAttendance(startDate, endDate);
         } else {
-            // Make API call with user-provided dates
             fetchEmployeeAttendance(startDate, endDate);
         }
-
     }
 
     public LiveData<Boolean> getShowNoDataAlert() {
@@ -78,27 +74,46 @@ public class AttendanceViewModel extends ViewModel {
                     public void onResponse(@NonNull Call<EmployeeAttendanceResponse> call, @NonNull Response<EmployeeAttendanceResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             EmployeeAttendanceResponse responseBody = response.body();
+
+                            // Post the response body to LiveData safely
                             mainHandler.post(() -> _attendance.setValue(responseBody));
+
+                            // Show the date range toast message
                             mainHandler.post(() -> {
                                 String message = "Attendance Showing from " + startDate + " to " + endDate;
                                 showToastMessage(message);
                             });
-                            if (responseBody.getData().getEmployeePunchData().isEmpty()) {
-                                mainHandler.post(() -> showNoDataAlert.setValue(true));
+
+                            // 1. Ensure responseBody.getData() is not null
+                            // 2. Ensure responseBody.getData().getEmployeePunchData() is not null
+                            if (responseBody.getData() != null && responseBody.getData().getEmployeePunchData() != null) {
+                                if (responseBody.getData().getEmployeePunchData().isEmpty()) {
+                                    // List is empty -> Alert the user
+                                    mainHandler.post(() -> showNoDataAlert.setValue(true));
+                                } else {
+                                    // List has items -> Dismiss any alerts
+                                    mainHandler.post(() -> showNoDataAlert.setValue(false));
+                                }
                             } else {
-                                mainHandler.post(() -> showNoDataAlert.setValue(false));
+                                // If data or employeePunchData is missing entirely from the payload,
+                                // treat it safely as "No Data Available" instead of throwing a crash.
+                                mainHandler.post(() -> showNoDataAlert.setValue(true));
                             }
-//                            String responseJson = gson.toJson(response.body());
-//                            Log.d(TAG, "onResponse:\n " + responseJson);
+
                         } else {
-                            Log.e(TAG, "Error:authToken is null");
+                            Log.e(TAG, "API Error Response: Code " + response.code());
                             System.err.println("API Error : " + response.code());
+
+                            // Trigger no-data alert since the API call failed to return content
+                            mainHandler.post(() -> showNoDataAlert.setValue(true));
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<EmployeeAttendanceResponse> call, @NonNull Throwable throwable) {
                         System.err.println("Error: " + throwable.getMessage());
+                        // In case of network drops or timeout errors, trigger the no data alert state
+                        mainHandler.post(() -> showNoDataAlert.setValue(true));
                     }
                 });
             }).start();
@@ -107,5 +122,4 @@ public class AttendanceViewModel extends ViewModel {
             System.err.println("Error:authToken is null");
         }
     }
-
 }

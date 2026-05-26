@@ -2,6 +2,7 @@ package app.xedigital.ai.api;
 
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
+import app.xedigital.ai.model.TeamLeave.TeamLeaveResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
 import app.xedigital.ai.model.TeamUnderManagerResponse.TeamUnderManagerResponse;
 import app.xedigital.ai.model.UpdateProfile.UpdateProfileImageResponse;
@@ -140,6 +141,12 @@ public interface APIInterface {
 
     @GET("leaves/applied/report/manager/{employeeId}")
     retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+
+//    Team Leave
+
+    //    https://app.xedigital.ai/api/v1/leaves/employees/leaves/685bbf7b528dc12b11868484
+    @GET("leaves/employees/leaves/{employeeId}")
+    retrofit2.Call<TeamLeaveResponse> getTeamLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
     @GET("claims/employee/claimLength")
     retrofit2.Call<ClaimLengthResponse> getClaimLength(@Header("Authorization") String authToken);

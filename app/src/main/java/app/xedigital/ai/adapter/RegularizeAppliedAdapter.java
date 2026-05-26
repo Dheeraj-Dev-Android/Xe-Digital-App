@@ -4,7 +4,6 @@ import static app.xedigital.ai.ui.regularize_attendance.RegularizeViewFragment.A
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import app.xedigital.ai.R;
@@ -28,10 +28,12 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeAppliedAdapter.ViewHolder> {
 
-    private List<AttendanceRegularizeAppliedItem> items;
+    private List<AttendanceRegularizeAppliedItem> items = new ArrayList<>();
 
     public RegularizeAppliedAdapter(List<AttendanceRegularizeAppliedItem> items) {
-        this.items = items;
+        if (items != null) {
+            this.items = items;
+        }
     }
 
     @NonNull
@@ -41,86 +43,71 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AttendanceRegularizeAppliedItem item = items.get(position);
+        if (item == null) return;
 
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
         holder.empPunchDate.setText("Punch Date : " + formattedPunchDate);
+
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
         holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
-//        holder.appliedStatus.setText(item.getStatus());
 
         holder.statusChip.setText(item.getStatus());
 
-        String status = item.getStatus().toLowerCase();
+        String status = item.getStatus() != null ? item.getStatus().toLowerCase() : "";
         int chipColor;
 
         if (status.equals("approved")) {
             chipColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved);
         } else if (status.equals("unapproved")) {
             chipColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
-        } else if (status.equals("rejected")) {
-            chipColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
-        } else if (status.equals("cancelled")) {
+        } else if (status.equals("rejected") || status.equals("cancelled")) {
             chipColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
         } else {
             chipColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.icon_tint);
         }
 
-//        holder.statusChip.setChipBackgroundColorResource(chipColor);
-
         ColorStateList colorStateList = ColorStateList.valueOf(chipColor);
         holder.statusChip.setChipBackgroundColor(colorStateList);
 
+        holder.btnViewRegularize.setOnClickListener(v -> handleNavigation(v, position));
+        holder.regularizeAppliedCard.setOnClickListener(v -> handleNavigation(v, position));
+    }
 
-        holder.btnViewRegularize.setOnClickListener(v -> {
-            if (position != RecyclerView.NO_POSITION) {
-                AttendanceRegularizeAppliedItem regularizeAppliedItem = items.get(position);
-                if (regularizeAppliedItem != null && regularizeAppliedItem.getId() != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_REGULARIZE_APPLIED_ITEM, regularizeAppliedItem);
-                    Navigation.findNavController(v).navigate(R.id.action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment, bundle);
-                } else {
-                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                }
+    private void handleNavigation(View v, int position) {
+        if (position != RecyclerView.NO_POSITION && position < items.size()) {
+            AttendanceRegularizeAppliedItem regularizeAppliedItem = items.get(position);
+            if (regularizeAppliedItem != null && regularizeAppliedItem.getId() != null) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(ARG_REGULARIZE_APPLIED_ITEM, regularizeAppliedItem);
+                Navigation.findNavController(v).navigate(R.id.action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment, bundle);
             } else {
                 Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
-        });
-        holder.regularizeAppliedCard.setOnClickListener(v -> {
-            if (position != RecyclerView.NO_POSITION) {
-                AttendanceRegularizeAppliedItem regularizeAppliedItem = items.get(position);
-                if (regularizeAppliedItem != null && regularizeAppliedItem.getId() != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_REGULARIZE_APPLIED_ITEM, regularizeAppliedItem);
-                    Navigation.findNavController(v).navigate(R.id.action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment, bundle);
-                } else {
-                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
+        } else {
+            Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public int getItemCount() {
-        int size = (items != null) ? items.size() : 0;
-        Log.d("RegularizeAdapter", "getItemCount called. Items size: " + size);
-        return size;
+        return items.size();
     }
 
     public void updateList(List<AttendanceRegularizeAppliedItem> filteredList) {
-        this.items = filteredList;
+        if (filteredList == null) {
+            this.items = new ArrayList<>();
+        } else {
+            this.items = filteredList;
+        }
         notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView empPunchDate;
         public TextView appliedDate;
-        //        public TextView appliedStatus;
         public Chip statusChip;
         public ShapeableImageView btnViewRegularize;
         public MaterialCardView regularizeAppliedCard;
@@ -129,11 +116,9 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
             super(itemView);
             empPunchDate = itemView.findViewById(R.id.empPunchDate);
             appliedDate = itemView.findViewById(R.id.appliedDate);
-//            appliedStatus = itemView.findViewById(R.id.appliedStatus);
             btnViewRegularize = itemView.findViewById(R.id.btn_viewRegularize);
             statusChip = itemView.findViewById(R.id.statusChip);
             regularizeAppliedCard = itemView.findViewById(R.id.regularizeAppliedCard);
         }
-
     }
 }
