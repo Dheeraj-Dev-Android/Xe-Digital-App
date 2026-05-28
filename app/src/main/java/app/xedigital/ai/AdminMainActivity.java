@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -89,14 +88,6 @@ public class AdminMainActivity extends AppCompatActivity {
         // Handle dismiss slow internet layout
         slowInternetBinding.btnDismiss.setOnClickListener(v -> slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
 
-        // Digital Identity main toggle item
-        MenuItem digitalIdentityGroup = navigationView.getMenu().findItem(R.id.nav_digital_identity);
-        digitalIdentityGroup.setOnMenuItemClickListener(item -> {
-            toggleVisitorSubMenuVisibility(navigationView.getMenu());
-            return true;
-        });
-        // Set all sub-items initially hidden (if needed)
-        setVisitorSubMenuVisibility(navigationView.getMenu(), false);
 
         if (navigationView != null) {
             fetchUserProfileData();
@@ -126,18 +117,6 @@ public class AdminMainActivity extends AppCompatActivity {
         });
     }
 
-    private void setVisitorSubMenuVisibility(Menu menu, boolean visible) {
-        menu.findItem(R.id.nav_visitorCheckInFragment).setVisible(visible);
-        menu.findItem(R.id.nav_visitorDetailsFragment).setVisible(visible);
-//        menu.findItem(R.id.nav_employees).setVisible(visible);
-//        menu.findItem(R.id.nav_partners).setVisible(visible);
-//        menu.findItem(R.id.nav_allUsers).setVisible(visible);
-
-        MenuItem parentItem = menu.findItem(R.id.nav_digital_identity);
-        parentItem.setIcon(visible ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
-        isVisitorSubMenuVisible = visible;
-    }
-
 
     // Internet UI Handlers
     public void showNoInternetLayout() {
@@ -159,18 +138,10 @@ public class AdminMainActivity extends AppCompatActivity {
         slowInternetBinding.tvSpeed.setText(speedText);
     }
 
-    private void toggleVisitorSubMenuVisibility(Menu menu) {
-        boolean newVisibility = !isVisitorSubMenuVisible;
-        setVisitorSubMenuVisibility(menu, newVisibility);
-        binding.adminNavView.invalidate();
-    }
-
     private void handleLogout() {
         // Access the same SharedPreferences file used in Login
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        // .clear() removes EVERYTHING (email, password, token, isRemembered)
         editor.clear();
         editor.apply();
 

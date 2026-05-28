@@ -1,10 +1,8 @@
 package app.xedigital.ai.adminUI.adminDashboard;
 
 import static app.xedigital.ai.utills.BirthdayUtils.formatBirthdayDate;
-import static app.xedigital.ai.utills.BirthdayUtils.isBirthdayToday;
 
 import android.graphics.Rect;
-import android.icu.util.Calendar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.Admin.EmployeeDetails.EmployeesItem;
@@ -32,117 +24,26 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmployeesAdapter.BirthdayViewHolder> {
 
-    private List<EmployeesItem> birthdayEmployees;
+    private final List<EmployeesItem> birthdayEmployees;
 
     public BirthdayEmployeesAdapter() {
         this.birthdayEmployees = new ArrayList<>();
     }
 
     public static void setupHorizontalScrolling(RecyclerView recyclerView) {
-        // Set horizontal LinearLayoutManager
+        if (recyclerView == null) return;
         LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-        // Add item decoration for spacing between items
-        recyclerView.addItemDecoration(new HorizontalSpaceItemDecoration(recyclerView.getContext().getResources().getDimensionPixelSize(R.dimen.birthday_item_spacing)));
+        int spacing = recyclerView.getContext().getResources().getDimensionPixelSize(R.dimen.birthday_item_spacing);
+        recyclerView.addItemDecoration(new HorizontalSpaceItemDecoration(spacing));
     }
 
-//    public void updateBirthdayEmployees(List<EmployeesItem> employees) {
-//        this.birthdayEmployees = employees != null ? new ArrayList<>(employees) : new ArrayList<>();
-//
-//        this.birthdayEmployees.sort(new Comparator<EmployeesItem>() {
-//            private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//
-//            @Override
-//            public int compare(EmployeesItem e1, EmployeesItem e2) {
-//                try {
-//                    if (e1.getDateOfBirth() == null || e2.getDateOfBirth() == null) {
-//                        return 0;
-//                    }
-//
-//                    Date date1 = sdf.parse(e1.getDateOfBirth());
-//                    Date date2 = sdf.parse(e2.getDateOfBirth());
-//
-//                    Calendar cal1 = Calendar.getInstance();
-//                    Calendar cal2 = Calendar.getInstance();
-//
-//                    cal1.setTime(date1);
-//                    cal2.setTime(date2);
-//
-//                    int month1 = cal1.get(Calendar.MONTH);
-//                    int day1 = cal1.get(Calendar.DAY_OF_MONTH);
-//
-//                    int month2 = cal2.get(Calendar.MONTH);
-//                    int day2 = cal2.get(Calendar.DAY_OF_MONTH);
-//
-//                    // Compare by month first, then by day
-//                    if (month1 != month2) {
-//                        return Integer.compare(month1, month2);
-//                    } else {
-//                        return Integer.compare(day1, day2);
-//                    }
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                    return 0;
-//                }
-//            }
-//        });
-//
-//        notifyDataSetChanged();
-//    }
-
     public void updateBirthdayEmployees(List<EmployeesItem> employees) {
-        if (employees == null) {
-            this.birthdayEmployees = new ArrayList<>();
-        } else {
-            // Filter only active employees
-            this.birthdayEmployees = new ArrayList<>();
-            for (EmployeesItem emp : employees) {
-                if (emp.isActive()) {
-                    this.birthdayEmployees.add(emp);
-                }
-
-            }
+        this.birthdayEmployees.clear();
+        if (employees != null) {
+            this.birthdayEmployees.addAll(employees);
         }
-
-        // Sort by birthday (month and day)
-        this.birthdayEmployees.sort(new Comparator<EmployeesItem>() {
-            private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-            @Override
-            public int compare(EmployeesItem e1, EmployeesItem e2) {
-                try {
-                    if (e1.getDateOfBirth() == null || e2.getDateOfBirth() == null) {
-                        return 0;
-                    }
-
-                    Date date1 = sdf.parse(e1.getDateOfBirth());
-                    Date date2 = sdf.parse(e2.getDateOfBirth());
-
-                    Calendar cal1 = Calendar.getInstance();
-                    Calendar cal2 = Calendar.getInstance();
-
-                    cal1.setTime(date1);
-                    cal2.setTime(date2);
-
-                    int month1 = cal1.get(Calendar.MONTH);
-                    int day1 = cal1.get(Calendar.DAY_OF_MONTH);
-
-                    int month2 = cal2.get(Calendar.MONTH);
-                    int day2 = cal2.get(Calendar.DAY_OF_MONTH);
-
-                    if (month1 != month2) {
-                        return Integer.compare(month1, month2);
-                    } else {
-                        return Integer.compare(day1, day2);
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    return 0;
-                }
-            }
-        });
-
         notifyDataSetChanged();
     }
 
@@ -155,8 +56,12 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
 
     @Override
     public void onBindViewHolder(@NonNull BirthdayViewHolder holder, int position) {
-        EmployeesItem employee = birthdayEmployees.get(position);
-        holder.bind(employee);
+        if (position >= 0 && position < birthdayEmployees.size()) {
+            EmployeesItem employee = birthdayEmployees.get(position);
+            if (employee != null) {
+                holder.bind(employee);
+            }
+        }
     }
 
     @Override
@@ -164,7 +69,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         return birthdayEmployees.size();
     }
 
-    // Item decoration for horizontal spacing
     public static class HorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
         private final int spacing;
 
@@ -175,19 +79,18 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         @Override
         public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             int position = parent.getChildAdapterPosition(view);
+            if (parent.getAdapter() == null) return;
+            int totalItems = parent.getAdapter().getItemCount();
 
-            // Add spacing to the right of each item except the last one
-            if (position < (Objects.requireNonNull(parent.getAdapter()).getItemCount() - 1)) {
+            if (position == RecyclerView.NO_POSITION || totalItems == 0) return;
+
+            if (position < (totalItems - 1)) {
                 outRect.right = spacing;
             }
-
-            // Add spacing to the left of the first item
             if (position == 0) {
                 outRect.left = spacing / 2;
             }
-
-            // Add spacing to the right of the last item
-            if (position == parent.getAdapter().getItemCount() - 1) {
+            if (position == totalItems - 1) {
                 outRect.right = spacing / 2;
             }
         }
@@ -201,6 +104,7 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         private final TextView department;
         private final TextView email;
         private final TextView contact;
+        private final String fallbackText = "Data Not Available";
 
         public BirthdayViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -214,58 +118,62 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         }
 
         public void bind(EmployeesItem employee) {
-            String fullName = "";
-            if (employee.getFirstname() != null && employee.getLastname() != null) {
-                fullName = employee.getFirstname() + " " + employee.getLastname();
-            } else if (employee.getFirstname() != null) {
-                fullName = employee.getFirstname();
-            } else if (employee.getLastname() != null) {
-                fullName = employee.getLastname();
+            String firstName = employee.getFirstname();
+            String lastName = employee.getLastname();
+            String fullName;
+
+            if (firstName != null && !firstName.trim().isEmpty() && lastName != null && !lastName.trim().isEmpty()) {
+                fullName = firstName.trim() + " " + lastName.trim();
+            } else if (firstName != null && !firstName.trim().isEmpty()) {
+                fullName = firstName.trim();
+            } else if (lastName != null && !lastName.trim().isEmpty()) {
+                fullName = lastName.trim();
             } else {
-                fullName = "Unknown";
+                fullName = fallbackText;
             }
             employeeName.setText(fullName);
 
-            // Set employee code
-            employeeCode.setText(employee.getEmployeeCode() != null ? employee.getEmployeeCode() : "N/A");
+            employeeCode.setText((employee.getEmployeeCode() != null && !employee.getEmployeeCode().trim().isEmpty())
+                    ? employee.getEmployeeCode() : fallbackText);
 
-            // Set department - Added null check for department object
-            if (employee.getDepartment() != null && employee.getDepartment().getName() != null) {
+            if (employee.getDepartment() != null && employee.getDepartment().getName() != null && !employee.getDepartment().getName().trim().isEmpty()) {
                 department.setText(employee.getDepartment().getName());
             } else {
-                department.setText("N/A");
+                department.setText(fallbackText);
             }
 
-            // Set email
-            email.setText(employee.getEmail() != null ? employee.getEmail() : "N/A");
+            email.setText((employee.getEmail() != null && !employee.getEmail().trim().isEmpty()) ? employee.getEmail() : fallbackText);
+            contact.setText((employee.getContact() != null && !employee.getContact().trim().isEmpty()) ? employee.getContact() : fallbackText);
 
-            // Set contact
-            contact.setText(employee.getContact() != null ? employee.getContact() : "N/A");
-
-            // Set birthday date
             setBirthdayDate(employee.getDateOfBirth());
-
-            // Load profile image
             loadProfileImage(employee);
         }
 
         private void setBirthdayDate(String dateOfBirth) {
-            String formattedDate = formatBirthdayDate(dateOfBirth);
-            birthdayDate.setText(formattedDate);
-
-            // Add special styling for today's birthday
-            if (isBirthdayToday(dateOfBirth)) {
-                birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.white));
-            } else {
-                birthdayDate.setTextColor(itemView.getContext().getResources().getColor(android.R.color.white));
+            if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
+                birthdayDate.setText(fallbackText);
+                return;
+            }
+            try {
+                String formattedDate = formatBirthdayDate(dateOfBirth);
+                birthdayDate.setText((formattedDate != null && !formattedDate.trim().isEmpty()) ? formattedDate : fallbackText);
+            } catch (Exception e) {
+                birthdayDate.setText(fallbackText);
             }
         }
 
         private void loadProfileImage(EmployeesItem employee) {
-            if (employee.getProfileImageUrl() != null) {
-                Glide.with(itemView.getContext()).load(employee.getProfileImageUrl()).apply(new RequestOptions().placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).centerCrop()).into(profileImage);
+            Object rawUrl = employee.getProfileImageUrl();
+
+            if (rawUrl != null) {
+                Glide.with(itemView.getContext())
+                        .load(rawUrl)
+                        .apply(new RequestOptions()
+                                .placeholder(R.drawable.ic_profile_placeholder)
+                                .error(R.drawable.ic_profile_placeholder)
+                                .centerCrop())
+                        .into(profileImage);
             } else {
-                // Set default profile image
                 profileImage.setImageResource(R.drawable.ic_profile_placeholder);
             }
         }

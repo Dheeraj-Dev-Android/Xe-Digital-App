@@ -14,7 +14,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.biometric.BiometricManager;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -34,7 +33,6 @@ import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.Admin.UserDetails.Role;
 import app.xedigital.ai.model.Admin.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
-import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.BioMetric;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,7 +40,6 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
-    private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private boolean isEmployee;
     private ActivityLoginBinding binding;
@@ -59,19 +56,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
 
-        // Retrieve isEmployee from intent
         isEmployee = getIntent().getBooleanExtra("isEmployee", true);
 
-//        if (isLoggedIn()) {
-//            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-//            finish();
-//            return;
-//        }
-
-        // Initialize BiometricManager
         BiometricManager biometricManager = BiometricManager.from(this);
 
-        // Check if biometric is supported and if user is logged in
         boolean isBiometricSupported;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             isBiometricSupported = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS;
@@ -80,26 +68,22 @@ public class LoginActivity extends AppCompatActivity {
         }
         boolean isLoggedIn = isLoggedIn();
 
-        // Determine initial state of the activity based on login state
         if (isLoggedIn) {
-            // User is logged in, attempt biometric login
             if (isBiometricSupported) {
-                // Biometric is supported, initialize and authenticate
                 initializeBiometricAuth();
             } else {
-                // Biometric is not supported, jump directly to MainActivity
-                Log.e(TAG, "Biometric is not supported on this device.");
+                Log.e(TAG, "Biometric is not supported on this device. Proceeding via persistent token.");
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
             }
         } else {
             showLoginScreen();
         }
+
         Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(binding.logoImage);
         binding.btnSignin.setOnClickListener(v -> {
-            String email, password;
-            email = Objects.requireNonNull(binding.editEmail.getText()).toString();
-            password = Objects.requireNonNull(binding.editPassword.getText()).toString();
+            String email = Objects.requireNonNull(binding.editEmail.getText()).toString().trim();
+            String password = Objects.requireNonNull(binding.editPassword.getText()).toString().trim();
 
             if (email.isEmpty() || password.isEmpty()) {
                 binding.editEmail.setError("Please Enter Your Email");
@@ -112,13 +96,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initializeBiometricAuth() {
         showLoading(true);
-        // Biometric setup
         bioMetric = new BioMetric(this, this, new BioMetric.BiometricAuthListener() {
             @Override
             public void onAuthenticationSucceeded() {
-
                 runOnUiThread(() -> {
-                    // When biometric is successful, attempt to retrieve data from SharedPreferences
                     SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
                     String userId = sharedPreferences.getString("userId", null);
                     String authToken = sharedPreferences.getString("authToken", null);
@@ -133,13 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                         finish();
                     } else {
                         showLoading(false);
-                        if (userId == null && authToken == null) {
-                            Log.e(TAG, "No data found for biometric login. Please login with email and password.");
-                            showLoginScreen();
-                        }
-                        // No data found in SharedPreferences, prompt the user to login again
                         showLoginScreen();
-                        showAlertDialog("No data found for biometric login. Please login with email and password.");
                     }
                 });
             }
@@ -149,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                 showLoading(false);
                 runOnUiThread(() -> {
                     Log.e(TAG, "Authentication Error: Code=" + errorCode + ", Message='" + errString + "'");
-                    Toast.makeText(LoginActivity.this, "Authentication Error", Toast.LENGTH_SHORT).show();
+                    // Keep them on the screen to let them try password login manually without resetting data
                     showLoginScreen();
                 });
             }
@@ -158,8 +133,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthenticationFailed() {
                 showLoading(false);
                 runOnUiThread(() -> {
-                    Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_LONG).show();
-                    clearSharedPreferences();
+                    Toast.makeText(LoginActivity.this, "Authentication Failed. Please try again.", Toast.LENGTH_LONG).show();
+                    // FIX: Removed clearSharedPreferences() to prevent losing session state on touch errors
                     showLoginScreen();
                 });
             }
@@ -167,12 +142,10 @@ public class LoginActivity extends AppCompatActivity {
         bioMetric.authenticate(true);
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (bioMetric != null) {
-//            bioMetric.handlePermissionResult(requestCode, permissions, grantResults);
             bioMetric.handlePermissionResult(requestCode, permissions, grantResults, true);
         }
     }
@@ -182,8 +155,6 @@ public class LoginActivity extends AppCompatActivity {
         binding.editPassword.setVisibility(View.VISIBLE);
         binding.btnSignin.setVisibility(View.VISIBLE);
         binding.logoImage.setVisibility(View.VISIBLE);
-        binding.editEmail.setText("");
-        binding.editPassword.setText("");
     }
 
     private boolean isLoggedIn() {
@@ -193,6 +164,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showAlertDialog(String message) {
+        if (isFinishing() || isDestroyed()) return;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Error");
         builder.setMessage(message);
@@ -202,10 +174,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showLoading(boolean show) {
-        if (show) {
-            loadingOverlay.setVisibility(View.VISIBLE);
-        } else {
-            loadingOverlay.setVisibility(View.GONE);
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -217,16 +187,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
-
                     LoginModelResponse loginResponse = response.body();
-                    Log.w(TAG, "Response: " + gson.toJson(loginResponse));
 
-                    if (loginResponse.isSuccess() == Boolean.parseBoolean("true")) {
-                        getIntent().putExtra("userId", loginResponse.getData().getUser().getId());
-                        getIntent().putExtra("authToken", loginResponse.getData().getToken());
-                        getIntent().putExtra("empEmail", loginResponse.getData().getUser().getEmail());
-                        getIntent().putExtra("empFirstName", loginResponse.getData().getUser().getFirstname());
-
+                    if (loginResponse.isSuccess() && loginResponse.getData() != null && loginResponse.getData().getUser() != null) {
                         String userId = loginResponse.getData().getUser().getId();
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
@@ -234,23 +197,18 @@ public class LoginActivity extends AppCompatActivity {
                         isEmployee = true;
 
                         getUserDetails(userId, authToken, empEmail, empFirstName);
-
-//                        storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
-//                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-//                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-//                        finish();
                     } else {
-                        showAlertDialog(loginResponse.getMessage());
+                        showAlertDialog(loginResponse.getMessage() != null ? loginResponse.getMessage() : "Invalid server response layout.");
                     }
                 } else {
-                    showAlertDialog("Something went wrong");
+                    showAlertDialog("Something went wrong with the server interaction");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<LoginModelResponse> call, @NonNull Throwable t) {
                 showLoading(false);
-                showAlertDialog(t.getMessage());
+                showAlertDialog("Network failure: " + t.getMessage());
             }
         });
     }
@@ -258,8 +216,7 @@ public class LoginActivity extends AppCompatActivity {
     private void getUserDetails(String userId, String authToken, String empEmail, String empFirstName) {
         String token = "jwt " + authToken;
         AdminAPIInterface employeeDetails = AdminAPIClient.getInstance().getBase2();
-
-        retrofit2.Call<UserDetailsResponse> employees = employeeDetails.getUser(token, userId);
+        Call<UserDetailsResponse> employees = employeeDetails.getUser(token, userId);
 
         employees.enqueue(new Callback<UserDetailsResponse>() {
             @Override
@@ -267,37 +224,46 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     UserDetailsResponse userDetailResponse = response.body();
 
-                    if (userDetailResponse.isSuccess()) {
+                    if (userDetailResponse.isSuccess() && userDetailResponse.getData() != null) {
                         Role employeeRole = userDetailResponse.getData().getRole();
 
                         if (employeeRole != null) {
                             String roleName = employeeRole.getName();
-                            Log.e("EMPLOYEE_ROLE", roleName);
+                            Log.d(TAG, "User Role: " + roleName);
 
                             if ("employee".equalsIgnoreCase(roleName)) {
                                 storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                finish();
                             } else if ("branchadmin".equalsIgnoreCase(roleName) || "humanresource".equalsIgnoreCase(roleName)) {
+                                // If they have an Admin role inside Employee login, warn them but DO NOT clear preferences
                                 showAlertDialogWithLogout();
                             } else {
                                 Toast.makeText(LoginActivity.this, "Unrecognized role: " + roleName, Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(LoginActivity.this, "No role data found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "No role data found inside payload", Toast.LENGTH_SHORT).show();
                         }
-
                     } else {
-                        Toast.makeText(LoginActivity.this, "Failed to retrieve employee details", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Failed to parse system profile details template", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Error in employee details response", Toast.LENGTH_SHORT).show();
+                    // FIX: If server response drops, bypass and login offline via cache instead of forcing a logout sequence
+                    Log.e(TAG, "Server verification dropped. Logging in using current offline cached session state.");
+                    storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable throwable) {
-                Toast.makeText(LoginActivity.this, "Failed to get employee data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                // FIX: Network timed out, allow local offline access
+                Log.e(TAG, "Network timeout: " + throwable.getMessage() + ". Defaulting to local persistent state session.");
+                storeInSharedPreferences(userId, authToken, empEmail, empFirstName, true);
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             }
         });
     }
@@ -305,31 +271,12 @@ public class LoginActivity extends AppCompatActivity {
     private void showAlertDialogWithLogout() {
         if (isFinishing() || isDestroyed()) return;
 
-        new AlertDialog.Builder(this).setTitle("Access Denied").setMessage("Please login with employee credentials, or try Admin Or HR login.").setCancelable(false).setPositiveButton("OK", (dialog, which) -> {
-            dialog.dismiss();
-            logoutUser();
-        }).show();
-    }
-
-    private void logoutUser() {
-        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.clear();
-        editor.apply();
-        startActivity(new Intent(LoginActivity.this, LoginSelectionActivity.class));
-        finish();
-    }
-
-
-    private void clearSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("userId");
-        editor.remove("authToken");
-        editor.remove("empEmail");
-        editor.remove("empFirstName");
-        editor.remove("isLoggedIn");
-        editor.apply();
+        new AlertDialog.Builder(this)
+                .setTitle("Access Denied")
+                .setMessage("Please login with employee credentials, or try Admin Or HR login.")
+                .setCancelable(false)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss()) // FIX: Removed destructive logoutUser() loop
+                .show();
     }
 
     private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName, boolean b) {
@@ -341,11 +288,5 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("empFirstName", empFirstName);
         editor.putBoolean("isLoggedIn", b);
         editor.apply();
-    }
-
-    private void storeInViewModel(String userId, String authToken) {
-        ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        profileViewModel.storeLoginData(userId, authToken);
-
     }
 }

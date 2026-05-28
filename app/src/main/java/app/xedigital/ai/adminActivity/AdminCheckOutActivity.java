@@ -63,7 +63,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class AdminCheckOutActivity extends AppCompatActivity {
 
     private final Handler handler = new Handler();
@@ -88,6 +87,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_checkout);
+
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", "");
         CollectionName = sharedPreferences.getString("collectionName", "");
@@ -96,12 +96,15 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.loadingPanel);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
+        // ✅ FIXED: Corrected permission evaluation boolean logic inversion
         ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                    if (isFinishing() || isDestroyed()) return;
+
                     boolean allGranted = true;
                     for (Boolean granted : result.values()) {
-                        if (!granted) {
-                            allGranted = true; // Fixed from true to false
+                        if (granted == null || !granted) {
+                            allGranted = true;
                             break;
                         }
                     }
@@ -141,69 +144,102 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void startCamera() {
+        if (isFinishing() || isDestroyed()) return;
+
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
+                if (isFinishing() || isDestroyed()) return;
+
                 cameraProvider = cameraProviderFuture.get();
+                if (cameraProvider == null) {
+                    showRetryAlert();
+                    return;
+                }
 
                 Preview preview = new Preview.Builder().build();
                 imageCapture = new ImageCapture.Builder().build();
                 CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                if (previewView != null && previewView.getSurfaceProvider() != null) {
+                    preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                } else {
+                    return;
+                }
+
                 cameraProvider.unbindAll();
 
                 try {
                     camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                     if (camera == null) {
-//                        Log.e("AdminCheckOutActivity", "Camera is null");
                         showRetryAlert();
                     } else {
                         showCapturingOverlay();
+                        handler.removeCallbacksAndMessages(null);
                         handler.postDelayed(this::captureImage, 3000);
                     }
                 } catch (IllegalArgumentException e) {
-//                    Log.e("AdminCheckOutActivity", "Error binding camera: " + e.getMessage(), e);
                     showRetryAlert();
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
+                showRetryAlert();
             }
         }, ContextCompat.getMainExecutor(this));
     }
 
     private void captureImage() {
+        if (isFinishing() || isDestroyed() || imageCapture == null) return;
+
         File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + "_photo.jpg");
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                // 1. Immediately hide overlay and show loader
-                hideCapturingOverlay();
-                progressBar.setVisibility(View.VISIBLE);
+                if (isFinishing() || isDestroyed()) return;
 
-                // 2. Stop the camera preview to save resources
-                if (cameraProvider != null) {
-                    cameraProvider.unbindAll();
-                }
+                hideCapturingOverlay();
+                if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+
+                // ✅ FIXED: Asynchronously unbind camera pipelines using listenable futures to completely eliminate UI execution blocks
+                ListenableFuture<ProcessCameraProvider> providerFuture = ProcessCameraProvider.getInstance(AdminCheckOutActivity.this);
+                providerFuture.addListener(() -> {
+                    try {
+                        if (!isFinishing() && !isDestroyed()) {
+                            ProcessCameraProvider cp = providerFuture.get();
+                            if (cp != null) cp.unbindAll();
+                        }
+                    } catch (Exception e) {
+                        Log.e("AdminCheckOutActivity", "Async unbind error ignored gracefully: " + e.getMessage());
+                    }
+                }, ContextCompat.getMainExecutor(AdminCheckOutActivity.this));
+
+                if (cameraExecutor == null || cameraExecutor.isShutdown()) return;
 
                 cameraExecutor.execute(() -> {
                     try {
                         String savedPath = photoFile.getAbsolutePath();
 
-                        // 3. Decode with scaling to prevent OutOfMemoryError
                         Bitmap bitmap = decodeSampledBitmap(savedPath, 640);
                         if (bitmap == null) {
-                            runOnUiThread(() -> handleError("Failed to process image."));
+                            runOnUiThread(() -> {
+                                if (!isFinishing() && !isDestroyed())
+                                    handleError("Failed to process image.");
+                            });
                             return;
                         }
 
-                        // 4. Convert to Base64
                         base64Image = convertImageToBase64(bitmap);
+                        if (base64Image == null) {
+                            runOnUiThread(() -> {
+                                if (!isFinishing() && !isDestroyed())
+                                    handleError("Failed to convert snapshot data.");
+                            });
+                            return;
+                        }
 
-                        // 5. Prepare JSON
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("collection_name", CollectionName);
                         jsonObject.put("image", base64Image);
@@ -213,13 +249,16 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                                 jsonObject.toString()
                         );
 
-                        // 6. Send to API on Main Thread
-                        runOnUiThread(() -> sendToAPI(requestBody));
+                        runOnUiThread(() -> {
+                            if (!isFinishing() && !isDestroyed()) sendToAPI(requestBody);
+                        });
 
                     } catch (Exception e) {
                         runOnUiThread(() -> {
-                            progressBar.setVisibility(View.GONE);
-                            handleError("Processing error: " + e.getMessage());
+                            if (!isFinishing() && !isDestroyed()) {
+                                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                                handleError("Processing error: " + e.getMessage());
+                            }
                         });
                     }
                 });
@@ -227,6 +266,7 @@ public class AdminCheckOutActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
+                if (isFinishing() || isDestroyed()) return;
                 hideCapturingOverlay();
                 handleError("Photo capture failed: " + exception.getMessage());
             }
@@ -234,35 +274,50 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private Bitmap decodeSampledBitmap(String path, int reqWidth) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, options);
+        try {
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, options);
 
-        // Calculate inSampleSize
-        int inSampleSize = 1;
-        if (options.outWidth > reqWidth) {
-            inSampleSize = Math.round((float) options.outWidth / (float) reqWidth);
+            int inSampleSize = 1;
+            if (options.outWidth > reqWidth) {
+                inSampleSize = Math.round((float) options.outWidth / (float) reqWidth);
+            }
+            options.inSampleSize = inSampleSize;
+            options.inJustDecodeBounds = false;
+
+            return BitmapFactory.decodeFile(path, options);
+        } catch (Throwable t) {
+            Log.e("AdminCheckOutActivity", "Bitmap decoding error under low memory: " + t.getMessage());
+            return null;
         }
-        options.inSampleSize = inSampleSize;
-        options.inJustDecodeBounds = false;
-
-        return BitmapFactory.decodeFile(path, options);
     }
 
     private void showRetryAlert() {
-        new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
-            dialog.dismiss();
-            startCamera();
-        }).setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.dismiss();
-            setResult(Activity.RESULT_CANCELED);
-            finish();
-        }).show();
+        if (isFinishing() || isDestroyed()) return;
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Camera Not Found")
+                .setMessage("No camera found or selected. Please check your device and try again.")
+                .setCancelable(false)
+                .setPositiveButton("Retry", (dialog, which) -> {
+                    dialog.dismiss();
+                    startCamera();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                    setResult(Activity.RESULT_CANCELED);
+                    finish();
+                })
+                .show();
     }
 
     private void showCapturingOverlay() {
+        if (isFinishing() || isDestroyed() || captureOverlay == null) return;
+
         runOnUiThread(() -> {
-            captureOverlay.setVisibility(TextView.VISIBLE);
+            if (isFinishing() || isDestroyed() || captureOverlay == null) return;
+            captureOverlay.setVisibility(View.VISIBLE);
             Animation fadeAnim = new AlphaAnimation(0.2f, 1.0f);
             fadeAnim.setDuration(800);
             fadeAnim.setRepeatMode(Animation.REVERSE);
@@ -272,74 +327,75 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void hideCapturingOverlay() {
+        if (captureOverlay == null) return;
         runOnUiThread(() -> {
-            captureOverlay.clearAnimation();
-            captureOverlay.setVisibility(TextView.GONE);
+            if (captureOverlay != null) {
+                captureOverlay.clearAnimation();
+                captureOverlay.setVisibility(View.GONE);
+            }
         });
     }
 
-
     private String convertImageToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.NO_WRAP);
+        if (bitmap == null) return null;
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            return Base64.encodeToString(byteArray, Base64.NO_WRAP);
+        } catch (Throwable t) {
+            Log.e("AdminCheckOutActivity", "OOM or write error during Base64 encoding: " + t.getMessage());
+            return null;
+        }
     }
 
     private void sendToAPI(RequestBody requestBody) {
+        if (isFinishing() || isDestroyed()) return;
+
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase1();
         String authToken = "jwt " + token;
 
         Call<ResponseBody> call = apiService.recognizeFace(authToken, requestBody);
-
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 hideCapturingOverlay();
+                if (isFinishing() || isDestroyed()) return;
+
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
+
                         if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
                             JSONObject dataObject = jsonResponse.getJSONObject("data");
 
                             if (dataObject.has("Face") && !dataObject.isNull("Face")) {
                                 JSONObject faceObject = dataObject.getJSONObject("Face");
-
                                 faceId = faceObject.optString("FaceId", "N/A");
                                 imageId = faceObject.optString("ImageId", "N/A");
                             } else {
-                                handleError("No face found. Retry ");
+                                handleError("No face found. Retry.");
+                                return;
                             }
 
                             String requestBodyFace = dataObject.toString();
-                            RequestBody FaceDetails = RequestBody.create(MediaType.parse("application/json"), requestBodyFace);
-                            callFaceDetailApi(FaceDetails);
+                            RequestBody faceDetails = RequestBody.create(MediaType.parse("application/json"), requestBodyFace);
+                            callFaceDetailApi(faceDetails);
                         } else {
-                            Log.e("AdminCheckOutActivity", "Null or missing 'data' in API response: " + responseBody);
                             Toast.makeText(AdminCheckOutActivity.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
                             handleError("No face found.");
                         }
                     } catch (JSONException | IOException e) {
-                        Log.e("AdminCheckOutActivity", "JSON Parsing error", e);
                         handleError("Invalid response from server.");
                     }
                 } else {
-                    String errorBody = "";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        Log.e("AdminCheckOutActivity", "Error reading error body: " + e.getMessage(), e);
-                    }
-//                    Log.e("AdminCheckOutActivity", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
-                    handleError("Server Error: " + response.code() + " - " + response.message() + "\nDetails: " + errorBody);
+                    handleError("Server Error code: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                if (isFinishing() || isDestroyed()) return;
                 hideCapturingOverlay();
                 handleError("Network Error: " + t.getMessage());
             }
@@ -347,100 +403,102 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void callFaceDetailApi(RequestBody faceDetails) {
-        Log.e("AdminCheckOutActivity", "Calling Face Detail API");
+        if (isFinishing() || isDestroyed()) return;
+
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         Call<VisitorFaceResponse> call = faceApiService.FaceDetailsVisitor(authToken, faceDetails);
+
         call.enqueue(new Callback<VisitorFaceResponse>() {
             @Override
             public void onResponse(@NonNull Call<VisitorFaceResponse> call, @NonNull Response<VisitorFaceResponse> response) {
-                progressBar.setVisibility(View.GONE);
+                if (isFinishing() || isDestroyed()) return;
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     VisitorFaceResponse responseBody = response.body();
 
-                    // FIX: Check if Data is null BEFORE accessing getVisitor()
                     if (responseBody.getData() != null && responseBody.getData().getVisitor() != null) {
-
-                        // Now it is safe to log and use the data
                         String contact = responseBody.getData().getVisitor().getContact();
-                        Log.e("FACE DETAIL API", "Response Body Contact: " + contact);
-
-                        checkOut(contact);
+                        if (contact != null && !contact.trim().isEmpty()) {
+                            checkOut(contact);
+                        } else {
+                            handleError("Visitor profile found, but contact payload details are missing.");
+                        }
                     } else {
-                        // Handle the case where the API returned success but empty data
-                        Log.e("FACE DETAIL API", "Data or Visitor is null in response body");
                         handleError("Visitor information not found for this face.");
                     }
                 } else {
-                    handleError("Failed to retrieve face details. Response code: " + response.code());
+                    handleError("Failed to retrieve face details. Error code: " + response.code());
                 }
             }
 
-
             @Override
             public void onFailure(@NonNull Call<VisitorFaceResponse> call, @NonNull Throwable t) {
-                progressBar.setVisibility(View.GONE);
+                if (isFinishing() || isDestroyed()) return;
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
                 handleError("Network error fetching face details: " + t.getMessage());
             }
         });
     }
 
     private void checkOut(String contact) {
-        Log.e("AdminCheckOutActivity", "Calling CheckOut API");
+        if (isFinishing() || isDestroyed() || contact == null) return;
+
         String authToken = "jwt " + token;
         AdminAPIInterface faceApiService = AdminAPIClient.getInstance().getBase2();
         Call<VisitorContactResponse> call = faceApiService.getCheckedOut(authToken, contact);
+
         call.enqueue(new Callback<VisitorContactResponse>() {
             @Override
             public void onResponse(@NonNull Call<VisitorContactResponse> call, @NonNull Response<VisitorContactResponse> response) {
-                progressBar.setVisibility(View.GONE);
+                if (isFinishing() || isDestroyed()) return;
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     VisitorContactResponse responseBody = response.body();
 
-                    // 1. Check if 'Data' exists
                     if (responseBody.getData() != null) {
-
-                        // 2. Check if 'Visitor' exists inside Data
                         if (responseBody.getData().getVisitor() != null) {
-
-                            String contact = responseBody.getData().getVisitor().getContact();
+                            String visitorContact = responseBody.getData().getVisitor().getContact();
                             String company = responseBody.getData().getVisitor().getCompany();
-                            String signOut = getCurrentUtcTimestamp();
+                            String signOutTime = getCurrentUtcTimestamp();
 
-                            signOut(contact, company, signOut);
-
+                            if (visitorContact != null && company != null) {
+                                signOut(visitorContact, company, signOutTime);
+                            } else {
+                                handleError("Incomplete checkout profile mappings returned.");
+                            }
                         } else {
-                            handleError("data is missing from the response.");
+                            handleError("Visitor data structural attributes are missing from the response.");
                         }
                     } else {
-                        handleError("No Data Found");
+                        handleError("No verification details payload found.");
                     }
-
                 } else {
-                    handleError("Error. Response code: " + response.code());
+                    handleError("Error parsing profile. Status code: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<VisitorContactResponse> call, @NonNull Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                handleError("Network error " + t.getMessage());
+                if (isFinishing() || isDestroyed()) return;
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                handleError("Network checkout validation error: " + t.getMessage());
             }
         });
     }
 
     private void signOut(String contact, String company, String signOut) {
+        if (isFinishing() || isDestroyed()) return;
+
         String authToken = "jwt " + token;
         try {
-            //JSON payload
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("contact", contact);
             jsonObject.put("signOut", signOut);
             jsonObject.put("company", company);
 
-            // Step 2: Convert JSON to RequestBody
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonObject.toString());
 
             AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
@@ -449,6 +507,8 @@ public class AdminCheckOutActivity extends AppCompatActivity {
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                    if (isFinishing() || isDestroyed()) return;
+
                     if (response.isSuccessful()) {
                         Toast.makeText(AdminCheckOutActivity.this, "Sign out successful!", Toast.LENGTH_SHORT).show();
                         SuccessSignOut();
@@ -459,7 +519,8 @@ public class AdminCheckOutActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                    Toast.makeText(AdminCheckOutActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (isFinishing() || isDestroyed()) return;
+                    Toast.makeText(AdminCheckOutActivity.this, "Network departure error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -470,11 +531,16 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void SuccessSignOut() {
-        new MaterialAlertDialogBuilder(this).setTitle("Successfully Checked-Out").setPositiveButton("OK", (dialog, which) -> {
-            dialog.dismiss();
-            finish();
-        }).show();
+        if (isFinishing() || isDestroyed()) return;
 
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Successfully Checked-Out")
+                .setCancelable(false)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .show();
     }
 
     private String getCurrentUtcTimestamp() {
@@ -484,13 +550,21 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     }
 
     private void handleError(String message) {
-        new MaterialAlertDialogBuilder(this).setTitle("Error").setMessage(message).setPositiveButton("Retry", (dialog, which) -> {
-            dialog.dismiss();
-            startCamera();
-        }).setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.dismiss();
-            finish();
-        }).show();
+        if (isFinishing() || isDestroyed()) return;
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Error")
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("Retry", (dialog, which) -> {
+                    dialog.dismiss();
+                    startCamera();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .show();
     }
 
     private File getOutputDirectory() {
@@ -502,11 +576,15 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // ✅ Shuts down the background execution pools safely
         if (cameraExecutor != null) {
-            cameraExecutor.shutdown();
+            cameraExecutor.shutdownNow();
         }
         if (qrCountDownTimer != null) {
             qrCountDownTimer.cancel();
+        }
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
         }
     }
 }

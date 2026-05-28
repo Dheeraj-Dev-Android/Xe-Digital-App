@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -39,7 +40,19 @@ public class AdminDashboardFragment extends Fragment {
 
     private final int SCROLL_INTERVAL = 3000;
     private final android.os.Handler scrollHandler = new android.os.Handler();
-    PieChart leavesBarChart;
+    private final Runnable scrollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isAdded() && birthdayAdapter != null && birthdayRecyclerView != null) {
+                int itemCount = birthdayAdapter.getItemCount();
+                if (itemCount > 0) {
+                    currentPosition = (currentPosition + 1) % itemCount;
+                    birthdayRecyclerView.smoothScrollToPosition(currentPosition);
+                    scrollHandler.postDelayed(this, SCROLL_INTERVAL);
+                }
+            }
+        }
+    };
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
     private String token;
@@ -48,17 +61,7 @@ public class AdminDashboardFragment extends Fragment {
     private RecyclerView birthdayRecyclerView;
     private LinearLayout emptyBirthdayState;
     private int currentPosition = 0;
-    private final Runnable scrollRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (birthdayAdapter != null && birthdayAdapter.getItemCount() > 0) {
-                currentPosition = (currentPosition + 1) % birthdayAdapter.getItemCount();
-                birthdayRecyclerView.smoothScrollToPosition(currentPosition);
-                scrollHandler.postDelayed(this, SCROLL_INTERVAL);
-            }
-        }
-    };
-
+    private PieChart leavesBarChart;
 
     public static AdminDashboardFragment newInstance() {
         return new AdminDashboardFragment();
@@ -66,8 +69,10 @@ public class AdminDashboardFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("authToken", "");
+        if (getContext() != null) {
+            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+            token = sharedPreferences.getString("authToken", "");
+        }
         return inflater.inflate(R.layout.fragment_admin_dashboard, container, false);
     }
 
@@ -79,24 +84,24 @@ public class AdminDashboardFragment extends Fragment {
         setupRecyclerView();
         setupViewModel();
 
-        String authToken = "jwt " + token;
-        mViewModel.fetchDashboardData(authToken);
-        mViewModel.fetchBirthdayData(authToken);
-        mViewModel.fetchLeavesGraph(authToken);
+        if (token != null && !token.isEmpty()) {
+            String authToken = "jwt " + token;
+            mViewModel.fetchDashboardData(authToken);
+            mViewModel.fetchBirthdayData(authToken);
+            mViewModel.fetchLeavesGraph(authToken);
+        } else {
+            setDashboardDefaultTexts();
+        }
     }
 
     private void initializeViews(View view) {
-        // Dashboard counters
         totalSignin = view.findViewById(R.id.signinCount);
         totalSignout = view.findViewById(R.id.signoutCount);
         totalEmployees = view.findViewById(R.id.employeesCount);
         totalBranches = view.findViewById(R.id.branchesCount);
-
-        // Birthday components
         birthdayCount = view.findViewById(R.id.birthdayCount);
         birthdayRecyclerView = view.findViewById(R.id.birthdayRecyclerView);
         emptyBirthdayState = view.findViewById(R.id.emptyBirthdayState);
-
         leavesBarChart = view.findViewById(R.id.pieChart);
     }
 
@@ -105,186 +110,186 @@ public class AdminDashboardFragment extends Fragment {
         BirthdayEmployeesAdapter.setupHorizontalScrolling(birthdayRecyclerView);
         birthdayRecyclerView.setAdapter(birthdayAdapter);
         birthdayRecyclerView.setNestedScrollingEnabled(false);
-        androidx.recyclerview.widget.PagerSnapHelper snapHelper = new androidx.recyclerview.widget.PagerSnapHelper();
+
+        PagerSnapHelper snapHelper = new PagerSnapHelper();
+        birthdayRecyclerView.setOnFlingListener(null);
         snapHelper.attachToRecyclerView(birthdayRecyclerView);
     }
 
     private void setupViewModel() {
         mViewModel = new ViewModelProvider(this).get(AdminDashboardViewModel.class);
 
-        // Observe dashboard data
         mViewModel.getDashboardData().observe(getViewLifecycleOwner(), data -> {
             if (data != null) {
+                // Wrap conversions defensively to confirm fields exist safely
                 String totalVisitors = String.valueOf(data.getTotalVisitors());
                 String checkInVisitors = String.valueOf(data.getTotalSigninVisitors());
                 String checkOutVisitors = String.valueOf(data.getTotalSignoutVisitors());
 
-                totalSignin.setText(checkInVisitors + " / " + totalVisitors);
-                totalSignout.setText(checkOutVisitors + " / " + totalVisitors);
+                totalSignin.setText(String.format("%s / %s", checkInVisitors, totalVisitors));
+                totalSignout.setText(String.format("%s / %s", checkOutVisitors, totalVisitors));
                 totalEmployees.setText(String.valueOf(data.getTotalEmployees()));
                 totalBranches.setText(String.valueOf(data.getTotalBranches()));
             } else {
-                totalSignin.setText("N/A");
-                totalSignout.setText("N/A");
-                totalEmployees.setText("N/A");
-                totalBranches.setText("N/A");
+                setDashboardDefaultTexts();
             }
         });
 
-        // Observe birthday data
         mViewModel.getBirthdayData().observe(getViewLifecycleOwner(), birthdayEmployees -> {
+            scrollHandler.removeCallbacks(scrollRunnable);
             if (birthdayEmployees != null && !birthdayEmployees.isEmpty()) {
-                // Show birthday data
                 birthdayCount.setText(String.valueOf(birthdayEmployees.size()));
                 birthdayAdapter.updateBirthdayEmployees(birthdayEmployees);
 
-                // Show RecyclerView and hide empty state
                 birthdayRecyclerView.setVisibility(View.VISIBLE);
                 emptyBirthdayState.setVisibility(View.GONE);
 
-                // 👉 Start auto-scroll
-                scrollHandler.removeCallbacks(scrollRunnable);
+                currentPosition = 0;
                 scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
             } else {
-                // Show empty state
                 birthdayCount.setText("0");
-                birthdayAdapter.updateBirthdayEmployees(null);
-
-                // Hide RecyclerView and show empty state
+                birthdayAdapter.updateBirthdayEmployees(new ArrayList<>());
                 birthdayRecyclerView.setVisibility(View.GONE);
                 emptyBirthdayState.setVisibility(View.VISIBLE);
-
-                // 👉 Stop auto-scroll
-                scrollHandler.removeCallbacks(scrollRunnable);
             }
         });
 
         mViewModel.getLeavesGraphData().observe(getViewLifecycleOwner(), response -> {
             if (response != null && response.getData() != null) {
                 updatePieChart(response.getData());
+            } else {
+                showChartEmptyState();
             }
         });
 
-        // Observe loading state
-        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            // You can show/hide a progress bar here if needed
-            // For now, we'll just handle it silently
-        });
-
-        // Observe error messages
         mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), errorMessage -> {
-            if (errorMessage != null && !errorMessage.isEmpty()) {
+            if (getContext() != null && errorMessage != null && !errorMessage.trim().isEmpty()) {
                 Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void setDashboardDefaultTexts() {
+        String missingLabel = "Data Not Available";
+        if (totalSignin != null) totalSignin.setText(missingLabel);
+        if (totalSignout != null) totalSignout.setText(missingLabel);
+        if (totalEmployees != null) totalEmployees.setText(missingLabel);
+        if (totalBranches != null) totalBranches.setText(missingLabel);
+    }
+
+    private void showChartEmptyState() {
+        if (leavesBarChart != null) {
+            leavesBarChart.clear();
+            leavesBarChart.setNoDataText("No Data Available");
+            leavesBarChart.setNoDataTextColor(Color.GRAY);
+            leavesBarChart.invalidate();
+        }
+    }
+
     private void updatePieChart(Data leaveGraphData) {
-        PieChart pieChart = leavesBarChart;
+        if (leavesBarChart == null) return;
+        if (leaveGraphData == null || leaveGraphData.getGraphData() == null || leaveGraphData.getGraphLabels() == null) {
+            showChartEmptyState();
+            return;
+        }
 
         List<Integer> values = leaveGraphData.getGraphData();
         List<String> labels = leaveGraphData.getGraphLabels();
         List<String> colors = leaveGraphData.getGraphBackground();
 
-        // Prepare entries
-        List<PieEntry> entries = new ArrayList<>();
-        for (int i = 0; i < values.size(); i++) {
-            entries.add(new PieEntry(values.get(i), labels.get(i)));
+        if (values.isEmpty() || labels.isEmpty() || values.size() != labels.size()) {
+            showChartEmptyState();
+            return;
         }
 
-        // Dataset
+        List<PieEntry> entries = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            Integer val = values.get(i);
+            String label = labels.get(i);
+            entries.add(new PieEntry(val != null ? val : 0f, label != null ? label : "Data Not Available"));
+        }
+
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(1f);
         dataSet.setSelectionShift(10f);
 
-        // Set colors
         List<Integer> colorInts = new ArrayList<>();
-        for (String colorName : colors) {
-            try {
-                colorInts.add(Color.parseColor(colorName));
-            } catch (IllegalArgumentException e) {
-                colorInts.add(Color.rgb((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
+        if (colors != null) {
+            for (String colorName : colors) {
+                try {
+                    if (colorName != null && !colorName.trim().isEmpty()) {
+                        colorInts.add(Color.parseColor(colorName));
+                    } else {
+                        colorInts.add(Color.LTGRAY);
+                    }
+                } catch (Exception e) {
+                    colorInts.add(Color.LTGRAY);
+                }
             }
         }
+        if (colorInts.isEmpty()) colorInts.add(Color.GRAY);
         dataSet.setColors(colorInts);
-
-        // Hide default slice values
-//        PieData data = new PieData(dataSet);
-//        data.setDrawValues(false); // ✅ hides % on chart initially
-//
-//        pieChart.setData(data);
-//        pieChart.setUsePercentValues(true);
-//        pieChart.setDrawHoleEnabled(true);
-//        pieChart.setHoleRadius(0f);
-//        pieChart.setHoleColor(Color.TRANSPARENT);
-//        pieChart.setTransparentCircleAlpha(0);
-//        pieChart.setCenterText("");
-//        pieChart.setEntryLabelColor(Color.TRANSPARENT);
-//        pieChart.setEntryLabelTextSize(0f);
-//        pieChart.getDescription().setEnabled(false);
 
         PieData data = new PieData(dataSet);
         data.setDrawValues(false);
-        pieChart.setData(data);
 
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(false);
-        pieChart.setHoleRadius(25f);
-        pieChart.setCenterText("");
-        pieChart.setTransparentCircleRadius(45f);
-        pieChart.animateXY(1000, 1000);
-        pieChart.setDrawEntryLabels(false);
-        pieChart.invalidate();
+        leavesBarChart.getDescription().setEnabled(false);
+        leavesBarChart.setDrawHoleEnabled(false);
+        leavesBarChart.setDrawEntryLabels(false);
 
-        // Legend setup
-        Legend legend = pieChart.getLegend();
-        legend.setEnabled(false);
-        legend.setOrientation(Legend.LegendOrientation.VERTICAL);
-        legend.setDrawInside(false);
-        legend.setWordWrapEnabled(true);
-        legend.setTextSize(8f);
-        legend.setForm(Legend.LegendForm.CIRCLE);
-        legend.setXEntrySpace(8f);
-        legend.setYEntrySpace(8f);
+        Legend legend = leavesBarChart.getLegend();
+        if (legend != null) legend.setEnabled(false);
 
-        // Custom MarkerView to show selected info on chart
-        MarkerView mv = new MarkerView(pieChart.getContext(), R.layout.marker_view) {
-            @Override
-            public void refreshContent(Entry e, Highlight highlight) {
-                if (e instanceof PieEntry) {
-                    PieEntry pieEntry = (PieEntry) e;
-                    float total = 0f;
-                    for (int val : values) total += val;
-                    float percentage = (pieEntry.getValue() / total) * 100f;
+        leavesBarChart.setData(data);
 
-                    TextView tv = findViewById(R.id.marker_text);
-                    tv.setText(pieEntry.getLabel() + "\n" + String.format(Locale.US, "%.1f", percentage) + "%");
-                }
-                super.refreshContent(e, highlight);
-            }
+        OptimizedMarkerView mv = new OptimizedMarkerView(leavesBarChart.getContext(), R.layout.marker_view, values);
+        mv.setChartView(leavesBarChart);
+        leavesBarChart.setMarker(mv);
 
-            @Override
-            public MPPointF getOffset() {
-                return new MPPointF(-(getWidth() / 2f), -getHeight());
-            }
-        };
-        pieChart.setMarker(mv);
-
-        pieChart.animateY(1400, Easing.EaseInOutQuad);
-        pieChart.invalidate();
+        leavesBarChart.animateY(1400, Easing.EaseInOutQuad);
+        leavesBarChart.invalidate();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
         scrollHandler.removeCallbacks(scrollRunnable);
+        super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
-        // Stop auto-scroll when view is destroyed
         scrollHandler.removeCallbacks(scrollRunnable);
+        super.onDestroyView();
     }
 
+    private static class OptimizedMarkerView extends MarkerView {
+        private final TextView markerTextView;
+        private final List<Integer> valueList;
+
+        public OptimizedMarkerView(Context context, int layoutResource, List<Integer> values) {
+            super(context, layoutResource);
+            this.valueList = values != null ? values : new ArrayList<>();
+            this.markerTextView = findViewById(R.id.marker_text);
+        }
+
+        @Override
+        public void refreshContent(Entry e, Highlight highlight) {
+            if (e instanceof PieEntry && markerTextView != null) {
+                PieEntry pieEntry = (PieEntry) e;
+                float total = 0f;
+                for (Integer val : valueList) {
+                    if (val != null) total += val;
+                }
+                float percentage = (total > 0) ? (pieEntry.getValue() / total) * 100f : 0f;
+                String label = pieEntry.getLabel() != null ? pieEntry.getLabel() : "Data Not Available";
+                markerTextView.setText(String.format(Locale.US, "%s\n%.1f%%", label, percentage));
+            }
+            super.refreshContent(e, highlight);
+        }
+
+        @Override
+        public MPPointF getOffset() {
+            return new MPPointF(-(getWidth() / 2f), -getHeight());
+        }
+    }
 }

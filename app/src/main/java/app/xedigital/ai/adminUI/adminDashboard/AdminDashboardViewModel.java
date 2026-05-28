@@ -32,8 +32,8 @@ public class AdminDashboardViewModel extends ViewModel {
     private final MutableLiveData<List<EmployeesItem>> birthdayData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final AdminAPIInterface apiInterface;
     private final MutableLiveData<LeaveGraphResponse> leavesGraphData = new MutableLiveData<>();
+    private final AdminAPIInterface apiInterface;
 
     public AdminDashboardViewModel() {
         apiInterface = AdminAPIClient.getInstance().getBase2();
@@ -59,23 +59,23 @@ public class AdminDashboardViewModel extends ViewModel {
         return leavesGraphData;
     }
 
-
     public void fetchDashboardData(String token) {
         isLoading.setValue(true);
         apiInterface.getDashboard(token).enqueue(new Callback<AdminDashboardResponse>() {
             @Override
             public void onResponse(@NonNull Call<AdminDashboardResponse> call, @NonNull Response<AdminDashboardResponse> response) {
                 isLoading.setValue(false);
-                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && response.body().getData().getCounterData() != null) {
+                if (response.isSuccessful() && response.body() != null &&
+                        response.body().getData() != null && response.body().getData().getCounterData() != null) {
                     dashboardData.setValue(response.body().getData().getCounterData());
                 } else {
                     dashboardData.setValue(null);
-                    errorMessage.setValue("Failed to load dashboard data");
+                    errorMessage.setValue("Dashboard metadata not available");
                 }
             }
 
             @Override
-            public void onFailure(Call<AdminDashboardResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<AdminDashboardResponse> call, @NonNull Throwable t) {
                 isLoading.setValue(false);
                 dashboardData.setValue(null);
                 errorMessage.setValue("Network error: " + t.getMessage());
@@ -89,15 +89,14 @@ public class AdminDashboardViewModel extends ViewModel {
             @Override
             public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
                 isLoading.setValue(false);
-                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && response.body().getData().getEmployees() != null) {
+                if (response.isSuccessful() && response.body() != null &&
+                        response.body().getData() != null && response.body().getData().getEmployees() != null) {
+
                     List<EmployeesItem> employees = response.body().getData().getEmployees();
-                    List<EmployeesItem> currentMonthBirthdays = filterCurrentMonthBirthdays(employees);
-                    birthdayData.setValue(currentMonthBirthdays);
-                    Log.d("BirthdayData", "Found " + currentMonthBirthdays.size() + " birthdays this month");
+                    birthdayData.setValue(processAndSortBirthdays(employees));
                 } else {
                     birthdayData.setValue(new ArrayList<>());
-                    errorMessage.setValue("Failed to load birthday data");
-                    Log.e("BirthdayData", "Response not successful or body is null");
+                    errorMessage.setValue("Birthday records not available");
                 }
             }
 
@@ -105,73 +104,108 @@ public class AdminDashboardViewModel extends ViewModel {
             public void onFailure(@NonNull Call<EmployeeDetailResponse> call, @NonNull Throwable throwable) {
                 isLoading.setValue(false);
                 birthdayData.setValue(new ArrayList<>());
-                errorMessage.setValue("Network error: " + throwable.getMessage());
-                Log.e("BirthdayData", "API call failed: " + throwable.getMessage());
+                errorMessage.setValue("Network connectivity failure");
             }
         });
     }
 
-    private List<EmployeesItem> filterCurrentMonthBirthdays(List<EmployeesItem> employees) {
-        List<EmployeesItem> birthdayEmployees = new ArrayList<>();
+    private List<EmployeesItem> processAndSortBirthdays(List<EmployeesItem> employees) {
+        List<EmployeesItem> filteredList = new ArrayList<>();
+        if (employees == null) return filteredList;
+
         Calendar currentCalendar = Calendar.getInstance();
         int currentMonth = currentCalendar.get(Calendar.MONTH);
-        int currentYear = currentCalendar.get(Calendar.YEAR);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat alternateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
         for (EmployeesItem employee : employees) {
-            if (employee.getDateOfBirth() != null && !employee.getDateOfBirth().isEmpty()) {
+            if (employee == null || !employee.isActive()) continue;
+
+            String dobString = employee.getDateOfBirth();
+            if (dobString != null && !dobString.trim().isEmpty()) {
                 try {
                     Date birthDate = null;
-
-                    // Try primary date format first
                     try {
-                        birthDate = dateFormat.parse(employee.getDateOfBirth());
+                        birthDate = dateFormat.parse(dobString);
                     } catch (ParseException e) {
-                        // Try alternate date format
                         try {
-                            birthDate = alternateFormat.parse(employee.getDateOfBirth());
+                            birthDate = alternateFormat.parse(dobString);
                         } catch (ParseException e2) {
-                            Log.w("BirthdayData", "Could not parse date: " + employee.getDateOfBirth() + " for employee: " + employee.getFirstname());
-                            continue;
+                            continue; // Unparseable format, skip safely to protect dataset loop integrity
                         }
                     }
 
                     if (birthDate != null) {
                         Calendar birthCalendar = Calendar.getInstance();
                         birthCalendar.setTime(birthDate);
-                        int birthMonth = birthCalendar.get(Calendar.MONTH);
-
-                        // Check if birthday is in current month
-                        if (birthMonth == currentMonth) {
-                            birthdayEmployees.add(employee);
-                            Log.d("BirthdayData", "Added birthday employee: " + employee.getFirstname() + " - " + employee.getDateOfBirth());
+                        if (birthCalendar.get(Calendar.MONTH) == currentMonth) {
+                            filteredList.add(employee);
                         }
                     }
                 } catch (Exception e) {
-                    Log.e("BirthdayData", "Error processing birthday for employee: " + employee.getFirstname(), e);
+                    Log.e("BirthdayData", "Error validating birthdate data structural integrity", e);
                 }
             }
         }
 
-        return birthdayEmployees;
+        // Safe sort algorithm with full internal element null handling
+        filteredList.sort((e1, e2) -> {
+            if (e1 == null && e2 == null) return 0;
+            if (e1 == null) return 1;
+            if (e2 == null) return -1;
+
+            Date d1 = parseDateHelper(e1.getDateOfBirth(), dateFormat, alternateFormat);
+            Date d2 = parseDateHelper(e2.getDateOfBirth(), dateFormat, alternateFormat);
+
+            if (d1 == null && d2 == null) return 0;
+            if (d1 == null) return 1;
+            if (d2 == null) return -1;
+
+            Calendar cal1 = Calendar.getInstance();
+            Calendar cal2 = Calendar.getInstance();
+            cal1.setTime(d1);
+            cal2.setTime(d2);
+
+            int m1 = cal1.get(Calendar.MONTH);
+            int day1 = cal1.get(Calendar.DAY_OF_MONTH);
+            int m2 = cal2.get(Calendar.MONTH);
+            int day2 = cal2.get(Calendar.DAY_OF_MONTH);
+
+            if (m1 != m2) {
+                return Integer.compare(m1, m2);
+            } else {
+                return Integer.compare(day1, day2);
+            }
+        });
+
+        return filteredList;
+    }
+
+    private Date parseDateHelper(String dateStr, SimpleDateFormat f1, SimpleDateFormat f2) {
+        if (dateStr == null || dateStr.trim().isEmpty()) return null;
+        try {
+            return f1.parse(dateStr);
+        } catch (ParseException e) {
+            try {
+                return f2.parse(dateStr);
+            } catch (ParseException e2) {
+                return null;
+            }
+        }
     }
 
     public void fetchLeavesGraph(String token) {
         isLoading.setValue(true);
-
         apiInterface.getLeavesGraph(token).enqueue(new Callback<LeaveGraphResponse>() {
             @Override
             public void onResponse(@NonNull Call<LeaveGraphResponse> call, @NonNull Response<LeaveGraphResponse> response) {
                 isLoading.setValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     leavesGraphData.setValue(response.body());
-                    Log.d("LeavesGraph", "Graph data loaded successfully");
                 } else {
                     leavesGraphData.setValue(null);
-                    errorMessage.setValue("Failed to load leaves graph data");
-                    Log.e("LeavesGraph", "Response error or null body");
+                    errorMessage.setValue("Graph statistics not available");
                 }
             }
 
@@ -179,10 +213,8 @@ public class AdminDashboardViewModel extends ViewModel {
             public void onFailure(@NonNull Call<LeaveGraphResponse> call, @NonNull Throwable throwable) {
                 isLoading.setValue(false);
                 leavesGraphData.setValue(null);
-                errorMessage.setValue("Network error while loading leaves graph: " + throwable.getMessage());
-                Log.e("LeavesGraph", "API call failed", throwable);
+                errorMessage.setValue("Network error loading graph dashboard parameters");
             }
         });
     }
-
 }

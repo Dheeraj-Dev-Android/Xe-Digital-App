@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -64,6 +63,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import app.xedigital.ai.R;
@@ -115,6 +115,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
     private String faceId, imageId;
     private String companyI;
     private String companyName;
+
     // Form views
     private NestedScrollView formScrollView;
     private TextInputEditText nameEditText, contactEditText, emailEditText, companyEditText, purposeEditText, serialNumber;
@@ -129,6 +130,8 @@ public class AdminManualCheckIn extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_manual);
 
+        cameraExecutor = Executors.newSingleThreadExecutor();
+
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
         token = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
@@ -142,13 +145,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
         GetEmployee(token, userId);
 
         ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-            boolean allGranted = true;
-            for (boolean granted : result.values()) {
-                if (!granted) {
-                    allGranted = true;
-                    break;
-                }
-            }
             startCamera();
         });
 
@@ -160,10 +156,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void initializeViews() {
-
         formScrollView = findViewById(R.id.formScrollView);
-
-        // Form fields
         nameEditText = findViewById(R.id.nameEditText);
         contactEditText = findViewById(R.id.contactEditText);
         emailEditText = findViewById(R.id.emailEditText);
@@ -219,9 +212,13 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void startCamera() {
+        if (isFinishing() || isDestroyed()) return;
+
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
+                if (isFinishing() || isDestroyed()) return;
+
                 cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
@@ -234,132 +231,118 @@ public class AdminManualCheckIn extends AppCompatActivity {
                 try {
                     camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                     if (camera == null) {
-//                        Log.e("AdminManualCheckIn", "Camera is null");
                         showRetryAlert();
                     } else {
                         showCapturingOverlay();
+                        handler.removeCallbacksAndMessages(null);
                         handler.postDelayed(this::captureImage, 3000);
                     }
                 } catch (IllegalArgumentException e) {
-//                    Log.e("AdminManualCheckIn", "Error binding camera: " + e.getMessage(), e);
                     showRetryAlert();
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
+                showRetryAlert();
             }
         }, ContextCompat.getMainExecutor(this));
     }
 
     private void captureImage() {
+        if (isFinishing() || isDestroyed()) return;
+
         File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + "_photo.jpg");
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                String savedUri = Uri.fromFile(photoFile).toString();
+                if (isFinishing() || isDestroyed()) return;
+
                 String savedImagePath = photoFile.getAbsolutePath();
 
-                try {
-                    ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(AdminManualCheckIn.this).get();
-                    cameraProvider.unbindAll();
-                } catch (ExecutionException | InterruptedException e) {
-                    Log.e("AdminManualCheckIn", "Error unbinding camera preview: " + e.getMessage(), e);
-                }
-
-                try {
-                    AtomicReference<Bitmap> bitmap;
-                    bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
-
+                // ✅ FIX 2: Safely unbind the camera asynchronously using listeners to eliminate UI thread locks
+                ListenableFuture<ProcessCameraProvider> providerFuture = ProcessCameraProvider.getInstance(AdminManualCheckIn.this);
+                providerFuture.addListener(() -> {
                     try {
-                        int newWidth = 500;
-                        int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
-                        bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
-
-                        base64Image = convertImageToBase64(bitmap.get());
-//                        Log.d("AdminManualCheckIn", "Base64 Image: " + base64Image);
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("collection_name", CollectionName);
-                        jsonObject.put("image", base64Image);
-                        String requestBodyJson = jsonObject.toString();
-                        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson);
-                        sendToAPI(requestBody);
-                        addFace(requestBody);
-
-//                        Add Bucket
-                        JSONObject jsonObject1 = new JSONObject();
-                        jsonObject1.put("bucketName", bucketName);
-                        jsonObject1.put("image", base64Image);
-                        jsonObject1.put("keyName", "");
-                        String requestBodyJson1 = jsonObject1.toString();
-                        RequestBody requestBody1 = RequestBody.create(MediaType.parse("application/json"), requestBodyJson1);
-                        addBucket(requestBody1);
-
-                        showForm();
-                    } catch (Exception e) {
-//                        Log.e("AdminManualCheckIn", "Error processing image: " + e.getMessage(), e);
-                        handleError("Error processing image: " + e.getMessage());
+                        if (!isFinishing() && !isDestroyed()) {
+                            ProcessCameraProvider cp = providerFuture.get();
+                            cp.unbindAll();
+                        }
+                    } catch (ExecutionException | InterruptedException e) {
+                        Log.e("AdminManualCheckIn", "Async camera resource cleanup failed gracefully: " + e.getMessage());
                     }
+                }, ContextCompat.getMainExecutor(AdminManualCheckIn.this));
+
+                try {
+                    AtomicReference<Bitmap> bitmap = new AtomicReference<>(BitmapFactory.decodeFile(savedImagePath));
+                    if (bitmap.get() == null) {
+                        handleError("Failed to parse captured image.");
+                        return;
+                    }
+
+                    int newWidth = 500;
+                    int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
+                    bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
+
+                    base64Image = convertImageToBase64(bitmap.get());
+                    if (base64Image == null) {
+                        handleError("Failed to convert captured image due to memory pressure.");
+                        return;
+                    }
+
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("collection_name", CollectionName);
+                    jsonObject.put("image", base64Image);
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+
+                    sendToAPI(requestBody);
+                    addFace(requestBody);
+
+                    JSONObject jsonObject1 = new JSONObject();
+                    jsonObject1.put("bucketName", bucketName);
+                    jsonObject1.put("image", base64Image);
+                    jsonObject1.put("keyName", "");
+                    RequestBody requestBody1 = RequestBody.create(MediaType.parse("application/json"), jsonObject1.toString());
+                    addBucket(requestBody1);
+
                 } catch (Exception e) {
-//                    Log.e("AdminManualCheckIn", "Error during face detection: " + e.getMessage(), e);
-                    handleError("Error detecting faces. Please try again.");
+                    handleError("Error processing image: " + e.getMessage());
                 }
             }
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-//                Log.e("AdminManualCheckIn", "Photo capture failed: " + exception.getMessage(), exception);
                 handleError("Photo capture failed: " + exception.getMessage());
             }
         });
     }
 
     private void sendToAPI(RequestBody requestBody) {
+        if (isFinishing() || isDestroyed()) return;
+
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase1();
         String authToken = "jwt " + token;
 
         Call<ResponseBody> call = apiService.recognizeFace(authToken, requestBody);
-
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 hideCapturingOverlay();
+                if (isFinishing() || isDestroyed()) return;
+
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
-                        if (jsonResponse.has("data") && !jsonResponse.isNull("data")) {
-//                            JSONObject dataObject = jsonResponse.getJSONObject("data");
-
-//                            if (dataObject.has("Face") && !dataObject.isNull("Face")) {
-//                                JSONObject faceObject = dataObject.getJSONObject("Face");
-//
-//                            } else {
-//                                Log.e("AdminManualCheckIn", "'Face' object not found in 'data'");
-//                                handleError("Face not recognized. Please try again.");
-//                            }
-
-                        } else {
-//                            Log.e("AdminManualCheckIn", "Null or missing 'data' in API response: " + responseBody);
+                        if (!jsonResponse.has("data") || jsonResponse.isNull("data")) {
                             Toast.makeText(AdminManualCheckIn.this, "No face data found in response.", Toast.LENGTH_SHORT).show();
                             handleError("No face found.");
                         }
                     } catch (JSONException | IOException e) {
-//                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
                         handleError("Error processing response. Please try again.");
                     }
-
                 } else {
-                    String errorBody = "";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
-                    }
-//                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     handleError("Server Error: " + response.code() + " - " + response.message());
                 }
             }
@@ -373,51 +356,38 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void addFace(RequestBody requestBody) {
+        if (isFinishing() || isDestroyed()) return;
+
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase1();
         String authToken = "jwt " + token;
 
         Call<AddFaceResponse> call = apiService.addFace(authToken, requestBody);
-
         call.enqueue(new Callback<AddFaceResponse>() {
             @Override
             public void onResponse(@NonNull Call<AddFaceResponse> call, @NonNull Response<AddFaceResponse> response) {
                 hideCapturingOverlay();
+                if (isFinishing() || isDestroyed()) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     AddFaceResponse faceResponse = response.body();
-
                     Data data = faceResponse.getData();
                     if (data != null && data.getFace() != null && data.getFaceDetail() != null) {
-
                         Face face = data.getFace();
                         FaceDetail faceDetail = data.getFaceDetail();
 
                         faceId = face.getFaceId();
                         imageId = face.getImageId();
 
-                        // Convert to JSON
-                        Gson gson = new Gson();
+                        Gson gsonInstance = new Gson();
                         JsonObject combinedData = new JsonObject();
-                        combinedData.add("Face", gson.toJsonTree(face));
-                        combinedData.add("FaceDetail", gson.toJsonTree(faceDetail));
+                        combinedData.add("Face", gsonInstance.toJsonTree(face));
+                        combinedData.add("FaceDetail", gsonInstance.toJsonTree(faceDetail));
 
-                        // Store for later use in handleFormSubmission
-                        faceDataJson = gson.toJson(combinedData);
-
+                        faceDataJson = gsonInstance.toJson(combinedData);
                     } else {
                         handleError("Face or face details missing.");
                     }
-
                 } else {
-                    String errorBody = "";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
-                    }
-
                     handleError("Server Error: " + response.code() + " - " + response.message());
                 }
             }
@@ -431,45 +401,37 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void addBucket(RequestBody requestBody1) {
+        if (isFinishing() || isDestroyed()) return;
+
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
         String authToken = "jwt " + token;
 
         Call<ResponseBody> call = apiService.addBucket(authToken, requestBody1);
-
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 hideCapturingOverlay();
+                if (isFinishing() || isDestroyed()) return;
+
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
-
                         JSONObject dataObject = jsonResponse.optJSONObject("data");
                         if (dataObject != null) {
                             uploadedImageUrl = dataObject.optString("imageUrl", null);
                             uploadedImageKey = dataObject.optString("imageKey", null);
                         }
 
-                        if (uploadedImageUrl == null || uploadedImageKey == null) {
-                            Toast.makeText(getApplicationContext(), "Image upload succeeded, but image URL or key is missing.", Toast.LENGTH_LONG).show();
+                        if (uploadedImageUrl != null && uploadedImageKey != null) {
+                            showForm();
+                        } else {
+                            handleError("Image upload completed, but payload addresses are missing.");
                         }
-
                     } catch (JSONException | IOException e) {
-//                        Log.e("AdminManualCheckIn", "Error parsing API response: " + e.getMessage(), e);
                         handleError("Error processing response. Please try again.");
                     }
-
                 } else {
-                    String errorBody = "";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
-                    }
-//                    Log.e("AdminManualCheckIn", "Recognize Response Error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     handleError("Server Error: " + response.code() + " - " + response.message());
                 }
             }
@@ -483,22 +445,20 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void GetEmployee(String authToken, String userId) {
-        String token = "jwt " + authToken;
+        String tokenStr = "jwt " + authToken;
         AdminAPIInterface employeeDetails = AdminAPIClient.getInstance().getBase2();
 
-        retrofit2.Call<UserDetailsResponse> employees = employeeDetails.getUser(token, userId);
-
+        Call<UserDetailsResponse> employees = employeeDetails.getUser(tokenStr, userId);
         employees.enqueue(new Callback<UserDetailsResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
+
                 if (response.isSuccessful() && response.body() != null) {
                     UserDetailsResponse userDetailResponse = response.body();
-
-                    if (userDetailResponse.isSuccess()) {
+                    if (userDetailResponse.isSuccess() && userDetailResponse.getData() != null && userDetailResponse.getData().getCompany() != null) {
                         String CompanyId = userDetailResponse.getData().getCompany().getId();
-                        getBranches(token, CompanyId);
-
-
+                        getBranches(tokenStr, CompanyId);
                     } else {
                         Toast.makeText(AdminManualCheckIn.this, "Failed to retrieve employee details", Toast.LENGTH_SHORT).show();
                     }
@@ -509,6 +469,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable throwable) {
+                if (isFinishing() || isDestroyed()) return;
                 Toast.makeText(AdminManualCheckIn.this, "Failed to get employee data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -517,129 +478,132 @@ public class AdminManualCheckIn extends AppCompatActivity {
     private void getBranches(String token, String companyId) {
         AdminAPIInterface getBranches = AdminAPIClient.getInstance().getBase2();
 
-        retrofit2.Call<CompanyBranchResponse> branches = getBranches.getBranches(token, companyId);
+        Call<CompanyBranchResponse> branches = getBranches.getBranches(token, companyId);
         branches.enqueue(new Callback<CompanyBranchResponse>() {
             @Override
             public void onResponse(@NonNull Call<CompanyBranchResponse> call, @NonNull Response<CompanyBranchResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
+
                 if (response.isSuccessful() && response.body() != null) {
                     CompanyBranchResponse companyBranchResponse = response.body();
-                    List<BranchesItem> branches = companyBranchResponse.getData().getBranches();
-
-                    if (branches != null && !branches.isEmpty()) {
-                        BranchesItem firstBranch = branches.get(0);
-
-                        companyI = firstBranch.getCompany();
-                        companyName = firstBranch.getName();
-
+                    if (companyBranchResponse.getData() != null && companyBranchResponse.getData().getBranches() != null) {
+                        List<BranchesItem> branchesList = companyBranchResponse.getData().getBranches();
+                        if (!branchesList.isEmpty()) {
+                            BranchesItem firstBranch = branchesList.get(0);
+                            companyI = firstBranch.getCompany();
+                            companyName = firstBranch.getName();
+                        }
                     }
-
                     fetchEmployees(token);
                 } else {
-                    handleError("Failed to get a valid response.");
+                    handleError("Failed to get a valid branch response.");
                 }
             }
 
-
             @Override
             public void onFailure(@NonNull Call<CompanyBranchResponse> call, @NonNull Throwable throwable) {
+                if (isFinishing() || isDestroyed()) return;
                 Toast.makeText(AdminManualCheckIn.this, "Failed to get branches: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-//                Log.e("AdminManualCheckIn", "Error getting branches: " + throwable.getMessage(), throwable);
                 handleError("Error getting branches: " + throwable.getMessage());
-
             }
         });
     }
 
     private void fetchEmployees(String token) {
-//        Log.e("AdminManualCheckIn", "Fetching employees with token: ");
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
         Call<EmployeeDetailResponse> call = apiService.getEmployees(token);
 
         call.enqueue(new Callback<EmployeeDetailResponse>() {
             @Override
             public void onResponse(@NonNull Call<EmployeeDetailResponse> call, @NonNull Response<EmployeeDetailResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
+
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess() && response.body().getData() != null && response.body().getData().getEmployees() != null) {
-                    List<EmployeesItem> employees = response.body().getData().getEmployees();
-//                    Log.e("API_RESPONSE", "Employees fetched: " + employees);
-                    List<EmployeeDropdownItem> employeeDropdownItems = new ArrayList<>();
-//                    Log.e("ADAPTER_INPUT", "Size: " + employeeDropdownItems.size());
-                    for (EmployeesItem employee : employees) {
-                        employeeDropdownItems.add(new EmployeeDropdownItem(employee.getId(), employee.getFirstname(), employee.getLastname(), employee));
-                    }
-//                    Log.e("DROPDOWN_ITEMS", "Dropdown items created: " + employeeDropdownItems);
 
-                    for (EmployeeDropdownItem item : employeeDropdownItems) {
-//                        Log.d("ADAPTER_INPUT", "Item: " + item.getFirstName() + " " + item.getLastName());
-                    }
-                    CustomEmployeeAdapter adapter = new CustomEmployeeAdapter(AdminManualCheckIn.this, employeeDropdownItems, selectedEmployeeMap.keySet());
+                    // ✅ FIX 1: Move data loop entirely into the runOnUiThread UI-thread block to guard against background thread model leaks
+                    runOnUiThread(() -> {
+                        if (isFinishing() || isDestroyed()) return;
 
-                    whomToMeetAutoComplete.setAdapter(adapter);
-                    whomToMeetAutoComplete.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-                    whomToMeetAutoComplete.setThreshold(1);
-                    whomToMeetAutoComplete.setText("");
+                        List<EmployeesItem> employees = response.body().getData().getEmployees();
+                        List<EmployeeDropdownItem> employeeDropdownItems = new ArrayList<>();
 
-                    whomToMeetAutoComplete.setOnClickListener(v -> adapter.getFilter().filter(""));
-                    whomToMeetAutoComplete.setOnFocusChangeListener((v, hasFocus) -> {
-                        if (hasFocus) adapter.getFilter().filter("");
-                    });
-
-                    whomToMeetAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-                        EmployeeDropdownItem selected = adapter.getItem(position);
-                        if (selected == null) return;
-
-                        String fullName = selected.getFirstName() + " " + selected.getLastName();
-                        String employeeId = selected.getId();
-
-                        if (selectedEmployeeMap.containsKey(employeeId)) {
-                            // Unselect
-                            selectedEmployeeMap.remove(employeeId);
-
-                            String currentText = whomToMeetAutoComplete.getText().toString();
-                            String updatedText = currentText.replace(fullName + ", ", "").replace(fullName, "");
-                            whomToMeetAutoComplete.setText(updatedText.trim());
-                            whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
-
-                        } else {
-                            // Select
-                            selectedEmployeeMap.put(employeeId, selected.getEmployeeItem());
-
-                            String currentText = whomToMeetAutoComplete.getText().toString();
-                            if (!currentText.contains(fullName)) {
-                                if (!currentText.isEmpty() && !currentText.endsWith(",")) {
-                                    currentText += ", ";
-                                }
-                                whomToMeetAutoComplete.setText(currentText + fullName + ", ");
-                                whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
+                        for (EmployeesItem employee : employees) {
+                            if (employee != null) {
+                                employeeDropdownItems.add(new EmployeeDropdownItem(employee.getId(), employee.getFirstname(), employee.getLastname(), employee));
                             }
                         }
 
-                        adapter.notifyDataSetChanged();
+                        CustomEmployeeAdapter adapter = new CustomEmployeeAdapter(AdminManualCheckIn.this, employeeDropdownItems, selectedEmployeeMap.keySet());
+
+                        whomToMeetAutoComplete.setAdapter(adapter);
+                        whomToMeetAutoComplete.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+                        whomToMeetAutoComplete.setThreshold(1);
+                        whomToMeetAutoComplete.setText("");
+
+                        whomToMeetAutoComplete.setOnClickListener(v -> {
+                            if (!isFinishing() && !isDestroyed()) adapter.getFilter().filter("");
+                        });
+                        whomToMeetAutoComplete.setOnFocusChangeListener((v, hasFocus) -> {
+                            if (hasFocus && !isFinishing() && !isDestroyed())
+                                adapter.getFilter().filter("");
+                        });
+
+                        whomToMeetAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+                            if (isFinishing() || isDestroyed()) return;
+                            EmployeeDropdownItem selected = adapter.getItem(position);
+                            if (selected == null) return;
+
+                            String fullName = selected.getFirstName() + " " + selected.getLastName();
+                            String employeeId = selected.getId();
+
+                            if (selectedEmployeeMap.containsKey(employeeId)) {
+                                selectedEmployeeMap.remove(employeeId);
+                                String currentText = whomToMeetAutoComplete.getText().toString();
+                                String updatedText = currentText.replace(fullName + ", ", "").replace(fullName, "");
+                                whomToMeetAutoComplete.setText(updatedText.trim());
+                                whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
+                            } else {
+                                selectedEmployeeMap.put(employeeId, selected.getEmployeeItem());
+                                String currentText = whomToMeetAutoComplete.getText().toString();
+                                if (!currentText.contains(fullName)) {
+                                    if (!currentText.isEmpty() && !currentText.endsWith(",")) {
+                                        currentText += ", ";
+                                    }
+                                    whomToMeetAutoComplete.setText(currentText + fullName + ", ");
+                                    whomToMeetAutoComplete.setSelection(whomToMeetAutoComplete.getText().length());
+                                }
+                            }
+                            adapter.notifyDataSetChanged();
+                        });
                     });
-
-
                 } else {
-//                    Log.e("API_FAILURE", "statusCode: " + response.code() +
-//                            ", success: " + (response.body() != null ? response.body().isSuccess() : "null") +
-//                            ", message: " + (response.body() != null ? response.body().getMessage() : "null"));
-                    Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> {
+                        if (!isFinishing() && !isDestroyed()) {
+                            Toast.makeText(AdminManualCheckIn.this, "Failed to get employees, please try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<EmployeeDetailResponse> call, @NonNull Throwable t) {
-                Toast.makeText(AdminManualCheckIn.this, "please try again.", Toast.LENGTH_SHORT).show();
-//                Log.e("API_FAILURE", "onFailure: " + t.getMessage());
+                if (isFinishing() || isDestroyed()) return;
+                runOnUiThread(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        Toast.makeText(AdminManualCheckIn.this, "Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
 
     private void submitFormData(String name, long contact, String email, String company, String whomToMeetStr, String purpose, boolean hasDevice, String serialNo, List<EmployeesItem> selectedEmployees, String faceDataJson, String imageUrl, String imageKey) {
+        if (isFinishing() || isDestroyed()) return;
 
         nextButton.setEnabled(false);
         nextButton.setText("SUBMITTING...");
 
         VisitorManualRequest request = new VisitorManualRequest();
-
         request.setName(name);
         request.setContact(contact);
         request.setEmail(email);
@@ -649,7 +613,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
         request.setSerialNumber(serialNo);
         request.setSignIn(DateTimeUtils.getCurrentUtcTimestamp());
 
-        // Fill with default/empty values
         request.setApprovalStatus("");
         request.setEmpcontact(null);
         request.setEmpfirstname(null);
@@ -667,8 +630,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
         request.setVisitorCategory("");
         request.setVisitorVisit("");
 
-
-        // ✅ Set list of WhomToMeetItem
         List<WhomToMeetItem> whomToMeetList = new ArrayList<>();
         for (EmployeesItem employee : selectedEmployees) {
             WhomToMeetItem whom = new WhomToMeetItem();
@@ -690,25 +651,23 @@ public class AdminManualCheckIn extends AppCompatActivity {
             whom.setDateOfBirth(employee.getDateOfBirth());
             whom.setEmployeeType(employee.getEmployeeType());
             whom.setGrade(employee.getGrade());
-//            whom.setCrossmanager(employee.getCrossmanager());
             whom.setCreatedAt(employee.getCreatedAt());
             whom.setUpdatedAt(employee.getUpdatedAt());
             whom.setV(employee.getV());
-            // Use mappers to convert EmployeeDetails objects to VisitorManual objects
+
             whom.setDepartment(DepartmentMapper.mapFromEmployeeDetailsDepartment(employee.getDepartment()));
             whom.setShift(ShiftMapper.mapFromEmployeeDetailsShift(employee.getShift()));
             whom.setReportingManager(ReportingManagerMapper.mapFromEmployeeDetailsReportingManager(employee.getReportingManager()));
-            // ✅ Deserialize and assign face data
+
             if (faceDataJson != null && !faceDataJson.isEmpty()) {
                 try {
-                    Gson gson = new Gson();
-                    FaceData faceData = gson.fromJson(faceDataJson, FaceData.class);
+                    Gson jsonConverter = new Gson();
+                    FaceData faceData = jsonConverter.fromJson(faceDataJson, FaceData.class);
                     request.setFaceData(faceData);
                 } catch (JsonSyntaxException e) {
                     Log.e("AdminManualCheckIn", "Invalid face data JSON: " + e.getMessage());
                 }
             }
-
             whomToMeetList.add(whom);
         }
 
@@ -721,6 +680,8 @@ public class AdminManualCheckIn extends AppCompatActivity {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (isFinishing() || isDestroyed()) return;
+
                 nextButton.setEnabled(true);
                 nextButton.setText("NEXT");
 
@@ -729,38 +690,33 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     setResult(Activity.RESULT_OK);
                     finish();
                 } else {
-                    String errorBody = "";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        Log.e("AdminManualCheckIn", "Error reading error body: " + e.getMessage(), e);
-                    }
-//                    Log.e("AdminManualCheckIn", "Form submission error: " + response.code() + " - " + response.message() + "\nError Body: " + errorBody);
                     Toast.makeText(AdminManualCheckIn.this, "Failed to submit form. Please try again.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                if (isFinishing() || isDestroyed()) return;
                 nextButton.setEnabled(true);
                 nextButton.setText("NEXT");
-//                Log.e("AdminManualCheckIn", "Form submission network error: " + t.getMessage(), t);
                 Toast.makeText(AdminManualCheckIn.this, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
     private void showForm() {
-        try {
-            ProcessCameraProvider cameraProvider = ProcessCameraProvider.getInstance(AdminManualCheckIn.this).get();
-            cameraProvider.unbindAll();
-        } catch (ExecutionException | InterruptedException e) {
-            Log.e("AdminCheckOutActivity", "Error unbinding camera preview: " + e.getMessage(), e);
-        }
+        ListenableFuture<ProcessCameraProvider> providerFuture = ProcessCameraProvider.getInstance(AdminManualCheckIn.this);
+        providerFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cp = providerFuture.get();
+                cp.unbindAll();
+            } catch (Exception e) {
+                Log.e("AdminManualCheckIn", "Error unbinding camera preview on showForm: " + e.getMessage());
+            }
+        }, ContextCompat.getMainExecutor(AdminManualCheckIn.this));
+
         runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
 
             previewView.setVisibility(View.GONE);
             formScrollView.setVisibility(View.VISIBLE);
@@ -779,7 +735,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
             String device = deviceAutoComplete.getText().toString().trim();
             String serialNo = Objects.requireNonNull(serialNumber.getText()).toString().trim();
 
-            boolean hasDevice = "Yes".equalsIgnoreCase(device);
+            boolean hasDeviceFlag = "Yes".equalsIgnoreCase(device);
 
             try {
                 long contact = Long.parseLong(contactStr);
@@ -792,11 +748,9 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     Toast.makeText(this, "Please upload image first.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                // ✅ Show confirm dialog before submitting
                 showConfirmationDialog(() -> {
-                    submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDevice, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
+                    submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDeviceFlag, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
                 });
-//                submitFormData(name, contact, email, company, whomToMeetStr, purpose, hasDevice, serialNo, selectedEmployees, faceDataJson, uploadedImageUrl, uploadedImageKey);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Invalid contact number", Toast.LENGTH_SHORT).show();
             }
@@ -804,6 +758,8 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void showConfirmationDialog(Runnable onConfirm) {
+        if (isFinishing() || isDestroyed()) return;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.confirm_manual_dailog_layout, null);
@@ -812,33 +768,32 @@ public class AdminManualCheckIn extends AppCompatActivity {
         ImageView imageView = dialogView.findViewById(R.id.imageView);
         Button confirmButton = dialogView.findViewById(R.id.confirmButton);
 
-        // ✅ Load image from uploadedImageUrl
-        Glide.with(this).load(uploadedImageUrl)
-//                .placeholder(R.drawable.placeholder) // optional placeholder
-//                .error(R.drawable.image_error)       // optional error fallback
-                .into(imageView);
+        if (uploadedImageUrl != null && !uploadedImageUrl.isEmpty()) {
+            Glide.with(AdminManualCheckIn.this)
+                    .load(uploadedImageUrl)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .into(imageView);
+        } else {
+            imageView.setImageResource(R.drawable.ic_profile_placeholder);
+        }
 
         AlertDialog dialog = builder.create();
-
         confirmButton.setOnClickListener(v -> {
             dialog.dismiss();
-            onConfirm.run(); // call your submitFormData
+            onConfirm.run();
         });
 
         dialog.show();
     }
 
-
     private boolean validateForm() {
         boolean isValid = true;
 
-        // Validate name
         if (nameEditText.getText().toString().trim().isEmpty()) {
             nameEditText.setError("Name is required");
             isValid = false;
         }
 
-        // Validate contact
         String contact = contactEditText.getText().toString().trim();
         if (contact.isEmpty()) {
             contactEditText.setError("Contact number is required");
@@ -848,7 +803,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
             isValid = false;
         }
 
-        // Validate email
         String email = emailEditText.getText().toString().trim();
         if (email.isEmpty()) {
             emailEditText.setError("Email is required");
@@ -858,25 +812,21 @@ public class AdminManualCheckIn extends AppCompatActivity {
             isValid = false;
         }
 
-        // Validate company
         if (companyEditText.getText().toString().trim().isEmpty()) {
             companyEditText.setError("Company name is required");
             isValid = false;
         }
 
-        // Validate whom to meet
         if (whomToMeetAutoComplete.getText().toString().trim().isEmpty()) {
             whomToMeetAutoComplete.setError("Please select whom to meet");
             isValid = false;
         }
 
-        // Validate purpose
         if (purposeEditText.getText().toString().trim().isEmpty()) {
             purposeEditText.setError("Purpose of meeting is required");
             isValid = false;
         }
 
-        // Validate device selection
         if (deviceAutoComplete.getText().toString().trim().isEmpty()) {
             deviceAutoComplete.setError("Please select device option");
             isValid = false;
@@ -886,23 +836,37 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private String convertImageToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.NO_WRAP);
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            return Base64.encodeToString(byteArray, Base64.NO_WRAP);
+        } catch (Throwable t) {
+            Log.e("AdminManualCheckIn", "Critical memory allocation error during Base64 conversion: " + t.getMessage());
+            return null;
+        }
     }
 
     private void handleError(String message) {
-        new MaterialAlertDialogBuilder(this).setTitle("Error").setMessage(message).setPositiveButton("Retry", (dialog, which) -> {
-            dialog.dismiss();
-            // Reset views and restart camera
-            formScrollView.setVisibility(View.GONE);
-            previewView.setVisibility(View.VISIBLE);
-            startCamera();
-        }).setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.dismiss();
-            finish();
-        }).show();
+        if (isFinishing() || isDestroyed()) return;
+
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+
+            new MaterialAlertDialogBuilder(AdminManualCheckIn.this)
+                    .setTitle("Error")
+                    .setMessage(message)
+                    .setPositiveButton("Retry", (dialog, which) -> {
+                        dialog.dismiss();
+                        formScrollView.setVisibility(View.GONE);
+                        previewView.setVisibility(View.VISIBLE);
+                        startCamera();
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                        finish();
+                    })
+                    .show();
+        });
     }
 
     private File getOutputDirectory() {
@@ -912,18 +876,31 @@ public class AdminManualCheckIn extends AppCompatActivity {
     }
 
     private void showRetryAlert() {
-        new MaterialAlertDialogBuilder(this).setTitle("Camera Not Found").setMessage("No camera found or selected. Please check your device and try again.").setPositiveButton("Retry", (dialog, which) -> {
-            dialog.dismiss();
-            startCamera();
-        }).setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.dismiss();
-            setResult(Activity.RESULT_CANCELED);
-            finish();
-        }).show();
+        if (isFinishing() || isDestroyed()) return;
+
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+
+            new MaterialAlertDialogBuilder(AdminManualCheckIn.this)
+                    .setTitle("Camera Not Found")
+                    .setMessage("No camera found or selected. Please check your device and try again.")
+                    .setPositiveButton("Retry", (dialog, which) -> {
+                        dialog.dismiss();
+                        startCamera();
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                        setResult(Activity.RESULT_CANCELED);
+                        finish();
+                    })
+                    .show();
+        });
     }
 
     private void showCapturingOverlay() {
+        if (isFinishing() || isDestroyed()) return;
         runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
             captureOverlay.setVisibility(TextView.VISIBLE);
             Animation fadeAnim = new AlphaAnimation(0.2f, 1.0f);
             fadeAnim.setDuration(800);
@@ -945,6 +922,9 @@ public class AdminManualCheckIn extends AppCompatActivity {
         super.onDestroy();
         if (cameraExecutor != null) {
             cameraExecutor.shutdown();
+        }
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
         }
     }
 }

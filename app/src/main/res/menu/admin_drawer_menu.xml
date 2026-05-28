@@ -6,39 +6,14 @@
         android:id="@+id/nav_admin_dashboard"
         android:title="Dashboard" />
 
-    <group
-        android:id="@+id/digital_identity_group"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_digital_identity"
-            android:icon="@drawable/ic_dropdown_adaptive_fore"
-            android:title="Digital Identity" />
-    </group>
-
-    <group
-        android:id="@+id/digital_identity_submenu"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_visitorCheckInFragment"
-            android:title="Visitor Check In "
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_visitorDetailsFragment"
-            android:title="Visitor Details"
-            android:visible="false" />
-        <!--        <item-->
-        <!--            android:id="@+id/nav_employees"-->
-        <!--            android:title="Employees"-->
-        <!--            android:visible="false" />-->
-        <!--        <item-->
-        <!--            android:id="@+id/nav_partners"-->
-        <!--            android:title="Partners"-->
-        <!--            android:visible="false" />-->
-        <!--        <item-->
-        <!--            android:id="@+id/nav_allUsers"-->
-        <!--            android:title="Users"-->
-        <!--            android:visible="false" />-->
-    </group>
+    <item
+        android:id="@+id/nav_visitorCheckInFragment"
+        android:title="Visitor Check In "
+        android:visible="true" />
+    <item
+        android:id="@+id/nav_visitorDetailsFragment"
+        android:title="Visitor Details"
+        android:visible="true" />
 
     <item
         android:id="@+id/nav_logout"

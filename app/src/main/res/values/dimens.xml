@@ -71,7 +71,7 @@
     <dimen name="card_padding_vertical">24dp</dimen>
 
     <!-- Logo and branding -->
-    <dimen name="logo_size">120dp</dimen>
+    <dimen name="logo_size">160dp</dimen>
     <dimen name="welcome_text_size">20sp</dimen>
     <dimen name="welcome_text_margin_top">16dp</dimen>
 
