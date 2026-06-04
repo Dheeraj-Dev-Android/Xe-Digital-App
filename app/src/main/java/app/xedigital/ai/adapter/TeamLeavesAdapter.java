@@ -101,9 +101,9 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
                 tvLeaveType.setText(leaveType != null ? leaveType : "Unspecified Leave");
                 tvOpening.setText(String.valueOf(leave.getOpeningLeave()));
                 tvCredited.setText(String.valueOf(leave.getCreditLeave()));
-                tvUsed.setText(String.valueOf(leave.getDebitLeave()));
+                tvUsed.setText(String.valueOf(leave.getUsedLeave()));
 
-                double balance = leave.getCreditLeave() - leave.getDebitLeave();
+                double balance = leave.getCreditLeave() - leave.getUsedLeave();
                 tvBalance.setText(String.valueOf(balance));
 
                 int balanceColor = balance > 0
