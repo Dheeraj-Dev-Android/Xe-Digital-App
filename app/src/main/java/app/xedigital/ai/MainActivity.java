@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog slowNetworkDialog;
     private boolean isAttendanceSubmenuVisible = false;
     private boolean isLeavesSubmenuVisible = false;
+    private boolean isTeamSubVisible = false;
     private boolean isDcrSubmenuVisible = false;
     private NavigationView navigationView;
     private boolean isNetworkChangeReceiverRegistered = false;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member_leave, R.id.nav_logout).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member, R.id.nav_team_member_leave, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -122,6 +123,11 @@ public class MainActivity extends AppCompatActivity {
             toggleAttendanceVisibility(navigationView.getMenu());
             return true;
         });
+        MenuItem teamMemberItem = navigationView.getMenu().findItem(R.id.nav_team_member);
+        teamMemberItem.setOnMenuItemClickListener(item -> {
+            toggleTeamMemberVisibility(navigationView.getMenu());
+            return true;
+        });
 
         MenuItem leavesItem = navigationView.getMenu().findItem(R.id.nav_leaves_menu);
         leavesItem.setOnMenuItemClickListener(item -> {
@@ -135,12 +141,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        MenuItem teamAttendanceItem = navigationView.getMenu().findItem(R.id.navManager_attendance_menu);
-        teamAttendanceItem.setOnMenuItemClickListener(item -> {
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-            navController.navigate(R.id.navManager_attendance_menu);
-            return true;
-        });
+//        MenuItem teamAttendanceItem = navigationView.getMenu().findItem(R.id.navManager_attendance_menu);
+//        teamAttendanceItem.setOnMenuItemClickListener(item -> {
+//           toggleTeamMemberVisibility(navigationView.getMenu());
+//            return true;
+//        });
 
         // Initialize header view elements
         View headerView = navigationView.getHeaderView(0);
@@ -204,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
         // Toggle visibility of submenu items
         boolean newVisibility = !isLeavesSubmenuVisible;
         menu.findItem(R.id.nav_leaves).setVisible(newVisibility);
-        menu.findItem(R.id.nav_team_member_leave).setVisible(newVisibility);
         menu.findItem(R.id.nav_leaves_data).setVisible(newVisibility);
         menu.findItem(R.id.nav_applied_leaves).setVisible(newVisibility);
         menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
@@ -212,6 +216,22 @@ public class MainActivity extends AppCompatActivity {
         // Change icon based on visibility
 //        leavesItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isLeavesSubmenuVisible = newVisibility;
+
+        // Refresh the navigation menu to reflect the changes
+        navigationView.invalidate();
+    }
+
+    private void toggleTeamMemberVisibility(Menu menu) {
+        MenuItem teamMemberItem = menu.findItem(R.id.nav_team_member);
+
+        // Toggle visibility of submenu items
+        boolean newVisibility = !isTeamSubVisible;
+        menu.findItem(R.id.navTeam_member).setVisible(newVisibility);
+        menu.findItem(R.id.navManager_attendance_menu).setVisible(newVisibility);
+        menu.findItem(R.id.nav_team_member_leave).setVisible(newVisibility);
+
+        // Change icon based on visibility
+        isTeamSubVisible = newVisibility;
 
         // Refresh the navigation menu to reflect the changes
         navigationView.invalidate();
@@ -372,9 +392,11 @@ public class MainActivity extends AppCompatActivity {
                 // Load profile image, or default if not available
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed()) {
                     if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.ic_profile_placeholder) // Shown while loading
+                                .error(R.drawable.ic_profile_placeholder).into(profileImage);
                     } else {
-                        Glide.with(MainActivity.this).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                        Glide.with(MainActivity.this).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.ic_profile_placeholder) // Shown while loading
+                                .error(R.drawable.ic_profile_placeholder).into(profileImage);
                     }
                 }
             }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,7 +50,7 @@ public class TeamLeavesFragment extends Fragment {
         progressBar = view.findViewById(R.id.progress_bar);
         layoutEmpty = view.findViewById(R.id.layout_empty);
 
-        // Setup RecyclerView
+        // Setup RecyclerView once with an empty list
         adapter = new TeamLeavesAdapter(requireContext(), new ArrayList<>());
         rvEmployees.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvEmployees.setAdapter(adapter);
@@ -64,6 +65,7 @@ public class TeamLeavesFragment extends Fragment {
         showLoading(true);
         mViewModel.fetchTeamLeaves("jwt " + authToken, employeeId);
 
+        // Observe successful data updates
         mViewModel.getEmployeesLiveData().observe(getViewLifecycleOwner(), employees -> {
             showLoading(false);
 
@@ -74,15 +76,28 @@ public class TeamLeavesFragment extends Fragment {
                 layoutEmpty.setVisibility(View.GONE);
                 rvEmployees.setVisibility(View.VISIBLE);
 
-                // Swap adapter data
-                adapter = new TeamLeavesAdapter(requireContext(), employees);
-                rvEmployees.setAdapter(adapter);
+                // Use a single adapter instance and update its list data internally
+                adapter.updateList(employees);
             }
+        });
+
+        // Observe errors to prevent infinite progress spinning
+        mViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), errorMessage -> {
+            showLoading(false);
+            layoutEmpty.setVisibility(View.VISIBLE);
+            rvEmployees.setVisibility(View.GONE);
+
+            // Optional alert to notify the user
+            Toast.makeText(requireContext(), "Failed to load team leaves", Toast.LENGTH_SHORT).show();
         });
     }
 
     private void showLoading(boolean loading) {
         progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
-        rvEmployees.setVisibility(loading ? View.GONE : View.VISIBLE);
+        // Toggle empty state visibility safely alongside the recycler layout
+        if (loading) {
+            rvEmployees.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(View.GONE);
+        }
     }
 }

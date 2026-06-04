@@ -112,6 +112,9 @@
     <string name="face_overlay_desc">Face detection overlay</string>
     <string name="loading_desc">Loading indicator</string>
     <string name="team_leaves">Team Leaves</string>
+    <string name="team_attendance">Team Attendance</string>
+    <string name="team_member_details">Team Member Details</string>
+    <string name="team_member">Team Members</string>
 
 
 </resources>

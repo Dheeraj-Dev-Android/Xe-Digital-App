@@ -2,7 +2,11 @@ package app.xedigital.ai.model.leaveApprovalPending;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Leavetype {
+import java.io.Serializable;
+
+public class Leavetype implements Serializable {
+    // Adding a serialVersionUID is best practice to ensure serialization stability
+    private static final long serialVersionUID = 1L;
 
     @SerializedName("createdAt")
     private String createdAt;

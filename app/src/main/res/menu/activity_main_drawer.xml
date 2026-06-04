@@ -15,6 +15,27 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_team_member"
+            android:icon="@drawable/ic_visitor"
+            android:title="@string/team_member" />
+    </group>
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navTeam_member"
+            android:title="@string/team_member_details"
+            android:visible="false" />
+        <item
+            android:id="@+id/navManager_attendance_menu"
+            android:title="@string/team_attendance"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_team_member_leave"
+            android:title="@string/team_leaves"
+            android:visible="false" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
             android:id="@+id/nav_attendance_menu"
             android:icon="@drawable/ic_collections_bookmark"
             android:title="@string/menu_attendance" />
@@ -41,16 +62,9 @@
 
     </group>
 
-    <item
-        android:id="@+id/navTeam_member"
-        android:icon="@drawable/ic_person"
-        android:title="Team Member" />
 
     <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/navManager_attendance_menu"
-            android:icon="@drawable/ic_collections_bookmark"
-            android:title="Team Attendance" />
+
     </group>
 
     <group android:checkableBehavior="single">
@@ -68,10 +82,6 @@
         <item
             android:id="@+id/nav_leaves_data"
             android:title="@string/total_leaves"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_team_member_leave"
-            android:title="@string/team_leaves"
             android:visible="false" />
         <item
             android:id="@+id/nav_applied_leaves"

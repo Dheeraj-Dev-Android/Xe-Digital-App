@@ -585,7 +585,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file1Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("image", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage(authTokenHeader, requestBody);
@@ -633,7 +633,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file2Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageOne", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage1(authTokenHeader, requestBody);
@@ -682,7 +682,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file3Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageTwo", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage2(authTokenHeader, requestBody);
@@ -730,7 +730,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file4Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageThree", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage3(authTokenHeader, requestBody);
@@ -779,7 +779,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file5Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageFour", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage4(authTokenHeader, requestBody);
@@ -828,7 +828,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file6Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageFive", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage5(authTokenHeader, requestBody);
@@ -876,7 +876,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file7Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageSix", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage6(authTokenHeader, requestBody);
@@ -925,7 +925,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file8Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageSeven", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage7(authTokenHeader, requestBody);
@@ -974,7 +974,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file9Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageEight", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage8(authTokenHeader, requestBody);
@@ -1023,7 +1023,7 @@ public class ClaimManagementFragment extends Fragment {
             String base64String = getBase64StringFromFile(file10Uri);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("imageNine", "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "companies-policy-file");
+            jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> call = apiInterface.uploadImage9(authTokenHeader, requestBody);

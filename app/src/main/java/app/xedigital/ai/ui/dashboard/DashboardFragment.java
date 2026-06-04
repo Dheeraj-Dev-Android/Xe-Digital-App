@@ -294,7 +294,7 @@ public class DashboardFragment extends Fragment {
                     Object profileImageUrl = employee.getProfileImageUrl();
                     ImageView profileImage = binding.ivEmployeeProfile;
                     if (profileImageUrl != null) {
-                        Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
+                        Glide.with(requireContext()).load(profileImageUrl).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).into(profileImage);
                     } else {
                         profileImage.setImageResource(R.drawable.ic_profile_placeholder);
                     }
@@ -333,23 +333,29 @@ public class DashboardFragment extends Fragment {
                             return false;
                         }
                     }).collect(Collectors.toList());
-
                     requireActivity().runOnUiThread(() -> {
-                        if (!currentPunchData.isEmpty()) {
-                            punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
-                            punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
-                            binding.tvPunchInTime.setText("Punch In: " + punchIn);
-                            binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
-                        } else {
-                            binding.tvPunchInTime.setText("Punch In: --:--");
-                            binding.tvPunchOutTime.setText("Punch Out: --:--");
+
+                        if (binding != null) {
+                            if (!currentPunchData.isEmpty()) {
+                                punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
+                                punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
+                                binding.tvPunchInTime.setText("Punch In: " + punchIn);
+                                binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+                            } else {
+                                binding.tvPunchInTime.setText("Punch In: --:--");
+                                binding.tvPunchOutTime.setText("Punch Out: --:--");
+                            }
                         }
                     });
                 }).start();
             } else {
-                binding.tvPunchInTime.setText("Punch In: --:--");
-                binding.tvPunchOutTime.setText("Punch Out: --:--");
-                punchCardView.setVisibility(View.VISIBLE);
+                if (binding != null) {
+                    binding.tvPunchInTime.setText("Punch In: --:--");
+                    binding.tvPunchOutTime.setText("Punch Out: --:--");
+                    punchCardView.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(requireContext(), "No attendance data available", Toast.LENGTH_SHORT).show();
+                }
             }
             punchCardShimmer.stopShimmer();
             punchCardShimmer.setVisibility(View.GONE);

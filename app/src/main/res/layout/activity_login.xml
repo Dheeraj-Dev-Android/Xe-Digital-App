@@ -10,6 +10,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="700dp"
+        android:paddingBottom="48dp"
         tools:context=".activity.LoginActivity">
 
         <View
@@ -27,6 +29,7 @@
             app:layout_constraintGuide_percent="0.45" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/logoCard"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:transitionName="logo_image"
@@ -63,12 +66,14 @@
             app:strokeWidth="0dp">
 
             <LinearLayout
+                android:id="@+id/loginFormContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="32dp">
 
                 <TextView
+                    android:id="@+id/textSignInHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -80,6 +85,7 @@
                     android:textSize="28sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout_email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -105,6 +111,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout_password"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -21,8 +21,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
@@ -70,7 +68,6 @@ public class LoginActivity extends AppCompatActivity {
 //        checkBatteryOptimization();
 
         Glide.with(this).load(R.mipmap.ic_launcher)
-                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
                 .into(binding.logoImage);
 
         binding.btnSignIn.setOnClickListener(v -> {
@@ -198,12 +195,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showLoginScreen() {
-        runOnUiThread(() -> {
-            binding.editEmail.setVisibility(View.VISIBLE);
-            binding.editPassword.setVisibility(View.VISIBLE);
-            binding.btnSignIn.setVisibility(View.VISIBLE);
-            binding.logoImage.setVisibility(View.VISIBLE);
-        });
+        binding.layoutEmail.setVisibility(View.VISIBLE);
+        binding.layoutPassword.setVisibility(View.VISIBLE);
+        binding.btnSignIn.setVisibility(View.VISIBLE);
+        binding.logoCard.setVisibility(View.VISIBLE);
     }
 
     private void callLoginApi(String email, String password) {
@@ -261,10 +256,10 @@ public class LoginActivity extends AppCompatActivity {
             });
 
     private void hideLoginScreen() {
-        binding.editEmail.setVisibility(View.GONE);
-        binding.editPassword.setVisibility(View.GONE);
+        binding.layoutEmail.setVisibility(View.GONE);
+        binding.layoutPassword.setVisibility(View.GONE);
         binding.btnSignIn.setVisibility(View.GONE);
-        binding.logoImage.setVisibility(View.INVISIBLE);
+        binding.logoCard.setVisibility(View.INVISIBLE);
     }
 
     private boolean hasBackgroundLocationPermission() {
@@ -338,10 +333,4 @@ public class LoginActivity extends AppCompatActivity {
 //            }
 //        }
 //    }
-
-
-
-
-
-
 }

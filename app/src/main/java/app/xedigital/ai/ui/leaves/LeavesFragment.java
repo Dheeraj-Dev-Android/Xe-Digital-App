@@ -838,6 +838,7 @@ public class LeavesFragment extends Fragment {
 
         if (!fromDate.isEmpty() && !toDate.isEmpty() && !leaveCategoryFrom.isEmpty() && !leaveCategoryTo.isEmpty()) {
             long totalDaysInDateRange = calculateTotalDays(fromDate, toDate);
+            Log.e(TAG, "Total days in date range: " + totalDaysInDateRange);
 
             // Apply logic from getTotalNumberOfDays()
             if (leaveCategoryFrom.equals("First Half Day") && leaveCategoryTo.equals("First Half Day")) {

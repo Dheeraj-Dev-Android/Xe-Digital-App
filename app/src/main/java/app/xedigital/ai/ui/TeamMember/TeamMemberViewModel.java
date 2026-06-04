@@ -20,6 +20,9 @@ public class TeamMemberViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
+    private final MutableLiveData<TeamMemberResponse> subTeamData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isSubTeamLoading = new MutableLiveData<>();
+
     public LiveData<TeamMemberResponse> getTeamMemberData() {
         return teamMemberData;
     }
@@ -32,32 +35,18 @@ public class TeamMemberViewModel extends ViewModel {
         return errorMessage;
     }
 
-    //    public void fetchTeamMembers(String authToken, String userId) {
-//        isLoading.setValue(true);
-//
-//        // Using your specific APIClient and APIInterface naming
-//        APIInterface apiInterface = APIClient.getInstance().getApi();
-//
-//        Call<TeamMemberResponse> call = apiInterface.getEmployeesByManager("jwt " + authToken, userId);
-//
-//        call.enqueue(new Callback<TeamMemberResponse>() {
-//            @Override
-//            public void onResponse(@NonNull Call<TeamMemberResponse> call, @NonNull Response<TeamMemberResponse> response) {
-//                isLoading.setValue(false);
-//                if (response.isSuccessful() && response.body() != null) {
-//                    teamMemberData.setValue(response.body());
-//                } else {
-//                    errorMessage.setValue("Error: " + response.code());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<TeamMemberResponse> call, @NonNull Throwable t) {
-//                isLoading.setValue(false);
-//                errorMessage.setValue(t.getMessage());
-//            }
-//        });
-//    }
+    public LiveData<TeamMemberResponse> getSubTeamData() {
+        return subTeamData;
+    }
+
+    public LiveData<Boolean> getIsSubTeamLoading() {
+        return isSubTeamLoading;
+    }
+
+    public void clearSubTeamData() {
+        subTeamData.postValue(null);
+    }
+
     public void fetchTeamMembers(String authToken, String userId) {
         isLoading.setValue(true);
         Log.e("TreeDebug", "Fetching API for UserId: " + userId);
@@ -68,26 +57,46 @@ public class TeamMemberViewModel extends ViewModel {
         call.enqueue(new Callback<TeamMemberResponse>() {
             @Override
             public void onResponse(@NonNull Call<TeamMemberResponse> call, @NonNull Response<TeamMemberResponse> response) {
-                isLoading.setValue(false);
+                // FIX: Utilizing postValue ensures continuous background thread-safety execution paths
+                isLoading.postValue(false);
                 Log.e("TreeDebug", "Response Code: " + response.code());
 
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.e("TreeDebug", "API Success. Message: " + response.body().getMessage());
-                    if (response.body().getData() != null) {
-                        Log.e("TreeDebug", "Employee Count: " + (response.body().getData().getEmployees() != null ? response.body().getData().getEmployees().size() : 0));
-                    }
-                    teamMemberData.setValue(response.body());
+                    teamMemberData.postValue(response.body());
                 } else {
-                    Log.e("TreeDebug", "API Response Error Body: " + response.errorBody());
-                    errorMessage.setValue("Error: " + response.code());
+                    errorMessage.postValue("Error: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<TeamMemberResponse> call, @NonNull Throwable t) {
-                isLoading.setValue(false);
-                Log.e("TreeDebug", "API Failure: " + t.getMessage(), t);
-                errorMessage.setValue(t.getMessage());
+                isLoading.postValue(false);
+                errorMessage.postValue(t.getMessage());
+            }
+        });
+    }
+
+    public void fetchSubTeamMembers(String authToken, String clickedUserId) {
+        isSubTeamLoading.setValue(true);
+
+        APIInterface apiInterface = APIClient.getInstance().AppliedLeave();
+        Call<TeamMemberResponse> call = apiInterface.getEmployeesByManager("jwt " + authToken, clickedUserId);
+
+        call.enqueue(new Callback<TeamMemberResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<TeamMemberResponse> call, @NonNull Response<TeamMemberResponse> response) {
+                isSubTeamLoading.postValue(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    subTeamData.postValue(response.body());
+                } else {
+                    subTeamData.postValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TeamMemberResponse> call, @NonNull Throwable t) {
+                isSubTeamLoading.postValue(false);
+                subTeamData.postValue(null);
             }
         });
     }

@@ -1,5 +1,6 @@
 package app.xedigital.ai.ui.TeamMember;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -29,6 +30,7 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
         this.listener = listener;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setMergedData(List<EmployeesItem> fromEmployees, List<AllEmployeesItem> fromAll, RelationType type) {
         visibleList.clear();
         if (fromEmployees != null) {
@@ -54,11 +56,10 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
         String crossMgr = emp.getCrossmanager() != null ?
                 trim(emp.getCrossmanager().getFirstname()) + " " + trim(emp.getCrossmanager().getLastname()) : "N/A";
 
-        // Assuming your model has getShift() or similar. Adjust if named differently.
         String shift = emp.getShift() != null ? trim(emp.getShift().getStartTime() + "-" + emp.getShift().getEndTime()) : "Not Assigned";
 
         return new TreeNode(name, trim(emp.getDesignation()), dept, type,
-                trim(emp.getEmployeeCode()), emp.getEmail(), trim(emp.getContact()),
+                trim(emp.getId()), emp.getEmail(), trim(emp.getContact()),
                 repMgr, crossMgr, shift);
     }
 
@@ -69,11 +70,11 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
                 trim(emp.getReportingManager().getFirstname()) + " " + trim(emp.getReportingManager().getLastname()) : "N/A";
         String crossMgr = emp.getCrossmanager() != null ?
                 trim(emp.getCrossmanager().getFirstname()) + " " + trim(emp.getCrossmanager().getLastname()) : "N/A";
-        // Assuming your model has getShift() or similar. Adjust if named differently.
+
         String shift = emp.getShift() != null ? trim(emp.getShift().getStartTime() + "-" + emp.getShift().getEndTime()) : "Not Assigned";
 
         return new TreeNode(name, trim(emp.getDesignation()), dept, type,
-                trim(emp.getEmployeeCode()), emp.getEmail(), trim(emp.getContact()),
+                trim(emp.getId()), emp.getEmail(), trim(emp.getContact()),
                 repMgr, crossMgr, shift);
     }
 
@@ -98,7 +99,10 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onMemberClick(node);
+            int currentPos = holder.getAdapterPosition();
+            if (listener != null && currentPos != RecyclerView.NO_POSITION) {
+                listener.onMemberClick(visibleList.get(currentPos));
+            }
         });
     }
 
@@ -120,7 +124,7 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
 
     private String getInitials(String fullName) {
         if (fullName == null || fullName.trim().isEmpty()) return "?";
-        String[] parts = fullName.trim().split(" ");
+        String[] parts = fullName.trim().split("\\s+");
         if (parts.length >= 2 && !parts[1].isEmpty()) {
             return ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
         }
@@ -139,7 +143,7 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
 
     public static class TreeNode {
         public String name, role, department, id, email, contact,
-                reportingManager, crossManager, shiftTiming; // Added shiftTiming
+                reportingManager, crossManager, shiftTiming;
         public RelationType relation;
 
         public TreeNode(String name, String role, String department, RelationType relation,

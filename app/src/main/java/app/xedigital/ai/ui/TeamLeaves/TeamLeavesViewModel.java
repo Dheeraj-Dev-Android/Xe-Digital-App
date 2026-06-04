@@ -20,9 +20,15 @@ import retrofit2.Response;
 public class TeamLeavesViewModel extends ViewModel {
 
     private final MutableLiveData<List<EmployeesItem>> employeesLiveData = new MutableLiveData<>();
+    // LiveData to track API error messages
+    private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
 
     public LiveData<List<EmployeesItem>> getEmployeesLiveData() {
         return employeesLiveData;
+    }
+
+    public LiveData<String> getErrorLiveData() {
+        return errorLiveData;
     }
 
     public void fetchTeamLeaves(String authToken, String employeeId) {
@@ -35,13 +41,17 @@ public class TeamLeavesViewModel extends ViewModel {
                     employeesLiveData.setValue(response.body().getData().getEmployees());
                     Log.e("TEAM_LEAVE_API", "Response : " + response.body().toString());
                 } else {
-                    Log.e("TEAM_LEAVE_API", "Response Failed : " + response.code());
+                    String errorMsg = "Response Failed : " + response.code();
+                    Log.e("TEAM_LEAVE_API", errorMsg);
+                    errorLiveData.setValue(errorMsg);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<TeamLeaveResponse> call, @NonNull Throwable t) {
-                Log.e("TEAM_LEAVE_API", "Error : " + t.getMessage());
+                String errorMsg = "Error : " + t.getMessage();
+                Log.e("TEAM_LEAVE_API", errorMsg);
+                errorLiveData.setValue(errorMsg);
             }
         });
     }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Calendar;
 import java.util.List;
 
 import app.xedigital.ai.R;
@@ -20,12 +21,17 @@ import app.xedigital.ai.model.TeamLeave.LeavesItem;
 
 public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.EmployeeViewHolder> {
 
-    private final List<EmployeesItem> employees;
+    private List<EmployeesItem> employees;
     private final Context context;
 
     public TeamLeavesAdapter(Context context, List<EmployeesItem> employees) {
         this.context = context;
         this.employees = employees;
+    }
+
+    public void updateList(List<EmployeesItem> newList) {
+        this.employees = newList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -52,9 +58,36 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
         // Clear previous leave rows to avoid duplication during view recycling
         holder.llLeavesContainer.removeAllViews();
 
+        // Track if at least one current year row was added for this employee
+        boolean hasCurrentYearLeaves = false;
+
         // Populate leave rows
         if (employee.getLeaves() != null && !employee.getLeaves().isEmpty()) {
+
+            // Get the current system year dynamically (e.g., 2026)
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
             for (LeavesItem leave : employee.getLeaves()) {
+
+                // Extract year from assignDate (Format example: "2026-05-29T05:57:31.565Z")
+                String assignDate = leave.getAssignDate();
+                int recordYear = 0;
+
+                if (assignDate != null && assignDate.length() >= 4) {
+                    try {
+                        recordYear = Integer.parseInt(assignDate.substring(0, 4));
+                    } catch (NumberFormatException e) {
+                        recordYear = 0;
+                    }
+                }
+
+                // Filter: Only allow records matching the current year
+                if (recordYear != currentYear) {
+                    continue;
+                }
+
+                hasCurrentYearLeaves = true;
+
                 View leaveRow = inflater.inflate(R.layout.item_leave_row, holder.llLeavesContainer, false);
 
                 TextView tvLeaveType = leaveRow.findViewById(R.id.tv_leave_type);
@@ -68,18 +101,16 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
                 tvLeaveType.setText(leaveType != null ? leaveType : "Unspecified Leave");
                 tvOpening.setText(String.valueOf(leave.getOpeningLeave()));
                 tvCredited.setText(String.valueOf(leave.getCreditLeave()));
-                tvUsed.setText(String.valueOf(leave.getUsedLeave()));
+                tvUsed.setText(String.valueOf(leave.getDebitLeave()));
 
-                double balance = leave.getCreditLeave() - leave.getUsedLeave();
+                double balance = leave.getCreditLeave() - leave.getDebitLeave();
                 tvBalance.setText(String.valueOf(balance));
 
-                // Balance color: green if positive, red if zero/negative
                 int balanceColor = balance > 0
                         ? ContextCompat.getColor(containerContext, R.color.leave_balance_positive)
                         : ContextCompat.getColor(containerContext, R.color.leave_balance_zero);
                 tvBalance.setTextColor(balanceColor);
 
-                // Progress bar: percentage of leave used
                 double totalAllotted = leave.getCreditLeave();
                 if (totalAllotted > 0) {
                     int usedPct = (int) ((leave.getUsedLeave() / (float) totalAllotted) * 100);
@@ -90,12 +121,14 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
 
                 holder.llLeavesContainer.addView(leaveRow);
             }
-        } else {
-            // No leave data placeholder
+        }
+
+        // If employee has no leaves at all OR none match the current year, display fallback item
+        if (!hasCurrentYearLeaves) {
             View leaveRow = inflater.inflate(R.layout.item_leave_row, holder.llLeavesContainer, false);
             TextView tvLeaveType = leaveRow.findViewById(R.id.tv_leave_type);
 
-            tvLeaveType.setText("Not Specified");
+            tvLeaveType.setText("No entries for " + Calendar.getInstance().get(Calendar.YEAR));
             leaveRow.findViewById(R.id.pb_leave_usage).setVisibility(View.GONE);
 
             holder.llLeavesContainer.addView(leaveRow);

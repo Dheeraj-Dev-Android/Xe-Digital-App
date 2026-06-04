@@ -54,7 +54,7 @@ public class LeavesItem {
         return creditLeave;
     }
 
-    public void setCreditLeave(int creditLeave) {
+    public void setCreditLeave(double creditLeave) {
         this.creditLeave = creditLeave;
     }
 
@@ -86,7 +86,7 @@ public class LeavesItem {
         return usedLeave;
     }
 
-    public void setUsedLeave(int usedLeave) {
+    public void setUsedLeave(double usedLeave) {
         this.usedLeave = usedLeave;
     }
 
@@ -102,7 +102,7 @@ public class LeavesItem {
         return openingLeave;
     }
 
-    public void setOpeningLeave(int openingLeave) {
+    public void setOpeningLeave(double openingLeave) {
         this.openingLeave = openingLeave;
     }
 

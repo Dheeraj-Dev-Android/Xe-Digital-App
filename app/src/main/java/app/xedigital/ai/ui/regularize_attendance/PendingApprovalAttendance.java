@@ -61,27 +61,75 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
         super.onCreate(savedInstanceState);
     }
 
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        View view = inflater.inflate(R.layout.fragment_pending_approval_attendance, container, false);
+//        setHasOptionsMenu(true);
+//        approvalRecyclerView = view.findViewById(R.id.approval_recycler_view);
+//        loadingProgress = view.findViewById(R.id.loadingProgress);
+//        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
+//        // Initialize adapter with an empty list immediately
+//        adapter = new RegularizeApprovalAdapter(new ArrayList<>(), authToken, userId, this, getContext());
+//        approvalRecyclerView.setAdapter(adapter);
+//        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+//        loadingProgress.setVisibility(View.VISIBLE);
+//        apiInterface = APIClient.getInstance().getRegularizeListApproval();
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+//        authToken = sharedPreferences.getString("authToken", "");
+//        userId = sharedPreferences.getString("userId", "");
+//        getRegularizeApproval();
+//        ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
+//        chipGroup.setSingleSelection(true);
+//        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+//            // Handle chip selection
+//            if (checkedIds.contains(R.id.chipAll)) {
+//                filterLeaves("All");
+//            } else if (checkedIds.contains(R.id.chipApproved)) {
+//                filterLeaves("Approved");
+//            } else if (checkedIds.contains(R.id.chipUnapproved)) {
+//                filterLeaves("Unapproved");
+//            } else if (checkedIds.contains(R.id.chipRejected)) {
+//                filterLeaves("Rejected");
+//            } else if (checkedIds.contains(R.id.chipCancelled)) {
+//                filterLeaves("Cancelled");
+//            } else {
+//                filterLeaves("All");
+//            }
+//        });
+//        // Attach click listeners to chips
+//        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+//            View child = chipGroup.getChildAt(i);
+//            if (child instanceof Chip) {
+//                child.setOnClickListener(this::onChipClicked);
+//            }
+//        }
+//        return view;
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pending_approval_attendance, container, false);
         setHasOptionsMenu(true);
+
         approvalRecyclerView = view.findViewById(R.id.approval_recycler_view);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
-        // Initialize adapter with an empty list immediately
-        adapter = new RegularizeApprovalAdapter(new ArrayList<>(), authToken, userId, this, getContext());
-        approvalRecyclerView.setAdapter(adapter);
-        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        loadingProgress.setVisibility(View.VISIBLE);
-        apiInterface = APIClient.getInstance().getRegularizeListApproval();
+        ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
+
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
+
+        adapter = new RegularizeApprovalAdapter(new ArrayList<>(), authToken, userId, this, getContext());
+        approvalRecyclerView.setAdapter(adapter);
+        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+
+        loadingProgress.setVisibility(View.VISIBLE);
+        apiInterface = APIClient.getInstance().getRegularizeListApproval();
         getRegularizeApproval();
-        ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
+
         chipGroup.setSingleSelection(true);
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            // Handle chip selection
             if (checkedIds.contains(R.id.chipAll)) {
                 filterLeaves("All");
             } else if (checkedIds.contains(R.id.chipApproved)) {
@@ -96,16 +144,17 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
                 filterLeaves("All");
             }
         });
-        // Attach click listeners to chips
+
+        // Attach click listeners to chips safely
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             View child = chipGroup.getChildAt(i);
             if (child instanceof Chip) {
                 child.setOnClickListener(this::onChipClicked);
             }
         }
+
         return view;
     }
-
     public void onChipClicked(View view) {
         // Get the ChipGroup and the clicked chip
         ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
@@ -116,7 +165,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
     }
 
     private void filterLeaves(String status) {
-        if (regularizeApprovalResponse != null && regularizeApprovalResponse.getData() != null && regularizeApprovalResponse.getData().getAttendanceRegularizeApplied() != null && adapter != null) {
+        if (adapter != null && regularizeApprovalResponse != null && regularizeApprovalResponse.getData() != null && regularizeApprovalResponse.getData().getAttendanceRegularizeApplied() != null) {
             List<AttendanceRegularizeAppliedItem> originalList = regularizeApprovalResponse.getData().getAttendanceRegularizeApplied();
             List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
 

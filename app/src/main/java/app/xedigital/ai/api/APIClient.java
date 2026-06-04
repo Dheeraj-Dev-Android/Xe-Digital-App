@@ -1,7 +1,5 @@
 package app.xedigital.ai.api;
 
-import com.airbnb.lottie.BuildConfig;
-
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -20,13 +18,11 @@ public class APIClient {
     private APIClient() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
 
-        // FIX: Only log the full body in DEBUG builds.
-        // In production, use BASIC (only logs URL, method, and response code) or NONE.
-        if (BuildConfig.DEBUG) {
+//        if (BuildConfig.DEBUG) {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        } else {
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
-        }
+//        } else {
+//            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+//        }
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)

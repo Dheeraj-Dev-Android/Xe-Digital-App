@@ -49,14 +49,12 @@
             android:layout_marginTop="20dp"
             android:background="#EEEEEE" />
 
-        <!-- 4. Details Grid -->
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:columnCount="2">
 
-            <!-- ID Field -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -134,7 +132,7 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Department Field (Replaced Role here) -->
+            <!-- Department Field -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -159,34 +157,33 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
-
-            <!-- Shift Timing Field -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnSpan="2"
-                android:layout_columnWeight="2"
-                android:layout_marginTop="12dp"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="SHIFT TIMING"
-                    android:textColor="#9E9E9E"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_shift"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#212121"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
         </GridLayout>
+
+        <!-- Moved Shift Timing here, cleanly isolated outside the Grid layout container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SHIFT TIMING"
+                android:textColor="#9E9E9E"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_shift"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#212121"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -258,6 +255,69 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- 6. Nested Sub-Team Presentation Modules -->
+        <TextView
+            android:id="@+id/popup_subteam_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingHorizontal="8dp"
+            android:text="Their Reports"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/popup_sub_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:visibility="gone" />
+
+        <!-- Direct Sub-Reports Layout Wrapper -->
+        <TextView
+            android:id="@+id/popup_label_direct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:paddingHorizontal="8dp"
+            android:text="Direct Reports"
+            android:textColor="#0F6E56"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/popup_recycler_direct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone" />
+
+        <!-- Cross Sub-Reports Layout Wrapper -->
+        <TextView
+            android:id="@+id/popup_label_cross"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:paddingHorizontal="8dp"
+            android:text="Cross Reports"
+            android:textColor="#854F0B"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/popup_recycler_cross"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

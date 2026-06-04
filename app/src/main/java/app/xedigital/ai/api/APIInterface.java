@@ -49,6 +49,7 @@ import app.xedigital.ai.model.shiftTime.ShiftTimeResponse;
 import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
 import app.xedigital.ai.model.shifts.ShiftTypeResponse;
 import app.xedigital.ai.model.uploadDocument.UploadDocumentRequest;
+import app.xedigital.ai.model.usedLeave.UsedLeaveRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.model.userProfileEmail.UserProfileByEmailResponse;
 import app.xedigital.ai.model.visitorsDetails.VisitorsDetailsResponse;
@@ -256,6 +257,9 @@ public interface APIInterface {
 
     @PUT("leaves/used/debit")
     retrofit2.Call<ResponseBody> LeavesUsedDebit(@Header("Authorization") String token, @Body DebitLeaveRequest requestBody);
+
+    @PUT(" leaves/used/count")
+    retrofit2.Call<ResponseBody> LeavesUsedCount(@Header("Authorization") String token, @Body UsedLeaveRequest requestBody);
 
     @PUT("leaves/status/{managerId}")
     retrofit2.Call<ResponseBody> LeavesStatus(@Header("Authorization") String token, @Path("managerId") String managerId, @Body LeaveUpdateRequest requestBody);
