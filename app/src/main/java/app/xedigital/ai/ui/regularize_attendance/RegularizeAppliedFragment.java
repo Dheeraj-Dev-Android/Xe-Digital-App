@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ public class RegularizeAppliedFragment extends Fragment {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     private RegularizeAppliedAdapter regularizeAppliedAdapter;
     private RegularizeAppliedResponse apiResponse;
     private String currentFilterStatus = "All";
@@ -51,6 +53,8 @@ public class RegularizeAppliedFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.regularize_applied_recycler_view);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
@@ -76,9 +80,9 @@ public class RegularizeAppliedFragment extends Fragment {
                     List<AttendanceRegularizeAppliedItem> items = apiResponse.getData().getAttendanceRegularizeApplied();
 
                     if (items == null || items.isEmpty()) {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        emptyStateContainer.setVisibility(View.VISIBLE);
                     } else {
-                        emptyStateText.setVisibility(View.GONE);
+                        emptyStateContainer.setVisibility(View.GONE);
                         regularizeAppliedAdapter = new RegularizeAppliedAdapter(items);
                         recyclerView.setAdapter(regularizeAppliedAdapter);
 
@@ -135,12 +139,9 @@ public class RegularizeAppliedFragment extends Fragment {
     }
 
     private void filterLeaves(String status) {
-        // ADAPTER INITIALIZATION GUARD: Exit early if adapter doesn't exist yet to avoid V1.f.e NPE
         if (regularizeAppliedAdapter == null) {
             return;
         }
-
-        // DATA CONSISTENCY GUARD: Verify API datasets are fully intact before running calculations
         if (apiResponse == null || apiResponse.getData() == null || apiResponse.getData().getAttendanceRegularizeApplied() == null) {
             return;
         }
@@ -149,7 +150,6 @@ public class RegularizeAppliedFragment extends Fragment {
         List<AttendanceRegularizeAppliedItem> filteredList = new ArrayList<>();
 
         if ("All".equalsIgnoreCase(status)) {
-            // Null-check individual inner array objects within the response loop
             for (AttendanceRegularizeAppliedItem item : originalList) {
                 if (item != null) filteredList.add(item);
             }
@@ -160,7 +160,6 @@ public class RegularizeAppliedFragment extends Fragment {
                 }
             }
         }
-
         regularizeAppliedAdapter.updateList(filteredList);
     }
 }

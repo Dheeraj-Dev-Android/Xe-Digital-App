@@ -213,8 +213,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (loginResponse.isSuccess()) {
                         String userId = loginResponse.getData().getUser().getId();
                         String token = loginResponse.getData().getToken();
+                        String emailId = loginResponse.getData().getUser().getEmail();
 
-                        storeInSharedPreferences(userId, token);
+                        storeInSharedPreferences(userId, emailId, token);
                         checkPermissionsAndNavigate(token);
                     } else {
                         showAlertDialog(loginResponse.getMessage());
@@ -279,9 +280,10 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void storeInSharedPreferences(String userId, String authToken) {
+    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
         SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit();
         editor.putString("userId", userId);
+        editor.putString("emailId", emailId);
         editor.putString("authToken", authToken);
         editor.apply();
     }

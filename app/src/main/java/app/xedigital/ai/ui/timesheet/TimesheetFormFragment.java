@@ -28,7 +28,6 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.CalendarConstraints;
-import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -42,8 +41,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -89,7 +90,6 @@ public class TimesheetFormFragment extends Fragment {
     private FragmentDcrFormBinding binding;
     private boolean isSubmitting = false;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,7 +118,6 @@ public class TimesheetFormFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         getContext();
-        // Register the back press handler
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), backPressedCallback);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -157,32 +156,44 @@ public class TimesheetFormFragment extends Fragment {
 
         binding.dcrDate.setOnClickListener(v -> {
             dcrDate.requestFocus();
-            Calendar calendar = Calendar.getInstance();
-            long today = calendar.getTimeInMillis();
+            long todayMs = MaterialDatePicker.todayInUtcMilliseconds();
+            // 2 days in milliseconds = 2 * 24 * 60 * 60 * 1000
+            long twoDaysAgoMs = todayMs - (2L * 24 * 60 * 60 * 1000);
 
-            CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-            constraintsBuilder.setValidator(DateValidatorPointForward.now());
+            // Calendar Constraint Validator: Only allows selection between [twoDaysAgo, today]
+            CalendarConstraints.DateValidator threeDayWindowValidator = new CalendarConstraints.DateValidator() {
+                @Override
+                public boolean isValid(long date) {
+                    return date >= twoDaysAgoMs && date <= todayMs;
+                }
 
-            MaterialDatePicker.Builder<Long> materialDatePickerBuilder = MaterialDatePicker.Builder.datePicker();
-            materialDatePickerBuilder.setTitleText("Select Date");
-            materialDatePickerBuilder.setSelection(today);
-            materialDatePickerBuilder.setCalendarConstraints(constraintsBuilder.build());
+                @Override
+                public int describeContents() {
+                    return 0;
+                }
 
-            MaterialDatePicker<Long> materialDatePicker = materialDatePickerBuilder.build();
-            materialDatePicker.show(getParentFragmentManager(), "DATE_PICKER");
+                @Override
+                public void writeToParcel(android.os.Parcel dest, int flags) {
+                }
+            };
 
-//            materialDatePicker.addOnPositiveButtonClickListener(selection -> {
-//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//                dcrDate.setText(simpleDateFormat.format(selection));
-//            });
-            materialDatePicker.addOnPositiveButtonClickListener(selection -> {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                String selectedDateStr = simpleDateFormat.format(selection);
-                dcrDate.setText(selectedDateStr); //[cite: 1]
+            CalendarConstraints calendarConstraints = new CalendarConstraints.Builder().setValidator(threeDayWindowValidator).build();
 
-                // Trigger the auto-fill
-                fetchEmployeeAttendanceForDate(selectedDateStr);
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select DCR Date").setSelection(todayMs).setCalendarConstraints(calendarConstraints).setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR) // Blocks manual text entry icon
+                    .build();
+
+            datePicker.addOnPositiveButtonClickListener(selection -> {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String formattedDate = sdf.format(new Date(selection));
+                dcrDate.setText(formattedDate);
+
+                if (userId != null && authToken != null) {
+                    fetchEmployeeAttendanceForDate(formattedDate);
+                }
             });
+
+            datePicker.show(getParentFragmentManager(), "DATE_PICKER");
         });
 
         binding.inTime.setOnClickListener(v -> {
@@ -211,7 +222,7 @@ public class TimesheetFormFragment extends Fragment {
     }
 
     public void fetchEmployeeAttendanceForDate(String date) {
-        Context context = getContext(); // Use getContext() which returns null if detached
+        Context context = getContext();
         if (context == null) return;
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -224,26 +235,17 @@ public class TimesheetFormFragment extends Fragment {
                 if (!isAdded() || binding == null) return;
                 if (response.isSuccessful() && response.body() != null) {
                     EmployeeAttendanceResponse responseBody = response.body();
-
-                    // Check if data and the list are not null/empty
-                    if (responseBody.getData() != null &&
-                            responseBody.getData().getEmployeePunchData() != null &&
-                            !responseBody.getData().getEmployeePunchData().isEmpty()) {
-
-                        // Get the first entry for the selected date
+                    if (responseBody.getData() != null && responseBody.getData().getEmployeePunchData() != null && !responseBody.getData().getEmployeePunchData().isEmpty()) {
                         EmployeePunchDataItem punchData = responseBody.getData().getEmployeePunchData().get(0);
-
                         String pIn = punchData.getPunchIn();
                         String pOut = punchData.getPunchOut();
 
-                        // Null & Empty Check for Punch In
                         if (pIn != null && !pIn.trim().isEmpty() && !pIn.equalsIgnoreCase("null")) {
                             inTime.setText(formatTime(pIn));
                         } else {
                             Log.d(TAG, "Punch In is null or empty for this date");
                         }
 
-                        // Null & Empty Check for Punch Out
                         if (pOut != null && !pOut.trim().isEmpty() && !pOut.equalsIgnoreCase("null")) {
                             outTime.setText(formatTime(pOut));
                         } else {
@@ -286,7 +288,7 @@ public class TimesheetFormFragment extends Fragment {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                setLoading(false); // Stop the spinner
+                setLoading(false);
                 if (!isAdded()) return;
                 try {
                     if (response.isSuccessful() && response.body() != null) {
@@ -295,21 +297,18 @@ public class TimesheetFormFragment extends Fragment {
                         String message = jsonObject.getString("message");
                         showAlertDialog(true, "Submitted!", "Your DCR form has been successfully submitted.");
                     } else {
-
                         showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
-
                     showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                setLoading(false); // Stop the spinner even on failure
+                setLoading(false);
                 if (!isAdded()) return;
-
                 showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
             }
         });
@@ -319,8 +318,6 @@ public class TimesheetFormFragment extends Fragment {
         if (!isAdded() || getContext() == null) {
             return;
         }
-
-        // Inflate custom layout
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_custom_alert, null);
 
         ImageView icon = dialogView.findViewById(R.id.dialog_icon);
@@ -328,20 +325,17 @@ public class TimesheetFormFragment extends Fragment {
         TextView tvMessage = dialogView.findViewById(R.id.dialog_message);
 
         if (isSuccess) {
-            icon.setImageResource(R.drawable.ic_check_circle);   // green check icon
+            icon.setImageResource(R.drawable.ic_check_circle);
             icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.approved_color));
         } else {
-            icon.setImageResource(R.drawable.ic_cancel_circle);  // red cross icon
+            icon.setImageResource(R.drawable.ic_cancel_circle);
             icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.rejected_color));
         }
 
         tvTitle.setText(title);
         tvMessage.setText(message);
 
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setView(dialogView)
-                .setCancelable(false)
-                .create();
+        AlertDialog dialog = new AlertDialog.Builder(getContext()).setView(dialogView).setCancelable(false).create();
 
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -384,47 +378,78 @@ public class TimesheetFormFragment extends Fragment {
     }
 
     private boolean validateForm() {
+        if (dcrDate.getText() == null || TextUtils.isEmpty(dcrDate.getText().toString().trim())) {
+            dcrDate.setError("Please Enter a date");
+            Toast.makeText(getContext(), "Please Enter a date", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         dateFormat.setLenient(false);
         try {
-            dateFormat.parse(Objects.requireNonNull(dcrDate.getText()).toString());
+            String dateString = dcrDate.getText().toString().trim();
+            Date selectedDate = dateFormat.parse(dateString);
+
+            if (selectedDate != null) {
+                // Construct standard day baselines to carefully evaluate date constraints
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(selectedDate);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                long selectedTimeClean = cal.getTimeInMillis();
+
+                Calendar todayCal = Calendar.getInstance();
+                todayCal.set(Calendar.HOUR_OF_DAY, 0);
+                todayCal.set(Calendar.MINUTE, 0);
+                todayCal.set(Calendar.SECOND, 0);
+                todayCal.set(Calendar.MILLISECOND, 0);
+                long todayClean = todayCal.getTimeInMillis();
+
+                todayCal.add(Calendar.DAY_OF_YEAR, -2);
+                long twoDaysAgoClean = todayCal.getTimeInMillis();
+
+                // Logical constraint fallback validation check
+                if (selectedTimeClean > todayClean || selectedTimeClean < twoDaysAgoClean) {
+                    dcrDate.setError("You can only select today or the previous 2 days");
+                    Toast.makeText(getContext(), "Submission allowed only for today or past 2 days.", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
         } catch (ParseException e) {
             dcrDate.setError("Invalid date format. Use yyyy-MM-dd");
             Toast.makeText(getContext(), "Invalid date format. Use yyyy-MM-dd", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (TextUtils.isEmpty(dcrDate.getText())) {
-            dcrDate.setError("Please Enter a date");
-            Toast.makeText(getContext(), "Please Enter a date", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (TextUtils.isEmpty(inTime.getText())) {
+
+        // Checked other fields safely
+        if (inTime.getText() == null || TextUtils.isEmpty(inTime.getText().toString().trim())) {
             inTime.setError("Please Enter In Time");
             Toast.makeText(getContext(), "Please Enter In Time", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (TextUtils.isEmpty(outTime.getText())) {
+        if (outTime.getText() == null || TextUtils.isEmpty(outTime.getText().toString().trim())) {
             outTime.setError("Please Enter Out Time");
             Toast.makeText(getContext(), "Please Enter Out Time", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (TextUtils.isEmpty(highlightOfTheDay.getText())) {
+        if (highlightOfTheDay.getText() == null || TextUtils.isEmpty(highlightOfTheDay.getText().toString().trim())) {
             highlightOfTheDay.setError("Please Enter Highlight of the Day");
             Toast.makeText(getContext(), "Please Enter Highlight of the Day", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (TextUtils.isEmpty(outcomeOfTheDay.getText())) {
+        if (outcomeOfTheDay.getText() == null || TextUtils.isEmpty(outcomeOfTheDay.getText().toString().trim())) {
             outcomeOfTheDay.setError("Please Enter Outcome of the Day");
             Toast.makeText(getContext(), "Please Enter Outcome of the Day", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (TextUtils.isEmpty(nextDayPlan.getText())) {
+        if (nextDayPlan.getText() == null || TextUtils.isEmpty(nextDayPlan.getText().toString().trim())) {
             nextDayPlan.setError("Please Enter Next Day Plan");
             Toast.makeText(getContext(), "Please Enter Next Day Plan", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (TextUtils.isEmpty(feelingOfTheDay.getText())) {
+        if (feelingOfTheDay.getText() == null || TextUtils.isEmpty(feelingOfTheDay.getText().toString().trim())) {
             feelingOfTheDay.setError("Please Enter Feeling of the Day");
             Toast.makeText(getContext(), "Please Enter Feeling of the Day", Toast.LENGTH_SHORT).show();
             return false;
@@ -436,15 +461,11 @@ public class TimesheetFormFragment extends Fragment {
         if (binding == null) return;
 
         this.isSubmitting = isLoading;
-
-        // This line enables/disables the back button interception
         backPressedCallback.setEnabled(isLoading);
 
         binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         btnDcrSubmit.setEnabled(!isLoading);
         btnDcrClear.setEnabled(!isLoading);
-
-        // Also disable form fields so user can't type while loading
         dcrDate.setEnabled(!isLoading);
         inTime.setEnabled(!isLoading);
         outTime.setEnabled(!isLoading);
@@ -501,16 +522,11 @@ public class TimesheetFormFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        // 1. Disable the back button callback to prevent it from holding onto the fragment/activity reference
         if (backPressedCallback != null) {
             backPressedCallback.setEnabled(false);
             backPressedCallback.remove();
         }
-
-        // 2. Clear the binding reference to avoid memory leaks
         binding = null;
-
         super.onDestroyView();
     }
-
 }

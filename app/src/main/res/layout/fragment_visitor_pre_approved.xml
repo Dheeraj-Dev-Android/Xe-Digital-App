@@ -46,7 +46,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Contact"
-                    app:startIconDrawable="@drawable/ic_phone">
+                    app:startIconDrawable="@drawable/ic_phone"
+                    app:startIconTint="@color/approved_color">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etContact"
@@ -54,7 +55,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="phone"
                         android:maxLength="10"
-                        android:paddingStart="40dp"
+                        android:paddingStart="45dp"
                         android:paddingEnd="5dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -87,14 +88,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Email"
-                app:startIconDrawable="@drawable/ic_email">
+                app:startIconDrawable="@drawable/ic_email"
+                app:startIconTint="@color/_000000">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:paddingStart="40dp"
+                    android:paddingStart="45dp"
                     android:paddingEnd="5dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -119,7 +121,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Pre Approved Date"
-                app:startIconDrawable="@drawable/ic_calendar">
+                app:startIconDrawable="@drawable/ic_calendar"
+                app:startIconTint="@color/_000000">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPreApprovedDate"
@@ -127,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:focusable="false"
                     android:inputType="none"
-                    android:paddingStart="40dp"
+                    android:paddingStart="45dp"
                     android:paddingEnd="5dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -159,10 +162,10 @@
 
                         <com.google.android.material.imageview.ShapeableImageView
                             android:id="@+id/ivProfile"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
                             android:scaleType="centerCrop"
-                            android:src="@android:drawable/ic_menu_camera"
+                            android:src="@drawable/ic_upload"
                             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
 
                         <com.google.android.material.button.MaterialButton
@@ -198,7 +201,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:text="Clear" />
+                    android:backgroundTint="@color/RestrictedHoliday"
+                    android:text="Clear"
+                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

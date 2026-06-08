@@ -28,11 +28,9 @@ public class ShiftAppliedFragment extends Fragment {
     private ShiftAppliedAdapter shiftAdapter;
     private FragmentShiftAppliedBinding binding;
 
-
     public ShiftAppliedFragment() {
         // Required empty public constructor
     }
-
 
     public static ShiftAppliedFragment newInstance(String param1, String param2) {
         return new ShiftAppliedFragment();
@@ -45,15 +43,12 @@ public class ShiftAppliedFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentShiftAppliedBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-//     View view = inflater.inflate(R.layout.fragment_shift_applied, container, false);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
-
         getShiftApplied(authToken);
 
         return view;
@@ -75,10 +70,11 @@ public class ShiftAppliedFragment extends Fragment {
                         binding.ShiftAppliedRecyclerView.setAdapter(shiftAdapter);
                         binding.ShiftAppliedRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     } else {
-                        binding.emptyStateText.setVisibility(View.VISIBLE);
+                        binding.emptyStateContainer.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    binding.emptyStateText.setVisibility(View.VISIBLE);
+                    binding.loadingProgress.setVisibility(View.GONE);
+                    binding.emptyStateContainer.setVisibility(View.VISIBLE);
                     Log.e("Error", "Response not successful");
                 }
             }
@@ -86,7 +82,7 @@ public class ShiftAppliedFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ShiftAppliedResponse> call, @NonNull Throwable throwable) {
                 Log.e("Error", "API call failed: " + throwable.getMessage());
-
+                binding.emptyStateContainer.setVisibility(View.VISIBLE);
             }
         });
     }

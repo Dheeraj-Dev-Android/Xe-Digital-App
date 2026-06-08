@@ -122,15 +122,12 @@ public class ShiftsFragment extends Fragment {
         });
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
-            // 1. Check if the root profile response object or its inner 'data' block is null
             if (userProfile == null || userProfile.getData() == null) {
                 Log.e("ShiftsFragment", "UserProfileResponse or Data object is completely null");
                 return;
             }
 
             Data profileData = userProfile.getData();
-
-            // 2. Check if the 'employee' object exists inside the data payload
             if (profileData.getEmployee() == null) {
                 Log.e("ShiftsFragment", "Data exists, but the 'Employee' object field is null");
                 return;
@@ -138,7 +135,6 @@ public class ShiftsFragment extends Fragment {
 
             Employee employee = profileData.getEmployee();
 
-            // Safely retrieve primary employee info strings
             fName = employee.getFirstname();
             lName = employee.getLastname();
             email = employee.getEmail();

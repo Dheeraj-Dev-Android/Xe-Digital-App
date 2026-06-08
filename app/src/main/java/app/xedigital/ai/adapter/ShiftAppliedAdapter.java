@@ -1,5 +1,6 @@
 package app.xedigital.ai.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,7 @@ public class ShiftAppliedAdapter extends RecyclerView.Adapter<ShiftAppliedAdapte
         return new ShiftViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ShiftViewHolder holder, int position) {
         EmployeeShiftdataItem shift = shiftList.get(position);
@@ -70,14 +72,12 @@ public class ShiftAppliedAdapter extends RecyclerView.Adapter<ShiftAppliedAdapte
             holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected)));
         }
         holder.chipStatus.setText(shift.getStatus());
-
     }
 
     private String formatDate(String inputDate) {
         if (inputDate == null) {
             return "";
         }
-
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());

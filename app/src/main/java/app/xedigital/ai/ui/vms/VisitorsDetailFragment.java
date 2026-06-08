@@ -51,9 +51,9 @@ public class VisitorsDetailFragment extends Fragment {
             binding.tvVisitorName.setText(visitor.getName() != null ? visitor.getName() : "N/A");
             binding.tvSerialNumber.setText("Serial Number: " + (visitor.getSerialNumber() != null ? visitor.getSerialNumber() : "N/A"));
             binding.tvVisitorCategory.setText("Category: " + (visitor.getVisitorCategory() != null ? visitor.getVisitorCategory() : "N/A"));
-            binding.tvEmail.setText("Email: " + (visitor.getEmail() != null ? visitor.getEmail() : "N/A"));
-            binding.tvContact.setText("Contact: " + (visitor.getContact() != null ? visitor.getContact() : "N/A"));
-            binding.tvCompanyFrom.setText("Company: " + (visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A"));
+            binding.tvEmail.setText((visitor.getEmail() != null ? visitor.getEmail() : "N/A"));
+            binding.tvContact.setText((visitor.getContact() != null ? visitor.getContact() : "N/A"));
+            binding.tvCompanyFrom.setText("Company From: " + (visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A"));
             if (visitor.getWhomToMeet() != null) {
                 String firstName = visitor.getWhomToMeet().getFirstname() != null ? visitor.getWhomToMeet().getFirstname() : "";
                 String lastName = visitor.getWhomToMeet().getLastname() != null ? visitor.getWhomToMeet().getLastname() : "";
@@ -76,7 +76,6 @@ public class VisitorsDetailFragment extends Fragment {
             if (profileImagePath != null && !profileImagePath.isEmpty()) {
                 Glide.with(requireContext()).load(profileImagePath).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).circleCrop().into(binding.ivVisitorProfile);
             } else {
-                // Optional: Load a default placeholder or clear the ImageView if no image is available
                 Glide.with(requireContext()).load(R.drawable.ic_profile_placeholder).circleCrop().into(binding.ivVisitorProfile);
                 Log.w("VisitorsAdapter", "Profile image path is null or empty for visitor: " + visitor.getName());
             }

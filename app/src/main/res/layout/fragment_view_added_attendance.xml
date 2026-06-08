@@ -8,13 +8,6 @@
     android:orientation="vertical"
     tools:context=".ui.attendance.ViewAddedAttendanceFragment">
 
-
-    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:paddingHorizontal="12dp"-->
-    <!--        android:paddingVertical="12dp">-->
-
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
         android:layout_width="0dp"
@@ -43,7 +36,6 @@
                 android:text="All"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#9E9E9E" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipApproved"
@@ -54,7 +46,6 @@
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#4CAF50" />
 
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUnapproved"
@@ -64,7 +55,6 @@
                 android:text="Unapproved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#FF9800" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipRejected"
@@ -74,7 +64,6 @@
                 android:text="Rejected"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipCancelled"
@@ -84,11 +73,9 @@
                 android:text="Cancelled"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-            <!--            android:onClick="onChipClicked"-->
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
-    <!-- Rest of the layout remains the same -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/AddAttendanceRecyclerView"
         android:layout_width="0dp"
@@ -112,18 +99,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/emptyStateText"
+
+    <!-- Enhanced empty state container -->
+    <LinearLayout
+        android:id="@+id/emptyStateContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No Added Attendance Found"
-        android:textSize="16sp"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView"
+        app:layout_constraintVertical_bias="0.3">
 
-    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="No Added Attendance Found"
+            android:src="@drawable/ic_empty_state" />
+
+        <TextView
+            android:id="@+id/emptyStateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:gravity="center"
+            android:text="No Added Attendance Found"
+            android:textColor="@color/purple_700"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

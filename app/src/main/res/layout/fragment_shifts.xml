@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="@color/background_surface"
     android:paddingBottom="15dp"
     tools:context=".ui.shifts.ShiftsFragment">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/buttonLayout"
@@ -37,8 +37,7 @@
                     android:layout_height="wrap_content"
                     android:text="View Applied Shifts"
                     app:chipBackgroundColor="@color/chip_background"
-                    app:chipIconTint="@color/purple_700"
-                    app:chipStrokeColor="@color/purple_700"
+                    app:chipStrokeColor="@color/_000000"
                     app:chipStrokeWidth="1dp" />
 
                 <com.google.android.material.chip.Chip
@@ -48,8 +47,7 @@
                     android:layout_height="wrap_content"
                     android:text="Pending Approval"
                     app:chipBackgroundColor="@color/chip_background"
-                    app:chipIconTint="@color/purple_700"
-                    app:chipStrokeColor="@color/purple_700"
+                    app:chipStrokeColor="@color/_000000"
                     app:chipStrokeWidth="1dp" />
             </com.google.android.material.chip.ChipGroup>
 
@@ -59,7 +57,7 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
-                android:background="@color/purple_700"
+                android:background="@color/avatar_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/statusChipGroup" />
@@ -73,7 +71,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="16dp">
 
@@ -88,7 +86,7 @@
                             android:layout_height="wrap_content"
                             android:hint="First Name"
                             android:inputType="textPersonName"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/colorPrimaryDark" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -103,7 +101,7 @@
                             android:layout_height="wrap_content"
                             android:hint="Last Name"
                             android:inputType="textPersonName"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/colorPrimaryDark" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -118,7 +116,7 @@
                             android:layout_height="wrap_content"
                             android:hint="Email"
                             android:inputType="textEmailAddress"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/colorPrimaryDark" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -133,7 +131,7 @@
                             android:layout_height="wrap_content"
                             android:hint="Contact"
                             android:inputType="phone"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/colorPrimaryDark" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -180,12 +178,12 @@
                             android:layout_height="wrap_content"
                             android:hint="HR Email"
                             android:inputType="textEmailAddress"
-                            android:textColor="@color/SickLeave" />
+                            android:textColor="@color/status_approved" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
         android:id="@+id/buttonLayout"
@@ -201,8 +199,9 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/RestrictedHoliday"
             android:text="Clear"
-            android:textColor="#DA2929"
+            android:textColor="@color/white"
             app:cornerRadius="8dp" />
 
         <com.google.android.material.button.MaterialButton

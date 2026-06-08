@@ -29,8 +29,7 @@
                 android:layout_height="wrap_content"
                 android:text="View Claim"
                 app:chipBackgroundColor="@color/chip_background"
-                app:chipIconTint="@color/purple_700"
-                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeColor="@color/_000000"
                 app:chipStrokeWidth="1dp" />
 
             <View
@@ -44,8 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="Approve Claim"
                 app:chipBackgroundColor="@color/chip_background"
-                app:chipIconTint="@color/purple_700"
-                app:chipStrokeColor="@color/purple_700"
+                app:chipStrokeColor="@color/_000000"
                 app:chipStrokeWidth="1dp" />
 
         </LinearLayout>
@@ -56,20 +54,9 @@
             android:layout_height="1dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
-            android:background="@color/purple_700"
+            android:background="@color/avatar_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-
-        <!-- Header -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:gravity="center_horizontal"
-            android:text="Add Your Claims"
-            android:textSize="24sp"
-            android:textStyle="bold" />
 
         <!-- Claim Date -->
         <com.google.android.material.textfield.TextInputLayout
@@ -84,6 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/ic_calendar"
+                android:drawableTint="@color/_000000"
                 android:focusable="false"
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -133,7 +121,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Meeting Type"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/avatar_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/meetingTypeDropdown"
@@ -148,6 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="Expense Types"
+            android:textColor="@color/avatar_text"
             android:textStyle="bold" />
 
         <com.google.android.material.chip.ChipGroup
@@ -217,7 +208,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Claim Category"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/avatar_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/claimCategoryDropdown"
@@ -240,7 +233,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:hint="Travel Category"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/avatar_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/travelCategoryDropdown"
@@ -263,7 +258,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:hint="Mode of Transport"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/avatar_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/transportModeDropdown"
@@ -286,7 +283,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:hint="Shared Mode of Transport"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/avatar_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/transportModeShared"
@@ -309,7 +308,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:hint="Dedicated Mode of Transport"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/avatar_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/transportModeDedicated"
@@ -488,15 +489,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:minHeight="56dp"
-                android:text="Save" />
+                android:backgroundTint="@color/PrivilegeLeave"
+                android:text="Save"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:cornerRadius="8dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/submitButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="56dp"
-                android:text="Submit" />
+                android:text="Submit"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:backgroundTint="@color/colorPrimary"
+                app:cornerRadius="8dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

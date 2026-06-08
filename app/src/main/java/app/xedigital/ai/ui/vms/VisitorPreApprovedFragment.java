@@ -92,7 +92,7 @@ public class VisitorPreApprovedFragment extends Fragment {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", "");
         userId = sharedPreferences.getString("userId", "");
-        empEmail = sharedPreferences.getString("empEmail", "");
+        empEmail = sharedPreferences.getString("emailId", "");
         mViewModel.fetchUserProfile(empEmail, "jwt " + authToken);
 
         mViewModel.getUserProfileLiveData().observe(getViewLifecycleOwner(), userProfileByEmailResponse -> {

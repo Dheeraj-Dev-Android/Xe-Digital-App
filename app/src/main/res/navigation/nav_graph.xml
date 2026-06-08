@@ -232,7 +232,7 @@
     <fragment
         android:id="@+id/nav_approve_leave_data"
         android:name="app.xedigital.ai.ui.leaves.PendingLeaveApproveFragment"
-        android:label="Approve Leave Data"
+        android:label="Approve Leave"
         tools:layout="@layout/fragment_pending_approval_attendance">
         <action
             android:id="@+id/action_nav_approve_leave_data_to_nav_approve_leaves"
@@ -413,7 +413,7 @@
     <fragment
         android:id="@+id/nav_documents"
         android:name="app.xedigital.ai.ui.document_upload.ViewDocumentFragment"
-        android:label="@string/menu_documents_upload"
+        android:label="View Documents"
         tools:layout="@layout/fragment_view_document">
         <action
             android:id="@+id/action_nav_documents_to_nav_document_upload"
@@ -422,7 +422,7 @@
     <fragment
         android:id="@+id/nav_document_upload"
         android:name="app.xedigital.ai.ui.document_upload.DocumentUploadFragment"
-        android:label="Document Upload"
+        android:label="@string/menu_documents_upload"
         tools:layout="@layout/fragment_document_upload">
         <action
             android:id="@+id/action_nav_document_upload_to_nav_documents"
@@ -432,7 +432,7 @@
     <fragment
         android:id="@+id/nav_vms"
         android:name="app.xedigital.ai.ui.vms.VmsFragment"
-        android:label="VMS"
+        android:label="Visitor Management System"
         tools:layout="@layout/fragment_v_m_s">
         <action
             android:id="@+id/action_nav_vms_to_nav_preApproved_visitors"
@@ -446,7 +446,7 @@
     <fragment
         android:id="@+id/nav_preApproved_visitors"
         android:name="app.xedigital.ai.ui.vms.VisitorPreApprovedFragment"
-        android:label="Created Pre-Approved Visitors"
+        android:label="Add Pre-Approved Visitors"
         tools:layout="@layout/fragment_visitor_pre_approved">
         <action
             android:id="@+id/action_nav_preApproved_visitors_to_nav_vms"

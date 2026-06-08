@@ -46,8 +46,8 @@
                         android:layout_height="wrap_content"
                         android:text="View Applied Add Attendance"
                         app:chipBackgroundColor="@color/chip_background"
-                        app:chipIconTint="@color/purple_700"
-                        app:chipStrokeColor="@color/purple_700"
+                        app:chipIconTint="@color/avatar_text"
+                        app:chipStrokeColor="@color/avatar_text"
                         app:chipStrokeWidth="1dp" />
                 </com.google.android.material.chip.ChipGroup>
 
@@ -72,7 +72,7 @@
                     app:hintTextAppearance="@style/TextInputLayoutHint"
                     app:startIconContentDescription="@string/date"
                     app:startIconDrawable="@drawable/ic_calendar"
-                    app:startIconTint="@color/purple_700">
+                    app:startIconTint="@color/_000000">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/atDate"
@@ -106,7 +106,7 @@
                         app:hintTextAppearance="@style/TextInputLayoutHint"
                         app:startIconContentDescription="@string/punch_in_time"
                         app:startIconDrawable="@drawable/ic_clock"
-                        app:startIconTint="@color/purple_700">
+                        app:startIconTint="@color/_000000">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/timePunchIn"
@@ -131,7 +131,7 @@
                         app:hintTextAppearance="@style/TextInputLayoutHint"
                         app:startIconContentDescription="@string/punch_out_time"
                         app:startIconDrawable="@drawable/ic_clock"
-                        app:startIconTint="@color/purple_700">
+                        app:startIconTint="@color/_000000">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/timePunchOut"
@@ -157,7 +157,7 @@
                     app:hintTextAppearance="@style/TextInputLayoutHint"
                     app:startIconContentDescription="@string/punch_in_address"
                     app:startIconDrawable="@drawable/ic_location"
-                    app:startIconTint="@color/purple_700">
+                    app:startIconTint="@color/_000000">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPunchInAddress"
@@ -186,7 +186,7 @@
                     app:hintTextAppearance="@style/TextInputLayoutHint"
                     app:startIconContentDescription="@string/punch_out_address"
                     app:startIconDrawable="@drawable/ic_location"
-                    app:startIconTint="@color/purple_700">
+                    app:startIconTint="@color/_000000">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPunchOutAddress"
@@ -215,7 +215,7 @@
                     app:hintTextAppearance="@style/TextInputLayoutHint"
                     app:startIconContentDescription="@string/remarks"
                     app:startIconDrawable="@drawable/ic_note"
-                    app:startIconTint="@color/purple_700">
+                    app:startIconTint="@color/_000000">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etRemarks"
@@ -245,7 +245,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:text="@string/clear"
-                        android:textColor="@color/RestrictedHoliday"
+                        android:backgroundTint="@color/RestrictedHoliday"
+                        android:textColor="@color/color_white"
                         android:textSize="14sp" />
 
                     <com.google.android.material.button.MaterialButton

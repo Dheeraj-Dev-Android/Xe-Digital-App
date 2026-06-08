@@ -26,15 +26,15 @@
                 android:padding="@dimen/screen_margin">
 
                 <!-- Header Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:gravity="center"
-                    android:text="Apply Leave"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                    android:textColor="@color/purple_700"
-                    android:textStyle="bold" />
+                <!--                <TextView-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginBottom="24dp"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:text="Apply Leave"-->
+                <!--                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"-->
+                <!--                    android:textColor="@color/purple_700"-->
+                <!--                    android:textStyle="bold" />-->
 
                 <!-- Date Range Section -->
                 <LinearLayout
@@ -58,7 +58,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:startIconDrawable="@drawable/ic_calendar"
-                            app:startIconTint="@color/purple_500">
+                            app:startIconTint="@color/_000000">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etFromDate"
@@ -104,7 +104,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:startIconDrawable="@drawable/ic_calendar"
-                            app:startIconTint="@color/purple_500">
+                            app:startIconTint="@color/_000000">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etToDate"
@@ -220,7 +220,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     app:startIconDrawable="@drawable/ic_phone"
-                    app:startIconTint="@color/purple_500">
+                    app:startIconTint="@color/approved_color">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etContactNumber"
@@ -271,7 +271,7 @@
                         android:paddingHorizontal="32dp"
                         android:text="Apply"
                         android:textColor="@color/white"
-                        app:backgroundTint="@color/purple_500"
+                        app:backgroundTint="@color/colorPrimary"
                         app:cornerRadius="8dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -283,10 +283,10 @@
                         android:layout_marginEnd="8dp"
                         android:paddingHorizontal="32dp"
                         android:text="Clear"
-                        android:textColor="@color/design_default_color_error"
+                        android:backgroundTint="@color/RestrictedHoliday"
                         android:textSize="14sp"
                         app:cornerRadius="8dp"
-                        app:strokeColor="@color/design_default_color_error" />
+                        android:textColor="@color/white" />
                 </LinearLayout>
 
             </LinearLayout>

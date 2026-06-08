@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -39,6 +40,7 @@ public class ViewAddedAttendanceFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
+    private LinearLayout emptyStateContainer;
     private AddedAttendanceListResponse addedAttendanceListResponse;
     private AddedAttendanceAdapter addedAttendanceAdapter;
 
@@ -125,6 +127,7 @@ public class ViewAddedAttendanceFragment extends Fragment {
 
         recyclerView = binding.AddAttendanceRecyclerView;
         loadingProgress = binding.loadingProgress;
+        emptyStateContainer = binding.emptyStateContainer;
         emptyStateText = binding.emptyStateText;
 
         addedAttendanceAdapter = new AddedAttendanceAdapter(new ArrayList<>());
@@ -154,12 +157,12 @@ public class ViewAddedAttendanceFragment extends Fragment {
                             addedAttendanceAdapter.updateAttendanceData(addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied());
                         }
                     } else {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        emptyStateContainer.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
                     }
                 } else {
                     // Handle API error, show error message
-                    emptyStateText.setVisibility(View.VISIBLE);
+                    emptyStateContainer.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                     emptyStateText.setText("Failed to load data. Please try again.");
                 }
@@ -168,7 +171,7 @@ public class ViewAddedAttendanceFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<AddedAttendanceListResponse> call, @NonNull Throwable throwable) {
                 loadingProgress.setVisibility(View.GONE);
-                emptyStateText.setVisibility(View.VISIBLE);
+                emptyStateContainer.setVisibility(View.VISIBLE);
                 emptyStateText.setText("Failed to load data. Please try again.");
                 Log.e("API Error", "API call failed: " + throwable.getMessage());
             }

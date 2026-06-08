@@ -19,7 +19,6 @@ import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.vms.VisitorsItem;
-import app.xedigital.ai.utills.DateTimeUtils;
 
 public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHolder> {
 
@@ -44,24 +43,24 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
 
         // Bind data to views in the new layout
         holder.tvVisitorName.setText(visitor.getName() != null ? visitor.getName() : "N/A");
-        holder.tvSerialNumber.setText("Serial Number: " + (visitor.getSerialNumber() != null ? visitor.getSerialNumber() : "N/A"));
-        holder.tvVisitorCategory.setText("Category: " + (visitor.getVisitorCategory() != null ? visitor.getVisitorCategory() : "N/A"));
-        holder.tvEmail.setText("Email: " + (visitor.getEmail() != null ? visitor.getEmail() : "N/A"));
-        holder.tvContact.setText("Contact: " + (visitor.getContact() != null ? visitor.getContact() : "N/A"));
+        holder.tvEmail.setText((visitor.getEmail() != null ? visitor.getEmail() : "N/A"));
+        holder.tvContact.setText((visitor.getContact() != null ? visitor.getContact() : "N/A"));
         holder.tvCompanyFrom.setText("Company From: " + (visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A"));
-        holder.tvPreApproved.setText("Pre-approved: " + (visitor.isIsPreApproved() ? "Yes" : "No"));
-        holder.tvPreApprovedDate.setText("Pre-approval Date: " + (visitor.getPreApprovedDate() != null ? DateTimeUtils.getDayOfWeekAndDate(visitor.getPreApprovedDate()) : "N/A"));
+        if (visitor.getWhomToMeet() != null) {
+            String firstName = visitor.getWhomToMeet().getFirstname() != null ? visitor.getWhomToMeet().getFirstname() : "";
+            String lastName = visitor.getWhomToMeet().getLastname() != null ? visitor.getWhomToMeet().getLastname() : "";
+            holder.tvMeetingWith.setText("Meeting With: " + firstName + " " + lastName);
+        } else {
+            holder.tvMeetingWith.setText("Meeting With: N/A");
+        }
         String profileImagePath = visitor.getProfileImagePath();
         if (profileImagePath != null && !profileImagePath.isEmpty()) {
             Glide.with(holder.itemView.getContext()).load(profileImagePath).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).circleCrop().into(holder.ivVisitorProfile);
         } else {
-            // Optional: Load a default placeholder or clear the ImageView if no image is available
             Glide.with(holder.itemView.getContext()).load(R.drawable.ic_profile_placeholder).circleCrop().into(holder.ivVisitorProfile);
             Log.w("VisitorsAdapter", "Profile image path is null or empty for visitor: " + visitor.getName());
         }
-
         String status = visitor.getApprovalStatus();
-
         if (status == null || status.isEmpty()) {
             status = "Pending";
         }
@@ -80,12 +79,10 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         }
         // Add click listener to the card
         holder.cardViewVisitor.setOnClickListener(v -> {
-//            Log.d("VisitorsAdapter", "Clicked on visitor: " + visitor.getName());
             if (clickListener != null) {
                 clickListener.onVisitorClicked(visitor);
             }
         });
-
     }
 
     @Override
@@ -100,8 +97,6 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvVisitorName;
-        public TextView tvSerialNumber;
-        public TextView tvVisitorCategory;
         public TextView tvEmail;
         public TextView tvContact;
         public TextView tvCompanyFrom;
@@ -111,7 +106,7 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         public TextView tvCheckinDateTime;
         public TextView tvCheckoutDateTime;
         public TextView tvMeetingOverDateTime;
-        public TextView tvPreApproved;
+        public TextView tvMeetingWith;
         public TextView tvPreApprovedDate;
         public TextView tvVisitorVisited;
         public Chip chipApprovalStatus;
@@ -121,8 +116,6 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvVisitorName = itemView.findViewById(R.id.tvVisitorName);
-            tvSerialNumber = itemView.findViewById(R.id.tvSerialNumber);
-            tvVisitorCategory = itemView.findViewById(R.id.tvVisitorCategory);
             tvEmail = itemView.findViewById(R.id.tvEmail);
             tvContact = itemView.findViewById(R.id.tvContact);
             tvCompanyFrom = itemView.findViewById(R.id.tvCompanyFrom);
@@ -132,7 +125,7 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
             tvCheckinDateTime = itemView.findViewById(R.id.tvCheckinDateTime);
             tvCheckoutDateTime = itemView.findViewById(R.id.tvCheckoutDateTime);
             tvMeetingOverDateTime = itemView.findViewById(R.id.tvMeetingOverDateTime);
-            tvPreApproved = itemView.findViewById(R.id.tvPreApproved);
+            tvMeetingWith = itemView.findViewById(R.id.tvMeetingWith);
             tvPreApprovedDate = itemView.findViewById(R.id.tvPreApprovedDate);
             tvVisitorVisited = itemView.findViewById(R.id.tvVisitorVisited);
             chipApprovalStatus = itemView.findViewById(R.id.chipApprovalStatus);
