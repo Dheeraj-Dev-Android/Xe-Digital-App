@@ -400,6 +400,16 @@
         tools:layout="@layout/fragment_approve_claim_details" />
 
     <fragment
+        android:id="@+id/nav_meeting_room"
+        android:name="app.xedigital.ai.ui.mrm.MeetingRoomFragment"
+        android:label="@string/menu_meeting_room"
+        tools:layout="@layout/fragment_meeting_room">
+        <action
+            android:id="@+id/action_nav_meeting_room_to_nav_dashboard"
+            app:destination="@id/nav_dashboard" />
+    </fragment>
+
+    <fragment
         android:id="@+id/nav_payroll"
         android:name="app.xedigital.ai.ui.payroll.PayrollFragment"
         android:label="@string/menu_payroll"

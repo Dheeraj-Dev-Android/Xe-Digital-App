@@ -106,7 +106,6 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             txtTotalAmount = itemView.findViewById(R.id.amountText);
             txtAppliedDate = itemView.findViewById(R.id.claimDateText);
             viewDetailsButton = itemView.findViewById(R.id.viewDetailsButton);
-            actionButton = itemView.findViewById(R.id.actionButton);
 
             viewDetailsButton.setOnClickListener(v -> {
 //                Log.d("ClaimViewHolder", "View Details button clicked");

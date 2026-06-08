@@ -113,9 +113,21 @@
     </group>
 
     <item
+        android:id="@id/nav_meeting_room"
+        android:icon="@drawable/ic_calendar"
+        android:title="@string/menu_meeting_room" />
+    <item
+        android:id="@+id/nav_claim_management"
+        android:icon="@drawable/ic_payments"
+        android:title="@string/menu_claim_management" />
+    <item
         android:id="@+id/nav_vms"
         android:icon="@drawable/ic_visitor"
         android:title="@string/vms" />
+    <item
+        android:id="@+id/nav_shifts"
+        android:icon="@drawable/ic_shift"
+        android:title="@string/menu_shifts" />
 
     <item
         android:id="@+id/nav_holidays"
@@ -127,15 +139,6 @@
         android:icon="@drawable/ic_policy"
         android:title="@string/menu_policy" />
 
-    <item
-        android:id="@+id/nav_shifts"
-        android:icon="@drawable/ic_shift"
-        android:title="@string/menu_shifts" />
-
-    <item
-        android:id="@+id/nav_claim_management"
-        android:icon="@drawable/ic_payments"
-        android:title="@string/menu_claim_management" />
 
     <item
         android:id="@+id/nav_documents"

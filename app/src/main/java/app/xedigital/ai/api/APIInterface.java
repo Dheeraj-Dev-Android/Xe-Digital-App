@@ -208,6 +208,9 @@ public interface APIInterface {
     @GET("employees/employeeUnderManager/{userId}")
     Call<TeamUnderManagerResponse> getEmployeesUnderManager(@Header("Authorization") String authToken, @Path("userId") String userId);
 
+    @GET("meetings/getAll")
+    retrofit2.Call<ResponseBody> getMeetings(@Header("Authorization") String authToken);
+
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
