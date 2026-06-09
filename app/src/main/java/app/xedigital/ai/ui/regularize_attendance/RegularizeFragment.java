@@ -183,27 +183,23 @@ public class RegularizeFragment extends Fragment {
         });
 
         timePunchIn.setOnClickListener(v -> {
-            // Get current time
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
-            // Launch Time Picker Dialog
+
             TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), (view12, hourOfDay, minute1) -> {
-                // Set the selected time to the TextView
-                String selectedTime = hourOfDay + ":" + minute1;
+                String selectedTime = String.format(Locale.getDefault(), "%d:%02d", hourOfDay, minute1);
                 timePunchIn.setText(selectedTime);
             }, hour, minute, false);
             timePickerDialog.show();
         });
         timePunchOut.setOnClickListener(v -> {
-            // Get current time
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
-            // Launch Time Picker Dialog
+
             TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), (view12, hourOfDay, minute1) -> {
-                // Set the selected time to the TextView
-                String selectedTime = hourOfDay + ":" + minute1;
+                String selectedTime = String.format(Locale.getDefault(), "%d:%02d", hourOfDay, minute1);
                 timePunchOut.setText(selectedTime);
             }, hour, minute, false);
             timePickerDialog.show();

@@ -48,11 +48,15 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
         AttendanceRegularizeAppliedItem item = items.get(position);
         if (item == null) return;
 
+        holder.empName.setText(item.getEmployee().getFirstname() + " " + item.getEmployee().getLastname());
+        String name = trim(item.getEmployee().getFirstname()) + " " + trim(item.getEmployee().getLastname());
+        holder.empAvatar.setText(getInitials(name));
+
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
-        holder.empPunchDate.setText("Punch Date : " + formattedPunchDate);
+        holder.empPunchDate.setText(formattedPunchDate);
 
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
+        holder.appliedDate.setText(formattedAppliedDate);
 
         holder.statusChip.setText(item.getStatus());
 
@@ -91,6 +95,16 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
         }
     }
 
+    private String getInitials(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) return "?";
+        String[] parts = fullName.trim().split("\\s+");
+        return (parts.length >= 2) ? ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase() : ("" + parts[0].charAt(0)).toUpperCase();
+    }
+
+    private String trim(String s) {
+        return s != null ? s.trim() : "";
+    }
+
     @Override
     public int getItemCount() {
         return items.size();
@@ -111,9 +125,13 @@ public class RegularizeAppliedAdapter extends RecyclerView.Adapter<RegularizeApp
         public Chip statusChip;
         public ShapeableImageView btnViewRegularize;
         public MaterialCardView regularizeAppliedCard;
+        public TextView empName;
+        public TextView empAvatar;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            empName = itemView.findViewById(R.id.empName);
+            empAvatar = itemView.findViewById(R.id.empAvatar);
             empPunchDate = itemView.findViewById(R.id.empPunchDate);
             appliedDate = itemView.findViewById(R.id.appliedDate);
             btnViewRegularize = itemView.findViewById(R.id.btn_viewRegularize);

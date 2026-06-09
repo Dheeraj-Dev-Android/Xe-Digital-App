@@ -47,9 +47,11 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppliedLeavesItem leave = leaves.get(position);
         holder.empName.setText(leave.getEmpFirstName() + " " + leave.getEmpLastName());
-        holder.fromDate.setText("From: " + DateTimeUtils.getDayOfWeekAndDate(leave.getFromDate()));
-        holder.toDate.setText("To: " + DateTimeUtils.getDayOfWeekAndDate(leave.getToDate()));
-        holder.appliedDate.setText("Applied: " + DateTimeUtils.getDayOfWeekAndDate(leave.getAppliedDate()));
+        String name = trim(leave.getEmpFirstName()) + " " + trim(leave.getEmpLastName());
+        holder.empAvatar.setText(getInitials(name));
+        holder.fromDate.setText(DateTimeUtils.getDayOfWeekAndDate(leave.getFromDate()));
+        holder.toDate.setText(DateTimeUtils.getDayOfWeekAndDate(leave.getToDate()));
+        holder.appliedDate.setText(DateTimeUtils.getDayOfWeekAndDate(leave.getAppliedDate()));
 
         // Bind data to the Chip
         Chip statusChip = holder.itemView.findViewById(R.id.leaveStatusChip);
@@ -109,6 +111,17 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
         return leaves.size();
     }
 
+    private String getInitials(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) return "?";
+        String[] parts = fullName.trim().split("\\s+");
+        return (parts.length >= 2) ? ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase() : ("" + parts[0].charAt(0)).toUpperCase();
+    }
+
+    private String trim(String s) {
+        return s != null ? s.trim() : "";
+    }
+
+
     public void updateList(List<AppliedLeavesItem> filteredList) {
         this.leaves = filteredList;
         notifyDataSetChanged();
@@ -116,6 +129,7 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView empName;
+        TextView empAvatar;
         TextView fromDate;
         TextView toDate;
         TextView appliedDate;
@@ -126,6 +140,7 @@ public class CrossManagerLeaveApprovalAdapter extends RecyclerView.Adapter<Cross
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             empName = itemView.findViewById(R.id.empName);
+            empAvatar = itemView.findViewById(R.id.empAvatar);
             fromDate = itemView.findViewById(R.id.fromDate);
             toDate = itemView.findViewById(R.id.toDate);
             appliedDate = itemView.findViewById(R.id.appliedDate);

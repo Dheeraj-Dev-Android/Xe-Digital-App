@@ -55,12 +55,13 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
                 trim(emp.getReportingManager().getFirstname()) + " " + trim(emp.getReportingManager().getLastname()) : "N/A";
         String crossMgr = emp.getCrossmanager() != null ?
                 trim(emp.getCrossmanager().getFirstname()) + " " + trim(emp.getCrossmanager().getLastname()) : "N/A";
+        String empId = emp.getEmployeeCode() != null ? trim(emp.getEmployeeCode()) : "N/A";
 
         String shift = emp.getShift() != null ? trim(emp.getShift().getStartTime() + "-" + emp.getShift().getEndTime()) : "Not Assigned";
 
         return new TreeNode(name, trim(emp.getDesignation()), dept, type,
                 trim(emp.getId()), emp.getEmail(), trim(emp.getContact()),
-                repMgr, crossMgr, shift);
+                repMgr, crossMgr, shift, empId);
     }
 
     private TreeNode mapAllEmployeesItem(AllEmployeesItem emp, RelationType type) {
@@ -70,12 +71,13 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
                 trim(emp.getReportingManager().getFirstname()) + " " + trim(emp.getReportingManager().getLastname()) : "N/A";
         String crossMgr = emp.getCrossmanager() != null ?
                 trim(emp.getCrossmanager().getFirstname()) + " " + trim(emp.getCrossmanager().getLastname()) : "N/A";
+        String empId = emp.getEmployeeCode();
 
         String shift = emp.getShift() != null ? trim(emp.getShift().getStartTime() + "-" + emp.getShift().getEndTime()) : "Not Assigned";
 
         return new TreeNode(name, trim(emp.getDesignation()), dept, type,
                 trim(emp.getId()), emp.getEmail(), trim(emp.getContact()),
-                repMgr, crossMgr, shift);
+                repMgr, crossMgr, shift, empId);
     }
 
     @NonNull
@@ -143,17 +145,18 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
 
     public static class TreeNode {
         public String name, role, department, id, email, contact,
-                reportingManager, crossManager, shiftTiming;
+                reportingManager, crossManager, shiftTiming, empId;
         public RelationType relation;
 
         public TreeNode(String name, String role, String department, RelationType relation,
                         String id, String email, String contact, String reportingManager,
-                        String crossManager, String shiftTiming) {
+                        String crossManager, String shiftTiming, String empId) {
             this.name = name;
             this.role = role;
             this.department = department;
             this.relation = relation;
             this.id = id;
+            this.empId = empId;
             this.email = email;
             this.contact = contact;
             this.reportingManager = reportingManager;

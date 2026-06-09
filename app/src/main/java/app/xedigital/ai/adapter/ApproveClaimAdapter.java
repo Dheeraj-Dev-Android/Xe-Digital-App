@@ -58,7 +58,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
     @NonNull
     @Override
     public ClaimViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.claim_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.approval_claim_item, parent, false);
         Context context = parent.getContext();
         return new ClaimViewHolder(view, context, listener, claimList);
     }
@@ -106,6 +106,8 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             txtTotalAmount = itemView.findViewById(R.id.amountText);
             txtAppliedDate = itemView.findViewById(R.id.claimDateText);
             viewDetailsButton = itemView.findViewById(R.id.viewDetailsButton);
+            actionButton = itemView.findViewById(R.id.actionButton);
+
 
             viewDetailsButton.setOnClickListener(v -> {
 //                Log.d("ClaimViewHolder", "View Details button clicked");
@@ -201,19 +203,19 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
 
         public void bind(EmployeeClaimdataItem currentClaim, OnClaimClickListener listener) {
-            txtClaimId.setText("Claim ID : " + currentClaim.getClaimId());
-            txtProjectName.setText("Project Name : " + currentClaim.getProject());
-            txtMeetingType.setText("Meeting Type : " + currentClaim.getMeeting());
-            txtPurposeOfMeeting.setText("Purpose : " + currentClaim.getPerposeofmeet());
-            txtTotalAmount.setText("Amount : " + currentClaim.getCurrency() + " " + currentClaim.getTotalamount());
+            txtClaimId.setText("Claim ID : " + (currentClaim.getClaimId() != null ? currentClaim.getClaimId() : "N/A"));
+            txtProjectName.setText(currentClaim.getProject());
+            txtMeetingType.setText(currentClaim.getMeeting());
+            txtPurposeOfMeeting.setText(currentClaim.getPerposeofmeet());
+            txtTotalAmount.setText(currentClaim.getCurrency() + " " + currentClaim.getTotalamount());
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
             try {
                 Date date = inputFormat.parse(currentClaim.getClaimDate());
-                txtAppliedDate.setText("Claim Date : " + outputFormat.format(date));
+                txtAppliedDate.setText(outputFormat.format(date));
             } catch (Exception e) {
                 // Handle parsing error
-                txtAppliedDate.setText("Claim date : " + currentClaim.getClaimDate());
+                txtAppliedDate.setText(currentClaim.getClaimDate());
             }
 
             TextView statusText = itemView.findViewById(R.id.statusText);
@@ -258,8 +260,6 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             String authToken = sharedPreferences.getString("authToken", "");
             String userId = sharedPreferences.getString("userId", "");
             String claimId = claim.getId();
-//            Log.d("ClaimViewHolder", "Claim ID: " + claimId);
-
             ProfileViewModel profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
             profileViewModel.storeLoginData(userId, authToken);
             profileViewModel.fetchUserProfile();
@@ -287,7 +287,6 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
                             RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), requestBody.toString());
 
-                            // Get API instance and make the call
                             APIInterface apiInterface = APIClient.getInstance().ClaimUpdateStatus();
                             retrofit2.Call<ResponseBody> call = apiInterface.claimStatus("jwt " + authToken, claimId, body);
 

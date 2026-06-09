@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/avatar_bg">
 
-    <!-- Scrollable content -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
@@ -25,10 +24,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="16dp"
+                android:paddingStart="8dp"
                 android:paddingTop="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="4dp">
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp">
 
                 <!-- Direct stat -->
                 <com.google.android.material.card.MaterialCardView
@@ -38,7 +37,6 @@
                     android:layout_marginEnd="6dp"
                     app:cardBackgroundColor="@color/background_surface"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
                     app:strokeColor="@color/divider"
                     app:strokeWidth="1dp">
 
@@ -48,7 +46,6 @@
                         android:orientation="vertical"
                         android:padding="14dp">
 
-                        <!-- Top color bar -->
                         <View
                             android:layout_width="28dp"
                             android:layout_height="3dp"
@@ -62,6 +59,7 @@
                             android:text="0"
                             android:textColor="@color/colorPrimary"
                             android:textSize="28sp"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:textStyle="bold" />
 
                         <TextView
@@ -71,8 +69,10 @@
                             android:text="Direct"
                             android:letterSpacing="0.1"
                             android:textColor="@color/text_tertiary"
-                            android:textSize="10sp"
+                            android:fontFamily="@font/quicksand_font_family"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -84,7 +84,6 @@
                     android:layout_marginHorizontal="6dp"
                     app:cardBackgroundColor="@color/background_surface"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
                     app:strokeColor="@color/divider"
                     app:strokeWidth="1dp">
 
@@ -107,6 +106,7 @@
                             android:text="0"
                             android:textColor="@color/colorSecondary"
                             android:textSize="28sp"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:textStyle="bold" />
 
                         <TextView
@@ -116,20 +116,21 @@
                             android:text="Cross"
                             android:letterSpacing="0.1"
                             android:textColor="@color/text_tertiary"
-                            android:textSize="10sp"
+                            android:fontFamily="@font/quicksand_font_family"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Total stat -->
+                <!-- Total stat (filled) -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
                     app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp">
+                    app:cardCornerRadius="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -150,6 +151,7 @@
                             android:text="0"
                             android:textColor="@color/white"
                             android:textSize="28sp"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:textStyle="bold" />
 
                         <TextView
@@ -159,8 +161,10 @@
                             android:text="Total"
                             android:letterSpacing="0.1"
                             android:textColor="#B3FFFFFF"
-                            android:textSize="10sp"
+                            android:fontFamily="@font/quicksand_font_family"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -198,9 +202,10 @@
                         android:textColor="@color/white"
                         android:textSize="17sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/quicksand_font_family"
                         tools:text="AB" />
 
-                    <!-- Info -->
+                    <!-- Name + Role -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -215,6 +220,7 @@
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold"
+                            android:fontFamily="@font/quicksand_font_family"
                             tools:text="John Doe" />
 
                         <TextView
@@ -224,12 +230,25 @@
                             android:layout_marginTop="2dp"
                             android:textColor="@color/text_tertiary"
                             android:textSize="12sp"
+                            android:fontFamily="@font/quicksand_font_family"
                             tools:text="Senior Manager" />
 
                     </LinearLayout>
 
-                </LinearLayout>
+                    <!-- "You" badge -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="You"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- ── DIRECT REPORTEES LABEL ── -->
@@ -240,11 +259,12 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp"
                 android:visibility="gone">
 
+                <!-- Accent bar — no rounded corners on single-sided accent -->
                 <View
                     android:layout_width="4dp"
                     android:layout_height="16dp"
@@ -259,6 +279,7 @@
                     android:text="DIRECT REPORTEES"
                     android:textColor="@color/text_primary"
                     android:textSize="11sp"
+                    android:fontFamily="@font/quicksand_font_family"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -281,9 +302,9 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp"
                 android:visibility="gone">
 
                 <View
@@ -300,6 +321,7 @@
                     android:text="CROSS REPORTEES"
                     android:textColor="@color/text_primary"
                     android:textSize="11sp"
+                    android:fontFamily="@font/quicksand_font_family"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -336,12 +358,15 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
+        android:padding="24dp"
         android:visibility="gone">
 
-        <View
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@color/icon_background" />
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:contentDescription="No team members"
+            android:src="@drawable/ic_empty_state"
+            app:tint="@color/icon_background" />
 
         <TextView
             android:id="@+id/emptyStateText"
@@ -352,7 +377,7 @@
             android:text="No team members found"
             android:textColor="@color/text_tertiary"
             android:textSize="14sp"
-            android:visibility="gone" />
+            android:fontFamily="@font/quicksand_font_family" />
 
     </LinearLayout>
 

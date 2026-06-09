@@ -41,8 +41,8 @@
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
                 android:text="Pending"
-                android:textSize="12sp"
                 android:textColor="@color/color_white"
+                android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -232,6 +232,19 @@
                     android:text="Detail View"
                     android:textSize="13sp"
                     app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/actionButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:paddingVertical="8dp"
+                    android:text="Take Action"
+                    android:textSize="13sp"
+                    app:cornerRadius="8dp" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

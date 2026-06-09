@@ -51,15 +51,17 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppliedLeavesApproveItem item = items.get(position);
         holder.empName.setText((item.getFirstname() != null ? item.getFirstname() : "") + " " + (item.getLastname() != null ? item.getLastname() : ""));
+        String name = trim(item.getFirstname()) + " " + trim(item.getLastname());
+        holder.empAvatar.setText(getInitials(name));
 
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(item.getFromDate());
-        holder.fromDate.setText("From Date : " + (formattedFromDate != null ? formattedFromDate : ""));
+        holder.fromDate.setText(formattedFromDate != null ? formattedFromDate : "");
 
         String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(item.getToDate());
-        holder.toDate.setText("To Date : " + (formattedToDate != null ? formattedToDate : ""));
+        holder.toDate.setText(formattedToDate != null ? formattedToDate : "");
 
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText("Applied Date : " + (formattedAppliedDate != null ? formattedAppliedDate : ""));
+        holder.appliedDate.setText(formattedAppliedDate != null ? formattedAppliedDate : "");
 
         // Bind data to the Chip
         Chip statusChip = holder.itemView.findViewById(R.id.approveLeaveStatusChip);
@@ -120,6 +122,17 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         return items.size();
     }
 
+    private String getInitials(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) return "?";
+        String[] parts = fullName.trim().split("\\s+");
+        return (parts.length >= 2) ? ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase() : ("" + parts[0].charAt(0)).toUpperCase();
+    }
+
+    private String trim(String s) {
+        return s != null ? s.trim() : "";
+    }
+
+
     // Inside LeaveApprovalAdapter Class
     public void updateList(List<AppliedLeavesApproveItem> newLeaves) {
         this.items = newLeaves;
@@ -130,6 +143,7 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView empName;
+        TextView empAvatar;
         TextView fromDate;
         TextView toDate;
         TextView appliedDate;
@@ -140,6 +154,7 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             empName = itemView.findViewById(R.id.empNameTextView);
+            empAvatar = itemView.findViewById(R.id.empAvatar);
             fromDate = itemView.findViewById(R.id.fromDateTextView);
             toDate = itemView.findViewById(R.id.toDateTextView);
             appliedDate = itemView.findViewById(R.id.appliedDateTextView);

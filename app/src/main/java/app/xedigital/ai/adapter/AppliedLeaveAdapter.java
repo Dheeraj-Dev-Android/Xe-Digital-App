@@ -46,10 +46,12 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(appliedLeave.getAppliedDate());
         holder.appliedDate.setText(formattedAppliedDate);
         holder.leaveName.setText(appliedLeave.getLeaveName());
+        String name = trim(appliedLeave.getLeaveName());
+        holder.empAvatar.setText(getInitials(name));
         String formattedFromDate = DateTimeUtils.getDayOfWeekAndDate(appliedLeave.getFromDate());
-        holder.fromDate.setText("From " + formattedFromDate);
+        holder.fromDate.setText(formattedFromDate);
         String formattedToDate = DateTimeUtils.getDayOfWeekAndDate(appliedLeave.getToDate());
-        holder.toDate.setText("To " + formattedToDate);
+        holder.toDate.setText(formattedToDate);
         holder.statusChip.setText(appliedLeave.getStatus());
 
         String status = appliedLeave.getStatus().toLowerCase();
@@ -67,44 +69,8 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
             chipColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.icon_tint);
         }
 
-//        holder.statusChip.setChipBackgroundColorResource(chipColor);
-
         ColorStateList colorStateList = ColorStateList.valueOf(chipColor);
         holder.statusChip.setChipBackgroundColor(colorStateList);
-
-//        holder.btn_viewAppliedLeave.setOnClickListener(v -> {
-//            if (position != RecyclerView.NO_POSITION) {
-//                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
-//                String leaveId = appliedLeaveItem.getId();
-//                if (leaveId != null) {
-//                    Bundle bundle = new Bundle();
-//                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
-//                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
-//
-//                } else {
-//                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-//                }
-//            } else {
-//                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        holder.appliedLeaveCard.setOnClickListener(v -> {
-//            if (position != RecyclerView.NO_POSITION) {
-//                AppliedLeavesItem appliedLeaveItem = appliedLeaves.get(position);
-//                String leaveId = appliedLeaveItem.getId();
-//                if (leaveId != null) {
-//                    Bundle bundle = new Bundle();
-//                    bundle.putSerializable(ARG_APPLIED_LEAVE, appliedLeaveItem);
-//                    Navigation.findNavController(v).navigate(R.id.action_nav_applied_leaves_to_nav_view_applied_leaves, bundle);
-//
-//                } else {
-//                    Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-//                }
-//            } else {
-//                Toast.makeText(v.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         // Create a single listener variable
         View.OnClickListener listener = v -> {
             if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
@@ -129,6 +95,17 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
         return appliedLeaves.size();
     }
 
+    private String getInitials(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) return "?";
+        String[] parts = fullName.trim().split("\\s+");
+        return (parts.length >= 2) ? ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase() : ("" + parts[0].charAt(0)).toUpperCase();
+    }
+
+    private String trim(String s) {
+        return s != null ? s.trim() : "";
+    }
+
+
     public void updateList(List<AppliedLeavesItem> filteredList) {
         this.appliedLeaves = filteredList;
         notifyDataSetChanged();
@@ -137,6 +114,7 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView leaveName;
+        public TextView empAvatar;
         public TextView fromDate;
         public TextView toDate;
         public TextView appliedDate;
@@ -147,6 +125,7 @@ public class AppliedLeaveAdapter extends RecyclerView.Adapter<AppliedLeaveAdapte
         public ViewHolder(View itemView) {
             super(itemView);
             leaveName = itemView.findViewById(R.id.leaveName);
+            empAvatar = itemView.findViewById(R.id.empAvatar);
             fromDate = itemView.findViewById(R.id.fromDate);
             toDate = itemView.findViewById(R.id.toDate);
             appliedDate = itemView.findViewById(R.id.appliedDate);

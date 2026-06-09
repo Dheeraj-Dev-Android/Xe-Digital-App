@@ -26,18 +26,44 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.TimesheetViewHolder> {
 
-    private final OnTimesheetClickListener clickListener;
     private List<EmployeesDcrDataItem> dataset = new ArrayList<>();
+    private final OnTimesheetClickListener clickListener;
+
+    public void setDataset(List<EmployeesDcrDataItem> newDataset) {
+        this.dataset = newDataset != null ? newDataset : new ArrayList<>();
+        notifyDataSetChanged();
+    }
 
     public TimesheetAdapter(OnTimesheetClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
-    public void updateData(List<EmployeesDcrDataItem> newData) {
-        if (newData != null) {
-            this.dataset = newData;
-            notifyDataSetChanged();
+    @Override
+    public void onBindViewHolder(@NonNull TimesheetViewHolder holder, int position) {
+        EmployeesDcrDataItem item = dataset.get(position);
+
+        Employee employee = item.getEmployee();
+        if (employee != null) {
+            holder.tvEmpName.setText(employee.getFirstname() + " " + employee.getLastname());
+        } else {
+            holder.tvEmpName.setText("N/A");
         }
+
+        if (item.getDcrDate() != null) {
+            holder.tvDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getDcrDate()));
+        } else {
+            holder.tvDate.setText("N/A");
+        }
+
+        String formattedIn = formatTime(item.getInTime());
+        String formattedOut = formatTime(item.getOutTime());
+        holder.tvTimingSummary.setText("Punch In: " + formattedIn + " | Punch Out: " + formattedOut);
+
+        holder.btnViewDetails.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onViewDetailsClick(item);
+            }
+        });
     }
 
     @NonNull
@@ -47,41 +73,8 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
         return new TimesheetViewHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull TimesheetViewHolder holder, int position) {
-        EmployeesDcrDataItem item = dataset.get(position);
-        if (item == null) return;
-
-        // 1. Employee Fullname processing
-        Employee employee = item.getEmployee();
-        String firstName = (employee != null && employee.getFirstname() != null) ? employee.getFirstname() : "";
-        String lastName = (employee != null && employee.getLastname() != null) ? employee.getLastname() : "";
-        String fullName = (firstName + " " + lastName).trim();
-        holder.tvEmpName.setText(fullName.isEmpty() ? "Unknown Employee" : fullName);
-
-        // 2. Date conversion via DateTimeUtils
-        String rawDate = item.getDcrDate();
-        if (rawDate != null) {
-            // Converts ISO timestamp into a readable pattern like: "Tue, 09-06-2026"
-            holder.tvDate.setText(DateTimeUtils.getDayOfWeekAndDate(rawDate));
-        } else {
-            holder.tvDate.setText("N/A");
-        }
-
-        // 3. Time conversion via DateTimeUtils
-        String rawInTime = item.getInTime();
-        String rawOutTime = item.getOutTime();
-
-        String formattedIn = (rawInTime != null) ? formatTime(rawInTime) : "N/A";
-        String formattedOut = (rawOutTime != null) ? formatTime(rawOutTime) : "N/A";
-
-        holder.tvTimingSummary.setText("In: " + formattedIn + " | Out: " + formattedOut);
-
-        holder.btnViewDetails.setOnClickListener(v -> {
-            if (clickListener != null) {
-                clickListener.onViewDetailsClick(item);
-            }
-        });
+    public interface OnTimesheetClickListener {
+        void onViewDetailsClick(EmployeesDcrDataItem item);
     }
 
     public String formatTime(String timeString) {
@@ -103,10 +96,6 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
     @Override
     public int getItemCount() {
         return dataset.size();
-    }
-
-    public interface OnTimesheetClickListener {
-        void onViewDetailsClick(EmployeesDcrDataItem item);
     }
 
     static class TimesheetViewHolder extends RecyclerView.ViewHolder {

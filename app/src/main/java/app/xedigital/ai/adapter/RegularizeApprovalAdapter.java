@@ -60,12 +60,14 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         AttendanceRegularizeAppliedItem item = items.get(position);
 
         holder.empName.setText(item.getEmployee().getFullname());
+        String name = trim(item.getEmployee().getFirstname()) + " " + trim(item.getEmployee().getLastname());
+        holder.empAvatar.setText(getInitials(name));
 
         String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
-        holder.empPunchDate.setText("Punch Date : " + formattedPunchDate);
+        holder.empPunchDate.setText(formattedPunchDate);
 
         String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        holder.appliedDate.setText("Applied Date : " + formattedAppliedDate);
+        holder.appliedDate.setText(formattedAppliedDate);
 
         Chip statusChip = holder.itemView.findViewById(R.id.statusChip);
         statusChip.setText(item.getStatus());
@@ -120,6 +122,16 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         return items.size();
     }
 
+    private String getInitials(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) return "?";
+        String[] parts = fullName.trim().split("\\s+");
+        return (parts.length >= 2) ? ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase() : ("" + parts[0].charAt(0)).toUpperCase();
+    }
+
+    private String trim(String s) {
+        return s != null ? s.trim() : "";
+    }
+
     public void updateList(List<AttendanceRegularizeAppliedItem> newItems) {
         this.items = newItems;
         notifyDataSetChanged();
@@ -128,6 +140,7 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView empName;
+        public TextView empAvatar;
         public TextView empEmail;
         public TextView empShift;
         public TextView empContact;
@@ -153,6 +166,7 @@ public class RegularizeApprovalAdapter extends RecyclerView.Adapter<RegularizeAp
         public ViewHolder(View itemView) {
             super(itemView);
             empName = itemView.findViewById(R.id.empName);
+            empAvatar = itemView.findViewById(R.id.empAvatar);
             empEmail = itemView.findViewById(R.id.empEmail);
             empContact = itemView.findViewById(R.id.empContact);
             empPunchDate = itemView.findViewById(R.id.empPunchDate);

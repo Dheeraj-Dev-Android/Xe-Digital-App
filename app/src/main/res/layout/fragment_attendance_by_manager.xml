@@ -6,7 +6,6 @@
     android:background="#F4F6FA"
     android:orientation="vertical">
 
-    <!-- ── Filter Bar ─────────────────────────────────────────────────────── -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +22,6 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- DATE RANGE label -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,7 +37,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- From Date -->
                 <LinearLayout
                     android:id="@+id/layoutFromDate"
                     android:layout_width="0dp"
@@ -69,7 +66,6 @@
 
                 </LinearLayout>
 
-                <!-- Arrow -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -80,7 +76,6 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- To Date -->
                 <LinearLayout
                     android:id="@+id/layoutToDate"
                     android:layout_width="0dp"
@@ -111,14 +106,12 @@
 
             </LinearLayout>
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginVertical="6dp"
                 android:background="#F0F2F5" />
 
-            <!-- EMPLOYEE label -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -129,7 +122,6 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <!-- Employee picker row + Search Button in same line -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -168,11 +160,11 @@
                         android:textSize="12sp" />
 
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:contentDescription="Open dropdown"
-                        android:src="@android:drawable/arrow_down_float"
-                        app:tint="#8A94A6" />
+                        android:src="@drawable/ic_dropdown_adaptive_fore"
+                        app:tint="#3F51B5" />
 
                 </LinearLayout>
 

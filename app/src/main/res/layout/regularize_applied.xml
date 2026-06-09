@@ -9,106 +9,190 @@
     android:layout_marginVertical="@dimen/card_margin_vertical"
     android:clickable="true"
     android:focusable="true"
-    app:cardBackgroundColor="@color/color_white"
-    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="12dp"
     app:cardElevation="4dp"
     app:strokeColor="@color/stroke_color"
     app:strokeWidth="1dp">
 
-    <com.google.android.material.card.MaterialCardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="1dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="4dp">
+        android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Employee Header Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:background="@color/avatar_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp">
 
-            <!-- Content Container -->
+            <TextView
+                android:id="@+id/empAvatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_avatar_me"
+                android:fontFamily="@font/quicksand_font_family"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="XE" />
+
+            <TextView
+                android:id="@+id/empName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/quicksand_font_family"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="XeDigital.ai" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/btn_viewRegularize"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:background="@drawable/circular_background"
+                android:contentDescription="View Regularize Applied Details"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_eye"
+                app:shapeAppearanceOverlay="@style/CircularImageView"
+                app:tint="@color/icon_tint" />
+
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/stroke_color" />
+
+        <!-- Card Body -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="8dp">
+
+            <!-- Status Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/statusLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:text="Status : "
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/statusChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="2dp"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="@color/status_approved"
+                    app:chipMinHeight="24dp"
+                    tools:text="Approved" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/stroke_color" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:weightSum="2">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/btn_viewRegularize"
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="25dp"
-                    android:background="@drawable/circular_background"
-                    android:contentDescription="View Regularize Applied Details"
-                    android:padding="@dimen/icon_padding"
-                    android:src="@drawable/ic_eye"
-                    app:shapeAppearanceOverlay="@style/CircularImageView"
-                    app:tint="@color/icon_tint" />
-
+                <!-- Punch Date -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <!-- Status Container -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:id="@+id/statusLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="5dp"
-                            android:text="Status : "
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/statusChip"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="4dp"
-                            android:textColor="@color/white"
-                            android:textSize="12sp"
-                            app:chipBackgroundColor="@color/status_approved"
-                            app:chipMinHeight="20dp"
-                            tools:text="Approved" />
-
-                    </LinearLayout>
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:letterSpacing="0.05"
+                        android:text="Punch Date"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/empPunchDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="@font/quicksand_font_family"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
-                        tools:text="Punch Date : 23 March 2024" />
+                        android:textStyle="bold"
+                        tools:text="23 March 2024" />
+
+                </LinearLayout>
+
+                <!-- Applied Date -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:letterSpacing="0.05"
+                        android:text="Applied Date"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/appliedDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp"
-                        tools:text="Applied Date: 22 March 2024" />
+                        android:textStyle="bold"
+                        tools:text="22 March 2024" />
 
                 </LinearLayout>
+
             </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

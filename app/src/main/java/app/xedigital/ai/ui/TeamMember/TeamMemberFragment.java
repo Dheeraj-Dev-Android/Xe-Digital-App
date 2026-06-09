@@ -46,7 +46,6 @@ public class TeamMemberFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_team_member, container, false);
 
-        // UI Binding
         meAvatar = root.findViewById(R.id.me_avatar);
         meName = root.findViewById(R.id.me_name);
         meRole = root.findViewById(R.id.me_role);
@@ -60,11 +59,8 @@ public class TeamMemberFragment extends Fragment {
         recyclerDirect = root.findViewById(R.id.recyclerViewDirect);
         recyclerCross = root.findViewById(R.id.recyclerViewCross);
 
-        // Adapter Setup
         directAdapter = new TeamTreeAdapter();
         crossAdapter = new TeamTreeAdapter();
-
-        // CLICK LISTENERS
         directAdapter.setOnMemberClickListener(this::showMemberDetailPopup);
         crossAdapter.setOnMemberClickListener(this::showMemberDetailPopup);
 
@@ -77,17 +73,15 @@ public class TeamMemberFragment extends Fragment {
     }
 
     private void showMemberDetailPopup(TeamTreeAdapter.TreeNode node) {
-        // Guard check: ensures fragment is attached before attempting dialog initialization
         Context context = getContext();
         if (context == null || !isAdded()) return;
 
         View v = LayoutInflater.from(context).inflate(R.layout.dialog_member_info, null);
 
-        // 1. Core Profile Details Binding
         ((TextView) v.findViewById(R.id.popup_avatar_initials)).setText(getInitials(node.name));
         ((TextView) v.findViewById(R.id.popup_employee_name)).setText(node.name);
         ((TextView) v.findViewById(R.id.popup_employee_role)).setText(node.role);
-        ((TextView) v.findViewById(R.id.tv_emp_id)).setText(node.id);
+        ((TextView) v.findViewById(R.id.tv_emp_id)).setText(node.empId);
         ((TextView) v.findViewById(R.id.tv_email)).setText(node.email);
         ((TextView) v.findViewById(R.id.tv_contact)).setText(node.contact);
         ((TextView) v.findViewById(R.id.tv_dept)).setText(node.department);
@@ -95,7 +89,6 @@ public class TeamMemberFragment extends Fragment {
         ((TextView) v.findViewById(R.id.tv_reporting_manager)).setText(node.reportingManager);
         ((TextView) v.findViewById(R.id.tv_cross_manager)).setText(node.crossManager);
 
-        // 2. Find Sub-team View Components inside the Dialog View
         TextView popupSubteamTitle = v.findViewById(R.id.popup_subteam_title);
         View subLoading = v.findViewById(R.id.popup_sub_loading);
         View pLabelDirect = v.findViewById(R.id.popup_label_direct);
@@ -103,7 +96,6 @@ public class TeamMemberFragment extends Fragment {
         RecyclerView pRecyclerDirect = v.findViewById(R.id.popup_recycler_direct);
         RecyclerView pRecyclerCross = v.findViewById(R.id.popup_recycler_cross);
 
-        // 3. Initialize fresh mini-adapters for this clicked employee's sub-team
         TeamTreeAdapter subDirectAdapter = new TeamTreeAdapter();
         TeamTreeAdapter subCrossAdapter = new TeamTreeAdapter();
 
@@ -115,24 +107,17 @@ public class TeamMemberFragment extends Fragment {
         pRecyclerDirect.setAdapter(subDirectAdapter);
         pRecyclerCross.setAdapter(subCrossAdapter);
 
-        AlertDialog dialog = new MaterialAlertDialogBuilder(context)
-                .setView(v)
-                .setBackground(context.getDrawable(R.drawable.bg_dialog_white_rounded))
-                .show();
+        AlertDialog dialog = new MaterialAlertDialogBuilder(context).setView(v).setBackground(context.getDrawable(R.drawable.bg_dialog_white_rounded)).show();
 
-        // 5. Trigger network fetching process via ViewModel
         SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefs.getString("authToken", "");
 
-        mViewModel.clearSubTeamData(); // Reset historical sub-team details
-
-        // Explicit observer declarations to allow clean structural tear-down on dismiss
+        mViewModel.clearSubTeamData();
         Observer<Boolean> loadingObserver = loading -> {
             if (subLoading != null) {
                 subLoading.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE);
             }
         };
-
         Observer<TeamMemberResponse> subTeamDataObserver = response -> {
             if (!isAdded() || getContext() == null) return;
             if (response == null || response.getData() == null) return;
@@ -149,7 +134,6 @@ public class TeamMemberFragment extends Fragment {
                 for (EmployeesItem emp : employees) {
                     if (emp == null || targetMemberId.equals(emp.getId())) continue;
 
-                    // Fixed NPE Risk: safe evaluation utilizing targetMemberId configuration context
                     if (emp.getReportingManager() != null && targetMemberId.equals(emp.getReportingManager().getId())) {
                         dEmp.add(emp);
                         addedIds.add(emp.getId());
@@ -174,13 +158,11 @@ public class TeamMemberFragment extends Fragment {
                 }
             }
 
-            // Push data changes to adapters
             subDirectAdapter.setMergedData(dEmp, dAll, TeamTreeAdapter.RelationType.DIRECT);
             subCrossAdapter.setMergedData(cEmp, cAll, TeamTreeAdapter.RelationType.CROSS);
 
             int totalSubReports = dEmp.size() + dAll.size() + cEmp.size() + cAll.size();
 
-            // Dynamically toggle visibility setups inside the popup
             if (totalSubReports > 0) {
                 if (popupSubteamTitle != null) popupSubteamTitle.setVisibility(View.VISIBLE);
 
@@ -198,11 +180,9 @@ public class TeamMemberFragment extends Fragment {
             }
         };
 
-        // Attach layout runtime observers
         mViewModel.getIsSubTeamLoading().observe(getViewLifecycleOwner(), loadingObserver);
         mViewModel.getSubTeamData().observe(getViewLifecycleOwner(), subTeamDataObserver);
 
-        // FIX: Clears references on dismiss to prevent observer accumulation and UI memory leaks
         dialog.setOnDismissListener(dialogInterface -> {
             mViewModel.getIsSubTeamLoading().removeObserver(loadingObserver);
             mViewModel.getSubTeamData().removeObserver(subTeamDataObserver);
@@ -235,7 +215,6 @@ public class TeamMemberFragment extends Fragment {
         mViewModel.getTeamMemberData().observe(getViewLifecycleOwner(), response -> {
             if (response == null || response.getData() == null) return;
 
-            // Handle "Me" Card
             List<EmployeesItem> employees = response.getData().getEmployees();
             if (employees != null) {
                 for (EmployeesItem emp : employees) {
@@ -246,7 +225,6 @@ public class TeamMemberFragment extends Fragment {
                 }
             }
 
-            // Filtering logic (Direct vs Cross)
             Set<String> addedIds = new HashSet<>();
             List<EmployeesItem> dEmp = new ArrayList<>(), cEmp = new ArrayList<>();
             List<AllEmployeesItem> dAll = new ArrayList<>(), cAll = new ArrayList<>();
@@ -277,11 +255,9 @@ public class TeamMemberFragment extends Fragment {
                 }
             }
 
-            // Update Adapters
             directAdapter.setMergedData(dEmp, dAll, TeamTreeAdapter.RelationType.DIRECT);
             crossAdapter.setMergedData(cEmp, cAll, TeamTreeAdapter.RelationType.CROSS);
 
-            // Update Stats
             int tD = dEmp.size() + dAll.size();
             int tC = cEmp.size() + cAll.size();
             statDirect.setText(String.valueOf(tD));

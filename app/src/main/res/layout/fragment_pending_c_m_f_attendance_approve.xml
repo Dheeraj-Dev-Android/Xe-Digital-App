@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="#F8F9FA"
     android:fillViewport="true"
     tools:context=".ui.regularize_attendance.PendingCMFAttendanceApproveFragment">
 
@@ -13,52 +13,67 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Header Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/headerCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E0E0E0"
+            app:strokeWidth="1dp"
             app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
                     android:id="@+id/empName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
+                    android:fontFamily="sans-serif-medium"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textColor="#1A1A1A"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/empPunchDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
+                    android:layout_marginTop="8dp"
+                    android:textColor="#4A4A4A"
+                    android:textSize="15sp"
+                    app:layout_constraintTop_toBottomOf="@id/empName" />
 
                 <TextView
                     android:id="@+id/appliedDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
+                    android:textColor="#4A4A4A"
+                    android:textSize="15sp"
+                    app:layout_constraintTop_toBottomOf="@id/empPunchDate" />
+
+                <View
+                    android:id="@+id/dividerHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#EAEAEA"
+                    app:layout_constraintTop_toBottomOf="@id/appliedDate" />
 
                 <TextView
                     android:id="@+id/empEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="12dp"
                     android:textColor="#0379A6"
-                    android:textSize="14sp" />
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="14sp"
+                    app:layout_constraintTop_toBottomOf="@id/dividerHeader" />
 
                 <TextView
                     android:id="@+id/empContact"
@@ -66,453 +81,433 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:textColor="#0379A6"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="14sp"
+                    app:layout_constraintTop_toBottomOf="@id/empEmail" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Punch Details Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/punchDetailsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:cardElevation="4dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E0E0E0"
+            app:strokeWidth="1dp"
             app:layout_constraintTop_toBottomOf="@id/headerCard">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/titlePunchDetails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Punch Details"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#1A1A1A"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/shiftLabel"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="16dp"
+                    android:text="Shift"
+                    android:textColor="#757575"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/titlePunchDetails" />
 
-                    <!-- Shift Info -->
-                    <TextView
-                        android:id="@+id/shiftLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Shift"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/empShift"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/barrier"
+                    app:layout_constraintTop_toTopOf="@id/shiftLabel" />
 
-                    <TextView
-                        android:id="@+id/empShift"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/barrier"
-                        app:layout_constraintTop_toTopOf="@id/shiftLabel" />
+                <TextView
+                    android:id="@+id/punchInLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch In"
+                    android:textColor="#757575"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/empShift" />
 
-                    <!-- Punch In -->
-                    <TextView
-                        android:id="@+id/punchInLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Punch In"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/shiftLabel" />
+                <TextView
+                    android:id="@+id/empPunchIn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/barrier"
+                    app:layout_constraintTop_toTopOf="@id/punchInLabel" />
 
-                    <TextView
-                        android:id="@+id/empPunchIn"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/barrier"
-                        app:layout_constraintTop_toTopOf="@id/punchInLabel" />
+                <TextView
+                    android:id="@+id/punchOutLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch Out"
+                    android:textColor="#757575"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/empPunchIn" />
 
-                    <!-- Punch Out -->
-                    <TextView
-                        android:id="@+id/punchOutLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Punch Out"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/punchInLabel" />
+                <TextView
+                    android:id="@+id/empPunchOut"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/barrier"
+                    app:layout_constraintTop_toTopOf="@id/punchOutLabel" />
 
-                    <TextView
-                        android:id="@+id/empPunchOut"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/barrier"
-                        app:layout_constraintTop_toTopOf="@id/punchOutLabel" />
+                <TextView
+                    android:id="@+id/empPunchInAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch In Address"
+                    android:textColor="#757575"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/empPunchOut" />
 
-                    <!-- Employee Punch In Address -->
-                    <TextView
-                        android:id="@+id/empPunchInAddressLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Punch In Address"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/punchOutLabel" />
+                <TextView
+                    android:id="@+id/empPunchInAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#4A4A4A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/barrier"
+                    app:layout_constraintTop_toTopOf="@id/empPunchInAddressLabel" />
 
-                    <TextView
-                        android:id="@+id/empPunchInAddress"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/barrier"
-                        app:layout_constraintTop_toTopOf="@id/empPunchInAddressLabel" />
+                <TextView
+                    android:id="@+id/empPunchOutAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch Out Address"
+                    android:textColor="#757575"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/empPunchInAddress" />
 
-                    <!-- Employee Punch Out Address -->
-                    <TextView
-                        android:id="@+id/empPunchOutAddressLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Punch Out Address"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empPunchInAddress" />
+                <TextView
+                    android:id="@+id/empPunchOutAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#4A4A4A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/barrier"
+                    app:layout_constraintTop_toTopOf="@id/empPunchOutAddressLabel" />
 
-                    <TextView
-                        android:id="@+id/empPunchOutAddress"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/barrier"
-                        app:layout_constraintTop_toTopOf="@id/empPunchOutAddressLabel" />
-                    <!-- Creating a barrier for alignment -->
-                    <androidx.constraintlayout.widget.Barrier
-                        android:id="@+id/barrier"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:barrierDirection="end"
-                        app:constraint_referenced_ids="shiftLabel,punchInLabel,punchOutLabel,empPunchInAddressLabel,empPunchOutAddressLabel" />
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="end"
+                    app:constraint_referenced_ids="shiftLabel,punchInLabel,punchOutLabel,empPunchInAddressLabel,empPunchOutAddressLabel" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Updated Info Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/updatedInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:cardElevation="4dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#F0F7FA"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#D1E4ED"
+            app:strokeWidth="1dp"
             app:layout_constraintTop_toBottomOf="@id/punchDetailsCard">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/titleUpdatedInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Updated Information"
-                    android:textColor="@android:color/holo_blue_dark"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#026287"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/updatedPunchInLabel"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="16dp"
+                    android:text="Punch In"
+                    android:textColor="#5B7E91"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/titleUpdatedInfo" />
 
-                    <!-- Updated punch in info -->
-                    <TextView
-                        android:id="@+id/updatedPunchInLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Punch In"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/appliedPunchIn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#026287"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
+                    app:layout_constraintTop_toTopOf="@id/updatedPunchInLabel" />
 
-                    <TextView
-                        android:id="@+id/appliedPunchIn"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                        app:layout_constraintTop_toTopOf="@id/updatedPunchInLabel" />
-                    <!-- Updated punch Out info -->
-                    <TextView
-                        android:id="@+id/updatedPunchOutLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Punch Out"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/updatedPunchInLabel" />
+                <TextView
+                    android:id="@+id/updatedPunchOutLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch Out"
+                    android:textColor="#5B7E91"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appliedPunchIn" />
 
-                    <TextView
-                        android:id="@+id/appliedPunchOut"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                        app:layout_constraintTop_toTopOf="@id/updatedPunchOutLabel" />
+                <TextView
+                    android:id="@+id/appliedPunchOut"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#026287"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
+                    app:layout_constraintTop_toTopOf="@id/updatedPunchOutLabel" />
 
-                    <TextView
-                        android:id="@+id/punchInAddressLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Punch In Address"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/updatedPunchOutLabel" />
+                <TextView
+                    android:id="@+id/punchInAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch In Address"
+                    android:textColor="#5B7E91"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appliedPunchOut" />
 
-                    <TextView
-                        android:id="@+id/appliedPunchInAddress"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                        app:layout_constraintTop_toTopOf="@id/punchInAddressLabel" />
+                <TextView
+                    android:id="@+id/appliedPunchInAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#026287"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
+                    app:layout_constraintTop_toTopOf="@id/punchInAddressLabel" />
 
-                    <!-- Punch Out Address info -->
-                    <TextView
-                        android:id="@+id/punchOutAddressLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Punch Out Address"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/appliedPunchInAddress" />
+                <TextView
+                    android:id="@+id/punchOutAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Punch Out Address"
+                    android:textColor="#5B7E91"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appliedPunchInAddress" />
 
-                    <TextView
-                        android:id="@+id/appliedPunchOutAddress"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/holo_blue_dark"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                        app:layout_constraintTop_toTopOf="@id/punchOutAddressLabel" />
+                <TextView
+                    android:id="@+id/appliedPunchOutAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#026287"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
+                    app:layout_constraintTop_toTopOf="@id/punchOutAddressLabel" />
 
-                    <androidx.constraintlayout.widget.Barrier
-                        android:id="@+id/addressBarrier"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:barrierDirection="end"
-                        app:constraint_referenced_ids="updatedPunchInLabel,updatedPunchOutLabel,punchInAddressLabel,punchOutAddressLabel" />
-
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </LinearLayout>
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/addressBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="end"
+                    app:constraint_referenced_ids="updatedPunchInLabel,updatedPunchOutLabel,punchInAddressLabel,punchOutAddressLabel" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Status Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/statusCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            app:cardElevation="4dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#FDF2F2"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#FAD2D2"
+            app:strokeWidth="1dp"
             app:layout_constraintTop_toBottomOf="@id/updatedInfoCard">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/titleStatusInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Status Information"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#C53030"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/statusLabel"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="16dp"
+                    android:text="Status"
+                    android:textColor="#9B6A6A"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/titleStatusInfo" />
 
-                    <!-- Status info -->
-                    <TextView
-                        android:id="@+id/statusLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Status"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/appliedStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#C53030"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/statusBarrier"
+                    app:layout_constraintTop_toTopOf="@id/statusLabel" />
 
-                    <TextView
-                        android:id="@+id/appliedStatus"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/statusBarrier"
-                        app:layout_constraintTop_toTopOf="@id/statusLabel" />
+                <TextView
+                    android:id="@+id/updatedByLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Updated By"
+                    android:textColor="#9B6A6A"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appliedStatus" />
 
-                    <!-- Updated By info -->
-                    <TextView
-                        android:id="@+id/updatedByLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Updated By"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/statusLabel" />
+                <TextView
+                    android:id="@+id/appliedStatusUpdateBy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/statusBarrier"
+                    app:layout_constraintTop_toTopOf="@id/updatedByLabel" />
 
-                    <TextView
-                        android:id="@+id/appliedStatusUpdateBy"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/statusBarrier"
-                        app:layout_constraintTop_toTopOf="@id/updatedByLabel" />
+                <TextView
+                    android:id="@+id/updatedDateLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Updated Date"
+                    android:textColor="#9B6A6A"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appliedStatusUpdateBy" />
 
-                    <!-- Updated Date info -->
-                    <TextView
-                        android:id="@+id/updatedDateLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Updated Date"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
-                        android:textStyle="bold|normal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/updatedByLabel" />
+                <TextView
+                    android:id="@+id/appliedStatusUpdateDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/statusBarrier"
+                    app:layout_constraintTop_toTopOf="@id/updatedDateLabel" />
 
-                    <TextView
-                        android:id="@+id/appliedStatusUpdateDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/statusBarrier"
-                        app:layout_constraintTop_toTopOf="@id/updatedDateLabel" />
-
-                    <androidx.constraintlayout.widget.Barrier
-                        android:id="@+id/statusBarrier"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:barrierDirection="end"
-                        app:constraint_referenced_ids="statusLabel,updatedByLabel,updatedDateLabel" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </LinearLayout>
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/statusBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="end"
+                    app:constraint_referenced_ids="statusLabel,updatedByLabel,updatedDateLabel" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Action Buttons -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:id="@+id/actionButtonsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardElevation="4dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/statusCard">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/approve_button"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:text="Approve"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/approved_color"
+                app:cornerRadius="12dp"
+                app:elevation="0dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/approve_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:text="Approve"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    app:backgroundTint="#4CAF50"
-                    app:cornerRadius="8dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/reject_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:text="Reject"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    app:backgroundTint="#F44336"
-                    app:cornerRadius="8dp" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/reject_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:text="Reject"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="#C62828"
+                app:cornerRadius="12dp"
+                app:elevation="0dp" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

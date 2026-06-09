@@ -36,7 +36,8 @@
                 android:layout_height="wrap_content"
                 android:text="YYYY-MM-DD"
                 android:textColor="#666666"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:textStyle="bold|italic" />
         </LinearLayout>
 
         <View
@@ -62,14 +63,15 @@
                     android:layout_height="wrap_content"
                     android:text="Punch Timing"
                     android:textColor="#999999"
-                    android:textSize="11sp" />
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvTimingSummary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="In: --:-- | Out: --:--"
+                    android:text="Punch In: --:-- | Punch Out: --:--"
                     android:textColor="#424242"
                     android:textSize="14sp" />
             </LinearLayout>
