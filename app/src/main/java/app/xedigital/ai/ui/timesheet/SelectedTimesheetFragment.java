@@ -61,9 +61,6 @@ public class SelectedTimesheetFragment extends Fragment {
         dateTextView.setText("Date : " + DateTimeUtils.getDayOfWeekAndDate(selectedDcrItem.getDcrDate()));
         inTimeTextView.setText(formatTime(selectedDcrItem.getInTime()));
         outTimeTextView.setText(formatTime(selectedDcrItem.getOutTime()));
-//        reportTextValue.setText(selectedDcrItem.getTodayReport());
-//        reportOutcomeTextValue.setText(selectedDcrItem.getOutcome());
-//        nextDayTextValue.setText(selectedDcrItem.getTommarowPlan());
 
         reportTextValue.setText(Html.fromHtml(selectedDcrItem.getTodayReport(), Html.FROM_HTML_MODE_LEGACY));
         reportOutcomeTextValue.setText(Html.fromHtml(selectedDcrItem.getOutcome(), Html.FROM_HTML_MODE_LEGACY));

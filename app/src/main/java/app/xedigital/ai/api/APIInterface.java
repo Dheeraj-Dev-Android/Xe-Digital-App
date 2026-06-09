@@ -4,6 +4,7 @@ import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
 import app.xedigital.ai.model.TeamLeave.TeamLeaveResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
+import app.xedigital.ai.model.TeamTimesheetResponse.TeamTimesheetResponse;
 import app.xedigital.ai.model.TeamUnderManagerResponse.TeamUnderManagerResponse;
 import app.xedigital.ai.model.UpdateProfile.UpdateProfileImageResponse;
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
@@ -197,9 +198,9 @@ public interface APIInterface {
     Call<AttandanceByManagerResponse> getAttendanceByManager(
             @Header("Authorization") String authToken,
             @Query("managerId") String managerId,
-            @Query("start") String startDate,       // format: yyyy-MM-dd
-            @Query("end") String endDate,           // format: yyyy-MM-dd
-            @Query("employee") String employeeId    // _id of employee, null = omitted (all employees)
+            @Query("start") String startDate,
+            @Query("end") String endDate,
+            @Query("employee") String employeeId
     );
 
     @GET("employees/reportingManager/{UserId}")
@@ -211,6 +212,8 @@ public interface APIInterface {
     @GET("meetings/getAll")
     retrofit2.Call<ResponseBody> getMeetings(@Header("Authorization") String authToken);
 
+    @GET("employees/dcrDataForRM/{userId}")
+    Call<TeamTimesheetResponse> getDcrDataForRM(@Header("Authorization") String authToken, @Path("userId") String userId);
     //    POST APIs
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);

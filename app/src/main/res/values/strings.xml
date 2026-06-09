@@ -116,6 +116,7 @@
     <string name="team_member_details">Team Member Details</string>
     <string name="team_member">Team Members</string>
     <string name="menu_meeting_room">Meeting Room</string>
+    <string name="team_dcr">Team Member Timesheet</string>
 
 
 </resources>

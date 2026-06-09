@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member, R.id.nav_team_member_leave, R.id.nav_meeting_room, R.id.nav_logout).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member, R.id.nav_team_member_leave, R.id.nav_meeting_room, R.id.nav_team_member_timesheet, R.id.nav_logout).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -229,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.navTeam_member).setVisible(newVisibility);
         menu.findItem(R.id.navManager_attendance_menu).setVisible(newVisibility);
         menu.findItem(R.id.nav_team_member_leave).setVisible(newVisibility);
+        menu.findItem(R.id.nav_team_member_timesheet).setVisible(newVisibility);
 
         // Change icon based on visibility
         isTeamSubVisible = newVisibility;

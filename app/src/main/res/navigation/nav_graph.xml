@@ -507,6 +507,11 @@
         android:name="app.xedigital.ai.ui.TeamMember.TeamMemberFragment"
         android:label="Team Members"
         tools:layout="@layout/fragment_team_member" />
+    <fragment
+        android:id="@+id/nav_team_member_timesheet"
+        android:name="app.xedigital.ai.ui.teamTimesheet.TeamTimesheetFragment"
+        android:label="Team Timesheet"
+        tools:layout="@layout/fragment_team_timesheet" />
 
     <fragment
         android:id="@+id/nav_team_member_leave"

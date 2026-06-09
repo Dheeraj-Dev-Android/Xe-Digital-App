@@ -32,6 +32,10 @@
             android:id="@+id/nav_team_member_leave"
             android:title="@string/team_leaves"
             android:visible="false" />
+        <item
+            android:id="@+id/nav_team_member_timesheet"
+            android:title="@string/team_dcr"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
