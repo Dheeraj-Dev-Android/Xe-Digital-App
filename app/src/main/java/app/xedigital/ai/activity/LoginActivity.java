@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
 
+import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
@@ -41,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     private AlertDialog backgroundDialog;
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
+
     // Launcher for Background Location (Android 10+)
     private final ActivityResultLauncher<String> backgroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -51,8 +53,37 @@ public class LoginActivity extends AppCompatActivity {
                     if (cachedToken != null) navigateToFaceLogin(cachedToken);
                 } else {
                     showLoginScreen();
-                    // Inform them why they are seeing the settings dialog layout or notice block
                     showAlertDialog("Shift tracking requires background location 'Allow all the time' to run properly when closed.");
+                }
+            });
+
+    private void checkPermissionsAndNavigate(String token) {
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefs.edit().putString("cachedTokenPermission", token).apply();
+
+        if (!hasForegroundLocationPermission()) {
+            foregroundPermissionLauncher.launch(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+            return;
+        }
+        navigateToFaceLogin(token);
+//        if (hasBackgroundLocationPermission()) {
+//            navigateToFaceLogin(token);
+//        } else {
+//            showBackgroundPermissionDialog(token);
+//        }
+    }    // Launcher for Notifications (Android 13+)
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // If granted, we can run evaluateSessionWorkflow to proceed.
+                // If denied, we bypass evaluateSessionWorkflow directly to avoid the loop,
+                // jumping straight to checking session credentials.
+                if (isGranted) {
+                    evaluateSessionWorkflow();
+                } else {
+                    proceedToAuthCheck();
                 }
             });
 
@@ -65,7 +96,6 @@ public class LoginActivity extends AppCompatActivity {
         loadingOverlay = binding.loadingOverlay;
 
         hideLoginScreen();
-//        checkBatteryOptimization();
 
         Glide.with(this).load(R.mipmap.ic_launcher)
                 .into(binding.logoImage);
@@ -104,25 +134,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void checkPermissionsAndNavigate(String token) {
-        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        prefs.edit().putString("cachedTokenPermission", token).apply();
-
-        if (!hasForegroundLocationPermission()) {
-            foregroundPermissionLauncher.launch(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            });
-            return;
-        }
-
-        if (hasBackgroundLocationPermission()) {
-            navigateToFaceLogin(token);
-        } else {
-            showBackgroundPermissionDialog(token);
-        }
-    }
-
+    /**
+     * Entry point for checking runtime configurations like Notifications.
+     */
     private void evaluateSessionWorkflow() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -132,6 +146,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
+        // If notification permission is granted (or device is < Android 13), proceed with auth checks
+        proceedToAuthCheck();
+    }
+
+    /**
+     * Separated logic to process routing and credential authorization status.
+     * This isolates auth checking from the notification launcher callbacks to prevent runtime StackOverflows.
+     */
+    private void proceedToAuthCheck() {
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefs.getString("authToken", null);
         String cachedToken = prefs.getString("cachedTokenPermission", null);
@@ -146,8 +169,6 @@ public class LoginActivity extends AppCompatActivity {
             if (hasForegroundLocationPermission() && hasBackgroundLocationPermission()) {
                 navigateToFaceLogin(cachedToken);
             } else {
-                // To avoid an automatic loop on device resume, only force dialog checks
-                // if the screen elements indicate explicit user-navigation setups.
                 checkPermissionsAndNavigate(cachedToken);
             }
         } else if (authToken != null && !isRedirectInProgress) {
@@ -157,10 +178,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                evaluateSessionWorkflow();
-            });
+    private void navigateToFaceLogin(String token) {
+        if (isFinishing() || isDestroyed()) return;
+        isRedirectInProgress = true;
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("authToken", token);
+        startActivity(intent);
+        finish();
+    }
 
     private void showBackgroundPermissionDialog(String token) {
         if (isFinishing() || isDestroyed()) return;
@@ -173,8 +198,6 @@ public class LoginActivity extends AppCompatActivity {
                 .setPositiveButton("Configure", (dialog, which) -> {
                     dialog.dismiss();
 
-                    // Android 11+ (API 30) requires going to the application settings page
-                    // for Background Permissions, while Android 10 can use system prompt.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                         Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -271,14 +294,7 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    private void navigateToFaceLogin(String token) {
-        if (isFinishing() || isDestroyed()) return;
-        isRedirectInProgress = true;
-        Intent intent = new Intent(this, FaceLoginActivity.class);
-        intent.putExtra("authToken", token);
-        startActivity(intent);
-        finish();
-    }
+
 
     private void storeInSharedPreferences(String userId, String emailId, String authToken) {
         SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit();
@@ -309,30 +325,4 @@ public class LoginActivity extends AppCompatActivity {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
-
-//    private void checkBatteryOptimization() {
-//        if (isFinishing() || isDestroyed()) return;
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            String packageName = getPackageName();
-//            android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
-//            if (pm != null && !pm.isIgnoringBatteryOptimizations(packageName)) {
-//
-//                if (batteryDialog != null && batteryDialog.isShowing()) return;
-//
-//                batteryDialog = new MaterialAlertDialogBuilder(this)
-//                        .setTitle("Keep App Running")
-//                        .setMessage("To ensure tracking works while your screen is off, please disable battery optimization for this app.")
-//                        .setPositiveButton("Allow", (dialog, which) -> {
-//                            dialog.dismiss();
-//                            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-//                            intent.setData(Uri.parse("package:" + packageName));
-//                            startActivity(intent);
-//                        })
-//                        .create();
-//
-//                batteryDialog.show();
-//            }
-//        }
-//    }
 }

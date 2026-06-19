@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -14,12 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -29,7 +24,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
 
 import app.xedigital.ai.R;
@@ -56,22 +50,22 @@ public class EditProfileFragment extends Fragment {
     private String currentPhotoPath;
     private boolean isImageCaptured = false;
 
-    private final ActivityResultLauncher<Uri> takePictureLauncher = registerForActivityResult(
-            new ActivityResultContracts.TakePicture(),
-            success -> {
-                if (success) {
-                    if (photoFile == null && currentPhotoPath != null) {
-                        photoFile = new File(currentPhotoPath);
-                    }
-                    if (photoFile != null && photoFile.exists()) {
-                        binding.imageViewProfile.setImageURI(Uri.fromFile(photoFile));
-                        isImageCaptured = true;
-                    }
-                } else {
-                    Toast.makeText(requireContext(), "Camera capture cancelled", Toast.LENGTH_SHORT).show();
-                }
-            }
-    );
+//    private final ActivityResultLauncher<Uri> takePictureLauncher = registerForActivityResult(
+//            new ActivityResultContracts.TakePicture(),
+//            success -> {
+//                if (success) {
+//                    if (photoFile == null && currentPhotoPath != null) {
+//                        photoFile = new File(currentPhotoPath);
+//                    }
+//                    if (photoFile != null && photoFile.exists()) {
+//                        binding.imageViewProfile.setImageURI(Uri.fromFile(photoFile));
+//                        isImageCaptured = true;
+//                    }
+//                } else {
+//                    Toast.makeText(requireContext(), "Camera capture cancelled", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//    );
 
     public EditProfileFragment() {
         // Required empty public constructor
@@ -114,8 +108,8 @@ public class EditProfileFragment extends Fragment {
         binding.spinnerRole.setEnabled(false);
         binding.spinnerStatus.setEnabled(false);
 
-        binding.btnPickImage.setOnClickListener(v -> openCamera());
-
+//        binding.btnPickImage.setOnClickListener(v -> openCamera());
+//
         binding.buttonUpdate.setOnClickListener(v -> {
             if (isValidFormData()) {
                 processUnifiedUpdate();
@@ -124,26 +118,26 @@ public class EditProfileFragment extends Fragment {
 
         binding.clearForm.setOnClickListener(v -> clearForm());
 
-        if (isImageCaptured && photoFile != null && photoFile.exists()) {
-            binding.imageViewProfile.setImageURI(Uri.fromFile(photoFile));
-        }
+//        if (isImageCaptured && photoFile != null && photoFile.exists()) {
+//            binding.imageViewProfile.setImageURI(Uri.fromFile(photoFile));
+//        }
 
         return view;
     }
 
-    private void openCamera() {
-        try {
-            File storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            photoFile = File.createTempFile("profile_", ".jpg", storageDir);
-            currentPhotoPath = photoFile.getAbsolutePath();
-
-            Uri photoURI = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", photoFile);
-            takePictureLauncher.launch(photoURI);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(requireContext(), "Failed to create storage for photo", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    private void openCamera() {
+//        try {
+//            File storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//            photoFile = File.createTempFile("profile_", ".jpg", storageDir);
+//            currentPhotoPath = photoFile.getAbsolutePath();
+//
+//            Uri photoURI = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", photoFile);
+//            takePictureLauncher.launch(photoURI);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Toast.makeText(requireContext(), "Failed to create storage for photo", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     private String encodeImageToBase64(File file) {
         try {
@@ -358,7 +352,7 @@ public class EditProfileFragment extends Fragment {
         photoFile = null;
         currentPhotoPath = null;
         isImageCaptured = false;
-        binding.imageViewProfile.setImageResource(R.mipmap.ic_default_profile);
+//        binding.imageViewProfile.setImageResource(R.mipmap.ic_default_profile);
     }
 
     private void navigateToProfileFragment() {

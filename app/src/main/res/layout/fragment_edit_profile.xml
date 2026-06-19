@@ -14,69 +14,69 @@
         android:padding="16dp"
         android:paddingBottom="24dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="24dp">
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:gravity="center"-->
+        <!--            android:orientation="vertical"-->
+        <!--            android:paddingTop="8dp"-->
+        <!--            android:paddingBottom="24dp">-->
 
-            <FrameLayout
-                android:id="@+id/frameAvatar"
-                android:layout_width="96dp"
-                android:layout_height="96dp">
+        <!--            <FrameLayout-->
+        <!--                android:id="@+id/frameAvatar"-->
+        <!--                android:layout_width="96dp"-->
+        <!--                android:layout_height="96dp">-->
 
-                <View
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:background="@drawable/bg_avatar_ring" />
+        <!--                <View-->
+        <!--                    android:layout_width="96dp"-->
+        <!--                    android:layout_height="96dp"-->
+        <!--                    android:background="@drawable/bg_avatar_ring" />-->
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/imageViewProfile"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center"
-                    android:src="@mipmap/ic_default_profile"
-                    app:civ_border_color="@color/white"
-                    app:civ_border_width="2dp" />
+        <!--                <de.hdodenhof.circleimageview.CircleImageView-->
+        <!--                    android:id="@+id/imageViewProfile"-->
+        <!--                    android:layout_width="100dp"-->
+        <!--                    android:layout_height="100dp"-->
+        <!--                    android:layout_gravity="center"-->
+        <!--                    android:src="@mipmap/ic_default_profile"-->
+        <!--                    app:civ_border_color="@color/white"-->
+        <!--                    app:civ_border_width="2dp" />-->
 
-                <FrameLayout
-                    android:id="@+id/btnPickImage"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="bottom|end"
-                    android:background="@drawable/bg_camera_badge"
-                    android:clickable="true"
-                    android:contentDescription="Change profile photo"
-                    android:focusable="true">
+        <!--                <FrameLayout-->
+        <!--                    android:id="@+id/btnPickImage"-->
+        <!--                    android:layout_width="48dp"-->
+        <!--                    android:layout_height="48dp"-->
+        <!--                    android:layout_gravity="bottom|end"-->
+        <!--                    android:background="@drawable/bg_camera_badge"-->
+        <!--                    android:clickable="true"-->
+        <!--                    android:contentDescription="Change profile photo"-->
+        <!--                    android:focusable="true">-->
 
-                    <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:layout_gravity="center"
-                        android:src="@android:drawable/ic_menu_camera"
-                        app:tint="@color/gradient_start" />
-                </FrameLayout>
+        <!--                    <ImageView-->
+        <!--                        android:layout_width="26dp"-->
+        <!--                        android:layout_height="26dp"-->
+        <!--                        android:layout_gravity="center"-->
+        <!--                        android:src="@android:drawable/ic_menu_camera"-->
+        <!--                        app:tint="@color/gradient_start" />-->
+        <!--                </FrameLayout>-->
 
-            </FrameLayout>
+        <!--            </FrameLayout>-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Profile Photo"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+        <!--            <TextView-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginTop="10dp"-->
+        <!--                android:text="Profile Photo"-->
+        <!--                android:textColor="@android:color/black"-->
+        <!--                android:textSize="14sp"-->
+        <!--                android:textStyle="bold" />-->
 
-        </LinearLayout>
+        <!--        </LinearLayout>-->
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="20dp"
-            android:background="@color/divider_color" />
+        <!--        <View-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="1dp"-->
+        <!--            android:layout_marginBottom="20dp"-->
+        <!--            android:background="@color/divider_color" />-->
 
         <TextView
             android:layout_width="wrap_content"

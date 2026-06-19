@@ -34,10 +34,6 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -67,7 +63,6 @@ public class TimesheetFormFragment extends Fragment {
     private final OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
-            // Do nothing when back is pressed while submitting
             Toast.makeText(getContext(), "Please wait while we submit your timesheet", Toast.LENGTH_SHORT).show();
         }
     };
@@ -117,7 +112,6 @@ public class TimesheetFormFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        getContext();
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), backPressedCallback);
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", "");
@@ -127,7 +121,6 @@ public class TimesheetFormFragment extends Fragment {
         profileViewModel.fetchUserProfile();
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-            String responseString = gson.toJson(userprofileResponse);
             employeeName = userprofileResponse.getData().getEmployee().getFirstname();
             employeeEmail = userprofileResponse.getData().getEmployee().getEmail();
             employeeLastName = userprofileResponse.getData().getEmployee().getLastname();
@@ -151,16 +144,13 @@ public class TimesheetFormFragment extends Fragment {
             }
         });
 
-
         binding.btnDcrClear.setOnClickListener(v -> clearForm());
 
         binding.dcrDate.setOnClickListener(v -> {
             dcrDate.requestFocus();
             long todayMs = MaterialDatePicker.todayInUtcMilliseconds();
-            // 2 days in milliseconds = 2 * 24 * 60 * 60 * 1000
             long twoDaysAgoMs = todayMs - (2L * 24 * 60 * 60 * 1000);
 
-            // Calendar Constraint Validator: Only allows selection between [twoDaysAgo, today]
             CalendarConstraints.DateValidator threeDayWindowValidator = new CalendarConstraints.DateValidator() {
                 @Override
                 public boolean isValid(long date) {
@@ -179,7 +169,11 @@ public class TimesheetFormFragment extends Fragment {
 
             CalendarConstraints calendarConstraints = new CalendarConstraints.Builder().setValidator(threeDayWindowValidator).build();
 
-            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select DCR Date").setSelection(todayMs).setCalendarConstraints(calendarConstraints).setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR) // Blocks manual text entry icon
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("Select DCR Date")
+                    .setSelection(todayMs)
+                    .setCalendarConstraints(calendarConstraints)
+                    .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
                     .build();
 
             datePicker.addOnPositiveButtonClickListener(selection -> {
@@ -198,25 +192,33 @@ public class TimesheetFormFragment extends Fragment {
 
         binding.inTime.setOnClickListener(v -> {
             inTime.requestFocus();
-            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder().setTitleText("Select In Time").setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK).build();
+            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder()
+                    .setTitleText("Select In Time")
+                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                    .build();
             materialTimePicker.show(getParentFragmentManager(), "inTime");
             materialTimePicker.addOnPositiveButtonClickListener(dialog -> {
                 int hour = materialTimePicker.getHour();
                 int minute = materialTimePicker.getMinute();
                 String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
                 inTime.setText(selectedTime);
+                inTime.setError(null);
             });
         });
 
         binding.outTime.setOnClickListener(v -> {
             outTime.requestFocus();
-            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder().setTitleText("Select Out Time").setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK).build();
+            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder()
+                    .setTitleText("Select Out Time")
+                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                    .build();
             materialTimePicker.show(getParentFragmentManager(), "OutTime");
             materialTimePicker.addOnPositiveButtonClickListener(dialog -> {
                 int hour = materialTimePicker.getHour();
                 int minute = materialTimePicker.getMinute();
                 String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
                 outTime.setText(selectedTime);
+                outTime.setError(null);
             });
         });
     }
@@ -243,29 +245,43 @@ public class TimesheetFormFragment extends Fragment {
                         if (pIn != null && !pIn.trim().isEmpty() && !pIn.equalsIgnoreCase("null")) {
                             inTime.setText(formatTime(pIn));
                         } else {
-                            Log.d(TAG, "Punch In is null or empty for this date");
+                            inTime.setText("N/A");
+                            Log.d(TAG, "Punch In is null or empty, auto-filled N/A");
                         }
 
                         if (pOut != null && !pOut.trim().isEmpty() && !pOut.equalsIgnoreCase("null")) {
                             outTime.setText(formatTime(pOut));
                         } else {
-                            Log.d(TAG, "Punch Out is null or empty for this date");
+                            outTime.setText("N/A");
+                            Log.d(TAG, "Punch Out is null or empty, auto-filled N/A");
                         }
+                    } else {
+                        inTime.setText("N/A");
+                        outTime.setText("N/A");
                     }
+                } else {
+                    inTime.setText("N/A");
+                    outTime.setText("N/A");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<EmployeeAttendanceResponse> call, @NonNull Throwable throwable) {
+                if (!isAdded() || binding == null) return;
                 Log.e(TAG, "Error fetching attendance: " + throwable.getMessage());
+                inTime.setText("N/A");
+                outTime.setText("N/A");
             }
         });
     }
 
     private void dcrFormSubmit(String userId, String authToken, String date, String inTimeValue, String outTimeValue, String highlightOfTheDayValue, String outcomeOfTheDayValue, String nextDayPlanValue, String feelingOfTheDayValue) {
         setLoading(true);
-        String formattedInTime = date + "T" + inTimeValue + ":00.000Z";
-        String formattedOutTime = date + "T" + outTimeValue + ":00.000Z";
+
+        String standardizedInTime = convertTo24HourFormat(inTimeValue);
+        String standardizedOutTime = convertTo24HourFormat(outTimeValue);
+        String formattedInTime = date + "T" + standardizedInTime + ":00.000Z";
+        String formattedOutTime = date + "T" + standardizedOutTime + ":00.000Z";
 
         DcrFormRequest requestBody = new DcrFormRequest();
         requestBody.setDcrDate(date);
@@ -292,14 +308,11 @@ public class TimesheetFormFragment extends Fragment {
                 if (!isAdded()) return;
                 try {
                     if (response.isSuccessful() && response.body() != null) {
-                        String responseBody = response.body().string();
-                        JSONObject jsonObject = new JSONObject(responseBody);
-                        String message = jsonObject.getString("message");
                         showAlertDialog(true, "Submitted!", "Your DCR form has been successfully submitted.");
                     } else {
                         showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                     }
-                } catch (IOException | JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                 }
@@ -315,9 +328,7 @@ public class TimesheetFormFragment extends Fragment {
     }
 
     private void showAlertDialog(boolean isSuccess, String title, String message) {
-        if (!isAdded() || getContext() == null) {
-            return;
-        }
+        if (!isAdded() || getContext() == null) return;
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_custom_alert, null);
 
         ImageView icon = dialogView.findViewById(R.id.dialog_icon);
@@ -360,6 +371,31 @@ public class TimesheetFormFragment extends Fragment {
         dialog.show();
     }
 
+    private String convertTo24HourFormat(String timeString) {
+        if (timeString == null || timeString.trim().isEmpty() || timeString.equalsIgnoreCase("N/A")) {
+            return "00:00";
+        }
+
+        String cleanedTime = timeString.trim().toLowerCase();
+
+        if (!cleanedTime.contains("am") && !cleanedTime.contains("pm")) {
+            return cleanedTime;
+        }
+
+        try {
+            SimpleDateFormat displayFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            SimpleDateFormat parseFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            Date date = displayFormat.parse(cleanedTime);
+            if (date != null) {
+                return parseFormat.format(date);
+            }
+        } catch (ParseException e) {
+            Log.e(TAG, "Failed parsing time format: " + timeString, e);
+        }
+
+        return cleanedTime.replaceAll("[a-zA-Z\\s]", "");
+    }
+
     private void clearForm() {
         dcrDate.setText("");
         inTime.setText("");
@@ -391,7 +427,6 @@ public class TimesheetFormFragment extends Fragment {
             Date selectedDate = dateFormat.parse(dateString);
 
             if (selectedDate != null) {
-                // Construct standard day baselines to carefully evaluate date constraints
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(selectedDate);
                 cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -410,7 +445,6 @@ public class TimesheetFormFragment extends Fragment {
                 todayCal.add(Calendar.DAY_OF_YEAR, -2);
                 long twoDaysAgoClean = todayCal.getTimeInMillis();
 
-                // Logical constraint fallback validation check
                 if (selectedTimeClean > todayClean || selectedTimeClean < twoDaysAgoClean) {
                     dcrDate.setError("You can only select today or the previous 2 days");
                     Toast.makeText(getContext(), "Submission allowed only for today or past 2 days.", Toast.LENGTH_SHORT).show();
@@ -423,17 +457,20 @@ public class TimesheetFormFragment extends Fragment {
             return false;
         }
 
-        // Checked other fields safely
-        if (inTime.getText() == null || TextUtils.isEmpty(inTime.getText().toString().trim())) {
-            inTime.setError("Please Enter In Time");
-            Toast.makeText(getContext(), "Please Enter In Time", Toast.LENGTH_SHORT).show();
+        // Check In Time for Empty or N/A
+        if (inTime.getText() == null || TextUtils.isEmpty(inTime.getText().toString().trim()) || inTime.getText().toString().trim().equalsIgnoreCase("N/A")) {
+            inTime.setError("Please enter or select a valid In Time");
+            Toast.makeText(getContext(), "Please enter or select a valid In Time", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (outTime.getText() == null || TextUtils.isEmpty(outTime.getText().toString().trim())) {
-            outTime.setError("Please Enter Out Time");
-            Toast.makeText(getContext(), "Please Enter Out Time", Toast.LENGTH_SHORT).show();
+
+        // Check Out Time for Empty or N/A
+        if (outTime.getText() == null || TextUtils.isEmpty(outTime.getText().toString().trim()) || outTime.getText().toString().trim().equalsIgnoreCase("N/A")) {
+            outTime.setError("Please enter or select a valid Out Time");
+            Toast.makeText(getContext(), "Please enter or select a valid Out Time", Toast.LENGTH_SHORT).show();
             return false;
         }
+
         if (highlightOfTheDay.getText() == null || TextUtils.isEmpty(highlightOfTheDay.getText().toString().trim())) {
             highlightOfTheDay.setError("Please Enter Highlight of the Day");
             Toast.makeText(getContext(), "Please Enter Highlight of the Day", Toast.LENGTH_SHORT).show();
@@ -483,7 +520,6 @@ public class TimesheetFormFragment extends Fragment {
             public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     UserModelResponse userResponse = response.body();
-                    String responseJson = gson.toJson(userResponse.getData());
                     String branchId = userResponse.getData().getBranch().getId();
                     callBranchApi(branchId, authToken);
                 }
@@ -505,7 +541,6 @@ public class TimesheetFormFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         UserBranchResponse responseBranch = response.body();
-                        String responseString = gson.toJson(responseBranch);
                         notificationMail = responseBranch.getData().getBranch().getNotificationEmail();
                     } catch (Exception e) {
                         e.printStackTrace();

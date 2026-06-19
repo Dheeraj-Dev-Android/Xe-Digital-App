@@ -281,8 +281,8 @@
         android:label="@string/menu_dcr"
         tools:layout="@layout/fragment_dcr">
         <action
-            android:id="@+id/action_nav_dcr_to_nav_holidays"
-            app:destination="@id/nav_holidays" />
+            android:id="@+id/action_nav_dcr_to_nav_dcr_form"
+            app:destination="@id/nav_dcr_form" />
         <action
             android:id="@+id/action_nav_dcr_to_nav_selected_Timesheet"
             app:destination="@id/nav_selected_Timesheet" />
