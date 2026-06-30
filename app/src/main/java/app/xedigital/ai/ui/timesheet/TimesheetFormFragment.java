@@ -120,15 +120,18 @@ public class TimesheetFormFragment extends Fragment {
         String userId = prefManager.getString("userId", "");
         callUserApi(userId, authToken);
         profileViewModel.storeLoginData(userId, authToken);
-        profileViewModel.fetchUserProfile();
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userprofileResponse -> {
-            employeeName = userprofileResponse.getData().getEmployee().getFirstname();
-            employeeEmail = userprofileResponse.getData().getEmployee().getEmail();
-            employeeLastName = userprofileResponse.getData().getEmployee().getLastname();
-            reportingManagerEmail = userprofileResponse.getData().getEmployee().getReportingManager().getEmail();
-            reportingManagerFirstName = userprofileResponse.getData().getEmployee().getReportingManager().getFirstname();
-            reportingManagerLastName = userprofileResponse.getData().getEmployee().getReportingManager().getLastname();
+            if (userprofileResponse != null && userprofileResponse.getData() != null && userprofileResponse.getData().getEmployee() != null) {
+                employeeName = userprofileResponse.getData().getEmployee().getFirstname();
+                employeeEmail = userprofileResponse.getData().getEmployee().getEmail();
+                employeeLastName = userprofileResponse.getData().getEmployee().getLastname();
+                if (userprofileResponse.getData().getEmployee().getReportingManager() != null) {
+                    reportingManagerEmail = userprofileResponse.getData().getEmployee().getReportingManager().getEmail();
+                    reportingManagerFirstName = userprofileResponse.getData().getEmployee().getReportingManager().getFirstname();
+                    reportingManagerLastName = userprofileResponse.getData().getEmployee().getReportingManager().getLastname();
+                }
+            }
         });
 
         btnDcrSubmit.setOnClickListener(v -> {
@@ -142,7 +145,7 @@ public class TimesheetFormFragment extends Fragment {
                 String feelingOfTheDayValue = Objects.requireNonNull(feelingOfTheDay.getText()).toString();
                 dcrFormSubmit(userId, authToken, date, inTimeValue, outTimeValue, highlightOfTheDayValue, outcomeOfTheDayValue, nextDayPlanValue, feelingOfTheDayValue);
 
-                Toast.makeText(getContext(), "Timesheet submitted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Submitting timesheet...", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -165,18 +168,13 @@ public class TimesheetFormFragment extends Fragment {
                 }
 
                 @Override
-                public void writeToParcel(android.os.Parcel dest, int flags) {
+                public void writeToParcel(@NonNull android.os.Parcel dest, int flags) {
                 }
             };
 
             CalendarConstraints calendarConstraints = new CalendarConstraints.Builder().setValidator(threeDayWindowValidator).build();
 
-            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                    .setTitleText("Select DCR Date")
-                    .setSelection(todayMs)
-                    .setCalendarConstraints(calendarConstraints)
-                    .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-                    .build();
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select DCR Date").setSelection(todayMs).setCalendarConstraints(calendarConstraints).setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR).build();
 
             datePicker.addOnPositiveButtonClickListener(selection -> {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -189,16 +187,13 @@ public class TimesheetFormFragment extends Fragment {
                 }
             });
 
-            datePicker.show(getParentFragmentManager(), "DATE_PICKER");
+            datePicker.show(getChildFragmentManager(), "DATE_PICKER");
         });
 
         binding.inTime.setOnClickListener(v -> {
             inTime.requestFocus();
-            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder()
-                    .setTitleText("Select In Time")
-                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                    .build();
-            materialTimePicker.show(getParentFragmentManager(), "inTime");
+            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder().setTitleText("Select In Time").setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK).build();
+            materialTimePicker.show(getChildFragmentManager(), "inTime");
             materialTimePicker.addOnPositiveButtonClickListener(dialog -> {
                 int hour = materialTimePicker.getHour();
                 int minute = materialTimePicker.getMinute();
@@ -210,11 +205,8 @@ public class TimesheetFormFragment extends Fragment {
 
         binding.outTime.setOnClickListener(v -> {
             outTime.requestFocus();
-            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder()
-                    .setTitleText("Select Out Time")
-                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                    .build();
-            materialTimePicker.show(getParentFragmentManager(), "OutTime");
+            MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder().setTitleText("Select Out Time").setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK).build();
+            materialTimePicker.show(getChildFragmentManager(), "OutTime");
             materialTimePicker.addOnPositiveButtonClickListener(dialog -> {
                 int hour = materialTimePicker.getHour();
                 int minute = materialTimePicker.getMinute();
@@ -310,7 +302,7 @@ public class TimesheetFormFragment extends Fragment {
                 if (!isAdded()) return;
                 try {
                     if (response.isSuccessful() && response.body() != null) {
-                        showAlertDialog(true, "Submitted!", "Your DCR form has been successfully submitted.");
+                        showAlertDialog(true, "Submitted!", "Your Timesheet has been successfully submitted.");
                     } else {
                         showAlertDialog(false, "Submission failed", "Something went wrong. Please try again later.");
                     }
@@ -357,15 +349,17 @@ public class TimesheetFormFragment extends Fragment {
         dialogView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
             dialog.dismiss();
             if (isSuccess) {
-                View view = getView();
-                if (view != null) {
+                View currentView = getView();
+                if (currentView != null && isAdded()) {
                     clearForm();
                     try {
-                        NavController navController = Navigation.findNavController(view);
+                        NavController navController = Navigation.findNavController(currentView);
                         navController.navigate(R.id.action_nav_dcr_form_to_nav_dcr);
                     } catch (IllegalArgumentException e) {
                         Log.e(TAG, "Navigation error: " + e.getMessage());
                     }
+                } else {
+                    Log.w(TAG, "Fragment view unavailable or detached during dialog interaction.");
                 }
             }
         });
@@ -515,6 +509,7 @@ public class TimesheetFormFragment extends Fragment {
     }
 
     public void callUserApi(String userId, String authToken) {
+        if (!isAdded() || getContext() == null) return;
         String authHeaderValue = "jwt " + authToken;
         Call<UserModelResponse> call = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
         call.enqueue(new Callback<UserModelResponse>() {
@@ -522,8 +517,11 @@ public class TimesheetFormFragment extends Fragment {
             public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     UserModelResponse userResponse = response.body();
+
                     String branchId = userResponse.getData().getBranch().getId();
-                    callBranchApi(branchId, authToken);
+                    if (branchId != null) {
+                        callBranchApi(branchId, authToken);
+                    }
                 }
             }
 
@@ -535,6 +533,7 @@ public class TimesheetFormFragment extends Fragment {
     }
 
     public void callBranchApi(String branchId, String authToken) {
+        if (!isAdded() || getContext() == null) return;
         String authHeaderValue = "jwt " + authToken;
         Call<UserBranchResponse> branchCall = APIClient.getInstance().getBranch().getBranchData(branchId, authHeaderValue);
         branchCall.enqueue(new Callback<UserBranchResponse>() {
@@ -543,7 +542,10 @@ public class TimesheetFormFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         UserBranchResponse responseBranch = response.body();
-                        notificationMail = responseBranch.getData().getBranch().getNotificationEmail();
+                        if (responseBranch.getData() != null && responseBranch.getData().getBranch() != null) {
+                            notificationMail = responseBranch.getData().getBranch().getNotificationEmail();
+                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
