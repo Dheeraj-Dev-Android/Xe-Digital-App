@@ -3,9 +3,7 @@ package app.xedigital.ai.ui.claim_management;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -60,6 +58,7 @@ import app.xedigital.ai.model.claimSubmit.ReportingManager;
 import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -103,10 +102,11 @@ public class ClaimManagementFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", null);
         authTokenHeader = "jwt " + authToken;
-        userId = sharedPreferences.getString("userId", "");
+        userId = prefManager.getString("userId", null);
 
         claimManagementViewModel = new ViewModelProvider(this).get(ClaimManagementViewModel.class);
         claimManagementViewModel.getClaimLength(authToken);

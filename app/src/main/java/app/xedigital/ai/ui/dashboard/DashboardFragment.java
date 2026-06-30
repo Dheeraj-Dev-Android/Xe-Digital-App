@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.dashboard;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
@@ -57,6 +55,7 @@ import app.xedigital.ai.ui.attendance.AttendanceViewModel;
 import app.xedigital.ai.ui.leaves.LeavesViewModel;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class DashboardFragment extends Fragment {
     private static final SimpleDateFormat DATE_FORMAT_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -197,10 +196,11 @@ public class DashboardFragment extends Fragment {
         initializeViews(root);
 
         binding.punchButton.setOnClickListener(v -> {
-            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-            String userId = sharedPreferences.getString("userId", "");
-            String authToken = sharedPreferences.getString("authToken", "");
-            String name = sharedPreferences.getString("name", "");
+//            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+            String userId = prefManager.getString("userId", "");
+            String authToken = prefManager.getString("authToken", "");
+            String name = prefManager.getString("name", "");
             Intent intent = new Intent(requireContext(), PunchActivity.class);
             intent.putExtra("userId", userId);
             intent.putExtra("authToken", authToken);
@@ -228,9 +228,10 @@ public class DashboardFragment extends Fragment {
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
 
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();

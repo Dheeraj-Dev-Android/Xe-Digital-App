@@ -19,7 +19,7 @@ public class APIClient {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
 
 //        if (BuildConfig.DEBUG) {
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 //        } else {
 //            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 //        }

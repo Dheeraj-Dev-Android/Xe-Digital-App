@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.claim_management;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -39,6 +37,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.approveClaim.ApproveClaimResponse;
 import app.xedigital.ai.model.approveClaim.Data;
 import app.xedigital.ai.model.approveClaim.EmployeeClaimdataItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -148,8 +147,9 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         loadingProgress.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
 
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", null);
 
         Call<ApproveClaimResponse> call = apiInterface.getClaimsForApproval("jwt " + authToken);
         call.enqueue(new Callback<ApproveClaimResponse>() {

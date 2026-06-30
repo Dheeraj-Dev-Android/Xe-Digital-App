@@ -72,8 +72,8 @@
                 android:id="@+id/VisitorsListRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
                 android:background="#F5F5F5"
+                android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 android:padding="16dp" />
 

@@ -1,7 +1,6 @@
 package app.xedigital.ai.ui.TeamMember;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +28,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.model.TeamMember.AllEmployeesItem;
 import app.xedigital.ai.model.TeamMember.EmployeesItem;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class TeamMemberFragment extends Fragment {
 
@@ -41,6 +41,7 @@ public class TeamMemberFragment extends Fragment {
     private CircularProgressIndicator loadingProgress;
     private TextView emptyStateText;
     private String myUserId = "";
+    private SecurePrefManager prefManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -109,8 +110,9 @@ public class TeamMemberFragment extends Fragment {
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(context).setView(v).setBackground(context.getDrawable(R.drawable.bg_dialog_white_rounded)).show();
 
-        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = prefs.getString("authToken", "");
+//        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
 
         mViewModel.clearSubTeamData();
         Observer<Boolean> loadingObserver = loading -> {
@@ -197,9 +199,10 @@ public class TeamMemberFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(TeamMemberViewModel.class);
-        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = prefs.getString("authToken", "");
-        myUserId = prefs.getString("userId", "");
+//        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
+        myUserId = prefManager.getString("userId", "");
 
         setupObservers();
         if (!authToken.isEmpty()) mViewModel.fetchTeamMembers(authToken, myUserId);

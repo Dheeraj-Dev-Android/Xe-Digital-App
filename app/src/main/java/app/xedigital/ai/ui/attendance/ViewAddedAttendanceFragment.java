@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.attendance;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +28,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentViewAddedAttendanceBinding;
 import app.xedigital.ai.model.addedAttendanceList.AddAttendanceRegularizeAppliedItem;
 import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -121,9 +120,10 @@ public class ViewAddedAttendanceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
 
         recyclerView = binding.AddAttendanceRecyclerView;
         loadingProgress = binding.loadingProgress;

@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.leaves;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.util.Log;
@@ -64,6 +62,7 @@ import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.ui.holidays.HolidaysViewModel;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -157,9 +156,10 @@ public class LeavesFragment extends Fragment {
         ArrayAdapter<String> leavePlannedAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, getResources().getStringArray(R.array.leave_planned));
         leavePlannedSpinner.setAdapter(leavePlannedAdapter);
 
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesType();
         holidaysViewModel.loadHolidays(authToken);
@@ -285,9 +285,10 @@ public class LeavesFragment extends Fragment {
                     checkRestrictedHoliday(fromDate, toDate);
                 }
 
-                SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                String authTokenN = sharedPreferences.getString("authToken", "");
-                String employeeId = sharedPreferences.getString("userId", "");
+//                SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+                String authTokenN = prefManager.getString("authToken", "");
+                String employeeId = prefManager.getString("userId", "");
                 String authToken = "jwt " + authTokenN;
                 fetchEmployeeLeave(selectedLeaveTypeId, employeeId, authToken, selectedLeaveTypeName);
                 fetchLeaveTypeDetails(selectedLeaveTypeId, authToken);

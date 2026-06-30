@@ -2,10 +2,8 @@ package app.xedigital.ai;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -47,6 +45,7 @@ import app.xedigital.ai.databinding.ActivityMainBinding;
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.utills.NetworkUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -141,12 +140,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-//        MenuItem teamAttendanceItem = navigationView.getMenu().findItem(R.id.navManager_attendance_menu);
-//        teamAttendanceItem.setOnMenuItemClickListener(item -> {
-//           toggleTeamMemberVisibility(navigationView.getMenu());
-//            return true;
-//        });
-
         // Initialize header view elements
         View headerView = navigationView.getHeaderView(0);
         profileImage = headerView.findViewById(R.id.imageView);
@@ -177,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
             tvSpeed.setText(speedText);
         } else {
-//            Log.e("MainActivity", "FrameLayout for slow internet is null.");
+            Log.e("MainActivity", "FrameLayout for slow internet is null.");
         }
     }
 
@@ -255,26 +248,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //    private void handleLogout() {
-//        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.remove("authToken");
-//        editor.remove("cachedTokenPermission");
-////        editor.putBoolean("isLoggedIn", false);
-//        editor.apply();
-//
-//        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//        intent.putExtra("isFallback", true);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        startActivity(intent);
-//        finish();
-//    }
     private void handleLogout() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
+        SecurePrefManager.getInstance(MainActivity.this).clearAll();
 
+        // Redirect to LoginActivity with fallback flag to prevent session auto-checks
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         intent.putExtra("isFallback", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -309,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onRetryButtonClicked(View view) {
-        // Code to retry network operations
         if (NetworkUtils.isNetworkAvailable(this)) {
             hideNoInternetLayout();
 
@@ -325,9 +301,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfileData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", null);
-        String authToken = sharedPreferences.getString("authToken", null);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(MainActivity.this);
+        String userId = prefManager.getString("userId", null);
+        String authToken = prefManager.getString("authToken", null);
 
         if (userId == null || authToken == null) {
             handleProfileFetchFailure("User not found", profileImage, profileName, profileEmail, clientLogo);
@@ -349,8 +325,6 @@ public class MainActivity extends AppCompatActivity {
         String authHeaderValue = "jwt " + authToken;
 
         profileCall = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
-
-//        Call<UserProfileResponse> call = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
         profileCall.enqueue(new Callback<UserProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {

@@ -4,7 +4,6 @@ import static app.xedigital.ai.utills.DateTimeUtils.formatTime;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -52,6 +51,7 @@ import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -84,6 +84,7 @@ public class TimesheetFormFragment extends Fragment {
     private MaterialButton btnDcrClear;
     private FragmentDcrFormBinding binding;
     private boolean isSubmitting = false;
+    private SecurePrefManager prefManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,9 +114,10 @@ public class TimesheetFormFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), backPressedCallback);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
         callUserApi(userId, authToken);
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
@@ -226,8 +228,8 @@ public class TimesheetFormFragment extends Fragment {
     public void fetchEmployeeAttendanceForDate(String date) {
         Context context = getContext();
         if (context == null) return;
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = prefManager.getString("authToken", "");
         String authHeaderValue = "jwt " + authToken;
 
         APIInterface apiInterface = APIClient.getInstance().getAttendance();

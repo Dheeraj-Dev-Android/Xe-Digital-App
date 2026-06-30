@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.shifts;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +18,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentShiftAppliedBinding;
 import app.xedigital.ai.model.shiftApplied.EmployeeShiftdataItem;
 import app.xedigital.ai.model.shiftApplied.ShiftAppliedResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -27,6 +26,7 @@ public class ShiftAppliedFragment extends Fragment {
     private String authToken, userId;
     private ShiftAppliedAdapter shiftAdapter;
     private FragmentShiftAppliedBinding binding;
+    private SecurePrefManager prefManager;
 
     public ShiftAppliedFragment() {
         // Required empty public constructor
@@ -46,9 +46,10 @@ public class ShiftAppliedFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentShiftAppliedBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
         getShiftApplied(authToken);
 
         return view;

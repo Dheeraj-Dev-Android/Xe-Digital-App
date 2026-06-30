@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.AttendanceByManager;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.TeamUnderManagerResponse.TeamUnderManagerResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,22 +39,21 @@ public class AttendanceByManagerViewModel extends AndroidViewModel {
         return errorMessage;
     }
 
+    // Updated to pull the encrypted auth token securely
     private String getToken() {
-        return "jwt " + getPrefs().getString("authToken", "");
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(getApplication());
+        return "jwt " + prefManager.getString("authToken", "");
     }
 
+    // Updated to pull the encrypted userId safely
     private String getManagerId() {
-        return getPrefs().getString("userId", "");
-    }
-
-    private SharedPreferences getPrefs() {
-        return getApplication().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(getApplication());
+        return prefManager.getString("userId", "");
     }
 
     /**
      * Fetch employees reporting to this manager (populates the dropdown)
      */
-
     public void fetchEmployeesUnderManager(String token, String userId) {
         APIClient.getInstance().getApi().getEmployeesUnderManager(getToken(), getManagerId()).enqueue(new Callback<TeamUnderManagerResponse>() {
             @Override

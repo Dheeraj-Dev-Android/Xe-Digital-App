@@ -2,8 +2,6 @@ package app.xedigital.ai.ui.regularize_attendance;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +43,7 @@ import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -88,10 +87,11 @@ public class RegularizeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("authToken", "");
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        token = prefManager.getString("authToken", "");
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         profileViewModel.storeLoginData(userId, authToken);
 

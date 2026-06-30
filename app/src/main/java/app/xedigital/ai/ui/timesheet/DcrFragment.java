@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.timesheet;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +27,7 @@ import app.xedigital.ai.model.dcrData.Data;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrData.EmployeesDcrDataItem;
 import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class DcrFragment extends Fragment implements FilterAppliedListener {
     private FragmentDcrBinding binding;
@@ -67,9 +66,10 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
         emptyStateContainer = binding.emptyStateContainer;
 
         loadingProgress.setVisibility(View.VISIBLE);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
-        String userId = sharedPreferences.getString("userId", null);
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", null);
+        String userId = prefManager.getString("userId", null);
 
         dcrViewModel.storeLoginData(authToken);
 

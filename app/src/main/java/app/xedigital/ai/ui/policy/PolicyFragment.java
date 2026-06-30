@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.policy;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,7 @@ import java.util.List;
 import app.xedigital.ai.adapter.PolicyAdapter;
 import app.xedigital.ai.databinding.FragmentPolicyBinding;
 import app.xedigital.ai.model.policy.PoliciesItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class PolicyFragment extends Fragment {
 
@@ -27,8 +26,9 @@ public class PolicyFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         PolicyViewModel policyViewModel = new ViewModelProvider(this).get(PolicyViewModel.class);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
         String authTokenHeader = "jwt " + authToken;
         policyViewModel.fetchPolicies(authTokenHeader);
 

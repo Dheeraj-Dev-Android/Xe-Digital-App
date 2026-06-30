@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.mrm;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import java.io.IOException;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class MeetingRoomFragment extends Fragment {
 
@@ -54,13 +53,13 @@ public class MeetingRoomFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(MeetingRoomViewModel.class);
         setupObservers();
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", null);
 
         if (authToken != null) {
             mViewModel.fetchMeetings(authToken);
         } else {
-            Log.e(TAG, "Auth token not found in SharedPreferences");
             Toast.makeText(getContext(), "Authentication token is missing. Please log in again.", Toast.LENGTH_SHORT).show();
             showEmptyState("Please login to see meetings.");
         }

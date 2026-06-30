@@ -3,7 +3,6 @@ package app.xedigital.ai.adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +37,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.shiftApprovalList.EmployeeApproveShiftdataItem;
 import app.xedigital.ai.model.shiftApprove.ShiftApproveRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,14 +66,13 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_shift_approval, parent, false);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
         profileViewModel.fetchUserProfile();
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.userProfile.observe(lifecycleOwner, userProfile -> {
             if (userProfile != null) {
-//                Log.d("ShiftsFragment", "User profile data: " + userProfile.getData());
                 fName = userProfile.getData().getEmployee().getFirstname();
                 lName = userProfile.getData().getEmployee().getLastname();
                 empId = userProfile.getData().getEmployee().getId();
@@ -123,13 +122,11 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
 
         holder.btnApprove.setOnClickListener(v -> {
             String shiftID = shiftApprovalData.getId();
-//            profileViewModel.fetchUserProfile();
             updateShiftStatus(shiftID, "approved", "", shiftApprovalData);
 
         });
 
         holder.btnCancel.setOnClickListener(v -> {
-//            profileViewModel.fetchUserProfile();
             showRejectDialog(holder, shiftApprovalData.getId(), shiftApprovalData);
         });
     }
@@ -155,8 +152,8 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
 
     private void updateShiftStatus(String shiftId, String status, String comment, EmployeeApproveShiftdataItem originalPayload) {
         Log.d("ShiftStatus", "Shift ID: " + shiftId + ", Status: " + status + ", Comment: " + comment);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+        String authToken = prefManager.getString("authToken", "");
         String token = "jwt " + authToken;
         ShiftApproveRequest requestBody = new ShiftApproveRequest();
 
@@ -173,11 +170,7 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
         requestBody.setAppliedDate(originalPayload.getAppliedDate());
         requestBody.setApprovedDate(formattedDate);
         requestBody.setStatus(status);
-//        requestBody.setShiftType(originalPayload.getShiftType());
-//        requestBody.setShiftUpdate(originalPayload.getShiftUpdate());
         requestBody.setReportingManager(originalPayload.getReportingManager());
-//        requestBody.setShift(originalPayload.getShift());
-//        requestBody.setEmployee(originalPayload.getEmployee());
         requestBody.setApprovedByName(fName + " " + lName);
         requestBody.setComment(comment);
 

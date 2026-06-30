@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.profile;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +21,7 @@ import com.bumptech.glide.Glide;
 import app.xedigital.ai.R;
 import app.xedigital.ai.databinding.FragmentProfileBinding;
 import app.xedigital.ai.model.profile.Employee;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
@@ -36,9 +35,10 @@ public class ProfileFragment extends Fragment {
         binding.profileLoader.setVisibility(View.VISIBLE);
         binding.emptyStateText.setVisibility(View.GONE);
         binding.profileCard.setVisibility(View.GONE);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", null);
-        String authToken = sharedPreferences.getString("authToken", null);
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String userId = prefManager.getString("userId", null);
+        String authToken = prefManager.getString("authToken", null);
 
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();

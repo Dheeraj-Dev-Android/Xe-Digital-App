@@ -83,8 +83,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Employee Details"
                             android:letterSpacing="0.04"
+                            android:text="Employee Details"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -368,8 +368,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Reason for Leave"
                             android:letterSpacing="0.04"
+                            android:text="Reason for Leave"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />

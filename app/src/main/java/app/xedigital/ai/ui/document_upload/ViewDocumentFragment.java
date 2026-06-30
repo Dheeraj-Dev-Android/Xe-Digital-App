@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.document_upload;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +22,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentViewDocumentBinding;
 import app.xedigital.ai.model.getDocuments.DocumentListResponse;
 import app.xedigital.ai.model.getDocuments.DocumentsItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,9 +52,10 @@ public class ViewDocumentFragment extends Fragment {
         recyclerView = binding.viewUploadedDocumentRecyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
         fetchDocuments();
 
         binding.uploadDocumentsChip.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_nav_documents_to_nav_document_upload));

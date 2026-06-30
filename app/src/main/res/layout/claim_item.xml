@@ -41,8 +41,8 @@
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
                 android:text="Pending"
-                android:textSize="12sp"
                 android:textColor="@color/color_white"
+                android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
 

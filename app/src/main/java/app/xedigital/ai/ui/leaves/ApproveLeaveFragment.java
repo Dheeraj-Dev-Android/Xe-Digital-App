@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.leaves;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +35,7 @@ import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesApproveItem;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
 import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -97,9 +96,10 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         approvalRecyclerView.setAdapter(approvalAdapter);
 
         apiInterface = APIClient.getInstance().getPendingApprovalLeaves();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
         authTokenHeader = "jwt " + authToken;
 //        getLeaveApproval();
 

@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.regularize_attendance;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +32,7 @@ import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.model.regularizeUpdateStatus.RegularizeUpdateRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,6 +48,7 @@ public class PendingApprovalViewFragment extends Fragment {
     private String reportingManager;
     private AttendanceApprovalBinding binding;
     private OnRegularizeApprovalActionListener listener;
+    private SecurePrefManager prefManager;
 
     public PendingApprovalViewFragment() {
 
@@ -84,9 +84,10 @@ public class PendingApprovalViewFragment extends Fragment {
         }
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         apiInterface = APIClient.getInstance().UpdateRegularizeListApproval();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", "");
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String userId = prefManager.getString("userId", "");
+        String authToken = prefManager.getString("authToken", "");
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
     }
@@ -196,8 +197,8 @@ public class PendingApprovalViewFragment extends Fragment {
         requestBody.setStatus("Approved");
         requestBody.setApprovedByName(reportingManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = prefManager.getString("authToken", "");
 
         Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
         call.enqueue(new Callback<ResponseBody>() {
@@ -228,8 +229,8 @@ public class PendingApprovalViewFragment extends Fragment {
         RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
         requestBody.setStatus("Rejected");
         requestBody.setApprovedByName(reportingManager);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = prefManager.getString("authToken", "");
 
         Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
         call.enqueue(new Callback<ResponseBody>() {

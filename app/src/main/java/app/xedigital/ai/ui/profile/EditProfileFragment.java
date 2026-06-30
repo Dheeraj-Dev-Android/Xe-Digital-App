@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.profile;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -32,6 +30,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.FragmentEditProfileBinding;
 import app.xedigital.ai.model.UpdateProfile.UpdateProfileImageResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -96,9 +95,10 @@ public class EditProfileFragment extends Fragment {
         View view = binding.getRoot();
 
         apiService = APIClient.getInstance().getUser();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
 
         fetchUserProfile(userId, authToken);
 

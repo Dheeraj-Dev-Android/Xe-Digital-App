@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.shifts;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,6 +35,7 @@ import app.xedigital.ai.model.shiftUpdate.ReportingManager;
 import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
 import app.xedigital.ai.model.shifts.ShiftsItem;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,9 +54,8 @@ public class ShiftsFragment extends Fragment {
     private String EmpReportingManagerName;
     private String EmpReportingManagerFName;
     private String EmpReportingManagerLName;
-
-
     private FragmentShiftsBinding binding;
+    private SecurePrefManager prefManager;
 
 
     @Override
@@ -67,9 +65,10 @@ public class ShiftsFragment extends Fragment {
 
         ShiftsViewModel shiftsViewModel = new ViewModelProvider(this).get(ShiftsViewModel.class);
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
         shiftsViewModel.callUserApi(userId, authToken);
         shiftsViewModel.setAuthToken(authToken);
         profileViewModel.storeLoginData(userId, authToken);

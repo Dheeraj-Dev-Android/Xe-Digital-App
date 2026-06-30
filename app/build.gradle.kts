@@ -118,6 +118,7 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // ── WorkManager — updated from 2.9.0 to fix R8/release build issues ──────
     implementation("androidx.work:work-runtime:2.10.1")

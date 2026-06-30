@@ -1,9 +1,7 @@
 package app.xedigital.ai.ui.permission;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,23 +25,24 @@ import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.utills.BioMetric;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class PermissionFragment extends Fragment {
 
     private PermissionViewModel mViewModel;
     private RecyclerView recyclerView;
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                refreshPermissionStatus();
-            });
     private BioMetric bioMetric;
+    private SecurePrefManager prefManager;
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        refreshPermissionStatus();
+    });
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_permission, container, false);
         recyclerView = view.findViewById(R.id.permissionRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        prefManager = SecurePrefManager.getInstance(requireContext());
         return view;
     }
 
@@ -69,15 +68,9 @@ public class PermissionFragment extends Fragment {
             return;
         }
 
-        // 2. Handle Background Location (Critical Fix)
         if ("BACKGROUND_LOCATION".equals(tag)) {
             if (!item.isGranted()) {
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Background Location Access")
-                        .setMessage("To track attendance accurately when the app is closed, please set location access to 'Allow all the time' in the next screen.")
-                        .setPositiveButton("Go to Settings", (dialog, which) -> openAppSettings())
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                new AlertDialog.Builder(requireContext()).setTitle("Background Location Access").setMessage("To track attendance accurately when the app is closed, please set location access to 'Allow all the time' in the next screen.").setPositiveButton("Go to Settings", (dialog, which) -> openAppSettings()).setNegativeButton("Cancel", null).show();
             } else {
                 openAppSettings();
             }
@@ -112,8 +105,10 @@ public class PermissionFragment extends Fragment {
             public void onAuthenticationSucceeded() {
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> {
-                        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                        prefs.edit().putBoolean("isBioEnabled", true).apply();
+//                        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                        prefManager = SecurePrefManager.getInstance(requireContext());
+                        prefManager.putBoolean("isBioEnabled", true);
+//                        prefs.edit().putBoolean("isBioEnabled", true).apply();
 
                         refreshPermissionStatus();
                         Toast.makeText(getContext(), "Biometric Login Enabled!", Toast.LENGTH_SHORT).show();
@@ -124,18 +119,14 @@ public class PermissionFragment extends Fragment {
             @Override
             public void onAuthenticationError(int errorCode, CharSequence errString) {
                 if (isAdded()) {
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(getContext(), "Error: " + errString, Toast.LENGTH_SHORT).show()
-                    );
+                    requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Error: " + errString, Toast.LENGTH_SHORT).show());
                 }
             }
 
             @Override
             public void onAuthenticationFailed() {
                 if (isAdded()) {
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(getContext(), "Authentication Failed", Toast.LENGTH_SHORT).show()
-                    );
+                    requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Authentication Failed", Toast.LENGTH_SHORT).show());
                 }
             }
         });
@@ -144,22 +135,18 @@ public class PermissionFragment extends Fragment {
     }
 
     private void showDisableBiometricDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Disable Biometric Login?")
-                .setMessage("You will need to enter your password manually next time you log in.")
-                .setPositiveButton("Disable", (dialog, which) -> {
-                    SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                    prefs.edit().putBoolean("isBioEnabled", false).apply();
-                    refreshPermissionStatus();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        new AlertDialog.Builder(requireContext()).setTitle("Disable Biometric Login?").setMessage("You will need to enter your password manually next time you log in.").setPositiveButton("Disable", (dialog, which) -> {
+//            SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+//            prefs.edit().putBoolean("isBioEnabled", false).apply();
+            prefManager.putBoolean("isBioEnabled", false);
+            refreshPermissionStatus();
+        }).setNegativeButton("Cancel", null).show();
     }
 
     private void refreshPermissionStatus() {
         List<PermissionItem> currentList = mViewModel.getPermissions().getValue();
-        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        boolean isBioEnabled = prefs.getBoolean("isBioEnabled", false);
+//        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        boolean isBioEnabled = prefManager.getBoolean("isBioEnabled", false);
 
         if (currentList != null) {
             for (PermissionItem item : currentList) {

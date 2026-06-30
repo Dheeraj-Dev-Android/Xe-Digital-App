@@ -26,16 +26,16 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.TimesheetViewHolder> {
 
-    private List<EmployeesDcrDataItem> dataset = new ArrayList<>();
     private final OnTimesheetClickListener clickListener;
+    private List<EmployeesDcrDataItem> dataset = new ArrayList<>();
+
+    public TimesheetAdapter(OnTimesheetClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     public void setDataset(List<EmployeesDcrDataItem> newDataset) {
         this.dataset = newDataset != null ? newDataset : new ArrayList<>();
         notifyDataSetChanged();
-    }
-
-    public TimesheetAdapter(OnTimesheetClickListener clickListener) {
-        this.clickListener = clickListener;
     }
 
     @Override
@@ -73,10 +73,6 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
         return new TimesheetViewHolder(view);
     }
 
-    public interface OnTimesheetClickListener {
-        void onViewDetailsClick(EmployeesDcrDataItem item);
-    }
-
     public String formatTime(String timeString) {
         if (timeString == null || timeString.equals("1900-01-01T00:00:00.000Z")) {
             return "N/A";
@@ -96,6 +92,10 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    public interface OnTimesheetClickListener {
+        void onViewDetailsClick(EmployeesDcrDataItem item);
     }
 
     static class TimesheetViewHolder extends RecyclerView.ViewHolder {

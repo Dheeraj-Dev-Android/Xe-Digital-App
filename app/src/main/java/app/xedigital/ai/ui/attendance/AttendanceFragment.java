@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.attendance;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +35,7 @@ import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import app.xedigital.ai.ui.timesheet.FilterAppliedListener;
 import app.xedigital.ai.utills.DateTimeUtils;
 import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class AttendanceFragment extends Fragment implements FilterAppliedListener {
     private static final String TAG = "AttendanceFragment";
@@ -87,21 +86,16 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         binding = FragmentAttendanceBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", null);
         attendanceViewModel.storeLoginData(authToken);
 
-//        String startDate = "";
-//        String endDate = "";
-//        attendanceViewModel.fetchAttendance(startDate, endDate);
-        // Check if we have any filter data from the previous filter
         if (currentStartDate.isEmpty() && currentEndDate.isEmpty()) {
             attendanceViewModel.fetchAttendance("", "");
         } else {
             attendanceViewModel.fetchAttendance(currentStartDate, currentEndDate);
         }
-
-
         recyclerViewAttendance = binding.recyclerViewAttendance;
         recyclerViewAttendance.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -110,13 +104,9 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
 
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceList -> {
             if (attendanceList != null) {
-//                Log.d(TAG, "Attendance List:\n " + attendanceList);
                 loadingProgress.setVisibility(View.GONE);
                 List<EmployeePunchDataItem> attendance = parseAttendanceData(attendanceList);
-//                AttendanceAdapter adapter = new AttendanceAdapter(attendance, attendanceViewModel);
-//                recyclerViewAttendance.setAdapter(adapter);
                 if (attendance.isEmpty()) {
-//                    showNoDataAlert();
                     emptyStateText.setVisibility(View.VISIBLE);
                     recyclerViewAttendance.setVisibility(View.GONE);
                 } else {

@@ -1,7 +1,6 @@
 package app.xedigital.ai.adapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -40,6 +39,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.approveClaim.EmployeeClaimdataItem;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -256,9 +256,10 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
         }
 
         private void updateClaimStatus(EmployeeClaimdataItem claim, String status, String comment) {
-            SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-            String authToken = sharedPreferences.getString("authToken", "");
-            String userId = sharedPreferences.getString("userId", "");
+            SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+            prefManager.putBoolean("instructionsSeenAttendance", true);
+            String authToken = prefManager.getString("authToken", "");
+            String userId = prefManager.getString("userId", "");
             String claimId = claim.getId();
             ProfileViewModel profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
             profileViewModel.storeLoginData(userId, authToken);

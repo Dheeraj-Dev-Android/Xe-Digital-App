@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.claim_management;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -38,6 +36,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.employeeClaim.Data;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimResponse;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimdataItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -150,8 +149,9 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
         loadingProgress.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
         String token = "jwt " + authToken;
 
         Call<EmployeeClaimResponse> call = apiInterface.getClaims(token);

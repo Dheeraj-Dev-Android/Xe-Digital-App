@@ -1,7 +1,6 @@
 package app.xedigital.ai.ui.leaves;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -47,6 +46,7 @@ import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.usedLeave.UsedLeaveRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,6 +66,7 @@ public class PendingLeaveApproveFragment extends Fragment {
     private LeaveApprovalBinding binding;
     private ProfileViewModel profileViewModel;
     private OnLeaveApprovalActionListener listener;
+    private SecurePrefManager securePrefManager;
 
     public PendingLeaveApproveFragment() {
         // Required empty public constructor
@@ -107,9 +108,10 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         Context context = getContext();
         if (context != null) {
-            SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-            userId = sharedPreferences.getString("userId", "");
-            authToken = sharedPreferences.getString("authToken", "");
+//            SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            securePrefManager = SecurePrefManager.getInstance(requireContext());
+            userId = securePrefManager.getString("userId", "");
+            authToken = securePrefManager.getString("authToken", "");
             profileViewModel.storeLoginData(userId, authToken);
             profileViewModel.fetchUserProfile();
         }
@@ -569,7 +571,9 @@ public class PendingLeaveApproveFragment extends Fragment {
 
     public interface OnLeaveApprovalActionListener {
         void onApprove(AppliedLeavesApproveItem item);
+
         void onReject(AppliedLeavesApproveItem item);
+
         void onCancel(AppliedLeavesApproveItem item);
     }
 }

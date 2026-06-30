@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.shifts;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +24,7 @@ import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.shiftApprovalList.EmployeeApproveShiftdataItem;
 import app.xedigital.ai.model.shiftApprovalList.ShiftApproveListResponse;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +36,7 @@ public class ShiftApproveFragment extends Fragment {
     private TextView emptyStateText;
     private View emptyStateContainer;
     private ProfileViewModel profileViewModel;
+    private SecurePrefManager prefManager;
 
     public ShiftApproveFragment() {
         // Required empty public constructor
@@ -63,8 +63,9 @@ public class ShiftApproveFragment extends Fragment {
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         ShiftApproveRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String token = prefManager.getString("authToken", "");
 
         APIInterface shiftApprovalList = APIClient.getInstance().getShiftTypes();
         String authToken = "jwt " + token;

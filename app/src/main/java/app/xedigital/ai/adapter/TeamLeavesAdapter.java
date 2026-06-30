@@ -21,8 +21,8 @@ import app.xedigital.ai.model.TeamLeave.LeavesItem;
 
 public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.EmployeeViewHolder> {
 
-    private List<EmployeesItem> employees;
     private final Context context;
+    private List<EmployeesItem> employees;
 
     public TeamLeavesAdapter(Context context, List<EmployeesItem> employees) {
         this.context = context;

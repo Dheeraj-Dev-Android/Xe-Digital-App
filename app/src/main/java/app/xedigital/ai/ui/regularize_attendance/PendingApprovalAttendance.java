@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.regularize_attendance;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +36,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,6 +53,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
     private TextView emptyStateText;
     private LinearLayout emptyStateContainer;
     private RegularizeApprovalResponse regularizeApprovalResponse;
+    private SecurePrefManager prefManager;
 
 
     @Override
@@ -116,9 +116,10 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
 
         adapter = new RegularizeApprovalAdapter(new ArrayList<>(), authToken, userId, this, getContext());
         approvalRecyclerView.setAdapter(adapter);
@@ -155,6 +156,7 @@ public class PendingApprovalAttendance extends Fragment implements PendingApprov
 
         return view;
     }
+
     public void onChipClicked(View view) {
         // Get the ChipGroup and the clicked chip
         ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);

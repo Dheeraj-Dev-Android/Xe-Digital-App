@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.leaves;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +32,7 @@ import java.util.Map;
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.LeaveAdapter;
 import app.xedigital.ai.model.leaves.LeavesItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class LeavesDataFragment extends Fragment {
 
@@ -80,8 +79,9 @@ public class LeavesDataFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
 
         leavesViewModel.setUserId(authToken);
         leavesViewModel.fetchLeavesData();

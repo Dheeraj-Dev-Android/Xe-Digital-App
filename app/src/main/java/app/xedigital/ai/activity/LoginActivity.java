@@ -1,9 +1,7 @@
 package app.xedigital.ai.activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -30,6 +28,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.login.LoginModelResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -46,8 +45,9 @@ public class LoginActivity extends AppCompatActivity {
     // Launcher for Background Location (Android 10+)
     private final ActivityResultLauncher<String> backgroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                String cachedToken = prefs.getString("cachedTokenPermission", null);
+                // Using SecurePrefManager instead of unencrypted SharedPreferences
+                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+                String cachedToken = prefManager.getString("cachedTokenPermission", null);
 
                 if (isGranted) {
                     if (cachedToken != null) navigateToFaceLogin(cachedToken);
@@ -58,8 +58,8 @@ public class LoginActivity extends AppCompatActivity {
             });
 
     private void checkPermissionsAndNavigate(String token) {
-        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        prefs.edit().putString("cachedTokenPermission", token).apply();
+        // Encrypted save for the transitional permission token
+        SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
 
         if (!hasForegroundLocationPermission()) {
             foregroundPermissionLauncher.launch(new String[]{
@@ -69,23 +69,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         navigateToFaceLogin(token);
-//        if (hasBackgroundLocationPermission()) {
-//            navigateToFaceLogin(token);
-//        } else {
-//            showBackgroundPermissionDialog(token);
-//        }
-    }    // Launcher for Notifications (Android 13+)
-    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                // If granted, we can run evaluateSessionWorkflow to proceed.
-                // If denied, we bypass evaluateSessionWorkflow directly to avoid the loop,
-                // jumping straight to checking session credentials.
-                if (isGranted) {
-                    evaluateSessionWorkflow();
-                } else {
-                    proceedToAuthCheck();
-                }
-            });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +97,38 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void proceedToAuthCheck() {
+        // Query parameters securely through SecurePrefManager wrapper
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        String authToken = prefManager.getString("authToken", null);
+        String cachedToken = prefManager.getString("cachedTokenPermission", null);
+        boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
+
+        if (isFallback) {
+            showLoginScreen();
+            return;
+        }
+
+        if (cachedToken != null) {
+            if (hasForegroundLocationPermission() && hasBackgroundLocationPermission()) {
+                navigateToFaceLogin(cachedToken);
+            } else {
+                checkPermissionsAndNavigate(cachedToken);
+            }
+        } else if (authToken != null && !isRedirectInProgress) {
+            checkPermissionsAndNavigate(authToken);
+        } else {
+            showLoginScreen();
+        }
+    }    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    evaluateSessionWorkflow();
+                } else {
+                    proceedToAuthCheck();
+                }
+            });
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -134,9 +150,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /**
-     * Entry point for checking runtime configurations like Notifications.
-     */
     private void evaluateSessionWorkflow() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -145,46 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
         }
-
-        // If notification permission is granted (or device is < Android 13), proceed with auth checks
         proceedToAuthCheck();
-    }
-
-    /**
-     * Separated logic to process routing and credential authorization status.
-     * This isolates auth checking from the notification launcher callbacks to prevent runtime StackOverflows.
-     */
-    private void proceedToAuthCheck() {
-        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = prefs.getString("authToken", null);
-        String cachedToken = prefs.getString("cachedTokenPermission", null);
-        boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
-
-        if (isFallback) {
-            showLoginScreen();
-            return;
-        }
-
-        if (cachedToken != null) {
-            if (hasForegroundLocationPermission() && hasBackgroundLocationPermission()) {
-                navigateToFaceLogin(cachedToken);
-            } else {
-                checkPermissionsAndNavigate(cachedToken);
-            }
-        } else if (authToken != null && !isRedirectInProgress) {
-            checkPermissionsAndNavigate(authToken);
-        } else {
-            showLoginScreen();
-        }
-    }
-
-    private void navigateToFaceLogin(String token) {
-        if (isFinishing() || isDestroyed()) return;
-        isRedirectInProgress = true;
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("authToken", token);
-        startActivity(intent);
-        finish();
     }
 
     private void showBackgroundPermissionDialog(String token) {
@@ -209,12 +183,30 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Logout", (dialog, which) -> {
                     dialog.dismiss();
-                    getSharedPreferences("MyPrefs", MODE_PRIVATE).edit().clear().apply();
+                    // Safe execution of clear operations across stored keys
+                    SecurePrefManager.getInstance(LoginActivity.this).clearAll();
                     showLoginScreen();
                 })
                 .create();
 
         backgroundDialog.show();
+    }
+
+    private void navigateToFaceLogin(String token) {
+        if (isFinishing() || isDestroyed()) return;
+        isRedirectInProgress = true;
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("authToken", token);
+        startActivity(intent);
+        finish();
+    }
+
+    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
+        // Rewritten to pipeline updates over hardware-backed encryption streams
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        prefManager.putString("userId", userId);
+        prefManager.putString("emailId", emailId);
+        prefManager.putString("authToken", authToken);
     }
 
     private void showLoginScreen() {
@@ -261,24 +253,6 @@ public class LoginActivity extends AppCompatActivity {
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
-                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
-
-                SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                String cachedToken = prefs.getString("cachedTokenPermission", null);
-
-                if (fineGranted || coarseGranted) {
-                    if (cachedToken != null) {
-                        checkPermissionsAndNavigate(cachedToken);
-                    }
-                } else {
-                    showLoginScreen();
-                    showAlertDialog("Foreground location permission is required for shift tracking.");
-                }
-            });
-
     private void hideLoginScreen() {
         binding.layoutEmail.setVisibility(View.GONE);
         binding.layoutPassword.setVisibility(View.GONE);
@@ -294,15 +268,25 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
+    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+
+                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+                String cachedToken = prefManager.getString("cachedTokenPermission", null);
+
+                if (fineGranted || coarseGranted) {
+                    if (cachedToken != null) {
+                        checkPermissionsAndNavigate(cachedToken);
+                    }
+                } else {
+                    showLoginScreen();
+                    showAlertDialog("Foreground location permission is required for shift tracking.");
+                }
+            });
 
 
-    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
-        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit();
-        editor.putString("userId", userId);
-        editor.putString("emailId", emailId);
-        editor.putString("authToken", authToken);
-        editor.apply();
-    }
 
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
@@ -325,4 +309,6 @@ public class LoginActivity extends AppCompatActivity {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
+
+
 }

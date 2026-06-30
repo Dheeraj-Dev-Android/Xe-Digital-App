@@ -1,9 +1,7 @@
 package app.xedigital.ai.ui.document_upload;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +34,7 @@ import app.xedigital.ai.databinding.FragmentDocumentUploadBinding;
 import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.uploadDocument.UploadDocumentRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -68,10 +67,11 @@ public class DocumentUploadFragment extends Fragment {
         View root = binding.getRoot();
 
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
         authTokenHeader = "jwt " + authToken;
-        userId = sharedPreferences.getString("userId", "");
+        userId = prefManager.getString("userId", "");
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
 

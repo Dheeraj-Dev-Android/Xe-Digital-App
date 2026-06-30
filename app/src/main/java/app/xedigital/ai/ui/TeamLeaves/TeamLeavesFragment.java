@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.TeamLeaves;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +19,7 @@ import java.util.ArrayList;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.TeamLeavesAdapter;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class TeamLeavesFragment extends Fragment {
 
@@ -30,6 +29,7 @@ public class TeamLeavesFragment extends Fragment {
     private ProgressBar progressBar;
     private LinearLayout layoutEmpty;
     private TeamLeavesAdapter adapter;
+    private SecurePrefManager prefManager;
 
     public static TeamLeavesFragment newInstance() {
         return new TeamLeavesFragment();
@@ -57,10 +57,11 @@ public class TeamLeavesFragment extends Fragment {
 
         mViewModel = new ViewModelProvider(this).get(TeamLeavesViewModel.class);
 
-        SharedPreferences prefs = requireContext()
-                .getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = prefs.getString("authToken", null);
-        String employeeId = prefs.getString("userId", null);
+//        SharedPreferences prefs = requireContext()
+//                .getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", null);
+        String employeeId = prefManager.getString("userId", null);
 
         showLoading(true);
         mViewModel.fetchTeamLeaves("jwt " + authToken, employeeId);

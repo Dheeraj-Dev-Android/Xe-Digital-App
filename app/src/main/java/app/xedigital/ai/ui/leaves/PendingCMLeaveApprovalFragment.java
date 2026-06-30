@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.leaves;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -43,6 +41,7 @@ import app.xedigital.ai.model.cmLeaveApprovalPending.AppliedLeavesItem;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,6 +60,7 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
     private ProfileViewModel profileViewModel;
     private OnLeaveApprovalActionListener listener;
     private Button leaveBtnApprove, leaveBtnReject, leaveBtnCancel;
+    private SecurePrefManager securePrefManager;
 
 
     public PendingCMLeaveApprovalFragment() {
@@ -96,9 +96,10 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
         }
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         apiInterface = APIClient.getInstance().UpdateLeaveListApproval();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", "");
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        securePrefManager = SecurePrefManager.getInstance(requireContext());
+        String userId = securePrefManager.getString("userId", "");
+        String authToken = securePrefManager.getString("authToken", "");
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
 
@@ -282,8 +283,8 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         requestBody.setComment(comment);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = securePrefManager.getString("authToken", "");
 
         Call<ResponseBody> leaveCancel = apiInterface.LeavesStatus("jwt " + authToken, leaveId, requestBody);
         leaveCancel.enqueue(new Callback<ResponseBody>() {
@@ -323,8 +324,8 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         requestBody.setComment(comment);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = securePrefManager.getString("authToken", "");
 
         Call<ResponseBody> leaveCancel = apiInterface.LeavesStatus("jwt " + authToken, leaveId, requestBody);
         leaveCancel.enqueue(new Callback<ResponseBody>() {
@@ -365,8 +366,8 @@ public class PendingCMLeaveApprovalFragment extends Fragment {
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         requestBody.setComment("");
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String authToken = securePrefManager.getString("authToken", "");
 
         Call<ResponseBody> leaveCancel = apiInterface.LeavesStatus("jwt " + authToken, leaveId, requestBody);
         leaveCancel.enqueue(new Callback<ResponseBody>() {

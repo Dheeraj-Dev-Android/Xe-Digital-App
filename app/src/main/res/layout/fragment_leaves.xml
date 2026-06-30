@@ -281,12 +281,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
+                        android:backgroundTint="@color/RestrictedHoliday"
                         android:paddingHorizontal="32dp"
                         android:text="Clear"
-                        android:backgroundTint="@color/RestrictedHoliday"
+                        android:textColor="@color/white"
                         android:textSize="14sp"
-                        app:cornerRadius="8dp"
-                        android:textColor="@color/white" />
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
 
             </LinearLayout>

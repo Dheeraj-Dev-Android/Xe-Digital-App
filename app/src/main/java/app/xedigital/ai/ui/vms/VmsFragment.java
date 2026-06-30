@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.vms;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +26,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.VisitorClickListener;
 import app.xedigital.ai.adapter.VisitorsAdapter;
 import app.xedigital.ai.model.vms.VisitorsItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class VmsFragment extends Fragment implements VisitorClickListener {
 
@@ -99,8 +98,9 @@ public class VmsFragment extends Fragment implements VisitorClickListener {
         });
 
         // Fetch visitors data
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
         mViewModel.fetchVisitors(authToken);
     }
 

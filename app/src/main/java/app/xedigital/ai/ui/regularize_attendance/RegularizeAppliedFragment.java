@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.regularize_attendance;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +28,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.regularizeApplied.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -41,6 +40,7 @@ public class RegularizeAppliedFragment extends Fragment {
     private RegularizeAppliedAdapter regularizeAppliedAdapter;
     private RegularizeAppliedResponse apiResponse;
     private String currentFilterStatus = "All";
+    private SecurePrefManager prefManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,8 +61,9 @@ public class RegularizeAppliedFragment extends Fragment {
 
         loadingProgress.setVisibility(View.VISIBLE);
         APIInterface apiInterface = APIClient.getInstance().getRegularizeApplied();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
 
         retrofit2.Call<RegularizeAppliedResponse> call = apiInterface.getRegularizeApplied("jwt " + authToken);
         call.enqueue(new Callback<RegularizeAppliedResponse>() {

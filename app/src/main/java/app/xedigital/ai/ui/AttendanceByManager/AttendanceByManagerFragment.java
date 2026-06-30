@@ -1,8 +1,6 @@
 package app.xedigital.ai.ui.AttendanceByManager;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +35,7 @@ import app.xedigital.ai.adapter.AttendanceByManagerAdapter;
 import app.xedigital.ai.model.AttandanceByManager.EmployeePunchDataItem;
 import app.xedigital.ai.model.TeamUnderManagerResponse.EmployeesItem;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class AttendanceByManagerFragment extends Fragment {
 
@@ -133,9 +132,10 @@ public class AttendanceByManagerFragment extends Fragment {
             showEmptyState();
         });
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("authToken", null);
-        String managerId = sharedPreferences.getString("userId", null);
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String token = prefManager.getString("authToken", null);
+        String managerId = prefManager.getString("userId", null);
 
         showLoading();
         mViewModel.fetchEmployeesUnderManager(token, managerId);

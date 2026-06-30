@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.attendance;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +29,7 @@ import app.xedigital.ai.model.addAttendanceRequest.AddedAttendanceCancelRequest;
 import app.xedigital.ai.model.addedAttendanceList.AddAttendanceRegularizeAppliedItem;
 import app.xedigital.ai.ui.regularize_attendance.RegularizeViewFragment;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -160,8 +159,9 @@ public class DetailViewAddAttendanceFragment extends Fragment {
     }
 
     private void updateAttendanceStatus() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
         String attendanceId = attendanceItem != null ? attendanceItem.getId() : null;
         if (attendanceId == null) {
             return;

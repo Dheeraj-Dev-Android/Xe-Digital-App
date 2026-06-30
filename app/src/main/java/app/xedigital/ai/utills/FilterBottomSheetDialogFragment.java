@@ -1,8 +1,6 @@
 package app.xedigital.ai.utills;
 
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,8 +76,9 @@ public class FilterBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void initializeAuthToken() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString(AUTH_TOKEN_KEY, null);
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString(AUTH_TOKEN_KEY, null);
         timesheetViewModel.storeLoginData(authToken);
     }
 

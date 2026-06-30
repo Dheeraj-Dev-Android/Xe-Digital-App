@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.leaves;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +26,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesItem;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -60,8 +59,9 @@ public class AppliedLeaveFragment extends Fragment {
         loadingProgress.setVisibility(View.VISIBLE);
 
         APIInterface apiInterface = APIClient.getInstance().AppliedLeave();
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
 
         retrofit2.Call<AppliedLeavesResponse> appliedLeaves = apiInterface.getAppliedLeaves("jwt " + authToken);
         appliedLeaves.enqueue(new Callback<AppliedLeavesResponse>() {

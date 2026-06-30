@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.holidays;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +28,7 @@ import java.util.Locale;
 import app.xedigital.ai.adapter.HolidayAdapter;
 import app.xedigital.ai.databinding.FragmentHolidaysBinding;
 import app.xedigital.ai.model.holiday.HolidaysItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 
 public class HolidaysFragment extends Fragment {
@@ -60,8 +59,9 @@ public class HolidaysFragment extends Fragment {
         binding.recyclerViewHolidays.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerViewHolidays.setAdapter(holidayAdapter);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        String authToken = prefManager.getString("authToken", "");
         loadHolidays(authToken);
 
 

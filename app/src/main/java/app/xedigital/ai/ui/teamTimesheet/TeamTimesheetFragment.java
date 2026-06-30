@@ -2,8 +2,6 @@ package app.xedigital.ai.ui.teamTimesheet;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,17 +37,17 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.model.TeamTimesheetResponse.Employee;
 import app.xedigital.ai.model.TeamTimesheetResponse.EmployeesDcrDataItem;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class TeamTimesheetFragment extends Fragment implements TimesheetAdapter.OnTimesheetClickListener {
 
+    private final List<String> uniqueEmployeeNamesList = new ArrayList<>();
     private TeamTimesheetViewModel mViewModel;
     private RecyclerView timesheetRecyclerView;
     private ProgressBar loadingProgressBar;
     private LinearLayout emptyStateContainer;
     private TextView emptyStateText;
     private TimesheetAdapter adapter;
-
-    private final List<String> uniqueEmployeeNamesList = new ArrayList<>();
     private LinearLayout layoutEmployeePicker;
     private TextView tvSelectedEmployee;
     private TextInputEditText etFromDate;
@@ -198,10 +196,11 @@ public class TeamTimesheetFragment extends Fragment implements TimesheetAdapter.
 
     private void loadCredentialsAndFetch() {
         if (getContext() == null) return;
-        SharedPreferences preferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        if (preferences != null) {
-            String token = preferences.getString("authToken", null);
-            String userId = preferences.getString("userId", null);
+//        SharedPreferences preferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+        if (prefManager != null) {
+            String token = prefManager.getString("authToken", null);
+            String userId = prefManager.getString("userId", null);
             if (loadingProgressBar != null) loadingProgressBar.setVisibility(View.VISIBLE);
             mViewModel.fetchDcrDataForRM(token, userId);
             mViewModel.fetchEmployeeUnderRM(token, userId);

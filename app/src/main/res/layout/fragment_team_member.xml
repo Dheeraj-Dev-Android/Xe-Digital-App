@@ -33,8 +33,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/background_surface"
                     app:cardCornerRadius="16dp"
                     app:strokeColor="@color/divider"
@@ -56,20 +56,20 @@
                             android:id="@+id/stat_direct_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:text="0"
                             android:textColor="@color/colorPrimary"
                             android:textSize="28sp"
-                            android:fontFamily="@font/quicksand_font_family"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Direct"
-                            android:letterSpacing="0.1"
-                            android:textColor="@color/text_tertiary"
                             android:fontFamily="@font/quicksand_font_family"
+                            android:letterSpacing="0.1"
+                            android:text="Direct"
+                            android:textColor="@color/text_tertiary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -80,8 +80,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginHorizontal="6dp"
+                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/background_surface"
                     app:cardCornerRadius="16dp"
                     app:strokeColor="@color/divider"
@@ -103,20 +103,20 @@
                             android:id="@+id/stat_cross_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:text="0"
                             android:textColor="@color/colorSecondary"
                             android:textSize="28sp"
-                            android:fontFamily="@font/quicksand_font_family"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Cross"
-                            android:letterSpacing="0.1"
-                            android:textColor="@color/text_tertiary"
                             android:fontFamily="@font/quicksand_font_family"
+                            android:letterSpacing="0.1"
+                            android:text="Cross"
+                            android:textColor="@color/text_tertiary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -127,8 +127,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginStart="6dp"
+                    android:layout_weight="1"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardCornerRadius="16dp">
 
@@ -148,20 +148,20 @@
                             android:id="@+id/stat_total_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:text="0"
                             android:textColor="@color/white"
                             android:textSize="28sp"
-                            android:fontFamily="@font/quicksand_font_family"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Total"
-                            android:letterSpacing="0.1"
-                            android:textColor="#B3FFFFFF"
                             android:fontFamily="@font/quicksand_font_family"
+                            android:letterSpacing="0.1"
+                            android:text="Total"
+                            android:textColor="#B3FFFFFF"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -188,8 +188,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <!-- Avatar -->
@@ -198,11 +198,11 @@
                         android:layout_width="52dp"
                         android:layout_height="52dp"
                         android:background="@drawable/bg_avatar_me"
+                        android:fontFamily="@font/quicksand_font_family"
                         android:gravity="center"
                         android:textColor="@color/white"
                         android:textSize="17sp"
                         android:textStyle="bold"
-                        android:fontFamily="@font/quicksand_font_family"
                         tools:text="AB" />
 
                     <!-- Name + Role -->
@@ -217,10 +217,10 @@
                             android:id="@+id/me_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold"
-                            android:fontFamily="@font/quicksand_font_family"
                             tools:text="John Doe" />
 
                         <TextView
@@ -228,9 +228,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:fontFamily="@font/quicksand_font_family"
                             android:textColor="@color/text_tertiary"
                             android:textSize="12sp"
-                            android:fontFamily="@font/quicksand_font_family"
                             tools:text="Senior Manager" />
 
                     </LinearLayout>
@@ -275,11 +275,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:fontFamily="@font/quicksand_font_family"
                     android:letterSpacing="0.1"
                     android:text="DIRECT REPORTEES"
                     android:textColor="@color/text_primary"
                     android:textSize="11sp"
-                    android:fontFamily="@font/quicksand_font_family"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -288,8 +288,8 @@
                 android:id="@+id/recyclerViewDirect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp" />
@@ -317,11 +317,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:fontFamily="@font/quicksand_font_family"
                     android:letterSpacing="0.1"
                     android:text="CROSS REPORTEES"
                     android:textColor="@color/text_primary"
                     android:textSize="11sp"
-                    android:fontFamily="@font/quicksand_font_family"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -330,8 +330,8 @@
                 android:id="@+id/recyclerViewCross"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp" />
@@ -373,11 +373,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="No team members found"
             android:textColor="@color/text_tertiary"
-            android:textSize="14sp"
-            android:fontFamily="@font/quicksand_font_family" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 

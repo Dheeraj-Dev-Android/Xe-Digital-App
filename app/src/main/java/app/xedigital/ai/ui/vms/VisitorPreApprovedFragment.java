@@ -1,9 +1,7 @@
 package app.xedigital.ai.ui.vms;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -52,6 +50,7 @@ import app.xedigital.ai.model.faceAdd.AddFaceResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.visitorsDetails.VisitorsDetailsResponse;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -66,6 +65,7 @@ public class VisitorPreApprovedFragment extends Fragment {
     private Uri selectedImageUri;
     private String authToken, userId, empEmail;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private SecurePrefManager prefManager;
 
     public static VisitorPreApprovedFragment newInstance() {
         return new VisitorPreApprovedFragment();
@@ -89,10 +89,11 @@ public class VisitorPreApprovedFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(VisitorPreApprovedViewModel.class);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        authToken = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
-        empEmail = sharedPreferences.getString("emailId", "");
+//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefManager = SecurePrefManager.getInstance(requireContext());
+        authToken = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
+        empEmail = prefManager.getString("emailId", "");
         mViewModel.fetchUserProfile(empEmail, "jwt " + authToken);
 
         mViewModel.getUserProfileLiveData().observe(getViewLifecycleOwner(), userProfileByEmailResponse -> {
