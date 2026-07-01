@@ -23,7 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
 
-import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
@@ -42,10 +41,8 @@ public class LoginActivity extends AppCompatActivity {
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
 
-    // Launcher for Background Location (Android 10+)
     private final ActivityResultLauncher<String> backgroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                // Using SecurePrefManager instead of unencrypted SharedPreferences
                 SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
                 String cachedToken = prefManager.getString("cachedTokenPermission", null);
 
@@ -58,9 +55,7 @@ public class LoginActivity extends AppCompatActivity {
             });
 
     private void checkPermissionsAndNavigate(String token) {
-        // Encrypted save for the transitional permission token
         SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
-
         if (!hasForegroundLocationPermission()) {
             foregroundPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -78,16 +73,13 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
-
         hideLoginScreen();
-
         Glide.with(this).load(R.mipmap.ic_launcher)
                 .into(binding.logoImage);
 
         binding.btnSignIn.setOnClickListener(v -> {
             String email = Objects.requireNonNull(binding.editEmail.getText()).toString().trim();
             String password = Objects.requireNonNull(binding.editPassword.getText()).toString().trim();
-
             if (email.isEmpty() || password.isEmpty()) {
                 if (email.isEmpty()) binding.editEmail.setError("Email Required");
                 if (password.isEmpty()) binding.editPassword.setError("Password Required");
@@ -98,17 +90,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void proceedToAuthCheck() {
-        // Query parameters securely through SecurePrefManager wrapper
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         String authToken = prefManager.getString("authToken", null);
         String cachedToken = prefManager.getString("cachedTokenPermission", null);
         boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
-
         if (isFallback) {
             showLoginScreen();
             return;
         }
-
         if (cachedToken != null) {
             if (hasForegroundLocationPermission() && hasBackgroundLocationPermission()) {
                 navigateToFaceLogin(cachedToken);
@@ -120,6 +109,15 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             showLoginScreen();
         }
+    }
+
+    private void navigateToFaceLogin(String token) {
+        if (isFinishing() || isDestroyed()) return;
+        isRedirectInProgress = true;
+        Intent intent = new Intent(this, FaceLoginActivity.class);
+        intent.putExtra("authToken", token);
+        startActivity(intent);
+        finish();
     }    private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -192,17 +190,9 @@ public class LoginActivity extends AppCompatActivity {
         backgroundDialog.show();
     }
 
-    private void navigateToFaceLogin(String token) {
-        if (isFinishing() || isDestroyed()) return;
-        isRedirectInProgress = true;
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("authToken", token);
-        startActivity(intent);
-        finish();
-    }
+
 
     private void storeInSharedPreferences(String userId, String emailId, String authToken) {
-        // Rewritten to pipeline updates over hardware-backed encryption streams
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         prefManager.putString("userId", userId);
         prefManager.putString("emailId", emailId);
@@ -286,8 +276,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
-
-
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
 
@@ -309,6 +297,4 @@ public class LoginActivity extends AppCompatActivity {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
-
-
 }

@@ -27,7 +27,6 @@ public class SecurePrefManager {
             );
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
-            // Secure fallback to isolated preferences if hardware keystore errors occur
             sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
         }
     }
