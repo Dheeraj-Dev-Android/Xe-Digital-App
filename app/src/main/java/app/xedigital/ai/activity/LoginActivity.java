@@ -23,6 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
 
+import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
@@ -114,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
     private void navigateToFaceLogin(String token) {
         if (isFinishing() || isDestroyed()) return;
         isRedirectInProgress = true;
-        Intent intent = new Intent(this, FaceLoginActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("authToken", token);
         startActivity(intent);
         finish();

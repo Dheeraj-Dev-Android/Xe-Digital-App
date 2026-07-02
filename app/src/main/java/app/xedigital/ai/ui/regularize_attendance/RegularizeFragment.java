@@ -87,7 +87,6 @@ public class RegularizeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         token = prefManager.getString("authToken", "");
         String authToken = prefManager.getString("authToken", "");
@@ -96,7 +95,6 @@ public class RegularizeFragment extends Fragment {
         profileViewModel.storeLoginData(userId, authToken);
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
-//            Log.d("RegularizeFragment", "Observer triggered");
             if (userProfile != null) {
                 this.userProfile = userProfile;
             } else {
@@ -105,9 +103,11 @@ public class RegularizeFragment extends Fragment {
         });
 
         profileViewModel.fetchUserProfile();
+
+        // --- Safe Autofill Logic ---
         if (attendanceItem != null) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm", Locale.getDefault());
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
             timeFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
 
             try {
@@ -142,21 +142,24 @@ public class RegularizeFragment extends Fragment {
 
                 if (punchInTime != null) {
                     timePunchIn.setText(timeFormatter.format(punchInTime));
+                } else {
+                    timePunchIn.setText("");
                 }
 
                 if (punchOutTime != null) {
                     timePunchOut.setText(timeFormatter.format(punchOutTime));
+                } else {
+                    timePunchOut.setText("");
                 }
 
-                etPunchInAddress.setText(attendanceItem.getPunchInAddress());
-                etPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
+                // Handles cases where addresses are null without causing a crash
+                etPunchInAddress.setText(attendanceItem.getPunchInAddress() != null ? attendanceItem.getPunchInAddress() : "");
+                etPunchOutAddress.setText(attendanceItem.getPunchOutAddress() != null ? attendanceItem.getPunchOutAddress() : "");
 
             } catch (ParseException e) {
-                // Handle ParseException, e.g., log the error
                 Log.e("RegularizeFragment", "Error parsing date/time: " + e.getMessage());
             }
         }
-
 
         btSubmit.setOnClickListener(v -> {
             if (validateForm()) {
@@ -174,13 +177,8 @@ public class RegularizeFragment extends Fragment {
                 }
             }
         });
-        btnClear.setOnClickListener(v -> {
-            timePunchIn.setText("");
-            timePunchOut.setText("");
-            etPunchInAddress.setText("");
-            etPunchOutAddress.setText("");
-            etRemarks.setText("");
-        });
+
+        btnClear.setOnClickListener(v -> clearForm());
 
         timePunchIn.setOnClickListener(v -> {
             final Calendar c = Calendar.getInstance();
@@ -188,18 +186,21 @@ public class RegularizeFragment extends Fragment {
             int minute = c.get(Calendar.MINUTE);
 
             TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), (view12, hourOfDay, minute1) -> {
-                String selectedTime = String.format(Locale.getDefault(), "%d:%02d", hourOfDay, minute1);
+                // Formats with %02d to ensure standard HH:mm layout
+                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
                 timePunchIn.setText(selectedTime);
             }, hour, minute, false);
             timePickerDialog.show();
         });
+
         timePunchOut.setOnClickListener(v -> {
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
 
             TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), (view12, hourOfDay, minute1) -> {
-                String selectedTime = String.format(Locale.getDefault(), "%d:%02d", hourOfDay, minute1);
+                // Formats with %02d to ensure standard HH:mm layout
+                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
                 timePunchOut.setText(selectedTime);
             }, hour, minute, false);
             timePickerDialog.show();
@@ -212,17 +213,13 @@ public class RegularizeFragment extends Fragment {
         apiInterface = APIClient.getInstance().RegularizeAttendance();
         if (getArguments() != null) {
             attendanceItem = (EmployeePunchDataItem) getArguments().getSerializable(ARG_ATTENDANCE_ITEM);
-//            Log.d("RegularizeFragment", "Attendance Item: " + attendanceItem);
-            if (attendanceItem != null) {
-//                Log.d("RegularizeFragment", "Attendance Item ID: " + attendanceItem.getId());
-            } else {
+            if (attendanceItem == null) {
                 Log.d("RegularizeFragment", "Attendance Item is null");
             }
         }
     }
 
     private void clearForm() {
-        atDate.setText("");
         timePunchIn.setText("");
         timePunchOut.setText("");
         etPunchInAddress.setText("");
@@ -253,7 +250,6 @@ public class RegularizeFragment extends Fragment {
             isValid = false;
         }
         return isValid;
-
     }
 
     private void regularize(String token, String id, String date, String punchIn, String punchOut, String punchInAddress, String punchOutAddress, String remarks) {
@@ -271,41 +267,45 @@ public class RegularizeFragment extends Fragment {
         requestBody.setEmployeeLastName(attendanceItem.getEmpLastName());
         requestBody.setHrEmail("hr@cloudfence.ai");
         requestBody.setPunchIn(attendanceItem.getPunchIn());
-        String dateTimeStr = attendanceItem.getPunchDate();
 
-// Parse the date and time string
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        LocalDate punchDate = LocalDate.parse(dateTimeStr, dateTimeFormatter);
-// Format the date only
-        DateTimeFormatter dateOnlyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String punchDateOnly = punchDate.format(dateOnlyFormatter);
-// Set the formatted date to punchDate
-        requestBody.setPunchDate(punchDateOnly);
+        // --- Fixed Date Logic ---
+        // Reads directly from user-selected field to guarantee calculations build on the proper day
+        String dateFieldStr = Objects.requireNonNull(atDate.getText()).toString();
+        DateTimeFormatter dateFieldFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault());
+        LocalDate punchDate = LocalDate.parse(dateFieldStr, dateFieldFormatter);
+
+        requestBody.setPunchDate(dateFieldStr);
         requestBody.setPunchInAddress(punchInAddress);
         requestBody.setPunchInTime(punchIn);
         requestBody.setPunchOut(attendanceItem.getPunchOut());
         requestBody.setPunchOutAddress(punchOutAddress);
         requestBody.setPunchOutTime(punchOut);
 
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:mm");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault());
         ZoneId inputTimeZone = ZoneId.of("Asia/Kolkata");
-        // --- punchIn ---
-        LocalTime localPunchInTime = LocalTime.parse(punchIn, timeFormatter);
-        // Convert local time to UTC
-        ZonedDateTime zonedPunchInTime = ZonedDateTime.of(punchDate, localPunchInTime, inputTimeZone);
-        OffsetDateTime utcPunchInTime = zonedPunchInTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        String punchInUpdate = utcPunchInTime.format(formatter);
-        requestBody.setPunchInUpdate(punchInUpdate);
+        DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
 
-        // --- punchOut ---
-        LocalTime localPunchOutTime = LocalTime.parse(punchOut, timeFormatter);
-        // Convert local time to UTC
-        ZonedDateTime zonedPunchOutTime = ZonedDateTime.of(punchDate, localPunchOutTime, inputTimeZone);
-        OffsetDateTime utcPunchOutTime = zonedPunchOutTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+        try {
+            // --- punchIn ---
+            LocalTime localPunchInTime = LocalTime.parse(punchIn, timeFormatter);
+            ZonedDateTime zonedPunchInTime = ZonedDateTime.of(punchDate, localPunchInTime, inputTimeZone);
+            OffsetDateTime utcPunchInTime = zonedPunchInTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+            String punchInUpdate = utcPunchInTime.format(outFormatter);
+            requestBody.setPunchInUpdate(punchInUpdate);
 
-        String punchOutUpdate = utcPunchOutTime.format(formatter);
-        requestBody.setPunchOutUpdate(punchOutUpdate);
+            // --- punchOut ---
+            LocalTime localPunchOutTime = LocalTime.parse(punchOut, timeFormatter);
+            ZonedDateTime zonedPunchOutTime = ZonedDateTime.of(punchDate, localPunchOutTime, inputTimeZone);
+            OffsetDateTime utcPunchOutTime = zonedPunchOutTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+            String punchOutUpdate = utcPunchOutTime.format(outFormatter);
+            requestBody.setPunchOutUpdate(punchOutUpdate);
+
+        } catch (Exception e) {
+            Log.e("RegularizeFragment", "Error converting times to UTC: " + e.getMessage());
+            Toast.makeText(requireContext(), "Error processing selected times.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (userProfile != null) {
             String reportingManagerId = userProfile.getData().getEmployee().getReportingManager().getId();
             String reportingManagerEmail = userProfile.getData().getEmployee().getReportingManager().getEmail();
@@ -319,7 +319,6 @@ public class RegularizeFragment extends Fragment {
             requestBody.setReportingManagerFirstName(reportingManagerFirstName);
             requestBody.setReportingManagerLastName(reportingManagerLastName);
             requestBody.setCrossManager(crossManager);
-
         }
 
         Call<ResponseBody> call = apiInterface.RegularizeApi("jwt " + token, attendanceId, requestBody);
@@ -331,19 +330,18 @@ public class RegularizeFragment extends Fragment {
                         String responseBodyString = response.body().string();
                         JSONObject jsonObject = new JSONObject(responseBodyString);
                         String message = jsonObject.getString("message");
-//                        Log.d("AddAttendanceMessage", message);
                         showAlertDialog("Attendance Regularize Applied", message);
                     } else {
                         showAlertDialog("Error", "Regularization failed");
                     }
                 } catch (IOException | JSONException e) {
-                    showAlertDialog("Error", "An error occurred");
+                    showAlertDialog("Error", "An error occurred parsing server response");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                showAlertDialog("Error", "Regularization failed");
+                showAlertDialog("Error", "Network connection failure");
             }
 
             private void showAlertDialog(String title, String message) {

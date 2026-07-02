@@ -56,7 +56,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<String> underProcessTextState = new MutableLiveData<>("");
     // Status Observers for Fragment
     public final MutableLiveData<Boolean> isTravelSelected = new MutableLiveData<>(false);
-    public final MutableLiveData<Integer> transportLayoutType = new MutableLiveData<>(0); // 1: Shared, 2: Dedicated, 0: Gone
+    public final MutableLiveData<Integer> transportLayoutType = new MutableLiveData<>(0);
     public final MutableLiveData<Boolean> showCustomTransportInput = new MutableLiveData<>(false);
     public final MutableLiveData<String> toastMessage = new MutableLiveData<>();
     public final MutableLiveData<Boolean> operationSuccess = new MutableLiveData<>();
@@ -64,7 +64,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final String[] imageUrls = new String[10];
     public final String[] imageKeys = new String[10];
     private final APIInterface apiInterface;
-    // Profile & Context Cache
     public int claimLength;
     public String hrMail;
     private Employee employeeCache;

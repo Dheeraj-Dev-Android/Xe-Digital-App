@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,7 +20,6 @@ import com.google.gson.GsonBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import app.xedigital.ai.R;
@@ -47,6 +45,8 @@ public class PendingApprovalViewFragment extends Fragment {
     private ProfileViewModel profileViewModel;
     private String reportingManager;
     private AttendanceApprovalBinding binding;
+    private static final String TAG = "PendingApprovalViewFrag";
+    private String approverName;
     private OnRegularizeApprovalActionListener listener;
     private SecurePrefManager prefManager;
 
@@ -82,12 +82,21 @@ public class PendingApprovalViewFragment extends Fragment {
         if (getArguments() != null) {
             item = (AttendanceRegularizeAppliedItem) getArguments().getSerializable(ARG_ATTENDANCE_ID);
         }
-        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        apiInterface = APIClient.getInstance().UpdateRegularizeListApproval();
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         prefManager = SecurePrefManager.getInstance(requireContext());
+
+        if (getActivity() != null) {
+            profileViewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
+            Log.d(TAG, "onCreate: ViewModel provided with Activity context scope");
+        } else {
+            profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+            Log.d(TAG, "onCreate: ViewModel provided with Fragment context scope");
+        }
+
+        apiInterface = APIClient.getInstance().UpdateRegularizeListApproval();
         String userId = prefManager.getString("userId", "");
         String authToken = prefManager.getString("authToken", "");
+
+        Log.d(TAG, "onCreate: Fetching user profile for userId: " + userId);
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
     }
@@ -178,27 +187,59 @@ public class PendingApprovalViewFragment extends Fragment {
             profileViewModel = new ViewModelProvider((FragmentActivity) requireContext()).get(ProfileViewModel.class);
         }
 
-        if (ViewTreeLifecycleOwner.get(binding.getRoot()) != null) {
-            profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(binding.getRoot())), userProfile -> {
-                if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee().getReportingManager() != null) {
-                    String reportingManagerFirstName = userProfile.getData().getEmployee().getReportingManager().getFirstname();
-                    String reportingManagerLastName = userProfile.getData().getEmployee().getReportingManager().getLastname();
-                    if (reportingManagerFirstName != null && reportingManagerLastName != null) {
-                        reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                    }
+        profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
+            Log.d(TAG, "userProfile Observer: Received update trigger");
+            if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null) {
+                String firstName = userProfile.getData().getEmployee().getFirstname();
+                String lastName = userProfile.getData().getEmployee().getLastname();
+                Log.d(TAG, "userProfile Observer: Parsed name values -> firstname: " + firstName + ", lastname: " + lastName);
+
+                if (firstName != null && lastName != null) {
+                    approverName = firstName + " " + lastName;
+                    Log.d(TAG, "userProfile Observer: Set approverName to: " + approverName);
                 }
-            });
-        }
+            } else {
+                Log.w(TAG, "userProfile Observer: profile structural hierarchy returns null elements");
+            }
+        });
+
         return view;
     }
 
+    private String resolveApproverIdentity() {
+        if (approverName != null && !approverName.trim().isEmpty()) {
+            Log.d(TAG, "resolveApproverIdentity: Using runtime approverName variable -> " + approverName);
+            return approverName;
+        } else if (item != null && item.getApprovedByName() != null && !item.getApprovedByName().trim().isEmpty()) {
+            Log.d(TAG, "resolveApproverIdentity: Using metadata value -> " + item.getApprovedByName());
+            return item.getApprovedByName();
+        } else {
+            String savedName = prefManager.getString("username", "");
+            Log.d(TAG, "resolveApproverIdentity: Using shared preferences fallback -> " + savedName);
+            return savedName;
+        }
+    }
+
     public void handleApprove(String attendanceId) {
+        String finalApprover = resolveApproverIdentity();
+
+        // Strict Pre-flight structural validate check
+        if (finalApprover == null || finalApprover.trim().isEmpty()) {
+            Log.e(TAG, "CRITICAL ERROR: Calculated approver identity string is blank! Aborting Approve API hit.");
+            Toast.makeText(requireContext(), "Error: Approver Identity missing. Request aborted.", Toast.LENGTH_LONG).show();
+            return;
+        }
         RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
+        requestBody.setPunchInUpdated(item.getPunchInUpdated());
+        requestBody.setPunchOutUpdated(item.getPunchOutUpdated());
+        requestBody.setPunchInAddressUpdated(item.getPunchInAddressUpdated());
+        requestBody.setPunchOutAddressUpdated(item.getPunchOutAddressUpdated());
         requestBody.setStatus("Approved");
-        requestBody.setApprovedByName(reportingManager);
+        requestBody.setApprovedByName(finalApprover);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
 //        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefManager.getString("authToken", "");
+        Log.i(TAG, "handleApprove: Dispatching PUT request. Payload json -> " + gson.toJson(requestBody));
 
         Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
         call.enqueue(new Callback<ResponseBody>() {
