@@ -16,13 +16,21 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
+import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
+import app.xedigital.ai.model.Food.FoodRequest;
 import app.xedigital.ai.model.branch.UserBranchResponse;
+import app.xedigital.ai.model.businessUnit.BusItem;
+import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
+import app.xedigital.ai.model.businessUnit.BusinessUnitSpinnerItem;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
+import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
 import app.xedigital.ai.model.profile.Employee;
@@ -44,7 +52,9 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final LiveData<List<String>> sharedTransportModes = new MutableLiveData<>(Arrays.asList("Select an option", "Auto", "Car", "E-Rickshaw", "Metro", "Others"));
     public final LiveData<List<String>> dedicatedTransportModes = new MutableLiveData<>(Arrays.asList("Select an option", "Two-Wheeler", "Three-Wheeler", "Others"));
     public final LiveData<List<String>> currencyDropdown = new MutableLiveData<>(Arrays.asList("Select an option", "INR", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SEK", "NZD"));
-    // Dynamic UI State Observations
+    public final MutableLiveData<List<BusinessUnitSpinnerItem>> businessUnitsSpinnerData = new MutableLiveData<>();
+    public final MutableLiveData<String> selectedBusinessUnitId = new MutableLiveData<>("");
+    public final MutableLiveData<List<String>> employeesList = new MutableLiveData<>(new ArrayList<>(Collections.singletonList("Please Select")));
     public final MutableLiveData<String> claimDate = new MutableLiveData<>("");
     public final MutableLiveData<String> projectName = new MutableLiveData<>("");
     public final MutableLiveData<String> purposeOfMeeting = new MutableLiveData<>("");
@@ -54,13 +64,11 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<String> remarks = new MutableLiveData<>("");
     public final MutableLiveData<String> customTransportInput = new MutableLiveData<>("");
     public final MutableLiveData<String> underProcessTextState = new MutableLiveData<>("");
-    // Status Observers for Fragment
     public final MutableLiveData<Boolean> isTravelSelected = new MutableLiveData<>(false);
     public final MutableLiveData<Integer> transportLayoutType = new MutableLiveData<>(0);
     public final MutableLiveData<Boolean> showCustomTransportInput = new MutableLiveData<>(false);
     public final MutableLiveData<String> toastMessage = new MutableLiveData<>();
     public final MutableLiveData<Boolean> operationSuccess = new MutableLiveData<>();
-    // File Data Holders (Arrays up to index 9 replacing unique strings)
     public final String[] imageUrls = new String[10];
     public final String[] imageKeys = new String[10];
     private final APIInterface apiInterface;
@@ -71,7 +79,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public ClaimManagementViewModel(@NonNull Application application) {
         super(application);
-        apiInterface = APIClient.getInstance().getClaimLength();
+        apiInterface = APIClient.getInstance().getApi();
     }
 
     public void initAuth(String authToken) {
@@ -107,11 +115,15 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     String branchId = response.body().getData().getBranch().getId();
                     getBranchData(branchId);
+                } else {
+                    Log.e("User", "Failed to fetch user data: " + response.code());
                 }
+
             }
 
             @Override
             public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
+                Log.e("User", "Error: " + t.getMessage());
             }
         });
     }
@@ -122,11 +134,118 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             public void onResponse(@NonNull Call<UserBranchResponse> call, @NonNull Response<UserBranchResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     hrMail = response.body().getData().getBranch().getNotificationEmail();
+                } else {
+                    Log.e("Branch", "Failed to fetch branch data: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserBranchResponse> call, @NonNull Throwable t) {
+                Log.e("Branch", "Error: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getClaimPrices(String authTokenHeader) {
+        String authToken = "jwt " + authTokenHeader;
+        APIClient.getInstance().getApi().getClaimPrices(authToken).enqueue(new Callback<ClaimPriceResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<ClaimPriceResponse> call, @NonNull Response<ClaimPriceResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("ClaimPrices", "Claim Prices: " + response.body().getData().toString());
+                } else {
+                    Log.e("ClaimPrices", "Failed to fetch claim prices: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ClaimPriceResponse> call, @NonNull Throwable t) {
+                Log.e("ClaimPrices", "Error: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getBusinessUnit(String authTokenHeader) {
+        String authToken = "jwt " + authTokenHeader;
+        APIClient.getInstance().getApi().getBusinessUnit(authToken).enqueue(new Callback<BusinessUnitResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<BusinessUnitResponse> call, @NonNull Response<BusinessUnitResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<BusinessUnitSpinnerItem> list = new ArrayList<>();
+                    list.add(new BusinessUnitSpinnerItem("", "Please Select"));
+
+                    if (response.body().getData() != null && response.body().getData().getBus() != null) {
+                        for (BusItem busItem : response.body().getData().getBus()) {
+                            list.add(new BusinessUnitSpinnerItem(busItem.getId(), busItem.getName()));
+                        }
+                    }
+                    businessUnitsSpinnerData.postValue(list);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<BusinessUnitResponse> call, @NonNull Throwable t) {
+                Log.e("ClaimViewModel", "Failed to fetch business units", t);
+            }
+        });
+    }
+
+    public void getEmployeesByBusinessUnit(String authTokenHeader, String businessUnitId) {
+        if (businessUnitId == null || businessUnitId.isEmpty()) {
+            employeesList.postValue(new ArrayList<>(Collections.singletonList("Please Select")));
+            return;
+        }
+
+        String authToken = "jwt " + authTokenHeader;
+        APIClient.getInstance().getApi().getEmployeesByBusinessUnit(authToken, businessUnitId).enqueue(new Callback<EmployeeByBusinessUnitResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EmployeeByBusinessUnitResponse> call, @NonNull Response<EmployeeByBusinessUnitResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<String> derivedEmployees = new ArrayList<>();
+                    derivedEmployees.add("Please Select");
+
+                    if (response.body().getData() != null && response.body().getData().getResult() != null) {
+                        for (app.xedigital.ai.model.EmployeeByBusinessUnit.ResultItem emp : response.body().getData().getResult()) {
+                            String firstName = emp.getFirstname() != null ? emp.getFirstname() : "";
+                            String lastName = emp.getLastname() != null ? emp.getLastname() : "";
+                            String fullName = (firstName + " " + lastName).trim();
+
+                            if (!fullName.isEmpty()) {
+                                derivedEmployees.add(fullName);
+                            }
+                        }
+                    }
+                    employeesList.postValue(derivedEmployees);
+                } else {
+                    Log.e("BusinessUnitEmployee", "Failed to fetch employees: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EmployeeByBusinessUnitResponse> call, @NonNull Throwable t) {
+                Log.e("BusinessUnitEmployee", "Error fetching employees: " + t.getMessage());
+            }
+        });
+    }
+
+    void getAllEmployees(String authTokenHeader) {
+        String authToken = "jwt " + authTokenHeader;
+        APIClient.getInstance().getApi().getAllEmployees(authToken).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<String> derivedEmployees = new ArrayList<>();
+                    derivedEmployees.add("Please Select");
+                    Log.d("AllEmployees", "All employees fetched successfully");
+
+                } else {
+                    Log.e("AllEmployees", "Failed to fetch all employees: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.e("AllEmployees", "Error fetching all employees: " + t.getMessage());
             }
         });
     }
@@ -152,8 +271,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             jsonObject.put("bucketName", "xe-digital-bucket/claims");
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-
-            // Map endpoints dynamically matching APIClient interface indices
             Call<ResponseBody> uploadCall;
             if (index == 0)
                 uploadCall = APIClient.getInstance().getUploadImage().uploadImage(authTokenHeader, requestBody);
@@ -210,22 +327,10 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     }
 
     public boolean validateAndExecute(boolean isSubmit, String meetingType, String claimCategory, String travelCategory, String transportMode, String sharedMode, String dedicatedMode, String currency) {
-
-        // 1. Fetch current values safely, defaulting to empty string if null
         String dateVal = claimDate.getValue() != null ? claimDate.getValue().trim() : "";
         String projectVal = projectName.getValue() != null ? projectName.getValue().trim() : "";
         String purposeVal = purposeOfMeeting.getValue() != null ? purposeOfMeeting.getValue().trim() : "";
         String amountVal = totalAmount.getValue() != null ? totalAmount.getValue().trim() : "";
-
-        // 2. Log everything to Logcat under the tag "ClaimValidation"
-        Log.d("ClaimValidation", "=== Validation Check ===");
-        Log.d("ClaimValidation", "Claim Date: '" + dateVal + "'");
-        Log.d("ClaimValidation", "Project Name: '" + projectVal + "'");
-        Log.d("ClaimValidation", "Purpose of Meeting: '" + purposeVal + "'");
-        Log.d("ClaimValidation", "Total Amount: '" + amountVal + "'");
-        Log.d("ClaimValidation", "========================");
-
-        // 3. Perform the evaluation using our safe, logged string variables
         if (dateVal.isEmpty() || projectVal.isEmpty() || purposeVal.isEmpty()) {
             toastMessage.setValue("Please populate all required text details.");
             return false;
@@ -238,12 +343,12 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
         if (isSubmit) {
             executeSubmit(meetingType, claimCategory, travelCategory, transportMode, sharedMode, dedicatedMode, currency);
+            executeFood(meetingType, claimCategory, travelCategory, transportMode, sharedMode, dedicatedMode, currency);
         } else {
             executeSave(meetingType, claimCategory, travelCategory, transportMode, sharedMode, dedicatedMode, currency);
         }
         return true;
     }
-
 
     private void executeSave(String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
         ClaimSaveRequest req = new ClaimSaveRequest();
@@ -255,11 +360,14 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 if (response.isSuccessful()) {
                     operationSuccess.setValue(true);
                     toastMessage.setValue("Claim Saved successfully");
+                } else {
+                    Log.e("ClaimSave", "Failed to save claim: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.e("ClaimSave", "Error: " + t.getMessage());
             }
         });
     }
@@ -279,6 +387,28 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+            }
+        });
+    }
+
+    private void executeFood(String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
+        FoodRequest foodRequest = new FoodRequest();
+//        mapCommonSaveData(req, mType, cCat, tCat, tMode, sMode, dMode, curr);
+
+        APIClient.getInstance().getApi().FoodClaimApi(authTokenHeader, foodRequest).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    operationSuccess.setValue(true);
+                    toastMessage.setValue("Food claim submitted successfully");
+                } else {
+                    Log.e("FoodClaim", "Failed to submit food claim: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.e("FoodClaim", "Error: " + t.getMessage());
             }
         });
     }
@@ -320,8 +450,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         req.setEmpTransport(customTransportInput.getValue());
         req.setRemark(remarks.getValue());
         req.setHrEmail(hrMail != null ? hrMail : "");
+//        req.setBusinessUnit(selectedBusinessUnitId.getValue());
 
-        // Dynamic payload mapping array extraction
         req.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
         req.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
         req.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
@@ -413,5 +543,13 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         totalAmount.setValue("");
         remarks.setValue("");
         customTransportInput.setValue("");
+        selectedBusinessUnitId.setValue("");
+        underProcessTextState.setValue("");
+        isTravelSelected.setValue(false);
+        transportLayoutType.setValue(0);
+        showCustomTransportInput.setValue(false);
+        Arrays.fill(imageUrls, null);
+        Arrays.fill(imageKeys, null);
+        employeesList.setValue(new ArrayList<>(Collections.singletonList("Please Select")));
     }
 }

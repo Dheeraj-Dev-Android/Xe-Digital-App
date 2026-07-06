@@ -2,6 +2,8 @@ package app.xedigital.ai.api;
 
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
+import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
+import app.xedigital.ai.model.Food.FoodRequest;
 import app.xedigital.ai.model.TeamLeave.TeamLeaveResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
 import app.xedigital.ai.model.TeamTimesheetResponse.TeamTimesheetResponse;
@@ -17,8 +19,10 @@ import app.xedigital.ai.model.attendance.EmployeeAttendanceResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.bucket.BucketRequest;
 import app.xedigital.ai.model.bucket.BucketResponse;
+import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
 import app.xedigital.ai.model.cfRegularizeApproval.CfRegularizeApprovalResponse;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
+import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
 import app.xedigital.ai.model.cmLeaveApprovalPending.CMLeavePendingResponse;
@@ -93,17 +97,7 @@ public interface APIInterface {
 //    Call<EmployeeAttendanceResponse> getAttendance(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
     @GET("employees/attendance/punch")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
-    Call<EmployeeAttendanceResponse> getAttendance(
-            @Header("Authorization") String authToken,
-            @Query("start") String startDate,
-            @Query("end") String endDate,
-            @Query("sorting") String sorting,
-            @Query("employee") String employee,
-            @Query("page") String page,
-            @Query("limit") String limit,
-            @Query("branch") String branch,
-            @Query("prefix") String prefix
-    );
+    Call<EmployeeAttendanceResponse> getAttendance(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
 
     @GET("holidays")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
@@ -195,13 +189,7 @@ public interface APIInterface {
     //    @GET("employees/attendancePunch/reportingManager")
 //    Call<AttandanceByManagerResponse> getAttendanceByManager(@Header("Authorization") String authToken, @Query("managerId") String managerId);
     @GET("employees/attendancePunch/reportingManager")
-    Call<AttandanceByManagerResponse> getAttendanceByManager(
-            @Header("Authorization") String authToken,
-            @Query("managerId") String managerId,
-            @Query("start") String startDate,
-            @Query("end") String endDate,
-            @Query("employee") String employeeId
-    );
+    Call<AttandanceByManagerResponse> getAttendanceByManager(@Header("Authorization") String authToken, @Query("managerId") String managerId, @Query("start") String startDate, @Query("end") String endDate, @Query("employee") String employeeId);
 
     @GET("employees/reportingManager/{UserId}")
     Call<TeamMemberResponse> getEmployeesByManager(@Header("Authorization") String authToken, @Path("UserId") String managerId);
@@ -215,7 +203,21 @@ public interface APIInterface {
     @GET("employees/dcrDataForRM/{userId}")
     Call<TeamTimesheetResponse> getDcrDataForRM(@Header("Authorization") String authToken, @Path("userId") String userId);
 
-    //    POST APIs
+    @GET("claims/claimPrices")
+    Call<ClaimPriceResponse> getClaimPrices(@Header("Authorization") String authToken);
+
+    @GET("bus/getAll?active=true")
+    Call<BusinessUnitResponse> getBusinessUnit(@Header("Authorization") String authToken);
+
+    @GET("bus/empByBuId/{buId}")
+    Call<EmployeeByBusinessUnitResponse> getEmployeesByBusinessUnit(@Header("Authorization") String authToken, @Path("buId") String buId);
+
+    @GET("employees/allEmp?active=true")
+    Call<ResponseBody> getAllEmployees(@Header("Authorization") String authToken);
+
+    //  POST APIs
+    @POST("claims/food")
+    retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body FoodRequest foodRequest);
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
 

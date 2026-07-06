@@ -39,13 +39,13 @@ import retrofit2.Response;
 public class PendingApprovalViewFragment extends Fragment {
 
     public static final String ARG_ATTENDANCE_ID = "attendance_id";
+    private static final String TAG = "PendingApprovalViewFrag";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private AttendanceRegularizeAppliedItem item;
     private APIInterface apiInterface;
     private ProfileViewModel profileViewModel;
     private String reportingManager;
     private AttendanceApprovalBinding binding;
-    private static final String TAG = "PendingApprovalViewFrag";
     private String approverName;
     private OnRegularizeApprovalActionListener listener;
     private SecurePrefManager prefManager;

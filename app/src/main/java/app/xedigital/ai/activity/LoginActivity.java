@@ -119,14 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("authToken", token);
         startActivity(intent);
         finish();
-    }    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    evaluateSessionWorkflow();
-                } else {
-                    proceedToAuthCheck();
-                }
-            });
+    }
 
     @Override
     protected void onResume() {
@@ -148,6 +141,15 @@ public class LoginActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    evaluateSessionWorkflow();
+                } else {
+                    proceedToAuthCheck();
+                }
+            });
 
     private void evaluateSessionWorkflow() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -190,8 +192,6 @@ public class LoginActivity extends AppCompatActivity {
 
         backgroundDialog.show();
     }
-
-
 
     private void storeInSharedPreferences(String userId, String emailId, String authToken) {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
@@ -259,24 +259,6 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
-                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
-
-                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-                String cachedToken = prefManager.getString("cachedTokenPermission", null);
-
-                if (fineGranted || coarseGranted) {
-                    if (cachedToken != null) {
-                        checkPermissionsAndNavigate(cachedToken);
-                    }
-                } else {
-                    showLoginScreen();
-                    showAlertDialog("Foreground location permission is required for shift tracking.");
-                }
-            });
-
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
 
@@ -298,4 +280,25 @@ public class LoginActivity extends AppCompatActivity {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
+
+
+    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+
+                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+                String cachedToken = prefManager.getString("cachedTokenPermission", null);
+
+                if (fineGranted || coarseGranted) {
+                    if (cachedToken != null) {
+                        checkPermissionsAndNavigate(cachedToken);
+                    }
+                } else {
+                    showLoginScreen();
+                    showAlertDialog("Foreground location permission is required for shift tracking.");
+                }
+            });
+
+
 }

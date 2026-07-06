@@ -52,9 +52,6 @@ public class APIClient {
         return instance;
     }
 
-    // --- API Interfaces ---
-    // Note: To keep memory footprints optimal, consider using separate
-    // OkHttpClients without logging interceptors specifically for getImage/getFace if needed.
 
     public APIInterface getApi() {
         return retrofit2.create(APIInterface.class);

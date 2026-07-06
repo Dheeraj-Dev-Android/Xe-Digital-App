@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,19 +40,19 @@ import java.util.Locale;
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.CurrencyArrayAdapter;
 import app.xedigital.ai.databinding.FragmentClaimManagementBinding;
+import app.xedigital.ai.model.businessUnit.BusinessUnitSpinnerItem;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.SecurePrefManager;
 
 public class ClaimManagementFragment extends Fragment {
 
-    private FragmentClaimManagementBinding binding;
     private final Calendar calendar = Calendar.getInstance();
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-    private ClaimManagementViewModel viewModel;
-    private ActivityResultLauncher<Intent> filePickerLauncher;
-
     // Track uploaded URIs locally to handle flexible deletions easily
     private final List<Uri> selectedFileUris = new ArrayList<>();
+    private FragmentClaimManagementBinding binding;
+    private ClaimManagementViewModel viewModel;
+    private ActivityResultLauncher<Intent> filePickerLauncher;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +64,9 @@ public class ClaimManagementFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(ClaimManagementViewModel.class);
         viewModel.initAuth(authToken);
         viewModel.fetchBranchDetails(userId);
+        viewModel.getClaimPrices(authToken);
+        viewModel.getBusinessUnit(authToken);
+        viewModel.getAllEmployees(authToken);
 
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.storeLoginData(userId, authToken);
@@ -86,6 +91,7 @@ public class ClaimManagementFragment extends Fragment {
         setupPickersAndButtons();
         setupDropdownObservers();
         setupLayoutVisibilityLogic();
+        setupValidationClearListeners();
 
         viewModel.toastMessage.observe(getViewLifecycleOwner(), msg -> {
             if (msg != null) Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
@@ -97,7 +103,10 @@ public class ClaimManagementFragment extends Fragment {
                 binding.selectedFilesContainer.removeAllViews();
                 binding.selectedFileText.setVisibility(View.GONE);
                 binding.forGuestEmployeesCheckbox.setChecked(false);
+                binding.businessUnitDropdown.setSelection(0);
+                viewModel.selectedBusinessUnitId.setValue("");
                 selectedFileUris.clear();
+                clearAllFieldErrors();
             }
         });
 
@@ -115,7 +124,6 @@ public class ClaimManagementFragment extends Fragment {
         binding.uploadButton.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            // Accept images and PDF
             intent.setType("*/*");
             String[] mimeTypes = {"image/jpeg", "application/pdf"};
             intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -146,9 +154,72 @@ public class ClaimManagementFragment extends Fragment {
     }
 
     private void performAction(boolean isSubmit) {
-        viewModel.projectName.setValue(binding.projectName.getText() != null ? binding.projectName.getText().toString() : "");
-        viewModel.purposeOfMeeting.setValue(binding.purposeInput.getText() != null ? binding.purposeInput.getText().toString() : "");
-        viewModel.totalAmount.setValue(binding.amountInput.getText() != null ? binding.amountInput.getText().toString() : "");
+        binding.claimDateInputLayout.setError(null);
+        binding.projectNameLayout.setError(null);
+        binding.purposeInputLayout.setError(null);
+        binding.meetingTypeDropdownLayout.setError(null);
+        binding.amountInputLayout.setError(null);
+        binding.currencyDropdownLayout.setError(null);
+
+        String claimDateVal = binding.claimDateInput.getText() != null ? binding.claimDateInput.getText().toString().trim() : "";
+        String projectNameVal = binding.projectName.getText() != null ? binding.projectName.getText().toString().trim() : "";
+        String purposeVal = binding.purposeInput.getText() != null ? binding.purposeInput.getText().toString().trim() : "";
+        String amountVal = binding.amountInput.getText() != null ? binding.amountInput.getText().toString().trim() : "";
+
+        String meetingTypeVal = binding.meetingTypeDropdown.getSelectedItem() != null ? binding.meetingTypeDropdown.getSelectedItem().toString() : "";
+        String currencyVal = binding.currencyDropdown.getText() != null ? binding.currencyDropdown.getText().toString().trim() : "";
+
+        boolean isValid = true;
+        View focusView = null;
+
+        if (claimDateVal.isEmpty()) {
+            binding.claimDateInputLayout.setError("Claim Date is required");
+            isValid = false;
+            if (focusView == null) focusView = binding.claimDateInput;
+        }
+
+        if (projectNameVal.isEmpty()) {
+            binding.projectNameLayout.setError("Project Name is required");
+            isValid = false;
+            if (focusView == null) focusView = binding.projectName;
+        }
+
+        if (purposeVal.isEmpty()) {
+            binding.purposeInputLayout.setError("Purpose of meeting is required");
+            isValid = false;
+            if (focusView == null) focusView = binding.purposeInput;
+        }
+
+        if (meetingTypeVal.isEmpty() || meetingTypeVal.equalsIgnoreCase("Select an option")) {
+            binding.meetingTypeDropdownLayout.setError("Please select a meeting type");
+            isValid = false;
+            if (focusView == null) focusView = binding.meetingTypeDropdown;
+        }
+
+        if (amountVal.isEmpty()) {
+            binding.amountInputLayout.setError("Total Amount is required");
+            isValid = false;
+            if (focusView == null) focusView = binding.amountInput;
+        }
+
+        if (currencyVal.isEmpty() || currencyVal.equalsIgnoreCase("Select Currency")) {
+            binding.currencyDropdownLayout.setError("Currency selection is required");
+            isValid = false;
+            if (focusView == null) focusView = binding.currencyDropdown;
+        }
+
+        if (!isValid) {
+            if (focusView != null) {
+                focusView.requestFocus();
+            }
+            Toast.makeText(requireContext(), "Please fill all mandatory fields marked with (*)", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        viewModel.claimDate.setValue(claimDateVal);
+        viewModel.projectName.setValue(projectNameVal);
+        viewModel.purposeOfMeeting.setValue(purposeVal);
+        viewModel.totalAmount.setValue(amountVal);
 
         viewModel.startLocation.setValue(binding.startLocationInput.getText() != null ? binding.startLocationInput.getText().toString() : "");
         viewModel.endLocation.setValue(binding.endLocationInput.getText() != null ? binding.endLocationInput.getText().toString() : "");
@@ -160,14 +231,113 @@ public class ClaimManagementFragment extends Fragment {
         String transportShared = binding.transportModeShared.getSelectedItem() != null ? binding.transportModeShared.getSelectedItem().toString() : "";
         String transportDedicated = binding.transportModeDedicated.getSelectedItem() != null ? binding.transportModeDedicated.getSelectedItem().toString() : "";
 
-        viewModel.validateAndExecute(isSubmit,
-                binding.meetingTypeDropdown.getSelectedItem().toString(),
-                binding.claimCategoryDropdown.getSelectedItem().toString(),
-                travelCategory,
-                transportMode,
-                transportShared,
-                transportDedicated,
-                binding.currencyDropdown.getText().toString());
+        viewModel.validateAndExecute(isSubmit, meetingTypeVal, binding.claimCategoryDropdown.getSelectedItem().toString(), travelCategory, transportMode, transportShared, transportDedicated, currencyVal);
+    }
+
+    private void setupValidationClearListeners() {
+        binding.claimDateInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) binding.claimDateInputLayout.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.projectName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) binding.projectNameLayout.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.purposeInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) binding.purposeInputLayout.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.amountInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) binding.amountInputLayout.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.meetingTypeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = parent.getItemAtPosition(position).toString();
+                if (!selected.equalsIgnoreCase("Select an option")) {
+                    binding.meetingTypeDropdownLayout.setError(null);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        binding.currencyDropdown.setOnItemClickListener((parent, view, position, id) -> {
+            binding.currencyDropdownLayout.setError(null);
+        });
+    }
+
+    private void clearAllFieldErrors() {
+        binding.claimDateInputLayout.setError(null);
+        binding.claimDateInputLayout.setErrorEnabled(false);
+        binding.claimDateInputLayout.setErrorEnabled(true);
+
+        binding.projectNameLayout.setError(null);
+        binding.projectNameLayout.setErrorEnabled(false);
+        binding.projectNameLayout.setErrorEnabled(true);
+
+        binding.purposeInputLayout.setError(null);
+        binding.purposeInputLayout.setErrorEnabled(false);
+        binding.purposeInputLayout.setErrorEnabled(true);
+
+        binding.meetingTypeDropdownLayout.setError(null);
+        binding.meetingTypeDropdownLayout.setErrorEnabled(false);
+        binding.meetingTypeDropdownLayout.setErrorEnabled(true);
+
+        binding.amountInputLayout.setError(null);
+        binding.amountInputLayout.setErrorEnabled(false);
+        binding.amountInputLayout.setErrorEnabled(true);
+
+        binding.currencyDropdownLayout.setError(null);
+        binding.currencyDropdownLayout.setErrorEnabled(false);
+        binding.currencyDropdownLayout.setErrorEnabled(true);
     }
 
     private void setupDropdownObservers() {
@@ -178,16 +348,23 @@ public class ClaimManagementFragment extends Fragment {
         viewModel.sharedTransportModes.observe(getViewLifecycleOwner(), list -> binding.transportModeShared.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, list)));
         viewModel.dedicatedTransportModes.observe(getViewLifecycleOwner(), list -> binding.transportModeDedicated.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, list)));
         viewModel.currencyDropdown.observe(getViewLifecycleOwner(), list -> binding.currencyDropdown.setAdapter(new CurrencyArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, list)));
+        viewModel.employeesList.observe(getViewLifecycleOwner(), list -> {
+            if (list != null) {
+                binding.requestedEmployeeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, list));
+            }
+        });
+        viewModel.businessUnitsSpinnerData.observe(getViewLifecycleOwner(), list -> {
+            if (list != null) {
+                ArrayAdapter<BusinessUnitSpinnerItem> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, list);
+                binding.businessUnitDropdown.setAdapter(adapter);
+            }
+        });
     }
 
     private void setupLayoutVisibilityLogic() {
-        binding.forGuestEmployeesCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
-                binding.guestEmployeesFieldsContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE));
+        binding.forGuestEmployeesCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> binding.guestEmployeesFieldsContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE));
 
-        String[] businessUnits = {"Please Select", "BU 1", "BU 2", "BU 3"};
-        binding.businessUnitDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, businessUnits));
-
-        String[] employeesList = {"Please Select", "Employee A", "Employee B", "Employee C"};
+        String[] employeesList = {"Please Select"};
         binding.requestedEmployeeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, employeesList));
 
         String[] mealTypes = {"Please Select", "Dinner", "Breakfast", "lunch", "snacks", "refreshments", "late night meals", "Others"};
@@ -242,42 +419,6 @@ public class ClaimManagementFragment extends Fragment {
         };
         binding.transportModeShared.setOnItemSelectedListener(othersListener);
         binding.transportModeDedicated.setOnItemSelectedListener(othersListener);
-
-        // Handles Chip Selection & explicit unselection states safely
-//        binding.expenseTypeChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-//            StringBuilder sb = new StringBuilder();
-//            boolean travelChecked = false;
-//            boolean foodChecked = false;
-//            boolean accommodationChecked = false;
-//            boolean miscChecked = false;
-//
-//            for (int id : checkedIds) {
-//                Chip chip = group.findViewById(id);
-//                if (chip != null) {
-//                    String text = chip.getText().toString();
-//                    sb.append(text).append(" - Expense Type\n");
-//
-//                    if ("Travel".equals(text)) travelChecked = true;
-//                    if ("Food".equals(text)) foodChecked = true;
-//                    if ("Accommodation".equals(text)) accommodationChecked = true;
-//                    if ("Miscellaneous".equals(text)) miscChecked = true;
-//                }
-//            }
-//
-//            if (checkedIds.isEmpty()) {
-//                binding.underProcessText.setVisibility(View.GONE);
-//            } else {
-//                binding.underProcessText.setVisibility(View.VISIBLE);
-//                viewModel.underProcessTextState.setValue(sb.toString().trim());
-//            }
-//
-//            // Exclusively toggle views. If unselected, it falls back to View.GONE gracefully
-//            binding.travelFieldsContainer.setVisibility(travelChecked ? View.VISIBLE : View.GONE);
-//            binding.foodFieldsContainer.setVisibility(foodChecked ? View.VISIBLE : View.GONE);
-//            binding.accommodationFieldsContainer.setVisibility(accommodationChecked ? View.VISIBLE : View.GONE);
-//            binding.miscellaneousFieldsContainer.setVisibility(miscChecked ? View.VISIBLE : View.GONE);
-//        });
-
         binding.expenseTypeChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             StringBuilder sb = new StringBuilder();
             boolean travelChecked = false;
@@ -285,20 +426,15 @@ public class ClaimManagementFragment extends Fragment {
             boolean accommodationChecked = false;
             boolean miscChecked = false;
 
-            // Get the single checked ID since app:singleSelection="true" is configured in XML
             int checkedChipId = checkedIds.isEmpty() ? View.NO_ID : checkedIds.get(0);
 
-            // Loop through all chips inside the group to apply correct unique state backgrounds
             for (int i = 0; i < group.getChildCount(); i++) {
                 View child = group.getChildAt(i);
                 if (child instanceof Chip) {
                     Chip chip = (Chip) child;
-
                     chip.setBackgroundTintList(null);
 
-                    // Match against the single checked ID
                     if (chip.getId() == checkedChipId) {
-                        // Checked chip style
                         chip.setChipBackgroundColorResource(R.color.avatar_text);
                         chip.setTextColor(getResources().getColor(R.color.approved_color));
 
@@ -310,7 +446,6 @@ public class ClaimManagementFragment extends Fragment {
                         if ("Accommodation".equals(text)) accommodationChecked = true;
                         if ("Miscellaneous".equals(text)) miscChecked = true;
                     } else {
-                        // Revert all unselected chips to original defaults
                         chip.setChipBackgroundColorResource(android.R.color.white);
                         chip.setTextColor(getResources().getColor(R.color.colorPrimary, requireContext().getTheme()));
                     }
@@ -344,14 +479,33 @@ public class ClaimManagementFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        binding.businessUnitDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                BusinessUnitSpinnerItem selectedItem = (BusinessUnitSpinnerItem) parent.getItemAtPosition(position);
+                if (selectedItem != null) {
+                    String buId = selectedItem.getId();
+                    viewModel.selectedBusinessUnitId.setValue(buId);
 
+                    // Retrieve token to make the cascade call cleanly
+                    SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
+                    String authToken = prefManager.getString("authToken", null);
+
+                    // Trigger tracking logic dynamically on choice selection
+                    viewModel.getEmployeesByBusinessUnit(authToken, buId);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         viewModel.transportLayoutType.observe(getViewLifecycleOwner(), type -> {
             binding.transportModeSharedLayout.setVisibility(type == 1 ? View.VISIBLE : View.GONE);
             binding.transportModeDedicatedLayout.setVisibility(type == 2 ? View.VISIBLE : View.GONE);
         });
 
-        viewModel.showCustomTransportInput.observe(getViewLifecycleOwner(), show ->
-                binding.EnterTransportInputLayout.setVisibility(show ? View.VISIBLE : View.GONE));
+        viewModel.showCustomTransportInput.observe(getViewLifecycleOwner(), show -> binding.EnterTransportInputLayout.setVisibility(show ? View.VISIBLE : View.GONE));
 
         viewModel.underProcessTextState.observe(getViewLifecycleOwner(), text -> {
             binding.underProcessText.setText(text);
@@ -390,24 +544,15 @@ public class ClaimManagementFragment extends Fragment {
         } catch (Exception e) {
             return;
         }
-
-        // 1MB Size Check Alert Dialog Requirement
         if (fileSize > 1024 * 1024) {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("File Too Large")
-                    .setMessage("The file \"" + name + "\" exceeds the 1MB limit and will not be uploaded.")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
+            new AlertDialog.Builder(requireContext()).setTitle("File Too Large").setMessage("The file \"" + name + "\" exceeds the 1MB limit and will not be uploaded.").setPositiveButton(android.R.string.ok, null).show();
             return;
         }
 
         selectedFileUris.add(uri);
         int listIndex = selectedFileUris.size() - 1;
 
-        // Pass index reference to the ViewModel file processor
         viewModel.uploadFileAtIndex(uri, listIndex);
-
-        // Render dynamic removable layout element
         addFileViewToContainer(uri, name);
     }
 
@@ -430,7 +575,6 @@ public class ClaimManagementFragment extends Fragment {
             int index = selectedFileUris.indexOf(uri);
             if (index != -1) {
                 selectedFileUris.remove(index);
-                // Note: If your ViewModel retains indexed state mapping, verify your viewmodel API context handling here
                 binding.selectedFilesContainer.removeView(rowLayout);
                 updateFileCountHeader();
             }
