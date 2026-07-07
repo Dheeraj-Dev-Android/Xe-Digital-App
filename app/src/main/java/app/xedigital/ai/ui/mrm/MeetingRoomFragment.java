@@ -13,17 +13,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.IOException;
+import java.util.List;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.model.meetingRoom.RoomDataItem;
 import app.xedigital.ai.utills.SecurePrefManager;
 
 public class MeetingRoomFragment extends Fragment {
 
     private static final String TAG = "MeetingRoomFragment";
     private MeetingRoomViewModel mViewModel;
-    private TextView meetingsTextView;
+
+    private RecyclerView recyclerView;
+    private MeetingRoomAdapter adapter;
+
     private TextView emptyTextView;
     private View emptyStateContainer;
     private ProgressBar progressBar;
@@ -38,10 +43,14 @@ public class MeetingRoomFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_meeting_room, container, false);
 
         // Bind Views
-        meetingsTextView = view.findViewById(R.id.meetingsTextView);
+        recyclerView = view.findViewById(R.id.meetingsRecyclerView);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         emptyTextView = view.findViewById(R.id.emptyStateText);
         progressBar = view.findViewById(R.id.progressBar);
+
+        // Setup RecyclerView
+        adapter = new MeetingRoomAdapter();
+        recyclerView.setAdapter(adapter);
 
         return view;
     }
@@ -53,7 +62,6 @@ public class MeetingRoomFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(MeetingRoomViewModel.class);
         setupObservers();
 
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", null);
 
@@ -70,33 +78,27 @@ public class MeetingRoomFragment extends Fragment {
         mViewModel.getIsLoadingLiveData().observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
                 progressBar.setVisibility(View.VISIBLE);
-                meetingsTextView.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);
                 emptyStateContainer.setVisibility(View.GONE);
             } else {
                 progressBar.setVisibility(View.GONE);
             }
         });
 
-        // Observe successful API response
-        // Observe successful API response
+        // Observe successful structural API model objects
         mViewModel.getMeetingsLiveData().observe(getViewLifecycleOwner(), responseBody -> {
-            try {
-                String jsonResponse = responseBody.string();
-                Log.d(TAG, "Meetings JSON Data: " + jsonResponse);
+            if (responseBody != null && responseBody.getData() != null && responseBody.getData().getRoomData() != null) {
+                List<RoomDataItem> rooms = responseBody.getData().getRoomData();
 
-                // Check for empty conditions, including your backend's custom "No record found" structures
-                if (jsonResponse.trim().isEmpty() || jsonResponse.equals("[]") || jsonResponse.equals("{}") || jsonResponse.contains("\"roomData\":[]") || jsonResponse.contains("No record found!!!")) {
-
-                    showEmptyState("No meetings rooms found");
+                if (rooms.isEmpty()) {
+                    showEmptyState("No meeting rooms found");
                 } else {
                     emptyStateContainer.setVisibility(View.GONE);
-                    meetingsTextView.setVisibility(View.VISIBLE);
-                    meetingsTextView.setText(jsonResponse);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    adapter.setRooms(rooms);
                 }
-
-            } catch (IOException e) {
-                Log.e(TAG, "Error reading response body", e);
-                showEmptyState("Error handling dynamic response data");
+            } else {
+                showEmptyState("No meeting rooms found");
             }
         });
 
@@ -109,8 +111,8 @@ public class MeetingRoomFragment extends Fragment {
     }
 
     private void showEmptyState(String message) {
-        if (meetingsTextView != null && emptyTextView != null) {
-            meetingsTextView.setVisibility(View.GONE);
+        if (recyclerView != null && emptyTextView != null) {
+            recyclerView.setVisibility(View.GONE);
             emptyStateContainer.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
             emptyTextView.setText(message);

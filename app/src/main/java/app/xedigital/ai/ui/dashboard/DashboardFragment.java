@@ -2,8 +2,6 @@ package app.xedigital.ai.ui.dashboard;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -212,15 +210,26 @@ public class DashboardFragment extends Fragment {
             intent.putExtra("userId", userId);
             intent.putExtra("authToken", authToken);
             intent.putExtra("name", name);
-            Drawable[] drawables = binding.punchButton.getCompoundDrawablesRelative();
-            if (drawables != null && drawables.length > 2) {
-                Drawable drawable = drawables[2];
-                if (drawable instanceof AnimatedVectorDrawable) {
-                    AnimatedVectorDrawable animatedVector = (AnimatedVectorDrawable) drawable;
-                    animatedVector.start();
-                }
-            }
             startActivity(intent);
+        });
+
+
+        // --- QUICK ACTION NAVIGATIONS ---
+
+        binding.quickActionsCard.findViewById(R.id.btnQuickAttendance).setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_attendance);
+        });
+
+        binding.quickActionsCard.findViewById(R.id.btnQuickApplyLeave).setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_leaves);
+        });
+
+        binding.quickActionsCard.findViewById(R.id.btnQuickTimesheet).setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_dcr_form);
+        });
+
+        binding.quickActionsCard.findViewById(R.id.btnQuickBookMeeting).setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_meeting_room);
         });
         return root;
     }
@@ -232,8 +241,6 @@ public class DashboardFragment extends Fragment {
         loader = view.findViewById(R.id.loader);
 
         viewModal = new ViewModelProvider(this).get(DashboardViewModel.class);
-
-
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
@@ -287,6 +294,7 @@ public class DashboardFragment extends Fragment {
                     String empDesignation = employee.getDesignation() != null ? employee.getDesignation() : "";
 
                     binding.tvEmployeeNameValue.setText((!employeeName.isEmpty() || !employeeLastName.isEmpty()) ? employeeName + " " + employeeLastName : "N/A");
+                    binding.tvHeaderEmployeeName.setText((!employeeName.isEmpty() || !employeeLastName.isEmpty()) ? employeeName + " " + employeeLastName : "N/A");
                     binding.tvEmployeeDesignationValue.setText(!empDesignation.isEmpty() ? empDesignation : "N/A");
 
                     Shift shift = employee.getShift();
@@ -353,6 +361,17 @@ public class DashboardFragment extends Fragment {
                                 punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
                                 binding.tvPunchInTime.setText("Punch In: " + punchIn);
                                 binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+                                if (punchIn != null && !punchIn.trim().isEmpty() && !punchIn.equals("-")) {
+                                    binding.tvPunchStatusValue.setText("Punched In");
+                                    binding.tvPunchButtonLabel.setText("Punch Out");
+                                    binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
+                                    binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color.rejected_color, requireContext().getTheme()));
+                                } else {
+                                    binding.tvPunchStatusValue.setText("Not Punched Yet");
+                                    binding.tvPunchButtonLabel.setText("Punch In");
+                                    binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
+                                    binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.text_primary, requireContext().getTheme()));
+                                }
                             } else {
                                 binding.tvPunchInTime.setText("Punch In: --:--");
                                 binding.tvPunchOutTime.setText("Punch Out: --:--");
@@ -429,6 +448,9 @@ public class DashboardFragment extends Fragment {
         punchCardView.setVisibility(View.GONE);
         employeeCard.setVisibility(View.GONE);
         leavePieChartContainer.setVisibility(View.GONE);
+
+        binding.quickActionsShimmer.setVisibility(View.VISIBLE);
+        binding.quickActionsShimmer.startShimmer();
     }
 
     private void stopShimmerAnimations() {
@@ -444,6 +466,9 @@ public class DashboardFragment extends Fragment {
         punchCardView.setVisibility(View.VISIBLE);
         employeeCard.setVisibility(View.VISIBLE);
         leavePieChartContainer.setVisibility(View.VISIBLE);
+
+        binding.quickActionsShimmer.stopShimmer();
+        binding.quickActionsShimmer.setVisibility(View.GONE);
     }
 
     private void initializeViews(View root) {
@@ -507,7 +532,6 @@ public class DashboardFragment extends Fragment {
         for (EmployeesItem employee : employees) {
             String dob = employee.getDateOfBirth();
             if (dob != null && !dob.isEmpty()) {
-                // Fix: Strip the 'T00:00:00.000Z' timestamp part off if present
                 if (dob.contains("T")) {
                     dob = dob.split("T")[0];
                 }
@@ -515,9 +539,9 @@ public class DashboardFragment extends Fragment {
                 String[] segments = dob.split("[-/]");
                 if (segments.length >= 2) {
                     String monthSegment = "";
-                    if (segments[0].length() == 4) { // Format: yyyy-MM-dd
+                    if (segments[0].length() == 4) {
                         monthSegment = segments[1];
-                    } else if (segments[2].length() == 4) { // Format: dd-MM-yyyy
+                    } else if (segments[2].length() == 4) {
                         monthSegment = segments[1];
                     }
 

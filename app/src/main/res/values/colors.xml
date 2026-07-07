@@ -133,4 +133,7 @@
     <color name="progress_fill">#1D9E75</color>
     <color name="progress_fill_warn">#EF9F27</color>
     <color name="progress_fill_danger">#D85A30</color>
+
+    <color name="bg_tint_green">#EAF3DE</color>
+    <color name="bg_tint_cyan">#E1F5FE</color>
 </resources>

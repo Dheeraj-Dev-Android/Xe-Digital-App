@@ -41,6 +41,7 @@ import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
+import app.xedigital.ai.model.meetingRoom.MeetingRoomResponse;
 import app.xedigital.ai.model.policy.PolicyResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
 import app.xedigital.ai.model.profile.UserProfileResponse;
@@ -191,7 +192,7 @@ public interface APIInterface {
     Call<TeamUnderManagerResponse> getEmployeesUnderManager(@Header("Authorization") String authToken, @Path("userId") String userId);
 
     @GET("meetings/getAll")
-    retrofit2.Call<ResponseBody> getMeetings(@Header("Authorization") String authToken);
+    retrofit2.Call<MeetingRoomResponse> getMeetings(@Header("Authorization") String authToken);
 
     @GET("employees/dcrDataForRM/{userId}")
     Call<TeamTimesheetResponse> getDcrDataForRM(@Header("Authorization") String authToken, @Path("userId") String userId);

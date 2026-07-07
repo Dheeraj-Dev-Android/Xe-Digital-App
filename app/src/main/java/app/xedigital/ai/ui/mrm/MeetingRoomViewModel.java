@@ -6,18 +6,18 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import app.xedigital.ai.api.APIClient;
-import okhttp3.ResponseBody;
+import app.xedigital.ai.model.meetingRoom.MeetingRoomResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MeetingRoomViewModel extends ViewModel {
 
-    private final MutableLiveData<ResponseBody> meetingsLiveData = new MutableLiveData<>();
+    private final MutableLiveData<MeetingRoomResponse> meetingsLiveData = new MutableLiveData<MeetingRoomResponse>();
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoadingLiveData = new MutableLiveData<>();
 
-    public LiveData<ResponseBody> getMeetingsLiveData() {
+    public LiveData<MeetingRoomResponse> getMeetingsLiveData() {
         return meetingsLiveData;
     }
 
@@ -37,9 +37,9 @@ public class MeetingRoomViewModel extends ViewModel {
 
         isLoadingLiveData.setValue(true);
 
-        APIClient.getInstance().getApi().getMeetings("jwt " + authToken).enqueue(new Callback<ResponseBody>() {
+        APIClient.getInstance().getApi().getMeetings("jwt " + authToken).enqueue(new Callback<MeetingRoomResponse>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<MeetingRoomResponse> call, @NonNull Response<MeetingRoomResponse> response) {
                 isLoadingLiveData.setValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     meetingsLiveData.setValue(response.body());
@@ -49,7 +49,7 @@ public class MeetingRoomViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<MeetingRoomResponse> call, @NonNull Throwable t) {
                 isLoadingLiveData.setValue(false);
                 errorLiveData.setValue(t.getMessage());
             }
