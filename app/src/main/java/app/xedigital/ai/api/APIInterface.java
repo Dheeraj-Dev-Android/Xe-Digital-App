@@ -12,6 +12,7 @@ import app.xedigital.ai.model.UpdateProfile.UpdateProfileImageResponse;
 import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
 import app.xedigital.ai.model.addAttendanceRequest.AddedAttendanceCancelRequest;
 import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
+import app.xedigital.ai.model.allEmployee.AllEmployeeResponse;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.approveClaim.ApproveClaimResponse;
@@ -92,9 +93,6 @@ public interface APIInterface {
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     Call<UserProfileResponse> getUserProfile(@Path("userId") String id, @Header("Authorization") String authToken);
 
-    //    @GET("employees/attendance/punch")
-//    @Headers({"Content-Type: application/json", "Accept: application/json"})
-//    Call<EmployeeAttendanceResponse> getAttendance(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
     @GET("employees/attendance/punch")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     Call<EmployeeAttendanceResponse> getAttendance(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
@@ -110,7 +108,6 @@ public interface APIInterface {
     @GET("employees/attendance/regularize/applied")
     retrofit2.Call<RegularizeAppliedResponse> getRegularizeApplied(@Header("Authorization") String authToken);
 
-    //    https://app.xedigital.ai/api/v1/employees/attendance/punch/logs/667d37233138d05f34b2c0ab?pDate=2026-05-22T00:00:00.000Z
     @GET("employees/attendance/punch/logs/{attendanceId}")
     retrofit2.Call<AttendanceLogResponse> getAttendanceLogs(@Header("Authorization") String authToken, @Path("attendanceId") String attendanceId, @Query("pDate") String pDate);
 
@@ -138,9 +135,7 @@ public interface APIInterface {
     @GET("leaves/applied/report/manager/{employeeId}")
     retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
-//    Team Leave
-
-    //    https://app.xedigital.ai/api/v1/leaves/employees/leaves/685bbf7b528dc12b11868484
+    //    Team Leave
     @GET("leaves/employees/leaves/{employeeId}")
     retrofit2.Call<TeamLeaveResponse> getTeamLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
@@ -186,8 +181,6 @@ public interface APIInterface {
     @GET("leaves/applied/report/crmanager/{employeeId}")
     Call<CMLeavePendingResponse> getPendingApprovalLeavesCR(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
-    //    @GET("employees/attendancePunch/reportingManager")
-//    Call<AttandanceByManagerResponse> getAttendanceByManager(@Header("Authorization") String authToken, @Query("managerId") String managerId);
     @GET("employees/attendancePunch/reportingManager")
     Call<AttandanceByManagerResponse> getAttendanceByManager(@Header("Authorization") String authToken, @Query("managerId") String managerId, @Query("start") String startDate, @Query("end") String endDate, @Query("employee") String employeeId);
 
@@ -213,11 +206,12 @@ public interface APIInterface {
     Call<EmployeeByBusinessUnitResponse> getEmployeesByBusinessUnit(@Header("Authorization") String authToken, @Path("buId") String buId);
 
     @GET("employees/allEmp?active=true")
-    Call<ResponseBody> getAllEmployees(@Header("Authorization") String authToken);
+    Call<AllEmployeeResponse> getAllEmployees(@Header("Authorization") String authToken);
 
     //  POST APIs
     @POST("claims/food")
     retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body FoodRequest foodRequest);
+
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);
 
@@ -251,8 +245,7 @@ public interface APIInterface {
     @POST("shifts/shiftChange")
     retrofit2.Call<ResponseBody> ShiftChange(@Header("Authorization") String token, @Body ShiftUpdateRequest requestBody);
 
-//    PUT API
-
+    //    PUT API
     @PUT("employees/profile/image/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<UpdateProfileImageResponse> updateProfileImage(@Header("Authorization") String token, @Path("userId") String userId, @Body RequestBody requestBody);
@@ -333,5 +326,4 @@ public interface APIInterface {
     @GET("employees/attendance/regularize/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<CfRegularizeApprovalResponse> getCFMRegularize(@Header("Authorization") String authToken, @Path("userId") String id);
-
 }

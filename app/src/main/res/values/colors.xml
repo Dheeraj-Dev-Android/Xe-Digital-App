@@ -6,12 +6,8 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
-    <!--    <color name="colorPrimary">#024265</color>-->
-    <!--    <color name="colorPrimaryDark">#024265</color>-->
-    <!--    <color name="colorAccent">#05af9b</color>-->
     <color name="primary_dark">#3700B3</color>
-
+    <color name="border_light">#E2E8F0</color>
     <color name="color_white">#ededf2</color>
 
     <color name="SickLeave">#FFA726</color>
@@ -30,18 +26,8 @@
     <color name="icon_tint">#3B82F6</color>
     <color name="icon_background">#EFF6FF</color>
 
-    <!--    <color name="colorSecondary">#1976D2</color>-->
-    <!--    <color name="colorSecondaryDark">#1565C0</color>-->
-    <!--    <color name="background">#F5F5F5</color>-->
-
     <color name="card_background">#F8F9FA</color>
     <color name="ripple_color">#1F000000</color>
-
-    <!-- Status Badge Colors -->
-
-    <!-- Button Colors -->
-
-
     <!-- Primary Colors -->
     <color name="colorPrimary">#2196F3</color>          <!-- Blue 500 -->
     <color name="colorPrimaryVariant">#1976D2</color>   <!-- Blue 700 -->
@@ -61,11 +47,6 @@
     <!-- Text Colors -->
     <!-- Grey 900 -->
     <color name="textSecondary">#757575</color>         <!-- Grey 600 -->
-
-    <!-- Status Colors -->
-    <!-- Green 500 -->
-    <!-- Amber 500 -->
-    <!-- Blue 500 -->
 
     <!-- Custom Gradient Colors -->
     <color name="gradient_start">#357ABD</color>

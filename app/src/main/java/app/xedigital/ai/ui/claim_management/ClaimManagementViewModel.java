@@ -25,6 +25,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
 import app.xedigital.ai.model.Food.FoodRequest;
+import app.xedigital.ai.model.allEmployee.AllEmployeeResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.businessUnit.BusItem;
 import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
@@ -192,10 +193,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public void getEmployeesByBusinessUnit(String authTokenHeader, String businessUnitId) {
         if (businessUnitId == null || businessUnitId.isEmpty()) {
-            employeesList.postValue(new ArrayList<>(Collections.singletonList("Please Select")));
             return;
         }
-
         String authToken = "jwt " + authTokenHeader;
         APIClient.getInstance().getApi().getEmployeesByBusinessUnit(authToken, businessUnitId).enqueue(new Callback<EmployeeByBusinessUnitResponse>() {
             @Override
@@ -228,15 +227,28 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         });
     }
 
-    void getAllEmployees(String authTokenHeader) {
+    public void getAllEmployees(String authTokenHeader) {
         String authToken = "jwt " + authTokenHeader;
-        APIClient.getInstance().getApi().getAllEmployees(authToken).enqueue(new Callback<ResponseBody>() {
+        APIClient.getInstance().getApi().getAllEmployees(authToken).enqueue(new Callback<AllEmployeeResponse>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<AllEmployeeResponse> call, @NonNull Response<AllEmployeeResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<String> derivedEmployees = new ArrayList<>();
                     derivedEmployees.add("Please Select");
-                    Log.d("AllEmployees", "All employees fetched successfully");
+                    if (response.body().getData() != null && response.body().getData().getEmployees() != null) {
+                        for (app.xedigital.ai.model.allEmployee.EmployeesItem emp : response.body().getData().getEmployees()) {
+                            String firstName = emp.getFirstname() != null ? emp.getFirstname() : "";
+                            String lastName = emp.getLastname() != null ? emp.getLastname() : "";
+                            String fullName = (firstName + " " + lastName).trim();
+
+                            if (!fullName.isEmpty()) {
+                                derivedEmployees.add(fullName);
+                            }
+                        }
+                    }
+
+                    employeesList.postValue(derivedEmployees);
+                    Log.d("AllEmployees", "All employees successfully parsed and posted.");
 
                 } else {
                     Log.e("AllEmployees", "Failed to fetch all employees: " + response.code());
@@ -244,7 +256,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<AllEmployeeResponse> call, @NonNull Throwable t) {
                 Log.e("AllEmployees", "Error fetching all employees: " + t.getMessage());
             }
         });

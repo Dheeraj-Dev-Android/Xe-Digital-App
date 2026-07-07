@@ -16,6 +16,8 @@ import java.util.TimeZone;
 
 public class DateTimeUtils {
 
+    private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
     //    public static String calculateTotalTime(String punchInTime, String punchOutTime) {
 //        if (punchInTime == null || punchOutTime == null || punchInTime.equals("N/A") || punchOutTime.equals("N/A")) {
 //            return "N/A";
@@ -88,6 +90,21 @@ public class DateTimeUtils {
         } catch (Exception e) {
             Log.e("DateTimeUtils", "Error calculating total time: " + e.getMessage());
             return "00:00 Hrs";
+        }
+    }
+
+
+    public static String formatToReadableDate(String isoString) {
+        if (isoString == null || isoString.isEmpty()) return "";
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat(ISO_FORMAT, Locale.getDefault());
+            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date date = inputFormat.parse(isoString);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            return date != null ? outputFormat.format(date) : "";
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return isoString;
         }
     }
 

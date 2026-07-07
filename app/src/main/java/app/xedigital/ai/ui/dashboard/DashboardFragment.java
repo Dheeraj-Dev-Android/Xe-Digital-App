@@ -19,6 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
@@ -47,6 +50,7 @@ import java.util.stream.Collectors;
 import app.xedigital.ai.R;
 import app.xedigital.ai.activity.PunchActivity;
 import app.xedigital.ai.databinding.FragmentDashboardBinding;
+import app.xedigital.ai.model.allEmployee.EmployeesItem;
 import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
 import app.xedigital.ai.model.leaves.LeavesItem;
 import app.xedigital.ai.model.profile.Employee;
@@ -87,6 +91,8 @@ public class DashboardFragment extends Fragment {
     // Real layouts
     private MaterialCardView punchCardView;
     private MaterialCardView employeeCard;
+    private RecyclerView rvBirthdayCarousel;
+    private View birthdayCardView;
     private MaterialCardView leavePieChartContainer;
 
     // Real layouts values
@@ -99,6 +105,7 @@ public class DashboardFragment extends Fragment {
     private ImageView ivEmployeeProfile;
     private TextView tvPunchInTime;
     private TextView tvPunchOutTime;
+    private DashboardViewModel viewModal;
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
         Map<String, Float> leaveData = new HashMap<>();
@@ -224,6 +231,9 @@ public class DashboardFragment extends Fragment {
         blurOverlay = view.findViewById(R.id.blurOverlay);
         loader = view.findViewById(R.id.loader);
 
+        viewModal = new ViewModelProvider(this).get(DashboardViewModel.class);
+
+
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
@@ -232,6 +242,7 @@ public class DashboardFragment extends Fragment {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
         String userId = prefManager.getString("userId", "");
+        viewModal.fetchEmployeeBirthdays(authToken);
 
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
@@ -383,6 +394,12 @@ public class DashboardFragment extends Fragment {
             employeeCardShimmer.setVisibility(View.GONE);
             employeeCard.setVisibility(View.VISIBLE);
         });
+
+        viewModal.getEmployeeBirthdayData().observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.getData() != null && response.getData().getEmployees() != null) {
+                filterAndProcessBirthdays(response.getData().getEmployees());
+            }
+        });
     }
 
     private void fetchData() {
@@ -447,6 +464,18 @@ public class DashboardFragment extends Fragment {
         ivEmployeeProfile = root.findViewById(R.id.ivEmployeeProfile);
         tvPunchInTime = root.findViewById(R.id.tvPunchInTime);
         tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
+        birthdayCardView = root.findViewById(R.id.includedBirthdayCarousel);
+        if (birthdayCardView != null) {
+            rvBirthdayCarousel = birthdayCardView.findViewById(R.id.rvBirthdayCarousel);
+            rvBirthdayCarousel.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+
+            java.util.ArrayList<EmployeesItem> emptyList = new java.util.ArrayList<>();
+            BirthdayCarouselAdapter initialAdapter = new BirthdayCarouselAdapter(emptyList);
+            rvBirthdayCarousel.setAdapter(initialAdapter);
+
+            LinearSnapHelper snapHelper = new LinearSnapHelper();
+            snapHelper.attachToRecyclerView(rvBirthdayCarousel);
+        }
     }
 
     private String formatShiftTime(String shiftTime) {
@@ -466,6 +495,81 @@ public class DashboardFragment extends Fragment {
             }
         }
         return "";
+    }
+
+    private void filterAndProcessBirthdays(List<EmployeesItem> employees) {
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int currentMonthNum = calendar.get(java.util.Calendar.MONTH) + 1;
+        String currentMonthString = String.format(java.util.Locale.getDefault(), "%02d", currentMonthNum);
+
+        List<EmployeesItem> currentMonthBirthdays = new ArrayList<>();
+
+        for (EmployeesItem employee : employees) {
+            String dob = employee.getDateOfBirth();
+            if (dob != null && !dob.isEmpty()) {
+                // Fix: Strip the 'T00:00:00.000Z' timestamp part off if present
+                if (dob.contains("T")) {
+                    dob = dob.split("T")[0];
+                }
+
+                String[] segments = dob.split("[-/]");
+                if (segments.length >= 2) {
+                    String monthSegment = "";
+                    if (segments[0].length() == 4) { // Format: yyyy-MM-dd
+                        monthSegment = segments[1];
+                    } else if (segments[2].length() == 4) { // Format: dd-MM-yyyy
+                        monthSegment = segments[1];
+                    }
+
+                    if (monthSegment.equals(currentMonthString)) {
+                        currentMonthBirthdays.add(employee);
+                    }
+                }
+            }
+        }
+
+        // Sort the filtered birthdays in ascending order (Day 1 to Day 31)
+        currentMonthBirthdays.sort((emp1, emp2) -> {
+            int day1 = getDayFromDob(emp1.getDateOfBirth());
+            int day2 = getDayFromDob(emp2.getDateOfBirth());
+            return Integer.compare(day1, day2);
+        });
+
+        displayBirthdayList(currentMonthBirthdays);
+    }
+
+    private int getDayFromDob(String dob) {
+        if (dob == null || dob.isEmpty()) return 0;
+        try {
+            if (dob.contains("T")) {
+                dob = dob.split("T")[0];
+            }
+
+            String[] segments = dob.split("[-/]");
+            if (segments.length >= 3) {
+                if (segments[0].length() == 4) {
+                    return Integer.parseInt(segments[2]);
+                } else if (segments[2].length() == 4) {
+                    // Format: dd-MM-yyyy -> Day is at index 0 (e.g. 16-08-1998 -> 16)
+                    return Integer.parseInt(segments[0]);
+                }
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    private void displayBirthdayList(List<EmployeesItem> birthdayList) {
+        if (birthdayCardView == null || rvBirthdayCarousel == null) return;
+
+        if (birthdayList == null || birthdayList.isEmpty()) {
+            birthdayCardView.setVisibility(View.GONE);
+        } else {
+            birthdayCardView.setVisibility(View.VISIBLE);
+            BirthdayCarouselAdapter adapter = new BirthdayCarouselAdapter(birthdayList);
+            rvBirthdayCarousel.setAdapter(adapter);
+        }
     }
 
     @Override

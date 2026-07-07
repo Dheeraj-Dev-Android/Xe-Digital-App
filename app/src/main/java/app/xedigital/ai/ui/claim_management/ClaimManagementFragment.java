@@ -364,10 +364,10 @@ public class ClaimManagementFragment extends Fragment {
     private void setupLayoutVisibilityLogic() {
         binding.forGuestEmployeesCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> binding.guestEmployeesFieldsContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE));
 
-        String[] employeesList = {"Please Select"};
-        binding.requestedEmployeeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, employeesList));
+//        String[] employeesList = {"Please Select"};
+//        binding.requestedEmployeeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, employeesList));
 
-        String[] mealTypes = {"Please Select", "Dinner", "Breakfast", "lunch", "snacks", "refreshments", "late night meals", "Others"};
+        String[] mealTypes = {"Please Select", "Dinner", "Breakfast", "Lunch", "Snacks", "Refreshments", "Late night meals", "Others"};
         binding.mealTypeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, mealTypes));
 
         String[] accommodationTypes = {"Please Select", "Hotel", "Guest House", "Rental", "Company Accommodation"};
@@ -486,13 +486,14 @@ public class ClaimManagementFragment extends Fragment {
                 if (selectedItem != null) {
                     String buId = selectedItem.getId();
                     viewModel.selectedBusinessUnitId.setValue(buId);
-
-                    // Retrieve token to make the cascade call cleanly
                     SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
                     String authToken = prefManager.getString("authToken", null);
 
-                    // Trigger tracking logic dynamically on choice selection
-                    viewModel.getEmployeesByBusinessUnit(authToken, buId);
+                    if (buId != null && !buId.isEmpty()) {
+                        viewModel.getEmployeesByBusinessUnit(authToken, buId);
+                    } else {
+                        viewModel.getAllEmployees(authToken);
+                    }
                 }
             }
 

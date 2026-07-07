@@ -23,19 +23,39 @@ public class Department {
         this.jsonMemberDefault = jsonMemberDefault;
     }
 
+    public boolean isJsonMemberDefault() {
+        return jsonMemberDefault;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setActive(boolean active) {
         this.active = active;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

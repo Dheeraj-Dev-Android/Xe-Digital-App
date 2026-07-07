@@ -1,11 +1,6 @@
 package app.xedigital.ai.model.profile;
 
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-
-import app.xedigital.ai.utills.CrossmanagerTypeAdapter;
-
-@JsonAdapter(CrossmanagerTypeAdapter.class)
 
 public class Crossmanager {
 
@@ -22,7 +17,6 @@ public class Crossmanager {
     private String lastname;
 
 
-    // New constructor to handle default cross-manager
     public Crossmanager(String id, String firstname, String lastname, String email) {
         this.id = id;
         this.firstname = firstname;
@@ -31,13 +25,11 @@ public class Crossmanager {
     }
 
     public Crossmanager() {
-        // You can initialize fields to default values here if needed
         this.id = null;
         this.firstname = null;
         this.lastname = null;
         this.email = null;
     }
-
 
     public String getFirstname() {
         return firstname;

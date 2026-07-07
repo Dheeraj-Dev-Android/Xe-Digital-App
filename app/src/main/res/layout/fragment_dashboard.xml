@@ -248,7 +248,7 @@
                         android:layout_height="135dp"
                         android:layout_marginTop="14dp"
                         app:cardBackgroundColor="@android:color/transparent"
-                        app:cardCornerRadius="44dp"
+                        app:cardCornerRadius="67.5dp"
                         app:cardElevation="2dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -260,7 +260,7 @@
                             android:layout_width="120dp"
                             android:layout_height="120dp"
                             android:layout_gravity="center"
-                            app:cardCornerRadius="40dp"
+                            app:cardCornerRadius="60dp"
                             app:cardElevation="4dp">
 
                             <ImageView
@@ -270,10 +270,7 @@
                                 android:contentDescription="@string/user_profile_picture"
                                 android:elevation="5dp"
                                 android:scaleType="centerCrop"
-                                android:src="@mipmap/ic_default_profile"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:src="@mipmap/ic_default_profile" />
                         </com.google.android.material.card.MaterialCardView>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -371,7 +368,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
                         android:autoSizeTextType="uniform"
-                        android:text="Software Engineer : Software Engineer "
+                        android:text="Software Engineer"
                         android:textColor="@color/black"
                         android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -472,6 +469,7 @@
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
             <!-- end shimmer-->
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/leavePieChartContainer"
                 android:layout_width="0dp"
@@ -509,6 +507,20 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+
+            <include
+                android:id="@+id/includedBirthdayCarousel"
+                layout="@layout/layout_dashboard_birthday_carousel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/leavePieChartContainer" />
 
             <View
                 android:id="@+id/blurOverlay"
