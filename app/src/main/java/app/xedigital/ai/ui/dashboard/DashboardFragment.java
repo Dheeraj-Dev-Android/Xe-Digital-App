@@ -36,6 +36,9 @@ import com.google.android.material.card.MaterialCardView;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -103,6 +106,7 @@ public class DashboardFragment extends Fragment {
     private ImageView ivEmployeeProfile;
     private TextView tvPunchInTime;
     private TextView tvPunchOutTime;
+    private TextView tvEmployeeCodeValue;
     private DashboardViewModel viewModal;
 
     public static void updatePieChartData(PieChart pieChart, List<LeavesItem> leaves) {
@@ -162,6 +166,7 @@ public class DashboardFragment extends Fragment {
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         legend.setWordWrapEnabled(true);
+        legend.setTextColor(Color.WHITE);
         legend.setTextSize(8f);
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
@@ -199,6 +204,7 @@ public class DashboardFragment extends Fragment {
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::fetchData);
         initializeViews(root);
+        updateGreetingText();
 
         binding.punchButton.setOnClickListener(v -> {
 //            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -294,8 +300,9 @@ public class DashboardFragment extends Fragment {
                     String empDesignation = employee.getDesignation() != null ? employee.getDesignation() : "";
 
                     binding.tvEmployeeNameValue.setText((!employeeName.isEmpty() || !employeeLastName.isEmpty()) ? employeeName + " " + employeeLastName : "N/A");
-                    binding.tvHeaderEmployeeName.setText((!employeeName.isEmpty() || !employeeLastName.isEmpty()) ? employeeName + " " + employeeLastName : "N/A");
+                    binding.tvHeaderEmployeeName.setText((!employeeName.isEmpty() ? employeeName : "N/A"));
                     binding.tvEmployeeDesignationValue.setText(!empDesignation.isEmpty() ? empDesignation : "N/A");
+                    binding.tvEmployeeCodeValue.setText(!employee.getEmployeeCode().isEmpty() ? employee.getEmployeeCode() : "N/A");
 
                     Shift shift = employee.getShift();
                     String startTime = shift != null && shift.getStartTime() != null ? shift.getStartTime() : "";
@@ -354,27 +361,45 @@ public class DashboardFragment extends Fragment {
                         }
                     }).collect(Collectors.toList());
                     requireActivity().runOnUiThread(() -> {
-
                         if (binding != null) {
-                            if (!currentPunchData.isEmpty()) {
+                            boolean isDataAvailable = !currentPunchData.isEmpty();
+                            boolean isToday = false;
+
+                            if (isDataAvailable) {
+                                String punchDateStr = currentPunchData.get(0).getPunchDateFormat();
+
+                                if (punchDateStr != null && !punchDateStr.trim().isEmpty()) {
+                                    try {
+                                        LocalDate localPunchDate = LocalDate.parse(punchDateStr);
+                                        LocalDate today = LocalDate.now();
+                                        isToday = localPunchDate.equals(today);
+
+                                    } catch (DateTimeParseException e) {
+                                        e.printStackTrace();
+                                        isToday = false;
+                                    }
+                                }
+                            }
+
+
+                            if (isDataAvailable && isToday) {
                                 punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
                                 punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
+
                                 binding.tvPunchInTime.setText("Punch In: " + punchIn);
                                 binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+
                                 if (punchIn != null && !punchIn.trim().isEmpty() && !punchIn.equals("-")) {
                                     binding.tvPunchStatusValue.setText("Punched In");
+                                    binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
+
                                     binding.tvPunchButtonLabel.setText("Punch Out");
-                                    binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
                                     binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color.rejected_color, requireContext().getTheme()));
                                 } else {
-                                    binding.tvPunchStatusValue.setText("Not Punched Yet");
-                                    binding.tvPunchButtonLabel.setText("Punch In");
-                                    binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
-                                    binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.text_primary, requireContext().getTheme()));
+                                    resetPunchUI();
                                 }
                             } else {
-                                binding.tvPunchInTime.setText("Punch In: --:--");
-                                binding.tvPunchOutTime.setText("Punch Out: --:--");
+                                resetPunchUI();
                             }
                         }
                     });
@@ -419,6 +444,44 @@ public class DashboardFragment extends Fragment {
                 filterAndProcessBirthdays(response.getData().getEmployees());
             }
         });
+    }
+
+    private void updateGreetingText() {
+        if (binding == null) return;
+
+        int hour = LocalTime.now().getHour();
+        String greeting;
+
+        if (hour >= 4 && hour < 12) {
+            greeting = "Good Morning ! ";
+        } else if (hour >= 12 && hour < 17) {
+            greeting = "Good Afternoon ! ";
+        } else if (hour >= 17 && hour < 22) {
+            greeting = "Good Evening ! ";
+        } else {
+            greeting = "Good Night ! "; // Covers 10 PM to 3:59 AM
+        }
+
+        binding.tvGreeting.setText(greeting);
+    }
+
+    private void resetPunchUI() {
+        if (binding == null) return;
+
+        // Reset Times
+        binding.tvPunchInTime.setText("Punch In: --:--");
+        binding.tvPunchOutTime.setText("Punch Out: --:--");
+
+        // Reset Status Value
+        binding.tvPunchStatusValue.setText("Not Punched Yet");
+        binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
+
+        // Reset Button Label & Text Color
+        binding.tvPunchButtonLabel.setText("Punch In");
+        binding.tvPunchButtonLabel.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme())); // Change to your default label color
+
+        // Reset Card Background
+        binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
     }
 
     private void fetchData() {
@@ -482,6 +545,7 @@ public class DashboardFragment extends Fragment {
 
         todayDate = root.findViewById(R.id.todayDate);
         tvEmployeeNameValue = root.findViewById(R.id.tvEmployeeNameValue);
+        tvEmployeeCodeValue = root.findViewById(R.id.tvEmployeeCodeValue);
         tvEmployeeDesignationValue = root.findViewById(R.id.tvEmployeeDesignationValue);
         tvEmployeeShiftValue = root.findViewById(R.id.tvEmployeeShiftValue);
         tvEmployeeContactValue = root.findViewById(R.id.tvEmployeeContactValue);

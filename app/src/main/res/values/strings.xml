@@ -118,7 +118,7 @@
     <string name="menu_meeting_room">Meeting Room</string>
     <string name="team_dcr">Team Member Timesheet</string>
 
-    <string name="greeting_default">Welcome,</string>
+    <string name="greeting_default">Welcome </string>
     <string name="current_status">Current status</string>
     <string name="not_punched_in">Not punched in</string>
     <string name="quick_actions">Quick actions</string>

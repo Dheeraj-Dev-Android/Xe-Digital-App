@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.allEmployee.EmployeesItem;
@@ -38,8 +42,30 @@ public class BirthdayCarouselAdapter extends RecyclerView.Adapter<BirthdayCarous
 
         String fullName = item.getFirstname() + " " + item.getLastname();
         holder.tvEmpName.setText(fullName);
-        holder.tvEmpDOB.setText(DateTimeUtils.formatToReadableDate(item.getDateOfBirth()));
-        holder.tvEmpEmail.setText(item.getEmail());
+//        holder.tvEmpDOB.setText(DateTimeUtils.formatToReadableDate(item.getDateOfBirth()));
+//        holder.tvEmpEmail.setText(item.getEmail());
+        String rawDob = DateTimeUtils.formatToReadableDate(item.getDateOfBirth()); // Returns "08 July 2026"
+
+        if (rawDob != null && !rawDob.trim().isEmpty()) {
+            try {
+                // 1. Define the incoming format matching "08 July 2026"
+                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+
+                // 2. Parse into a LocalDate object
+                LocalDate dob = LocalDate.parse(rawDob, inputFormatter);
+
+                // 3. Define the outgoing format without the year component -> "08 July"
+                DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH);
+
+                holder.tvEmpDOB.setText(dob.format(outputFormatter));
+            } catch (DateTimeParseException e) {
+                e.printStackTrace();
+                // Fallback to the original string just in case
+                holder.tvEmpDOB.setText(rawDob);
+            }
+        } else {
+            holder.tvEmpDOB.setText("N/A");
+        }
 
         if (item.getDepartment() != null) {
             holder.tvEmpDept.setText(item.getDesignation());
@@ -47,11 +73,7 @@ public class BirthdayCarouselAdapter extends RecyclerView.Adapter<BirthdayCarous
             holder.tvEmpDept.setText("N/A");
         }
 
-        Glide.with(holder.itemView.getContext())
-                .load(item.getProfileImageUrl())
-                .placeholder(R.mipmap.ic_default_profile)
-                .error(R.mipmap.ic_default_profile)
-                .into(holder.ivEmpProfile);
+        Glide.with(holder.itemView.getContext()).load(item.getProfileImageUrl()).placeholder(R.mipmap.ic_default_profile).error(R.mipmap.ic_default_profile).into(holder.ivEmpProfile);
     }
 
     @Override
@@ -69,7 +91,7 @@ public class BirthdayCarouselAdapter extends RecyclerView.Adapter<BirthdayCarous
             tvEmpName = itemView.findViewById(R.id.tvEmpName);
             tvEmpDOB = itemView.findViewById(R.id.tvEmpDOB);
             tvEmpDept = itemView.findViewById(R.id.tvEmpDept);
-            tvEmpEmail = itemView.findViewById(R.id.tvEmpEmail);
+//            tvEmpEmail = itemView.findViewById(R.id.tvEmpEmail);
         }
     }
 }

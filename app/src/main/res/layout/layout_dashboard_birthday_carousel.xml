@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
     android:layout_marginBottom="4dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="@color/text_primary"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
     app:strokeWidth="0dp">
@@ -23,7 +23,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginBottom="8dp"
             android:text="This Month's Birthdays"
-            android:textColor="#37474F"
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
 

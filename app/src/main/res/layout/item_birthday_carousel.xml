@@ -137,47 +137,47 @@
         </LinearLayout>
 
         <!-- Email row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical">
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="8dp"-->
+        <!--            android:orientation="vertical">-->
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:gravity="center_vertical"-->
+        <!--                android:orientation="horizontal">-->
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@mipmap/ic_email"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
+        <!--                <com.google.android.material.imageview.ShapeableImageView-->
+        <!--                    android:layout_width="25dp"-->
+        <!--                    android:layout_height="25dp"-->
+        <!--                    android:src="@mipmap/ic_email"-->
+        <!--                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:gravity="center_vertical"
-                    android:text="Email"
-                    android:textColor="#424242"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+        <!--                <TextView-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_marginStart="8dp"-->
+        <!--                    android:gravity="center_vertical"-->
+        <!--                    android:text="Email"-->
+        <!--                    android:textColor="#424242"-->
+        <!--                    android:textSize="13sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
 
-            <TextView
-                android:id="@+id/tvEmpEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="28dp"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/avatar_text"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+        <!--            <TextView-->
+        <!--                android:id="@+id/tvEmpEmail"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginStart="28dp"-->
+        <!--                android:layout_marginTop="2dp"-->
+        <!--                android:ellipsize="end"-->
+        <!--                android:maxLines="1"-->
+        <!--                android:textColor="@color/avatar_text"-->
+        <!--                android:textSize="13sp"-->
+        <!--                android:textStyle="bold" />-->
+        <!--        </LinearLayout>-->
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
