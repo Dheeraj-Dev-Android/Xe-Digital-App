@@ -782,6 +782,7 @@
                         android:id="@+id/punchInLabel"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
+
                     <TextView
                         android:id="@+id/tvPunchInTime"
                         android:layout_width="0dp"
@@ -803,6 +804,7 @@
                         android:id="@+id/punchOutLabel"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
+
                     <TextView
                         android:id="@+id/tvPunchOutTime"
                         android:layout_width="0dp"

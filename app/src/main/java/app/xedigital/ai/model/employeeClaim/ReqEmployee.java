@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Employee {
+public class ReqEmployee {
 
     @SerializedName("joiningType")
     private String joiningType;
@@ -122,9 +122,6 @@ public class Employee {
 
     @SerializedName("designation")
     private String designation;
-
-    @SerializedName("fullname")
-    private String fullname;
 
     @SerializedName("crossmanager")
     private String crossmanager;
@@ -289,10 +286,6 @@ public class Employee {
 
     public String getDesignation() {
         return designation;
-    }
-
-    public String getFullname() {
-        return fullname;
     }
 
     public String getCrossmanager() {

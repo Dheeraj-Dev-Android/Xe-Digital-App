@@ -3,7 +3,6 @@ package app.xedigital.ai.api;
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
 import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
-import app.xedigital.ai.model.Food.FoodRequest;
 import app.xedigital.ai.model.TeamLeave.TeamLeaveResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
 import app.xedigital.ai.model.TeamTimesheetResponse.TeamTimesheetResponse;
@@ -22,6 +21,7 @@ import app.xedigital.ai.model.bucket.BucketRequest;
 import app.xedigital.ai.model.bucket.BucketResponse;
 import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
 import app.xedigital.ai.model.cfRegularizeApproval.CfRegularizeApprovalResponse;
+import app.xedigital.ai.model.claim.ExpenseRequest;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
@@ -146,7 +146,9 @@ public interface APIInterface {
     @GET("policies")
     retrofit2.Call<PolicyResponse> getPolicies(@Header("Authorization") String authToken);
 
-    @GET("claims/employee/claim")
+    //    @GET("claims/employee/claim")
+//    https://app.xedigital.ai/api/v1/claims/getAll/claim
+    @GET("claims/getAll/claim")
     retrofit2.Call<EmployeeClaimResponse> getClaims(@Header("Authorization") String authToken);
 
     @GET("claims/employee/claim?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true")
@@ -211,7 +213,16 @@ public interface APIInterface {
 
     //  POST APIs
     @POST("claims/food")
-    retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body FoodRequest foodRequest);
+    retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body ExpenseRequest foodRequest);
+
+    @POST("claims/travel")
+    retrofit2.Call<ResponseBody> TravelClaimApi(@Header("Authorization") String token, @Body ExpenseRequest travelRequest);
+
+    @POST("claims/accommodation")
+    retrofit2.Call<ResponseBody> AccommodationClaimApi(@Header("Authorization") String token, @Body ExpenseRequest accommodationRequest);
+
+    @POST("claims/miscellaneous")
+    retrofit2.Call<ResponseBody> MiscellaneousClaimApi(@Header("Authorization") String token, @Body ExpenseRequest miscellaneousRequest);
 
     @POST("face/recognize")
     retrofit2.Call<ResponseBody> FaceRecognitionApi(@Body RequestBody requestBody);

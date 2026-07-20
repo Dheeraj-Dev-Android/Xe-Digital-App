@@ -153,15 +153,6 @@ public class LoginActivity extends AppCompatActivity {
         proceedToAuthCheck();
     }
 
-    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    evaluateSessionWorkflow();
-                } else {
-                    proceedToAuthCheck();
-                }
-            });
-
     private void showBackgroundPermissionDialog(String token) {
         if (isFinishing() || isDestroyed()) return;
         if (backgroundDialog != null && backgroundDialog.isShowing()) return;
@@ -238,6 +229,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    evaluateSessionWorkflow();
+                } else {
+                    proceedToAuthCheck();
+                }
+            });
 
     private boolean hasForegroundLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

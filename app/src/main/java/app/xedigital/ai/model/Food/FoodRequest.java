@@ -307,276 +307,276 @@ public class FoodRequest {
     @SerializedName("meantype")
     private String meantype;
 
-    public void setDocFileURLTwo(String docFileURLTwo) {
-        this.docFileURLTwo = docFileURLTwo;
-    }
-
     public String getDocFileURLTwo() {
         return docFileURLTwo;
     }
 
-    public void setImageNine(String imageNine) {
-        this.imageNine = imageNine;
+    public void setDocFileURLTwo(String docFileURLTwo) {
+        this.docFileURLTwo = docFileURLTwo;
     }
 
     public String getImageNine() {
         return imageNine;
     }
 
-    public void setPerposeofmeet(String perposeofmeet) {
-        this.perposeofmeet = perposeofmeet;
+    public void setImageNine(String imageNine) {
+        this.imageNine = imageNine;
     }
 
     public String getPerposeofmeet() {
         return perposeofmeet;
     }
 
-    public void setDocFileURLSeven(String docFileURLSeven) {
-        this.docFileURLSeven = docFileURLSeven;
+    public void setPerposeofmeet(String perposeofmeet) {
+        this.perposeofmeet = perposeofmeet;
     }
 
     public String getDocFileURLSeven() {
         return docFileURLSeven;
     }
 
-    public void setImageFive(String imageFive) {
-        this.imageFive = imageFive;
+    public void setDocFileURLSeven(String docFileURLSeven) {
+        this.docFileURLSeven = docFileURLSeven;
     }
 
     public String getImageFive() {
         return imageFive;
     }
 
-    public void setParkingdate(String parkingdate) {
-        this.parkingdate = parkingdate;
+    public void setImageFive(String imageFive) {
+        this.imageFive = imageFive;
     }
 
     public String getParkingdate() {
         return parkingdate;
     }
 
-    public void setCheckin(String checkin) {
-        this.checkin = checkin;
+    public void setParkingdate(String parkingdate) {
+        this.parkingdate = parkingdate;
     }
 
     public String getCheckin() {
         return checkin;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setCheckin(String checkin) {
+        this.checkin = checkin;
     }
 
     public String getState() {
         return state;
     }
 
-    public void setMeeting(String meeting) {
-        this.meeting = meeting;
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getMeeting() {
         return meeting;
     }
 
-    public void setDocFileURLKeySix(String docFileURLKeySix) {
-        this.docFileURLKeySix = docFileURLKeySix;
+    public void setMeeting(String meeting) {
+        this.meeting = meeting;
     }
 
     public String getDocFileURLKeySix() {
         return docFileURLKeySix;
     }
 
-    public void setTolllocation(String tolllocation) {
-        this.tolllocation = tolllocation;
+    public void setDocFileURLKeySix(String docFileURLKeySix) {
+        this.docFileURLKeySix = docFileURLKeySix;
     }
 
     public String getTolllocation() {
         return tolllocation;
     }
 
-    public void setImageSeven(String imageSeven) {
-        this.imageSeven = imageSeven;
+    public void setTolllocation(String tolllocation) {
+        this.tolllocation = tolllocation;
     }
 
     public String getImageSeven() {
         return imageSeven;
     }
 
-    public void setToaddress(String toaddress) {
-        this.toaddress = toaddress;
+    public void setImageSeven(String imageSeven) {
+        this.imageSeven = imageSeven;
     }
 
     public String getToaddress() {
         return toaddress;
     }
 
-    public void setDocFileURLKeySeven(String docFileURLKeySeven) {
-        this.docFileURLKeySeven = docFileURLKeySeven;
+    public void setToaddress(String toaddress) {
+        this.toaddress = toaddress;
     }
 
     public String getDocFileURLKeySeven() {
         return docFileURLKeySeven;
     }
 
-    public void setConfbutton(boolean confbutton) {
-        this.confbutton = confbutton;
+    public void setDocFileURLKeySeven(String docFileURLKeySeven) {
+        this.docFileURLKeySeven = docFileURLKeySeven;
     }
 
     public boolean isConfbutton() {
         return confbutton;
     }
 
-    public void setBillingperiod(String billingperiod) {
-        this.billingperiod = billingperiod;
+    public void setConfbutton(boolean confbutton) {
+        this.confbutton = confbutton;
     }
 
     public String getBillingperiod() {
         return billingperiod;
     }
 
-    public void setPurposeofstay(String purposeofstay) {
-        this.purposeofstay = purposeofstay;
+    public void setBillingperiod(String billingperiod) {
+        this.billingperiod = billingperiod;
     }
 
     public String getPurposeofstay() {
         return purposeofstay;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setPurposeofstay(String purposeofstay) {
+        this.purposeofstay = purposeofstay;
     }
 
     public String getLastname() {
         return lastname;
     }
 
-    public void setDocFileURLKey(String docFileURLKey) {
-        this.docFileURLKey = docFileURLKey;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public String getDocFileURLKey() {
         return docFileURLKey;
     }
 
-    public void setReportingManagerEmail(String reportingManagerEmail) {
-        this.reportingManagerEmail = reportingManagerEmail;
+    public void setDocFileURLKey(String docFileURLKey) {
+        this.docFileURLKey = docFileURLKey;
     }
 
     public String getReportingManagerEmail() {
         return reportingManagerEmail;
     }
 
-    public void setPersons(String persons) {
-        this.persons = persons;
+    public void setReportingManagerEmail(String reportingManagerEmail) {
+        this.reportingManagerEmail = reportingManagerEmail;
     }
 
     public String getPersons() {
         return persons;
     }
 
-    public void setImageTwo(String imageTwo) {
-        this.imageTwo = imageTwo;
+    public void setPersons(String persons) {
+        this.persons = persons;
     }
 
     public String getImageTwo() {
         return imageTwo;
     }
 
-    public void setExpancecategory(String expancecategory) {
-        this.expancecategory = expancecategory;
+    public void setImageTwo(String imageTwo) {
+        this.imageTwo = imageTwo;
     }
 
     public String getExpancecategory() {
         return expancecategory;
     }
 
-    public void setTotalamount(String totalamount) {
-        this.totalamount = totalamount;
+    public void setExpancecategory(String expancecategory) {
+        this.expancecategory = expancecategory;
     }
 
     public String getTotalamount() {
         return totalamount;
     }
 
-    public void setGrade(String grade) {
-        this.grade = grade;
+    public void setTotalamount(String totalamount) {
+        this.totalamount = totalamount;
     }
 
     public String getGrade() {
         return grade;
     }
 
-    public void setGuest(boolean guest) {
-        this.guest = guest;
+    public void setGrade(String grade) {
+        this.grade = grade;
     }
 
     public boolean isGuest() {
         return guest;
     }
 
-    public void setTotalClaim(int totalClaim) {
-        this.totalClaim = totalClaim;
+    public void setGuest(boolean guest) {
+        this.guest = guest;
     }
 
     public int getTotalClaim() {
         return totalClaim;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTotalClaim(int totalClaim) {
+        this.totalClaim = totalClaim;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setDocFileURLOne(String docFileURLOne) {
-        this.docFileURLOne = docFileURLOne;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDocFileURLOne() {
         return docFileURLOne;
     }
 
-    public void setShared(String shared) {
-        this.shared = shared;
+    public void setDocFileURLOne(String docFileURLOne) {
+        this.docFileURLOne = docFileURLOne;
     }
 
     public String getShared() {
         return shared;
     }
 
-    public void setImageSix(String imageSix) {
-        this.imageSix = imageSix;
+    public void setShared(String shared) {
+        this.shared = shared;
     }
 
     public String getImageSix() {
         return imageSix;
     }
 
-    public void setDocFileURL(String docFileURL) {
-        this.docFileURL = docFileURL;
+    public void setImageSix(String imageSix) {
+        this.imageSix = imageSix;
     }
 
     public String getDocFileURL() {
         return docFileURL;
     }
 
-    public void setDocFileURLEight(String docFileURLEight) {
-        this.docFileURLEight = docFileURLEight;
+    public void setDocFileURL(String docFileURL) {
+        this.docFileURL = docFileURL;
     }
 
     public String getDocFileURLEight() {
         return docFileURLEight;
     }
 
-    public void setEmployeeCode(String employeeCode) {
-        this.employeeCode = employeeCode;
+    public void setDocFileURLEight(String docFileURLEight) {
+        this.docFileURLEight = docFileURLEight;
     }
 
     public String getEmployeeCode() {
         return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
     }
 
     public Object getReqDepartment() {
@@ -587,68 +587,68 @@ public class FoodRequest {
         this.reqDepartment = reqDepartment;
     }
 
-    public void setVehiclenumber(String vehiclenumber) {
-        this.vehiclenumber = vehiclenumber;
-    }
-
     public String getVehiclenumber() {
         return vehiclenumber;
     }
 
-    public void setBu(String bu) {
-        this.bu = bu;
+    public void setVehiclenumber(String vehiclenumber) {
+        this.vehiclenumber = vehiclenumber;
     }
 
     public String getBu() {
         return bu;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setBu(String bu) {
+        this.bu = bu;
     }
 
     public String getCurrency() {
         return currency;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setImageThree(String imageThree) {
-        this.imageThree = imageThree;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getImageThree() {
         return imageThree;
     }
 
-    public void setRestaurant(String restaurant) {
-        this.restaurant = restaurant;
+    public void setImageThree(String imageThree) {
+        this.imageThree = imageThree;
     }
 
     public String getRestaurant() {
         return restaurant;
     }
 
-    public void setReportingManagerName(String reportingManagerName) {
-        this.reportingManagerName = reportingManagerName;
+    public void setRestaurant(String restaurant) {
+        this.restaurant = restaurant;
     }
 
     public String getReportingManagerName() {
         return reportingManagerName;
     }
 
-    public void setDocFileURLKeyFour(String docFileURLKeyFour) {
-        this.docFileURLKeyFour = docFileURLKeyFour;
+    public void setReportingManagerName(String reportingManagerName) {
+        this.reportingManagerName = reportingManagerName;
     }
 
     public String getDocFileURLKeyFour() {
         return docFileURLKeyFour;
+    }
+
+    public void setDocFileURLKeyFour(String docFileURLKeyFour) {
+        this.docFileURLKeyFour = docFileURLKeyFour;
     }
 
     public void setmodeofcal(String modeofcal) {
@@ -659,108 +659,108 @@ public class FoodRequest {
         return modeofcal;
     }
 
-    public void setImageEight(String imageEight) {
-        this.imageEight = imageEight;
-    }
-
     public String getImageEight() {
         return imageEight;
     }
 
-    public void setDocFileURLNine(String docFileURLNine) {
-        this.docFileURLNine = docFileURLNine;
+    public void setImageEight(String imageEight) {
+        this.imageEight = imageEight;
     }
 
     public String getDocFileURLNine() {
         return docFileURLNine;
     }
 
-    public void setCrossmanager(Crossmanager crossmanager) {
-        this.crossmanager = crossmanager;
+    public void setDocFileURLNine(String docFileURLNine) {
+        this.docFileURLNine = docFileURLNine;
     }
 
     public Crossmanager getCrossmanager() {
         return crossmanager;
     }
 
-    public void setTravelCategory(String travelCategory) {
-        this.travelCategory = travelCategory;
+    public void setCrossmanager(Crossmanager crossmanager) {
+        this.crossmanager = crossmanager;
     }
 
     public String getTravelCategory() {
         return travelCategory;
     }
 
-    public void setDocFileURLFive(String docFileURLFive) {
-        this.docFileURLFive = docFileURLFive;
+    public void setTravelCategory(String travelCategory) {
+        this.travelCategory = travelCategory;
     }
 
     public String getDocFileURLFive() {
         return docFileURLFive;
     }
 
-    public void setFueltype(String fueltype) {
-        this.fueltype = fueltype;
+    public void setDocFileURLFive(String docFileURLFive) {
+        this.docFileURLFive = docFileURLFive;
     }
 
     public String getFueltype() {
         return fueltype;
     }
 
-    public void setImageFour(String imageFour) {
-        this.imageFour = imageFour;
+    public void setFueltype(String fueltype) {
+        this.fueltype = fueltype;
     }
 
     public String getImageFour() {
         return imageFour;
     }
 
-    public void setAccommodationtype(String accommodationtype) {
-        this.accommodationtype = accommodationtype;
+    public void setImageFour(String imageFour) {
+        this.imageFour = imageFour;
     }
 
     public String getAccommodationtype() {
         return accommodationtype;
     }
 
-    public void setDocFileURLThree(String docFileURLThree) {
-        this.docFileURLThree = docFileURLThree;
+    public void setAccommodationtype(String accommodationtype) {
+        this.accommodationtype = accommodationtype;
     }
 
     public String getDocFileURLThree() {
         return docFileURLThree;
     }
 
-    public void setProject(String project) {
-        this.project = project;
+    public void setDocFileURLThree(String docFileURLThree) {
+        this.docFileURLThree = docFileURLThree;
     }
 
     public String getProject() {
         return project;
     }
 
-    public void setEmployee(String employee) {
-        this.employee = employee;
+    public void setProject(String project) {
+        this.project = project;
     }
 
     public String getEmployee() {
         return employee;
     }
 
-    public void setVarients(String varients) {
-        this.varients = varients;
+    public void setEmployee(String employee) {
+        this.employee = employee;
     }
 
     public String getVarients() {
         return varients;
     }
 
-    public void setEmpTransport(String empTransport) {
-        this.empTransport = empTransport;
+    public void setVarients(String varients) {
+        this.varients = varients;
     }
 
     public String getEmpTransport() {
         return empTransport;
+    }
+
+    public void setEmpTransport(String empTransport) {
+        this.empTransport = empTransport;
     }
 
     public String getModeofcal() {
@@ -771,347 +771,347 @@ public class FoodRequest {
         this.Modeofcal = Modeofcal;
     }
 
-    public void setTollvehiclenumber(String tollvehiclenumber) {
-        this.tollvehiclenumber = tollvehiclenumber;
-    }
-
     public String getTollvehiclenumber() {
         return tollvehiclenumber;
     }
 
-    public void setDocFileURLKeyOne(String docFileURLKeyOne) {
-        this.docFileURLKeyOne = docFileURLKeyOne;
+    public void setTollvehiclenumber(String tollvehiclenumber) {
+        this.tollvehiclenumber = tollvehiclenumber;
     }
 
     public String getDocFileURLKeyOne() {
         return docFileURLKeyOne;
     }
 
-    public void setDedicated(String dedicated) {
-        this.dedicated = dedicated;
+    public void setDocFileURLKeyOne(String docFileURLKeyOne) {
+        this.docFileURLKeyOne = docFileURLKeyOne;
     }
 
     public String getDedicated() {
         return dedicated;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setDedicated(String dedicated) {
+        this.dedicated = dedicated;
     }
 
     public String getImage() {
         return image;
     }
 
-    public void setReportingManager(ReportingManager reportingManager) {
-        this.reportingManager = reportingManager;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public ReportingManager getReportingManager() {
         return reportingManager;
     }
 
-    public void setModeoftransport(String modeoftransport) {
-        this.modeoftransport = modeoftransport;
+    public void setReportingManager(ReportingManager reportingManager) {
+        this.reportingManager = reportingManager;
     }
 
     public String getModeoftransport() {
         return modeoftransport;
     }
 
-    public void setDocFileURLKeyThree(String docFileURLKeyThree) {
-        this.docFileURLKeyThree = docFileURLKeyThree;
+    public void setModeoftransport(String modeoftransport) {
+        this.modeoftransport = modeoftransport;
     }
 
     public String getDocFileURLKeyThree() {
         return docFileURLKeyThree;
     }
 
-    public void setBuName(String buName) {
-        this.buName = buName;
+    public void setDocFileURLKeyThree(String docFileURLKeyThree) {
+        this.docFileURLKeyThree = docFileURLKeyThree;
     }
 
     public String getBuName() {
         return buName;
     }
 
-    public void setDocFileURLSix(String docFileURLSix) {
-        this.docFileURLSix = docFileURLSix;
+    public void setBuName(String buName) {
+        this.buName = buName;
     }
 
     public String getDocFileURLSix() {
         return docFileURLSix;
     }
 
-    public void setDocFileURLKeyTwo(String docFileURLKeyTwo) {
-        this.docFileURLKeyTwo = docFileURLKeyTwo;
+    public void setDocFileURLSix(String docFileURLSix) {
+        this.docFileURLSix = docFileURLSix;
     }
 
     public String getDocFileURLKeyTwo() {
         return docFileURLKeyTwo;
     }
 
-    public void setBillnumber(String billnumber) {
-        this.billnumber = billnumber;
+    public void setDocFileURLKeyTwo(String docFileURLKeyTwo) {
+        this.docFileURLKeyTwo = docFileURLKeyTwo;
     }
 
     public String getBillnumber() {
         return billnumber;
     }
 
-    public void setParkinglocation(String parkinglocation) {
-        this.parkinglocation = parkinglocation;
+    public void setBillnumber(String billnumber) {
+        this.billnumber = billnumber;
     }
 
     public String getParkinglocation() {
         return parkinglocation;
     }
 
-    public void setIndividually(String individually) {
-        this.individually = individually;
+    public void setParkinglocation(String parkinglocation) {
+        this.parkinglocation = parkinglocation;
     }
 
     public String getIndividually() {
         return individually;
     }
 
-    public void setDesignation(String designation) {
-        this.designation = designation;
+    public void setIndividually(String individually) {
+        this.individually = individually;
     }
 
     public String getDesignation() {
         return designation;
     }
 
-    public void setHrEmail(String hrEmail) {
-        this.hrEmail = hrEmail;
+    public void setDesignation(String designation) {
+        this.designation = designation;
     }
 
     public String getHrEmail() {
         return hrEmail;
     }
 
-    public void setTollplazaname(String tollplazaname) {
-        this.tollplazaname = tollplazaname;
+    public void setHrEmail(String hrEmail) {
+        this.hrEmail = hrEmail;
     }
 
     public String getTollplazaname() {
         return tollplazaname;
     }
 
-    public void setBuEmail(String buEmail) {
-        this.buEmail = buEmail;
+    public void setTollplazaname(String tollplazaname) {
+        this.tollplazaname = tollplazaname;
     }
 
     public String getBuEmail() {
         return buEmail;
     }
 
-    public void setEmpId(String empId) {
-        this.empId = empId;
+    public void setBuEmail(String buEmail) {
+        this.buEmail = buEmail;
     }
 
     public String getEmpId() {
         return empId;
     }
 
-    public void setRequest(String request) {
-        this.request = request;
+    public void setEmpId(String empId) {
+        this.empId = empId;
     }
 
     public String getRequest() {
         return request;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setRequest(String request) {
+        this.request = request;
     }
 
     public String getFirstname() {
         return firstname;
     }
 
-    public void setRequestedlastname(String requestedlastname) {
-        this.requestedlastname = requestedlastname;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
     public String getRequestedlastname() {
         return requestedlastname;
     }
 
-    public void setDistance(String distance) {
-        this.distance = distance;
+    public void setRequestedlastname(String requestedlastname) {
+        this.requestedlastname = requestedlastname;
     }
 
     public String getDistance() {
         return distance;
     }
 
-    public void setImageOne(String imageOne) {
-        this.imageOne = imageOne;
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 
     public String getImageOne() {
         return imageOne;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setImageOne(String imageOne) {
+        this.imageOne = imageOne;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setFuelstationname(String fuelstationname) {
-        this.fuelstationname = fuelstationname;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getFuelstationname() {
         return fuelstationname;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setFuelstationname(String fuelstationname) {
+        this.fuelstationname = fuelstationname;
     }
 
     public String getRemark() {
         return remark;
     }
 
-    public void setFuelquantity(String fuelquantity) {
-        this.fuelquantity = fuelquantity;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getFuelquantity() {
         return fuelquantity;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public void setFuelquantity(String fuelquantity) {
+        this.fuelquantity = fuelquantity;
     }
 
     public String getDuration() {
         return duration;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public Department getDepartment() {
         return department;
     }
 
-    public void setCheckout(String checkout) {
-        this.checkout = checkout;
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
     public String getCheckout() {
         return checkout;
     }
 
-    public void setExpenseType(String expenseType) {
-        this.expenseType = expenseType;
+    public void setCheckout(String checkout) {
+        this.checkout = checkout;
     }
 
     public String getExpenseType() {
         return expenseType;
     }
 
-    public void setDocFileURLKeyEight(String docFileURLKeyEight) {
-        this.docFileURLKeyEight = docFileURLKeyEight;
+    public void setExpenseType(String expenseType) {
+        this.expenseType = expenseType;
     }
 
     public String getDocFileURLKeyEight() {
         return docFileURLKeyEight;
     }
 
-    public void setRequestedfirstname(String requestedfirstname) {
-        this.requestedfirstname = requestedfirstname;
+    public void setDocFileURLKeyEight(String docFileURLKeyEight) {
+        this.docFileURLKeyEight = docFileURLKeyEight;
     }
 
     public String getRequestedfirstname() {
         return requestedfirstname;
     }
 
-    public void setNetprovider(String netprovider) {
-        this.netprovider = netprovider;
+    public void setRequestedfirstname(String requestedfirstname) {
+        this.requestedfirstname = requestedfirstname;
     }
 
     public String getNetprovider() {
         return netprovider;
     }
 
-    public void setDocFileURLFour(String docFileURLFour) {
-        this.docFileURLFour = docFileURLFour;
+    public void setNetprovider(String netprovider) {
+        this.netprovider = netprovider;
     }
 
     public String getDocFileURLFour() {
         return docFileURLFour;
     }
 
-    public void setDocFileURLKeyNine(String docFileURLKeyNine) {
-        this.docFileURLKeyNine = docFileURLKeyNine;
+    public void setDocFileURLFour(String docFileURLFour) {
+        this.docFileURLFour = docFileURLFour;
     }
 
     public String getDocFileURLKeyNine() {
         return docFileURLKeyNine;
     }
 
-    public void setClaimDate(String claimDate) {
-        this.claimDate = claimDate;
+    public void setDocFileURLKeyNine(String docFileURLKeyNine) {
+        this.docFileURLKeyNine = docFileURLKeyNine;
     }
 
     public String getClaimDate() {
         return claimDate;
     }
 
-    public void setTravelRefId(String travelRefId) {
-        this.travelRefId = travelRefId;
+    public void setClaimDate(String claimDate) {
+        this.claimDate = claimDate;
     }
 
     public String getTravelRefId() {
         return travelRefId;
     }
 
-    public void setDocFileURLKeyFive(String docFileURLKeyFive) {
-        this.docFileURLKeyFive = docFileURLKeyFive;
+    public void setTravelRefId(String travelRefId) {
+        this.travelRefId = travelRefId;
     }
 
     public String getDocFileURLKeyFive() {
         return docFileURLKeyFive;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setDocFileURLKeyFive(String docFileURLKeyFive) {
+        this.docFileURLKeyFive = docFileURLKeyFive;
     }
 
     public String getLocation() {
         return location;
     }
 
-    public void setAccommodationname(String accommodationname) {
-        this.accommodationname = accommodationname;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getAccommodationname() {
         return accommodationname;
     }
 
-    public void setFromaddress(String fromaddress) {
-        this.fromaddress = fromaddress;
+    public void setAccommodationname(String accommodationname) {
+        this.accommodationname = accommodationname;
     }
 
     public String getFromaddress() {
         return fromaddress;
     }
 
-    public void setMeantype(String meantype) {
-        this.meantype = meantype;
+    public void setFromaddress(String fromaddress) {
+        this.fromaddress = fromaddress;
     }
 
     public String getMeantype() {
         return meantype;
+    }
+
+    public void setMeantype(String meantype) {
+        this.meantype = meantype;
     }
 }

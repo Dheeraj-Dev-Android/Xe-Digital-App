@@ -26,8 +26,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.chip.Chip;
 
@@ -48,7 +51,6 @@ public class ClaimManagementFragment extends Fragment {
 
     private final Calendar calendar = Calendar.getInstance();
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-    // Track uploaded URIs locally to handle flexible deletions easily
     private final List<Uri> selectedFileUris = new ArrayList<>();
     private FragmentClaimManagementBinding binding;
     private ClaimManagementViewModel viewModel;
@@ -92,6 +94,7 @@ public class ClaimManagementFragment extends Fragment {
         setupDropdownObservers();
         setupLayoutVisibilityLogic();
         setupValidationClearListeners();
+        setupTextSyncWatchers();
 
         viewModel.toastMessage.observe(getViewLifecycleOwner(), msg -> {
             if (msg != null) Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
@@ -109,17 +112,34 @@ public class ClaimManagementFragment extends Fragment {
                 clearAllFieldErrors();
             }
         });
+        viewModel.getSubmissionSuccess().observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                binding.restaurantNameInput.setText("");
+                binding.numberOfPersonsInput.setText("");
+                binding.foodCommentInput.setText("");
+                binding.projectName.setText("");
+                binding.purposeInput.setText("");
+                binding.amountInput.setText("");
+                binding.claimDateInput.setText("");
+                binding.selectedFilesContainer.removeAllViews();
+                binding.selectedFileText.setVisibility(View.GONE);
+                binding.forGuestEmployeesCheckbox.setChecked(false);
+                binding.businessUnitDropdown.setSelection(0);
+                NavController navController = NavHostFragment.findNavController(this);
+                navController.navigate(R.id.action_nav_claim_management_to_nav_view_claim);
+                viewModel.resetSubmissionSuccess();
+            }
+        });
 
         return binding.getRoot();
     }
 
     private void setupPickersAndButtons() {
-        binding.claimDateInput.setOnClickListener(v -> showDatePicker(binding.claimDateInput, true));
-
-        binding.accommodationCheckInDate.setOnClickListener(v -> showDatePicker(binding.accommodationCheckInDate, false));
-        binding.accommodationCheckOutDate.setOnClickListener(v -> showDatePicker(binding.accommodationCheckOutDate, false));
-        binding.internetBillingPeriodInput.setOnClickListener(v -> showDatePicker(binding.internetBillingPeriodInput, false));
-        binding.parkingDateInput.setOnClickListener(v -> showDatePicker(binding.parkingDateInput, false));
+        binding.claimDateInput.setOnClickListener(v -> showDatePicker(binding.claimDateInput, 1));
+        binding.accommodationCheckInDate.setOnClickListener(v -> showDatePicker(binding.accommodationCheckInDate, 2));
+        binding.accommodationCheckOutDate.setOnClickListener(v -> showDatePicker(binding.accommodationCheckOutDate, 3));
+        binding.internetBillingPeriodInput.setOnClickListener(v -> showDatePicker(binding.internetBillingPeriodInput, 4));
+        binding.parkingDateInput.setOnClickListener(v -> showDatePicker(binding.parkingDateInput, 5));
 
         binding.uploadButton.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -138,17 +158,20 @@ public class ClaimManagementFragment extends Fragment {
         binding.approveClaimChip.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_nav_claim_management_to_nav_approve_claim));
     }
 
-    private void showDatePicker(EditText targetEditText, boolean updateViewModel) {
+    private void showDatePicker(EditText targetEditText, int dateTypeKey) {
         new DatePickerDialog(requireContext(), (view, year, month, day) -> {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.DAY_OF_MONTH, day);
 
             String formattedDate = dateFormatter.format(calendar.getTime());
-            if (updateViewModel) {
-                viewModel.claimDate.setValue(formattedDate);
-            }
             targetEditText.setText(formattedDate);
+
+            if (dateTypeKey == 1) viewModel.claimDate.setValue(formattedDate);
+            else if (dateTypeKey == 2) viewModel.accommodationCheckIn.setValue(formattedDate);
+            else if (dateTypeKey == 3) viewModel.accommodationCheckOut.setValue(formattedDate);
+            else if (dateTypeKey == 4) viewModel.billingPeriod.setValue(formattedDate);
+            else if (dateTypeKey == 5) viewModel.parkingDate.setValue(formattedDate);
 
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
@@ -209,89 +232,135 @@ public class ClaimManagementFragment extends Fragment {
         }
 
         if (!isValid) {
-            if (focusView != null) {
-                focusView.requestFocus();
-            }
+            if (focusView != null) focusView.requestFocus();
             Toast.makeText(requireContext(), "Please fill all mandatory fields marked with (*)", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        viewModel.claimDate.setValue(claimDateVal);
-        viewModel.projectName.setValue(projectNameVal);
-        viewModel.purposeOfMeeting.setValue(purposeVal);
-        viewModel.totalAmount.setValue(amountVal);
+        // Determine Active Selection Chip State String
+        String activeExpenseType = "";
+        int checkedId = binding.expenseTypeChipGroup.getCheckedChipId();
+        if (checkedId != View.NO_ID) {
+            Chip chip = binding.expenseTypeChipGroup.findViewById(checkedId);
+            if (chip != null) {
+                activeExpenseType = chip.getText().toString().trim();
+            }
+        }
 
-        viewModel.startLocation.setValue(binding.startLocationInput.getText() != null ? binding.startLocationInput.getText().toString() : "");
-        viewModel.endLocation.setValue(binding.endLocationInput.getText() != null ? binding.endLocationInput.getText().toString() : "");
-        viewModel.remarks.setValue(binding.remarksInput.getText() != null ? binding.remarksInput.getText().toString() : "");
-        viewModel.customTransportInput.setValue(binding.EnterTransportInput.getText() != null ? binding.EnterTransportInput.getText().toString() : "");
+        if (activeExpenseType.isEmpty()) {
+            Toast.makeText(requireContext(), "Please select an expense category", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        String travelCategory = binding.travelCategoryDropdown.getSelectedItem() != null ? binding.travelCategoryDropdown.getSelectedItem().toString() : "";
-        String transportMode = binding.transportModeDropdown.getSelectedItem() != null ? binding.transportModeDropdown.getSelectedItem().toString() : "";
-        String transportShared = binding.transportModeShared.getSelectedItem() != null ? binding.transportModeShared.getSelectedItem().toString() : "";
-        String transportDedicated = binding.transportModeDedicated.getSelectedItem() != null ? binding.transportModeDedicated.getSelectedItem().toString() : "";
+        // Route directly into explicit distinct target API submission methods
+        switch (activeExpenseType) {
+            case "Food":
+                viewModel.executeFoodSubmit(meetingTypeVal, currencyVal);
+                break;
 
-        viewModel.validateAndExecute(isSubmit, meetingTypeVal, binding.claimCategoryDropdown.getSelectedItem().toString(), travelCategory, transportMode, transportShared, transportDedicated, currencyVal);
+            case "Travel":
+                String travelCat = binding.travelCategoryDropdown.getSelectedItem() != null ? binding.travelCategoryDropdown.getSelectedItem().toString() : "";
+                String transportMode = binding.transportModeDropdown.getSelectedItem() != null ? binding.transportModeDropdown.getSelectedItem().toString() : "";
+                String sharedMode = binding.transportModeShared.getSelectedItem() != null ? binding.transportModeShared.getSelectedItem().toString() : "";
+                String dedicatedMode = binding.transportModeDedicated.getSelectedItem() != null ? binding.transportModeDedicated.getSelectedItem().toString() : "";
+
+                viewModel.executeTravelSubmit(
+                        meetingTypeVal,
+                        travelCat,
+                        transportMode,
+                        sharedMode,
+                        dedicatedMode,
+                        currencyVal
+                );
+                break;
+
+            case "Accommodation":
+                viewModel.executeAccommodationSubmit(meetingTypeVal, currencyVal);
+                break;
+
+            case "Miscellaneous":
+                viewModel.executeMiscSubmit(meetingTypeVal, currencyVal);
+                break;
+
+            default:
+                Toast.makeText(requireContext(), "Unsupported expense type: " + activeExpenseType, Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
-    private void setupValidationClearListeners() {
-        binding.claimDateInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+    private void setupTextSyncWatchers() {
+        // --- 1. Claim Details ---
+        binding.projectName.addTextChangedListener(new SimpleTextWatcher(viewModel.projectName));
+        binding.purposeInput.addTextChangedListener(new SimpleTextWatcher(viewModel.purposeOfMeeting));
 
+        // --- 2. Travel Details ---
+        binding.EnterTransportInput.addTextChangedListener(new SimpleTextWatcher(viewModel.customTransportInput));
+        binding.startLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.startLocation));
+        binding.endLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.endLocation));
+
+        // --- 3. Food Details ---
+        binding.restaurantNameInput.addTextChangedListener(new SimpleTextWatcher(viewModel.restaurantName));
+        binding.numberOfPersonsInput.addTextChangedListener(new SimpleTextWatcher(viewModel.numberOfPersons));
+        binding.foodCommentInput.addTextChangedListener(new SimpleTextWatcher(viewModel.foodComment));
+        binding.foodTravelIdInput.addTextChangedListener(new SimpleTextWatcher(viewModel.foodTravelId));
+
+        // --- 4. Accommodation Details ---
+        binding.accommodationNameInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationName));
+        binding.accommodationAddressInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationAddress));
+        binding.accommodationRegionInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationRegion));
+        binding.purposeOfStayInput.addTextChangedListener(new SimpleTextWatcher(viewModel.purposeOfStay));
+        binding.accommodationTravelIdInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationTravelId));
+
+        // --- 5. Miscellaneous Details (Internet, Fuel, Parking, Toll) ---
+        // Internet
+        binding.internetProviderInput.addTextChangedListener(new SimpleTextWatcher(viewModel.internetProvider));
+        binding.internetBillNumberInput.addTextChangedListener(new SimpleTextWatcher(viewModel.internetBillNumber));
+
+        // Fuel
+        binding.fuelVehicleNumberInput.addTextChangedListener(new SimpleTextWatcher(viewModel.fuelVehicleNumber));
+        binding.fuelStationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.fuelStation));
+        binding.fuelQuantityInput.addTextChangedListener(new SimpleTextWatcher(viewModel.fuelQuantity));
+
+        // Parking
+        binding.parkingLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.parkingLocation));
+        binding.parkingDurationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.parkingDuration));
+
+        // Toll Charges
+        binding.tollVehicleNumberInput.addTextChangedListener(new SimpleTextWatcher(viewModel.tollVehicleNumber));
+        binding.tollPlazaNameInput.addTextChangedListener(new SimpleTextWatcher(viewModel.tollPlazaName));
+        binding.tollLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.tollLocation));
+
+        // --- 6. Category & Amount ---
+        binding.amountInput.addTextChangedListener(new SimpleTextWatcher(viewModel.totalAmount));
+
+        // --- 7. Remarks ---
+        binding.remarksInput.addTextChangedListener(new SimpleTextWatcher(viewModel.remarks));
+    }
+
+
+    private void setupValidationClearListeners() {
+        binding.claimDateInput.addTextChangedListener(new SimpleTextWatcher(null) {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) binding.claimDateInputLayout.setError(null);
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
         });
-
-        binding.projectName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+        binding.projectName.addTextChangedListener(new SimpleTextWatcher(null) {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) binding.projectNameLayout.setError(null);
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
         });
-
-        binding.purposeInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+        binding.purposeInput.addTextChangedListener(new SimpleTextWatcher(null) {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) binding.purposeInputLayout.setError(null);
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
         });
-
-        binding.amountInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+        binding.amountInput.addTextChangedListener(new SimpleTextWatcher(null) {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) binding.amountInputLayout.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
             }
         });
 
@@ -309,35 +378,16 @@ public class ClaimManagementFragment extends Fragment {
             }
         });
 
-        binding.currencyDropdown.setOnItemClickListener((parent, view, position, id) -> {
-            binding.currencyDropdownLayout.setError(null);
-        });
+        binding.currencyDropdown.setOnItemClickListener((parent, view, position, id) -> binding.currencyDropdownLayout.setError(null));
     }
 
     private void clearAllFieldErrors() {
         binding.claimDateInputLayout.setError(null);
-        binding.claimDateInputLayout.setErrorEnabled(false);
-        binding.claimDateInputLayout.setErrorEnabled(true);
-
         binding.projectNameLayout.setError(null);
-        binding.projectNameLayout.setErrorEnabled(false);
-        binding.projectNameLayout.setErrorEnabled(true);
-
         binding.purposeInputLayout.setError(null);
-        binding.purposeInputLayout.setErrorEnabled(false);
-        binding.purposeInputLayout.setErrorEnabled(true);
-
         binding.meetingTypeDropdownLayout.setError(null);
-        binding.meetingTypeDropdownLayout.setErrorEnabled(false);
-        binding.meetingTypeDropdownLayout.setErrorEnabled(true);
-
         binding.amountInputLayout.setError(null);
-        binding.amountInputLayout.setErrorEnabled(false);
-        binding.amountInputLayout.setErrorEnabled(true);
-
         binding.currencyDropdownLayout.setError(null);
-        binding.currencyDropdownLayout.setErrorEnabled(false);
-        binding.currencyDropdownLayout.setErrorEnabled(true);
     }
 
     private void setupDropdownObservers() {
@@ -349,35 +399,50 @@ public class ClaimManagementFragment extends Fragment {
         viewModel.dedicatedTransportModes.observe(getViewLifecycleOwner(), list -> binding.transportModeDedicated.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, list)));
         viewModel.currencyDropdown.observe(getViewLifecycleOwner(), list -> binding.currencyDropdown.setAdapter(new CurrencyArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, list)));
         viewModel.employeesList.observe(getViewLifecycleOwner(), list -> {
-            if (list != null) {
+            if (list != null)
                 binding.requestedEmployeeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, list));
-            }
         });
         viewModel.businessUnitsSpinnerData.observe(getViewLifecycleOwner(), list -> {
-            if (list != null) {
-                ArrayAdapter<BusinessUnitSpinnerItem> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, list);
-                binding.businessUnitDropdown.setAdapter(adapter);
-            }
+            if (list != null)
+                binding.businessUnitDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, list));
         });
     }
 
     private void setupLayoutVisibilityLogic() {
-        binding.forGuestEmployeesCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> binding.guestEmployeesFieldsContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE));
-
-//        String[] employeesList = {"Please Select"};
-//        binding.requestedEmployeeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, employeesList));
+        binding.forGuestEmployeesCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            binding.guestEmployeesFieldsContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            viewModel.isGuestClaim.setValue(isChecked);
+        });
 
         String[] mealTypes = {"Please Select", "Dinner", "Breakfast", "Lunch", "Snacks", "Refreshments", "Late night meals", "Others"};
         binding.mealTypeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, mealTypes));
+        binding.mealTypeDropdown.setOnItemSelectedListener(new SimpleSpinnerListener(viewModel.selectedMealType));
 
         String[] accommodationTypes = {"Please Select", "Hotel", "Guest House", "Rental", "Company Accommodation"};
         binding.accommodationTypeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, accommodationTypes));
+        binding.accommodationTypeDropdown.setOnItemSelectedListener(new SimpleSpinnerListener(viewModel.selectedAccommodationType));
 
         String[] miscCategories = {"Please Select", "Internet Expense", "Fuel Expense", "Parking Expense", "Toll Expense"};
         binding.miscExpenseCategoryDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, miscCategories));
+        binding.miscExpenseCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selection = parent.getItemAtPosition(position).toString();
+                viewModel.selectedMiscCategory.setValue(selection);
+                binding.internetExpenseFieldsContainer.setVisibility("Internet Expense".equals(selection) ? View.VISIBLE : View.GONE);
+                binding.fuelExpenseFieldsContainer.setVisibility("Fuel Expense".equals(selection) ? View.VISIBLE : View.GONE);
+                binding.parkingExpenseFieldsContainer.setVisibility("Parking Expense".equals(selection) ? View.VISIBLE : View.GONE);
+                binding.tollChargesFieldsContainer.setVisibility("Toll Expense".equals(selection) ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         String[] fuelTypes = {"Please Select", "Petrol", "Diesel"};
         binding.fuelTypeDropdown.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, fuelTypes));
+        binding.fuelTypeDropdown.setOnItemSelectedListener(new SimpleSpinnerListener(viewModel.selectedFuelType));
 
         binding.claimCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -419,6 +484,7 @@ public class ClaimManagementFragment extends Fragment {
         };
         binding.transportModeShared.setOnItemSelectedListener(othersListener);
         binding.transportModeDedicated.setOnItemSelectedListener(othersListener);
+
         binding.expenseTypeChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             StringBuilder sb = new StringBuilder();
             boolean travelChecked = false;
@@ -465,20 +531,6 @@ public class ClaimManagementFragment extends Fragment {
             binding.miscellaneousFieldsContainer.setVisibility(miscChecked ? View.VISIBLE : View.GONE);
         });
 
-        binding.miscExpenseCategoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selection = parent.getItemAtPosition(position).toString();
-                binding.internetExpenseFieldsContainer.setVisibility("Internet Expense".equals(selection) ? View.VISIBLE : View.GONE);
-                binding.fuelExpenseFieldsContainer.setVisibility("Fuel Expense".equals(selection) ? View.VISIBLE : View.GONE);
-                binding.parkingExpenseFieldsContainer.setVisibility("Parking Expense".equals(selection) ? View.VISIBLE : View.GONE);
-                binding.tollChargesFieldsContainer.setVisibility("Toll Expense".equals(selection) ? View.VISIBLE : View.GONE);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
         binding.businessUnitDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -486,6 +538,7 @@ public class ClaimManagementFragment extends Fragment {
                 if (selectedItem != null) {
                     String buId = selectedItem.getId();
                     viewModel.selectedBusinessUnitId.setValue(buId);
+                    viewModel.selectedBusinessUnitName.setValue(selectedItem.getName());
                     SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
                     String authToken = prefManager.getString("authToken", null);
 
@@ -501,16 +554,14 @@ public class ClaimManagementFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
         viewModel.transportLayoutType.observe(getViewLifecycleOwner(), type -> {
             binding.transportModeSharedLayout.setVisibility(type == 1 ? View.VISIBLE : View.GONE);
             binding.transportModeDedicatedLayout.setVisibility(type == 2 ? View.VISIBLE : View.GONE);
         });
 
         viewModel.showCustomTransportInput.observe(getViewLifecycleOwner(), show -> binding.EnterTransportInputLayout.setVisibility(show ? View.VISIBLE : View.GONE));
-
-        viewModel.underProcessTextState.observe(getViewLifecycleOwner(), text -> {
-            binding.underProcessText.setText(text);
-        });
+        viewModel.underProcessTextState.observe(getViewLifecycleOwner(), text -> binding.underProcessText.setText(text));
     }
 
     private void processPickedFiles(Intent data) {
@@ -599,5 +650,43 @@ public class ClaimManagementFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private static class SimpleTextWatcher implements TextWatcher {
+        private final MutableLiveData<String> targetLiveData;
+
+        public SimpleTextWatcher(MutableLiveData<String> liveData) {
+            this.targetLiveData = liveData;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (targetLiveData != null) targetLiveData.setValue(s.toString());
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    }
+
+    private static class SimpleSpinnerListener implements AdapterView.OnItemSelectedListener {
+        private final MutableLiveData<String> targetLiveData;
+
+        public SimpleSpinnerListener(MutableLiveData<String> liveData) {
+            this.targetLiveData = liveData;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            targetLiveData.setValue(parent.getItemAtPosition(position).toString());
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+        }
     }
 }

@@ -24,16 +24,14 @@ import java.util.List;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
-import app.xedigital.ai.model.Food.FoodRequest;
 import app.xedigital.ai.model.allEmployee.AllEmployeeResponse;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.businessUnit.BusItem;
 import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
 import app.xedigital.ai.model.businessUnit.BusinessUnitSpinnerItem;
+import app.xedigital.ai.model.claim.ExpenseRequest;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
-import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
-import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
 import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.user.UserModelResponse;
 import okhttp3.MediaType;
@@ -45,7 +43,6 @@ import retrofit2.Response;
 
 public class ClaimManagementViewModel extends AndroidViewModel {
 
-    // UI Dropdowns
     public final LiveData<List<String>> meetingTypes = new MutableLiveData<>(Arrays.asList("Select an option", "Business", "Project", "Pre Sales"));
     public final LiveData<List<String>> claimCategories = new MutableLiveData<>(Arrays.asList("Select an option", "General", "Standard"));
     public final LiveData<List<String>> travelCategories = new MutableLiveData<>(Arrays.asList("Select an option", "Local", "Domestic", "International"));
@@ -53,9 +50,12 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final LiveData<List<String>> sharedTransportModes = new MutableLiveData<>(Arrays.asList("Select an option", "Auto", "Car", "E-Rickshaw", "Metro", "Others"));
     public final LiveData<List<String>> dedicatedTransportModes = new MutableLiveData<>(Arrays.asList("Select an option", "Two-Wheeler", "Three-Wheeler", "Others"));
     public final LiveData<List<String>> currencyDropdown = new MutableLiveData<>(Arrays.asList("Select an option", "INR", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SEK", "NZD"));
+
     public final MutableLiveData<List<BusinessUnitSpinnerItem>> businessUnitsSpinnerData = new MutableLiveData<>();
     public final MutableLiveData<String> selectedBusinessUnitId = new MutableLiveData<>("");
+    public final MutableLiveData<String> selectedBusinessUnitName = new MutableLiveData<>("");
     public final MutableLiveData<List<String>> employeesList = new MutableLiveData<>(new ArrayList<>(Collections.singletonList("Please Select")));
+
     public final MutableLiveData<String> claimDate = new MutableLiveData<>("");
     public final MutableLiveData<String> projectName = new MutableLiveData<>("");
     public final MutableLiveData<String> purposeOfMeeting = new MutableLiveData<>("");
@@ -65,22 +65,81 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<String> remarks = new MutableLiveData<>("");
     public final MutableLiveData<String> customTransportInput = new MutableLiveData<>("");
     public final MutableLiveData<String> underProcessTextState = new MutableLiveData<>("");
+
+    public final MutableLiveData<String> selectedMealType = new MutableLiveData<>("");
+    public final MutableLiveData<Boolean> isGuestClaim = new MutableLiveData<>(false);
+    public final MutableLiveData<String> foodRestaurant = new MutableLiveData<>("");
+    public final MutableLiveData<String> foodPersonsCount = new MutableLiveData<>("1");
+    public final MutableLiveData<String> foodDescription = new MutableLiveData<>("");
+
+    // Accommodation Observables
+    public final MutableLiveData<String> selectedAccommodationType = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationName = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationLocation = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationState = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationCheckIn = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationCheckOut = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationPurpose = new MutableLiveData<>("");
+
+    // Miscellaneous Observables
+    public final MutableLiveData<String> selectedMiscCategory = new MutableLiveData<>("");
+    public final MutableLiveData<String> billingPeriod = new MutableLiveData<>("");
+    public final MutableLiveData<String> netProvider = new MutableLiveData<>("");
+    public final MutableLiveData<String> billNumber = new MutableLiveData<>("");
+    public final MutableLiveData<String> vehicleNumber = new MutableLiveData<>("");
+    public final MutableLiveData<String> selectedFuelType = new MutableLiveData<>("");
+    public final MutableLiveData<String> fuelQuantity = new MutableLiveData<>("");
+    public final MutableLiveData<String> fuelStationName = new MutableLiveData<>("");
+    public final MutableLiveData<String> parkingLocation = new MutableLiveData<>("");
+    public final MutableLiveData<String> parkingDate = new MutableLiveData<>("");
+    public final MutableLiveData<String> parkingDuration = new MutableLiveData<>("");
+    public final MutableLiveData<String> tollVehicleNumber = new MutableLiveData<>("");
+    public final MutableLiveData<String> tollPlazaName = new MutableLiveData<>("");
+    public final MutableLiveData<String> tollLocation = new MutableLiveData<>("");
+
     public final MutableLiveData<Boolean> isTravelSelected = new MutableLiveData<>(false);
     public final MutableLiveData<Integer> transportLayoutType = new MutableLiveData<>(0);
     public final MutableLiveData<Boolean> showCustomTransportInput = new MutableLiveData<>(false);
     public final MutableLiveData<String> toastMessage = new MutableLiveData<>();
     public final MutableLiveData<Boolean> operationSuccess = new MutableLiveData<>();
+
     public final String[] imageUrls = new String[10];
     public final String[] imageKeys = new String[10];
+    // --- Food Details ---
+    public final MutableLiveData<String> restaurantName = new MutableLiveData<>("");
+    public final MutableLiveData<String> numberOfPersons = new MutableLiveData<>("");
+    public final MutableLiveData<String> foodComment = new MutableLiveData<>("");
+    public final MutableLiveData<String> foodTravelId = new MutableLiveData<>("");
+    // --- Accommodation Details ---
+    public final MutableLiveData<String> accommodationAddress = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationRegion = new MutableLiveData<>("");
+    public final MutableLiveData<String> purposeOfStay = new MutableLiveData<>("");
+    public final MutableLiveData<String> accommodationTravelId = new MutableLiveData<>("");
+    // --- Miscellaneous Details: Internet Expense ---
+    public final MutableLiveData<String> internetProvider = new MutableLiveData<>("");
+    public final MutableLiveData<String> internetBillNumber = new MutableLiveData<>("");
+    // --- Miscellaneous Details: Fuel Expense ---
+    public final MutableLiveData<String> fuelVehicleNumber = new MutableLiveData<>("");
+    public final MutableLiveData<String> fuelStation = new MutableLiveData<>("");
     private final APIInterface apiInterface;
+    private final MutableLiveData<Boolean> _submissionSuccess = new MutableLiveData<>();
     public int claimLength;
     public String hrMail;
     private Employee employeeCache;
+    private int bUemail;
     private String authTokenHeader;
 
     public ClaimManagementViewModel(@NonNull Application application) {
         super(application);
         apiInterface = APIClient.getInstance().getApi();
+    }
+
+    public LiveData<Boolean> getSubmissionSuccess() {
+        return _submissionSuccess;
+    }
+
+    public void resetSubmissionSuccess() {
+        _submissionSuccess.setValue(false);
     }
 
     public void initAuth(String authToken) {
@@ -119,7 +178,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 } else {
                     Log.e("User", "Failed to fetch user data: " + response.code());
                 }
-
             }
 
             @Override
@@ -149,7 +207,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public void getClaimPrices(String authTokenHeader) {
         String authToken = "jwt " + authTokenHeader;
-        APIClient.getInstance().getApi().getClaimPrices(authToken).enqueue(new Callback<ClaimPriceResponse>() {
+        apiInterface.getClaimPrices(authToken).enqueue(new Callback<ClaimPriceResponse>() {
             @Override
             public void onResponse(@NonNull Call<ClaimPriceResponse> call, @NonNull Response<ClaimPriceResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -168,7 +226,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public void getBusinessUnit(String authTokenHeader) {
         String authToken = "jwt " + authTokenHeader;
-        APIClient.getInstance().getApi().getBusinessUnit(authToken).enqueue(new Callback<BusinessUnitResponse>() {
+        apiInterface.getBusinessUnit(authToken).enqueue(new Callback<BusinessUnitResponse>() {
             @Override
             public void onResponse(@NonNull Call<BusinessUnitResponse> call, @NonNull Response<BusinessUnitResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -196,7 +254,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             return;
         }
         String authToken = "jwt " + authTokenHeader;
-        APIClient.getInstance().getApi().getEmployeesByBusinessUnit(authToken, businessUnitId).enqueue(new Callback<EmployeeByBusinessUnitResponse>() {
+        apiInterface.getEmployeesByBusinessUnit(authToken, businessUnitId).enqueue(new Callback<EmployeeByBusinessUnitResponse>() {
             @Override
             public void onResponse(@NonNull Call<EmployeeByBusinessUnitResponse> call, @NonNull Response<EmployeeByBusinessUnitResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -208,6 +266,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                             String firstName = emp.getFirstname() != null ? emp.getFirstname() : "";
                             String lastName = emp.getLastname() != null ? emp.getLastname() : "";
                             String fullName = (firstName + " " + lastName).trim();
+                            bUemail = Integer.parseInt(emp.getEmail() != null ? emp.getEmail() : "");
 
                             if (!fullName.isEmpty()) {
                                 derivedEmployees.add(fullName);
@@ -229,7 +288,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public void getAllEmployees(String authTokenHeader) {
         String authToken = "jwt " + authTokenHeader;
-        APIClient.getInstance().getApi().getAllEmployees(authToken).enqueue(new Callback<AllEmployeeResponse>() {
+        apiInterface.getAllEmployees(authToken).enqueue(new Callback<AllEmployeeResponse>() {
             @Override
             public void onResponse(@NonNull Call<AllEmployeeResponse> call, @NonNull Response<AllEmployeeResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -246,10 +305,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                             }
                         }
                     }
-
                     employeesList.postValue(derivedEmployees);
-                    Log.d("AllEmployees", "All employees successfully parsed and posted.");
-
+                    Log.d("AllEmployees", "All employees successfully parsed.");
                 } else {
                     Log.e("AllEmployees", "Failed to fetch all employees: " + response.code());
                 }
@@ -262,7 +319,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         });
     }
 
-    // Single unified iterative file upload methodology replacing handleFile1 to handleFile10
     public void uploadFileAtIndex(Uri uri, int index) {
         if (index > 9) return;
         try {
@@ -338,212 +394,249 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         return words[index];
     }
 
-    public boolean validateAndExecute(boolean isSubmit, String meetingType, String claimCategory, String travelCategory, String transportMode, String sharedMode, String dedicatedMode, String currency) {
-        String dateVal = claimDate.getValue() != null ? claimDate.getValue().trim() : "";
-        String projectVal = projectName.getValue() != null ? projectName.getValue().trim() : "";
-        String purposeVal = purposeOfMeeting.getValue() != null ? purposeOfMeeting.getValue().trim() : "";
-        String amountVal = totalAmount.getValue() != null ? totalAmount.getValue().trim() : "";
-        if (dateVal.isEmpty() || projectVal.isEmpty() || purposeVal.isEmpty()) {
-            toastMessage.setValue("Please populate all required text details.");
-            return false;
+    private String sanitize(String val) {
+        if (val == null || val.trim().isEmpty() || "Please Select".equalsIgnoreCase(val.trim()) || "Select an option".equalsIgnoreCase(val.trim()) || "N/A".equalsIgnoreCase(val.trim())) {
+            return "";
         }
-
-        if (amountVal.isEmpty() || !amountVal.matches("^[0-9]+(?:\\.[0-9]{0,2})?$") || Double.parseDouble(amountVal) <= 0) {
-            toastMessage.setValue("Invalid base calculation amount.");
-            return false;
-        }
-
-        if (isSubmit) {
-            executeSubmit(meetingType, claimCategory, travelCategory, transportMode, sharedMode, dedicatedMode, currency);
-            executeFood(meetingType, claimCategory, travelCategory, transportMode, sharedMode, dedicatedMode, currency);
-        } else {
-            executeSave(meetingType, claimCategory, travelCategory, transportMode, sharedMode, dedicatedMode, currency);
-        }
-        return true;
+        return val.trim();
     }
 
-    private void executeSave(String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
-        ClaimSaveRequest req = new ClaimSaveRequest();
-        mapCommonSaveData(req, mType, cCat, tCat, tMode, sMode, dMode, curr);
+    private ExpenseRequest prepareBasePayload(String meetingType, String currency) {
+        ExpenseRequest payload = new ExpenseRequest();
 
-        APIClient.getInstance().ClaimSave().claimSave(authTokenHeader, req).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    operationSuccess.setValue(true);
-                    toastMessage.setValue("Claim Saved successfully");
-                } else {
-                    Log.e("ClaimSave", "Failed to save claim: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Log.e("ClaimSave", "Error: " + t.getMessage());
-            }
-        });
-    }
-
-    private void executeSubmit(String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
-        ClaimUpdateRequest req = new ClaimUpdateRequest();
-        mapCommonUpdateData(req, mType, cCat, tCat, tMode, sMode, dMode, curr);
-
-        APIClient.getInstance().ClaimSubmit().claimSubmit(authTokenHeader, req).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    operationSuccess.setValue(true);
-                    toastMessage.setValue("Claim submitted successfully");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-            }
-        });
-    }
-
-    private void executeFood(String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
-        FoodRequest foodRequest = new FoodRequest();
-//        mapCommonSaveData(req, mType, cCat, tCat, tMode, sMode, dMode, curr);
-
-        APIClient.getInstance().getApi().FoodClaimApi(authTokenHeader, foodRequest).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    operationSuccess.setValue(true);
-                    toastMessage.setValue("Food claim submitted successfully");
-                } else {
-                    Log.e("FoodClaim", "Failed to submit food claim: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Log.e("FoodClaim", "Error: " + t.getMessage());
-            }
-        });
-    }
-
-    private void mapCommonSaveData(ClaimSaveRequest req, String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
         if (employeeCache != null) {
-            req.setEmployee(employeeCache.getId());
-            req.setEmployeeCode(employeeCache.getEmployeeCode());
-            req.setEmail(employeeCache.getEmail());
-            req.setFirstname(employeeCache.getFirstname());
-            req.setLastname(employeeCache.getLastname());
-            req.setDesignation(employeeCache.getDesignation());
-            req.setGrade(employeeCache.getGrade());
+            payload.setEmployee(sanitize(employeeCache.getId()));
+            payload.setEmpId(sanitize(employeeCache.getId()));
+            payload.setEmployeeCode(sanitize(employeeCache.getEmployeeCode()));
+            payload.setFirstname(sanitize(employeeCache.getFirstname()));
+            payload.setLastname(sanitize(employeeCache.getLastname()));
+            payload.setEmail(sanitize(employeeCache.getEmail()));
+            payload.setDesignation(sanitize(employeeCache.getDesignation()));
+            payload.setGrade(sanitize(employeeCache.getGrade()));
+            payload.setHrEmail(sanitize(hrMail));
 
-            app.xedigital.ai.model.claimSave.ReportingManager rm = new app.xedigital.ai.model.claimSave.ReportingManager();
-            rm.setId(employeeCache.getReportingManager().getId());
-            rm.setFirstname(employeeCache.getReportingManager().getFirstname());
-            rm.setLastname(employeeCache.getReportingManager().getLastname());
-            rm.setEmail(employeeCache.getReportingManager().getEmail());
-            req.setReportingManager(rm);
-            req.setReportingManagerName(employeeCache.getReportingManager().getFirstname());
-            req.setReportingManagerEmail(employeeCache.getReportingManager().getEmail());
+            if (employeeCache.getReportingManager() != null) {
+                ExpenseRequest.Manager mgr = new ExpenseRequest.Manager();
+                mgr.setId(sanitize(employeeCache.getReportingManager().getId()));
+                mgr.setFirstname(sanitize(employeeCache.getReportingManager().getFirstname()));
+                mgr.setLastname(sanitize(employeeCache.getReportingManager().getLastname()));
+                mgr.setEmail(sanitize(employeeCache.getReportingManager().getEmail()));
+
+                payload.setReportingManager(mgr);
+                payload.setReportingManagerName(sanitize(employeeCache.getReportingManager().getFirstname()));
+                payload.setReportingManagerEmail(sanitize(employeeCache.getReportingManager().getEmail()));
+            }
+
+            if (employeeCache.getDepartment() != null) {
+                ExpenseRequest.Department dept = new ExpenseRequest.Department();
+                dept.setId(sanitize(employeeCache.getDepartment().getId()));
+                dept.setName(sanitize(employeeCache.getDepartment().getName()));
+                payload.setDepartment(dept);
+            }
+
+            payload.setRequestedfirstname(sanitize(employeeCache.getFirstname()));
+            payload.setRequestedlastname(sanitize(employeeCache.getLastname()));
         }
-        req.setClaimDate(claimDate.getValue());
-        req.setProject(projectName.getValue());
-        req.setFromaddress(startLocation.getValue());
-        req.setToaddress(endLocation.getValue());
-        req.setMeeting(mType);
-        req.setPerposeofmeet(purposeOfMeeting.getValue());
-        req.setTotalClaim(claimLength);
-        req.setCurrency(curr != null ? curr : "INR");
-        req.setModeofcal(cCat);
-        req.setTotalamount(totalAmount.getValue());
-        req.setIsTravel("Travel".equals(cCat));
-        req.setTravelCategory(tCat);
-        req.setModeoftransport(tMode);
-        req.setShared(sMode);
-        req.setDedicated(dMode);
-        req.setEmpTransport(customTransportInput.getValue());
-        req.setRemark(remarks.getValue());
-        req.setHrEmail(hrMail != null ? hrMail : "");
-//        req.setBusinessUnit(selectedBusinessUnitId.getValue());
+        payload.setBu(sanitize(selectedBusinessUnitId.getValue()));
+        payload.setBuName(sanitize(selectedBusinessUnitName.getValue()));
+        payload.setBuEmail(bUemail == 0 ? "" : String.valueOf(bUemail));
+        payload.setClaimDate(sanitize(claimDate.getValue()));
+        payload.setProject(sanitize(projectName.getValue()));
+        payload.setMeeting(sanitize(meetingType != null ? meetingType.toLowerCase() : ""));
+        payload.setPerposeofmeet(sanitize(purposeOfMeeting.getValue()));
+        payload.setTotalClaim((double) claimLength);
+        payload.setCurrency(sanitize(currency));
+        payload.setTotalamount(sanitize(totalAmount.getValue()));
+        payload.setRemark(sanitize(remarks.getValue()));
+        payload.setStatus("Pending");
+        payload.setConfbutton(false);
+        payload.setModeofcal("general");
+        payload.setModeofcalPascal("");
+        payload.setRequest("Expense Claim Request");
+        payload.setFromaddress(sanitize(startLocation.getValue()));
+        payload.setToaddress(sanitize(endLocation.getValue()));
+        payload.setDistance(sanitize(customTransportInput.getValue()));
+        payload.setEmpTransport(sanitize(customTransportInput.getValue()));
+        payload.setGuest(isGuestClaim.getValue() != null ? isGuestClaim.getValue() : false);
+        payload.setMeantype(sanitize(selectedMealType.getValue()));
+        payload.setRestaurant(sanitize(foodRestaurant.getValue()));
+        payload.setPersons(sanitize(foodPersonsCount.getValue()));
+        payload.setDescription(sanitize(foodDescription.getValue()));
+        payload.setAccommodationtype(sanitize(selectedAccommodationType.getValue()));
+        payload.setAccommodationname(sanitize(accommodationName.getValue()));
+        payload.setLocation(sanitize(accommodationLocation.getValue()));
+        payload.setState(sanitize(accommodationState.getValue()));
+        payload.setCheckin(sanitize(accommodationCheckIn.getValue()));
+        payload.setCheckout(sanitize(accommodationCheckOut.getValue()));
+        payload.setPurposeofstay(sanitize(accommodationPurpose.getValue()));
+        payload.setExpancecategory(sanitize(selectedMiscCategory.getValue()));
+        payload.setBillingperiod(sanitize(billingPeriod.getValue()));
+        payload.setNetprovider(sanitize(netProvider.getValue()));
+        payload.setBillnumber(sanitize(billNumber.getValue()));
+        payload.setVehiclenumber(sanitize(vehicleNumber.getValue()));
+        payload.setFueltype(sanitize(selectedFuelType.getValue()));
+        payload.setFuelquantity(sanitize(fuelQuantity.getValue()));
+        payload.setFuelstationname(sanitize(fuelStationName.getValue()));
+        payload.setParkinglocation(sanitize(parkingLocation.getValue()));
+        payload.setParkingdate(sanitize(parkingDate.getValue()));
+        payload.setDuration(sanitize(parkingDuration.getValue()));
+        payload.setTollvehiclenumber(sanitize(tollVehicleNumber.getValue()));
+        payload.setTollplazaname(sanitize(tollPlazaName.getValue()));
+        payload.setTolllocation(sanitize(tollLocation.getValue()));
 
-        req.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
-        req.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
-        req.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
-        req.setDocFileURLKeyOne(imageKeys[1] != null ? imageKeys[1] : "");
-        req.setDocFileURLTwo(imageUrls[2] != null ? imageUrls[2] : "");
-        req.setDocFileURLKeyTwo(imageKeys[2] != null ? imageKeys[2] : "");
-        req.setDocFileURLThree(imageUrls[3] != null ? imageUrls[3] : "");
-        req.setDocFileURLKeyThree(imageKeys[3] != null ? imageKeys[3] : "");
-        req.setDocFileURLFour(imageUrls[4] != null ? imageUrls[4] : "");
-        req.setDocFileURLKeyFour(imageKeys[4] != null ? imageKeys[4] : "");
-        req.setDocFileURLFive(imageUrls[5] != null ? imageUrls[5] : "");
-        req.setDocFileURLKeyFive(imageKeys[5] != null ? imageKeys[5] : "");
-        req.setDocFileURLSix(imageUrls[6] != null ? imageUrls[6] : "");
-        req.setDocFileURLKeySix(imageKeys[6] != null ? imageKeys[6] : "");
-        req.setDocFileURLSeven(imageUrls[7] != null ? imageUrls[7] : "");
-        req.setDocFileURLKeySeven(imageKeys[7] != null ? imageKeys[7] : "");
-        req.setDocFileURLEight(imageUrls[8] != null ? imageUrls[8] : "");
-        req.setDocFileURLKeyEight(imageKeys[8] != null ? imageKeys[8] : "");
-        req.setDocFileURLNine(imageUrls[9] != null ? imageUrls[9] : "");
-        req.setDocFileURLKeyNine(imageKeys[9] != null ? imageKeys[9] : "");
+        // Document File Attachments
+        payload.setImage(imageUrls[0] != null ? imageUrls[0] : "");
+        payload.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
+        payload.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
+
+        payload.setImageOne(imageUrls[1] != null ? imageUrls[1] : "");
+        payload.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
+        payload.setDocFileURLKeyOne(imageKeys[1] != null ? imageKeys[1] : "");
+
+        payload.setImageTwo(imageUrls[2] != null ? imageUrls[2] : "");
+        payload.setDocFileURLTwo(imageUrls[2] != null ? imageUrls[2] : "");
+        payload.setDocFileURLKeyTwo(imageKeys[2] != null ? imageKeys[2] : "");
+
+        payload.setImageThree(imageUrls[3] != null ? imageUrls[3] : "");
+        payload.setDocFileURLThree(imageUrls[3] != null ? imageUrls[3] : "");
+        payload.setDocFileURLKeyThree(imageKeys[3] != null ? imageKeys[3] : "");
+
+        payload.setImageFour(imageUrls[4] != null ? imageUrls[4] : "");
+        payload.setDocFileURLFour(imageUrls[4] != null ? imageUrls[4] : "");
+        payload.setDocFileURLKeyFour(imageKeys[4] != null ? imageKeys[4] : "");
+
+        payload.setImageFive(imageUrls[5] != null ? imageUrls[5] : "");
+        payload.setDocFileURLFive(imageUrls[5] != null ? imageUrls[5] : "");
+        payload.setDocFileURLKeyFive(imageKeys[5] != null ? imageKeys[5] : "");
+
+        payload.setImageSix(imageUrls[6] != null ? imageUrls[6] : "");
+        payload.setDocFileURLSix(imageUrls[6] != null ? imageUrls[6] : "");
+        payload.setDocFileURLKeySix(imageKeys[6] != null ? imageKeys[6] : "");
+
+        payload.setImageSeven(imageUrls[7] != null ? imageUrls[7] : "");
+        payload.setDocFileURLSeven(imageUrls[7] != null ? imageUrls[7] : "");
+        payload.setDocFileURLKeySeven(imageKeys[7] != null ? imageKeys[7] : "");
+
+        payload.setImageEight(imageUrls[8] != null ? imageUrls[8] : "");
+        payload.setDocFileURLEight(imageUrls[8] != null ? imageUrls[8] : "");
+        payload.setDocFileURLKeyEight(imageKeys[8] != null ? imageKeys[8] : "");
+
+        payload.setImageNine(imageUrls[9] != null ? imageUrls[9] : "");
+        payload.setDocFileURLNine(imageUrls[9] != null ? imageUrls[9] : "");
+        payload.setDocFileURLKeyNine(imageKeys[9] != null ? imageKeys[9] : "");
+
+        return payload;
     }
 
-    private void mapCommonUpdateData(ClaimUpdateRequest req, String mType, String cCat, String tCat, String tMode, String sMode, String dMode, String curr) {
-        if (employeeCache != null) {
-            req.setEmployee(employeeCache.getId());
-            req.setEmployeeCode(employeeCache.getEmployeeCode());
-            req.setEmail(employeeCache.getEmail());
-            req.setFirstname(employeeCache.getFirstname());
-            req.setLastname(employeeCache.getLastname());
-            req.setDesignation(employeeCache.getDesignation());
-            req.setGrade(employeeCache.getGrade());
+    // --- EXPENSE SUBMIT API TARGET METHODS ---
 
-            app.xedigital.ai.model.claimSubmit.ReportingManager rm = new app.xedigital.ai.model.claimSubmit.ReportingManager();
-            rm.setId(employeeCache.getReportingManager().getId());
-            rm.setFirstname(employeeCache.getReportingManager().getFirstname());
-            rm.setLastname(employeeCache.getReportingManager().getLastname());
-            rm.setEmail(employeeCache.getReportingManager().getEmail());
-            req.setReportingManager(rm);
-            req.setReportingManagerName(employeeCache.getReportingManager().getFirstname());
-            req.setReportingManagerEmail(employeeCache.getReportingManager().getEmail());
+    public void executeFoodSubmit(String meetingType, String currency) {
+        ExpenseRequest request = prepareBasePayload(meetingType, currency);
+        request.setExpenseType("food");
+        request.setGuest(isGuestClaim.getValue() != null ? isGuestClaim.getValue() : false);
+
+        request.setMeantype(sanitize(selectedMealType.getValue()));
+        request.setRestaurant(sanitize(foodRestaurant.getValue()));
+        request.setPersons(sanitize(foodPersonsCount.getValue()));
+        request.setDescription(sanitize(foodDescription.getValue()));
+
+        executeNetworkCall(request, "Food");
+    }
+
+    public void executeTravelSubmit(String meetingType, String travelCategory, String transportMode, String sharedMode, String dedicatedMode, String currency) {
+        ExpenseRequest request = prepareBasePayload(meetingType, currency);
+        request.setExpenseType("travel");
+
+        request.setFromaddress(sanitize(startLocation.getValue()));
+        request.setToaddress(sanitize(endLocation.getValue()));
+        request.setTravelCategory(sanitize(travelCategory));
+        request.setModeoftransport(sanitize(transportMode));
+        request.setShared(sanitize(sharedMode));
+        request.setDedicated(sanitize(dedicatedMode));
+        request.setDistance(sanitize(customTransportInput.getValue()));
+        request.setEmpTransport(sanitize(customTransportInput.getValue()));
+
+        executeNetworkCall(request, "Travel");
+    }
+
+    public void executeAccommodationSubmit(String meetingType, String currency) {
+        ExpenseRequest request = prepareBasePayload(meetingType, currency);
+        request.setExpenseType("accommodation");
+
+        request.setAccommodationtype(sanitize(selectedAccommodationType.getValue()));
+        request.setAccommodationname(sanitize(accommodationName.getValue()));
+        request.setLocation(sanitize(accommodationLocation.getValue()));
+        request.setState(sanitize(accommodationState.getValue()));
+        request.setCheckin(sanitize(accommodationCheckIn.getValue()));
+        request.setCheckout(sanitize(accommodationCheckOut.getValue()));
+        request.setPurposeofstay(sanitize(accommodationPurpose.getValue()));
+
+        executeNetworkCall(request, "Accommodation");
+    }
+
+    public void executeMiscSubmit(String meetingType, String currency) {
+        ExpenseRequest request = prepareBasePayload(meetingType, currency);
+        request.setExpenseType("miscellaneous");
+
+        request.setExpancecategory(sanitize(selectedMiscCategory.getValue()));
+        request.setBillingperiod(sanitize(billingPeriod.getValue()));
+        request.setNetprovider(sanitize(netProvider.getValue()));
+        request.setBillnumber(sanitize(billNumber.getValue()));
+        request.setVehiclenumber(sanitize(vehicleNumber.getValue()));
+        request.setFueltype(sanitize(selectedFuelType.getValue()));
+        request.setFuelquantity(sanitize(fuelQuantity.getValue()));
+        request.setFuelstationname(sanitize(fuelStationName.getValue()));
+        request.setParkinglocation(sanitize(parkingLocation.getValue()));
+        request.setParkingdate(sanitize(parkingDate.getValue()));
+        request.setDuration(sanitize(parkingDuration.getValue()));
+        request.setTollvehiclenumber(sanitize(tollVehicleNumber.getValue()));
+        request.setTollplazaname(sanitize(tollPlazaName.getValue()));
+        request.setTolllocation(sanitize(tollLocation.getValue()));
+
+        executeNetworkCall(request, "Miscellaneous");
+    }
+
+    // --- DYNAMIC ENDPOINT ROUTING NETWORK EXECUTION BLOCK ---
+    private void executeNetworkCall(ExpenseRequest requestBody, final String label) {
+        Call<ResponseBody> apiCall;
+
+        switch (label) {
+            case "Food":
+                apiCall = apiInterface.FoodClaimApi(authTokenHeader, requestBody);
+                break;
+            case "Travel":
+                apiCall = apiInterface.TravelClaimApi(authTokenHeader, requestBody);
+                break;
+            case "Accommodation":
+                apiCall = apiInterface.AccommodationClaimApi(authTokenHeader, requestBody);
+                break;
+            case "Miscellaneous":
+                apiCall = apiInterface.MiscellaneousClaimApi(authTokenHeader, requestBody);
+                break;
+            default:
+                toastMessage.setValue("Unsupported expense type routing.");
+                return;
         }
-        req.setClaimDate(claimDate.getValue());
-        req.setProject(projectName.getValue());
-        req.setFromaddress(startLocation.getValue());
-        req.setToaddress(endLocation.getValue());
-        req.setMeeting(mType);
-        req.setPerposeofmeet(purposeOfMeeting.getValue());
-        req.setTotalClaim(claimLength);
-        req.setCurrency(curr != null ? curr : "INR");
-        req.setModeofcal(cCat);
-        req.setTotalamount(totalAmount.getValue());
-        req.setIsTravel("Travel".equals(cCat));
-        req.setTravelCategory(tCat);
-        req.setModeoftransport(tMode);
-        req.setShared(sMode);
-        req.setDedicated(dMode);
-        req.setEmpTransport(customTransportInput.getValue());
-        req.setRemark(remarks.getValue());
-        req.setHrEmail(hrMail != null ? hrMail : "");
 
-        req.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
-        req.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
-        req.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
-        req.setDocFileURLKeyOne(imageKeys[1] != null ? imageKeys[1] : "");
-        req.setDocFileURLTwo(imageUrls[2] != null ? imageUrls[2] : "");
-        req.setDocFileURLKeyTwo(imageKeys[2] != null ? imageKeys[2] : "");
-        req.setDocFileURLThree(imageUrls[3] != null ? imageUrls[3] : "");
-        req.setDocFileURLKeyThree(imageKeys[3] != null ? imageKeys[3] : "");
-        req.setDocFileURLFour(imageUrls[4] != null ? imageUrls[4] : "");
-        req.setDocFileURLKeyFour(imageKeys[4] != null ? imageKeys[4] : "");
-        req.setDocFileURLFive(imageUrls[5] != null ? imageUrls[5] : "");
-        req.setDocFileURLKeyFive(imageKeys[5] != null ? imageKeys[5] : "");
-        req.setDocFileURLSix(imageUrls[6] != null ? imageUrls[6] : "");
-        req.setDocFileURLKeySix(imageKeys[6] != null ? imageKeys[6] : "");
-        req.setDocFileURLSeven(imageUrls[7] != null ? imageUrls[7] : "");
-        req.setDocFileURLKeySeven(imageKeys[7] != null ? imageKeys[7] : "");
-        req.setDocFileURLEight(imageUrls[8] != null ? imageUrls[8] : "");
-        req.setDocFileURLKeyEight(imageKeys[8] != null ? imageKeys[8] : "");
-        req.setDocFileURLNine(imageUrls[9] != null ? imageUrls[9] : "");
-        req.setDocFileURLKeyNine(imageKeys[9] != null ? imageKeys[9] : "");
+        apiCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    operationSuccess.setValue(true);
+                    _submissionSuccess.setValue(true);
+                    toastMessage.setValue(label + " claim submitted successfully");
+                } else {
+                    Log.e("ExpenseSubmitAPI", label + " transaction error code: " + response.code());
+                    toastMessage.setValue("Failed to process " + label.toLowerCase() + " request parameters.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.e("ExpenseSubmitAPI", label + " networking engine terminal exception", t);
+                toastMessage.setValue("Network transaction channel failed.");
+            }
+        });
     }
 
     public void clearFormFields() {
@@ -556,7 +649,38 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         remarks.setValue("");
         customTransportInput.setValue("");
         selectedBusinessUnitId.setValue("");
+        selectedBusinessUnitName.setValue("");
         underProcessTextState.setValue("");
+
+        selectedMealType.setValue("");
+        isGuestClaim.setValue(false);
+        foodRestaurant.setValue("");
+        foodPersonsCount.setValue("1");
+        foodDescription.setValue("");
+
+        selectedAccommodationType.setValue("");
+        accommodationName.setValue("");
+        accommodationLocation.setValue("");
+        accommodationState.setValue("");
+        accommodationCheckIn.setValue("");
+        accommodationCheckOut.setValue("");
+        accommodationPurpose.setValue("");
+
+        selectedMiscCategory.setValue("");
+        billingPeriod.setValue("");
+        netProvider.setValue("");
+        billNumber.setValue("");
+        vehicleNumber.setValue("");
+        selectedFuelType.setValue("");
+        fuelQuantity.setValue("");
+        fuelStationName.setValue("");
+        parkingLocation.setValue("");
+        parkingDate.setValue("");
+        parkingDuration.setValue("");
+        tollVehicleNumber.setValue("");
+        tollPlazaName.setValue("");
+        tollLocation.setValue("");
+
         isTravelSelected.setValue(false);
         transportLayoutType.setValue(0);
         showCustomTransportInput.setValue(false);
