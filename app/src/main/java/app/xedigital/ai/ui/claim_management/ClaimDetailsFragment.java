@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -98,8 +99,8 @@ public class ClaimDetailsFragment extends Fragment {
         }
         btnDocumentView.setOnClickListener(v -> {
 //            Log.d("btnDocumentView", "btnDocumentView clicked");
-            if (claimData != null && claimData.getDocumentUrls() != null) {
-                List<String> documentUrls = claimData.getDocumentUrls();
+            if (claimData != null && claimData.getDocFileURL() != null) {
+                List<String> documentUrls = Collections.singletonList(claimData.getDocFileURL());
                 if (!documentUrls.isEmpty()) {
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
                     View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_image_viewer, null);

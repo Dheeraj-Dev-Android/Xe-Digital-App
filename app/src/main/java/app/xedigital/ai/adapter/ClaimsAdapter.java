@@ -3,6 +3,7 @@ package app.xedigital.ai.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,9 +47,10 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
 
     @Override
     public int getItemCount() {
-        return claimList != null ? claimList.size() : 0;
+        int count = claimList != null ? claimList.size() : 0;
+        Log.d("ADAPTER_DEBUG", "getItemCount called: " + count);
+        return count;
     }
-
     public void updateData(List<EmployeeClaimdataItem> filteredList) {
         this.claimList = filteredList;
         notifyDataSetChanged();
@@ -63,7 +67,8 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
     static class ClaimViewHolder extends RecyclerView.ViewHolder {
         private final Context context;
         private final TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
-        private final TextView viewDetailsButton, statusText;
+        private final TextView statusText;
+        private final ShapeableImageView viewDetailsButton;
 
         public ClaimViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
@@ -90,7 +95,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
             txtMeetingType.setText(sanitize.apply(claim.getMeeting()));
             txtPurposeOfMeeting.setText(sanitize.apply(claim.getPerposeofmeet()));
             String currency = claim.getCurrency() != null && !claim.getCurrency().equalsIgnoreCase("null") ? claim.getCurrency().trim() : "";
-            int rawAmount = claim.getTotalamount();
+            double rawAmount = claim.getTotalamount();
 
             if (rawAmount <= 0) {
                 txtTotalAmount.setText("N/A");

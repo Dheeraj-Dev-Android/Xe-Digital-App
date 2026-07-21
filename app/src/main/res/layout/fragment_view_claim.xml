@@ -120,8 +120,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp" />
+            android:paddingHorizontal="12dp"
+            android:paddingTop="12dp" />
 
         <!-- Enhanced loading state -->
         <com.google.android.material.progressindicator.CircularProgressIndicator

@@ -21,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -223,7 +224,7 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
     public void onClaimClick(EmployeeClaimdataItem claim) {
         // Create a bundle to pass data to the new fragment
         Bundle bundle = new Bundle();
-        bundle.putSerializable("claimData", claim);
+        bundle.putSerializable("claimData", (Serializable) claim);
 
         ClaimDetailsFragment fragment = new ClaimDetailsFragment();
         fragment.setArguments(bundle);

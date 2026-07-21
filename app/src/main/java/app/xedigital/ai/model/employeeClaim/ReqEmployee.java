@@ -28,7 +28,7 @@ public class ReqEmployee {
     private boolean addpayroll;
 
     @SerializedName("totalMonthlySalary")
-    private int totalMonthlySalary;
+    private double totalMonthlySalary;
 
     @SerializedName("joiningDate")
     private String joiningDate;
@@ -160,7 +160,7 @@ public class ReqEmployee {
         return addpayroll;
     }
 
-    public int getTotalMonthlySalary() {
+    public double getTotalMonthlySalary() {
         return totalMonthlySalary;
     }
 

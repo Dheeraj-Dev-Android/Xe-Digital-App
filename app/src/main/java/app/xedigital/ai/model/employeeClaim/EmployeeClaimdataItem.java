@@ -2,7 +2,9 @@ package app.xedigital.ai.model.employeeClaim;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeeClaimdataItem {
+import java.io.Serializable;
+
+public class EmployeeClaimdataItem implements Serializable {
 
     @SerializedName("empId")
     private String empId;
@@ -39,6 +41,8 @@ public class EmployeeClaimdataItem {
 
     @SerializedName("department")
     private Department department;
+//    @SerializedName("department")
+//    private Object department;
 
     @SerializedName("meeting")
     private String meeting;
@@ -62,7 +66,7 @@ public class EmployeeClaimdataItem {
     private int persons;
 
     @SerializedName("totalamount")
-    private int totalamount;
+    private double totalamount;
 
     @SerializedName("claimDate")
     private String claimDate;
@@ -73,8 +77,8 @@ public class EmployeeClaimdataItem {
     @SerializedName("_id")
     private String id;
 
-    @SerializedName("Id")
-    private String id;
+    @SerializedName("claimId")
+    private String claimId;
 
     @SerializedName("status")
     private String status;
@@ -188,7 +192,7 @@ public class EmployeeClaimdataItem {
         return persons;
     }
 
-    public int getTotalamount() {
+    public double getTotalamount() {
         return totalamount;
     }
 
@@ -200,8 +204,8 @@ public class EmployeeClaimdataItem {
         return travelRefId;
     }
 
-    public String getId() {
-        return id;
+    public String getClaimId() {
+        return claimId;
     }
 
     public String getId() {
