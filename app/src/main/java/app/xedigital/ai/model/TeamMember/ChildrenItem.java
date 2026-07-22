@@ -40,7 +40,7 @@ public class ChildrenItem {
     private String createdAt;
 
     @SerializedName("ctc")
-    private int ctc;
+    private double ctc;
 
     @SerializedName("children")
     private List<Object> children;
@@ -179,7 +179,7 @@ public class ChildrenItem {
         return createdAt;
     }
 
-    public int getCtc() {
+    public double getCtc() {
         return ctc;
     }
 

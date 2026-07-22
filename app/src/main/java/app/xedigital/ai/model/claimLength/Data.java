@@ -4,14 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class Data {
 
-    @SerializedName("cliamlength")
-    private int cliamlength;
+    @SerializedName("employeeCount")
+    private int employeeCount;
 
-    public int getCliamlength() {
-        return cliamlength;
+    public int getEmployeeCount() {
+        return employeeCount;
     }
 
-    public void setCliamlength(int cliamlength) {
-        this.cliamlength = cliamlength;
+    public void setEmployeeCount(int employeeCount) {
+        this.employeeCount = employeeCount;
     }
 }

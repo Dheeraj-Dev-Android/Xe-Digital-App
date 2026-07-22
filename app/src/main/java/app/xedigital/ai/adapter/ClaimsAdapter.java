@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.SimpleDateFormat;
@@ -67,8 +68,9 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
     static class ClaimViewHolder extends RecyclerView.ViewHolder {
         private final Context context;
         private final TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
-        private final TextView statusText;
+        private final TextView statusText, expenseTypeText;
         private final ShapeableImageView viewDetailsButton;
+        private MaterialCardView claimCardView;
 
         public ClaimViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
@@ -82,6 +84,8 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
             txtAppliedDate = itemView.findViewById(R.id.claimDateText);
             viewDetailsButton = itemView.findViewById(R.id.viewDetailsButton);
             statusText = itemView.findViewById(R.id.statusText);
+            expenseTypeText = itemView.findViewById(R.id.expenseTypeText);
+            claimCardView = itemView.findViewById(R.id.claimCardView);
         }
 
         public void bind(final EmployeeClaimdataItem claim, final OnClaimClickListener listener) {
@@ -94,6 +98,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
             txtProjectName.setText(sanitize.apply(claim.getProject()));
             txtMeetingType.setText(sanitize.apply(claim.getMeeting()));
             txtPurposeOfMeeting.setText(sanitize.apply(claim.getPerposeofmeet()));
+            expenseTypeText.setText(sanitize.apply(claim.getExpenseType()));
             String currency = claim.getCurrency() != null && !claim.getCurrency().equalsIgnoreCase("null") ? claim.getCurrency().trim() : "";
             double rawAmount = claim.getTotalamount();
 
@@ -142,6 +147,11 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
             }
 
             // 9. View Details Event Callback Click Binding
+            claimCardView.setOnClickListener(v -> {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    listener.onClaimClick(claim);
+                }
+            });
             viewDetailsButton.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
                     listener.onClaimClick(claim);

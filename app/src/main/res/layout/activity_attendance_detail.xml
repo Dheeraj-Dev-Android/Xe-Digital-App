@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.AttendanceByManager.AttendanceDetailActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color_white"
         android:orientation="vertical"
         tools:context=".MainActivity">
 
@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:background="#FFFFFF"
             android:padding="16dp">
 
             <TextView
@@ -37,10 +36,10 @@
                 android:drawableStart="@drawable/ic_calendar"
                 android:drawablePadding="10dp"
                 android:text="April 16, 2023"
-                android:textColor="#1C160C"
+                android:textColor="@color/background"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:drawableTint="@color/OccasionalLeave" />
+                app:drawableTint="@color/background" />
 
         </RelativeLayout>
 

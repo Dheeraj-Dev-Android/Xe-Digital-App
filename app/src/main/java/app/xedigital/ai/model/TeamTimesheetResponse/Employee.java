@@ -40,7 +40,7 @@ public class Employee {
     private String createdAt;
 
     @SerializedName("ctc")
-    private int ctc;
+    private double ctc;
 
     @SerializedName("contact")
     private String contact;
@@ -179,7 +179,7 @@ public class Employee {
         return createdAt;
     }
 
-    public int getCtc() {
+    public double getCtc() {
         return ctc;
     }
 

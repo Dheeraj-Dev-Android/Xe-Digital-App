@@ -21,14 +21,37 @@
         <item name="fontFamily">@font/quicksand_font_family</item>
     </style>
 
-    <!--Claim Details-->
-    <!-- Section Title Style -->
+    <style name="ClaimSectionTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
 
-    <!-- Table Row Style -->
+    <style name="ClaimLabelText">
+        <item name="android:layout_width">140dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
 
-    <!-- Label Style -->
+    <style name="ClaimValueText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#555555</item>
+    </style>
 
-    <!-- Value Style -->
+    <style name="ClaimRow">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
 
     <style name="ClaimDetailTextWithIcon">
         <item name="android:layout_width">match_parent</item>

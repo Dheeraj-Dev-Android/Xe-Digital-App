@@ -6,10 +6,10 @@ import java.util.List;
 
 public class Data {
 
-    @SerializedName("employeeClaimdata")
-    private List<EmployeeClaimdataItem> employeeClaimdata;
+	@SerializedName("employeeClaimdata")
+	private List<EmployeeClaimdataItem> employeeClaimdata;
 
-    public List<EmployeeClaimdataItem> getEmployeeClaimdata() {
-        return employeeClaimdata;
-    }
+	public List<EmployeeClaimdataItem> getEmployeeClaimdata() {
+		return employeeClaimdata;
+	}
 }

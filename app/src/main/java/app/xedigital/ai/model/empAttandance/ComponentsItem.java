@@ -14,7 +14,7 @@ public class ComponentsItem {
     private String componentCalculationType;
 
     @SerializedName("percentage")
-    private int percentage;
+    private double percentage;
 
     @SerializedName("_id")
     private String id;
@@ -23,10 +23,10 @@ public class ComponentsItem {
     private Object fixedAmount;
 
     @SerializedName("monthlyAmount")
-    private int monthlyAmount;
+    private double monthlyAmount;
 
     @SerializedName("yearlyAmount")
-    private int yearlyAmount;
+    private double yearlyAmount;
 
     @SerializedName("earningname")
     private String earningname;
@@ -55,11 +55,11 @@ public class ComponentsItem {
         this.componentCalculationType = componentCalculationType;
     }
 
-    public int getPercentage() {
+    public double getPercentage() {
         return percentage;
     }
 
-    public void setPercentage(int percentage) {
+    public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
 
@@ -79,19 +79,19 @@ public class ComponentsItem {
         this.fixedAmount = fixedAmount;
     }
 
-    public int getMonthlyAmount() {
+    public double getMonthlyAmount() {
         return monthlyAmount;
     }
 
-    public void setMonthlyAmount(int monthlyAmount) {
+    public void setMonthlyAmount(double monthlyAmount) {
         this.monthlyAmount = monthlyAmount;
     }
 
-    public int getYearlyAmount() {
+    public double getYearlyAmount() {
         return yearlyAmount;
     }
 
-    public void setYearlyAmount(int yearlyAmount) {
+    public void setYearlyAmount(double yearlyAmount) {
         this.yearlyAmount = yearlyAmount;
     }
 

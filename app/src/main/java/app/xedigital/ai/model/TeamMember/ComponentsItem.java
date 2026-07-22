@@ -14,7 +14,7 @@ public class ComponentsItem {
     private String componentCalculationType;
 
     @SerializedName("percentage")
-    private int percentage;
+    private double percentage;
 
     @SerializedName("_id")
     private String id;
@@ -46,7 +46,7 @@ public class ComponentsItem {
         return componentCalculationType;
     }
 
-    public int getPercentage() {
+    public double getPercentage() {
         return percentage;
     }
 

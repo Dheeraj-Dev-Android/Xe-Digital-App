@@ -6,304 +6,311 @@ import java.util.List;
 
 public class Employee {
 
-    @SerializedName("joiningType")
-    private String joiningType;
+	@SerializedName("joiningType")
+	private String joiningType;
 
-    @SerializedName("fatherName")
-    private Object fatherName;
+	@SerializedName("fatherName")
+	private Object fatherName;
 
-    @SerializedName("firstname")
-    private String firstname;
+	@SerializedName("firstname")
+	private String firstname;
 
-    @SerializedName("components")
-    private List<ComponentsItem> components;
+	@SerializedName("components")
+	private List<ComponentsItem> components;
 
-    @SerializedName("isVerified")
-    private boolean isVerified;
+	@SerializedName("isVerified")
+	private boolean isVerified;
 
-    @SerializedName("shift")
-    private String shift;
+	@SerializedName("shift")
+	private String shift;
 
-    @SerializedName("addpayroll")
-    private boolean addpayroll;
+	@SerializedName("addpayroll")
+	private boolean addpayroll;
 
-    @SerializedName("totalMonthlySalary")
-    private int totalMonthlySalary;
+	@SerializedName("totalMonthlySalary")
+	private double totalMonthlySalary;
 
-    @SerializedName("joiningDate")
-    private String joiningDate;
+	@SerializedName("joiningDate")
+	private String joiningDate;
 
-    @SerializedName("employeeCode")
-    private String employeeCode;
+	@SerializedName("employeeCode")
+	private String employeeCode;
 
-    @SerializedName("createdAt")
-    private String createdAt;
+	@SerializedName("createdAt")
+	private String createdAt;
 
-    @SerializedName("ctc")
-    private int ctc;
+	@SerializedName("ctc")
+	private double ctc;
 
-    @SerializedName("contact")
-    private String contact;
+	@SerializedName("bu")
+	private String bu;
 
-    @SerializedName("__v")
-    private int v;
+	@SerializedName("contact")
+	private String contact;
 
-    @SerializedName("isHROrAdmin")
-    private boolean isHROrAdmin;
+	@SerializedName("__v")
+	private int v;
 
-    @SerializedName("company")
-    private String company;
+	@SerializedName("isHROrAdmin")
+	private boolean isHROrAdmin;
 
-    @SerializedName("epf")
-    private boolean epf;
+	@SerializedName("company")
+	private String company;
 
-    @SerializedName("state")
-    private Object state;
+	@SerializedName("epf")
+	private boolean epf;
 
-    @SerializedName("department")
-    private String department;
+	@SerializedName("state")
+	private Object state;
 
-    @SerializedName("profileImageUrl")
-    private Object profileImageUrl;
+	@SerializedName("department")
+	private String department;
 
-    @SerializedName("email")
-    private String email;
+	@SerializedName("profileImageUrl")
+	private String profileImageUrl;
 
-    @SerializedName("updatedAt")
-    private String updatedAt;
+	@SerializedName("email")
+	private String email;
 
-    @SerializedName("pincode")
-    private Object pincode;
+	@SerializedName("updatedAt")
+	private String updatedAt;
 
-    @SerializedName("reportingManager")
-    private String reportingManager;
+	@SerializedName("pincode")
+	private Object pincode;
 
-    @SerializedName("address")
-    private Object address;
+	@SerializedName("reportingManager")
+	private String reportingManager;
 
-    @SerializedName("totalYearlySalary")
-    private Object totalYearlySalary;
+	@SerializedName("address")
+	private Object address;
 
-    @SerializedName("level")
-    private String level;
+	@SerializedName("totalYearlySalary")
+	private Object totalYearlySalary;
 
-    @SerializedName("differentlyAbled")
-    private Object differentlyAbled;
+	@SerializedName("level")
+	private String level;
 
-    @SerializedName("pfAccountNo")
-    private Object pfAccountNo;
+	@SerializedName("differentlyAbled")
+	private Object differentlyAbled;
 
-    @SerializedName("panNo")
-    private Object panNo;
+	@SerializedName("pfAccountNo")
+	private Object pfAccountNo;
 
-    @SerializedName("active")
-    private boolean active;
+	@SerializedName("panNo")
+	private Object panNo;
 
-    @SerializedName("dateOfBirth")
-    private String dateOfBirth;
+	@SerializedName("active")
+	private boolean active;
 
-    @SerializedName("lastname")
-    private String lastname;
+	@SerializedName("dateOfBirth")
+	private String dateOfBirth;
 
-    @SerializedName("employeeType")
-    private String employeeType;
+	@SerializedName("lastname")
+	private String lastname;
 
-    @SerializedName("partner")
-    private String partner;
+	@SerializedName("employeeType")
+	private String employeeType;
 
-    @SerializedName("grade")
-    private String grade;
+	@SerializedName("partner")
+	private String partner;
 
-    @SerializedName("esi")
-    private boolean esi;
+	@SerializedName("grade")
+	private String grade;
 
-    @SerializedName("_id")
-    private String id;
+	@SerializedName("esi")
+	private boolean esi;
 
-    @SerializedName("designation")
-    private String designation;
+	@SerializedName("_id")
+	private String id;
 
-    @SerializedName("fullname")
-    private String fullname;
+	@SerializedName("designation")
+	private String designation;
 
-    @SerializedName("crossmanager")
-    private String crossmanager;
+	@SerializedName("fullname")
+	private String fullname;
 
-    @SerializedName("uanno")
-    private Object uanno;
+	@SerializedName("crossmanager")
+	private String crossmanager;
 
-    @SerializedName("adharNo")
-    private Object adharNo;
+	@SerializedName("uanno")
+	private Object uanno;
 
-    public String getJoiningType() {
-        return joiningType;
-    }
+	@SerializedName("adharNo")
+	private Object adharNo;
 
-    public Object getFatherName() {
-        return fatherName;
-    }
+	public String getJoiningType() {
+		return joiningType;
+	}
 
-    public String getFirstname() {
-        return firstname;
-    }
+	public Object getFatherName() {
+		return fatherName;
+	}
 
-    public List<ComponentsItem> getComponents() {
-        return components;
-    }
+	public String getFirstname() {
+		return firstname;
+	}
 
-    public boolean isIsVerified() {
-        return isVerified;
-    }
+	public List<ComponentsItem> getComponents() {
+		return components;
+	}
 
-    public String getShift() {
-        return shift;
-    }
+	public boolean isIsVerified() {
+		return isVerified;
+	}
 
-    public boolean isAddpayroll() {
-        return addpayroll;
-    }
+	public String getShift() {
+		return shift;
+	}
 
-    public int getTotalMonthlySalary() {
-        return totalMonthlySalary;
-    }
+	public boolean isAddpayroll() {
+		return addpayroll;
+	}
 
-    public String getJoiningDate() {
-        return joiningDate;
-    }
+	public double getTotalMonthlySalary() {
+		return totalMonthlySalary;
+	}
 
-    public String getEmployeeCode() {
-        return employeeCode;
-    }
+	public String getJoiningDate() {
+		return joiningDate;
+	}
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
+	public String getEmployeeCode() {
+		return employeeCode;
+	}
 
-    public int getCtc() {
-        return ctc;
-    }
+	public String getCreatedAt() {
+		return createdAt;
+	}
 
-    public String getContact() {
-        return contact;
-    }
+	public double getCtc() {
+		return ctc;
+	}
 
-    public int getV() {
-        return v;
-    }
+	public String getBu() {
+		return bu;
+	}
 
-    public boolean isIsHROrAdmin() {
-        return isHROrAdmin;
-    }
+	public String getContact() {
+		return contact;
+	}
 
-    public String getCompany() {
-        return company;
-    }
+	public int getV() {
+		return v;
+	}
 
-    public boolean isEpf() {
-        return epf;
-    }
+	public boolean isIsHROrAdmin() {
+		return isHROrAdmin;
+	}
 
-    public Object getState() {
-        return state;
-    }
+	public String getCompany() {
+		return company;
+	}
 
-    public String getDepartment() {
-        return department;
-    }
+	public boolean isEpf() {
+		return epf;
+	}
 
-    public Object getProfileImageUrl() {
-        return profileImageUrl;
-    }
+	public Object getState() {
+		return state;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getDepartment() {
+		return department;
+	}
 
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
 
-    public Object getPincode() {
-        return pincode;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getReportingManager() {
-        return reportingManager;
-    }
+	public String getUpdatedAt() {
+		return updatedAt;
+	}
 
-    public Object getAddress() {
-        return address;
-    }
+	public Object getPincode() {
+		return pincode;
+	}
 
-    public Object getTotalYearlySalary() {
-        return totalYearlySalary;
-    }
+	public String getReportingManager() {
+		return reportingManager;
+	}
 
-    public String getLevel() {
-        return level;
-    }
+	public Object getAddress() {
+		return address;
+	}
 
-    public Object getDifferentlyAbled() {
-        return differentlyAbled;
-    }
+	public Object getTotalYearlySalary() {
+		return totalYearlySalary;
+	}
 
-    public Object getPfAccountNo() {
-        return pfAccountNo;
-    }
+	public String getLevel() {
+		return level;
+	}
 
-    public Object getPanNo() {
-        return panNo;
-    }
+	public Object getDifferentlyAbled() {
+		return differentlyAbled;
+	}
 
-    public boolean isActive() {
-        return active;
-    }
+	public Object getPfAccountNo() {
+		return pfAccountNo;
+	}
 
-    public String getDateOfBirth() {
-        return dateOfBirth;
-    }
+	public Object getPanNo() {
+		return panNo;
+	}
 
-    public String getLastname() {
-        return lastname;
-    }
+	public boolean isActive() {
+		return active;
+	}
 
-    public String getEmployeeType() {
-        return employeeType;
-    }
+	public String getDateOfBirth() {
+		return dateOfBirth;
+	}
 
-    public String getPartner() {
-        return partner;
-    }
+	public String getLastname() {
+		return lastname;
+	}
 
-    public String getGrade() {
-        return grade;
-    }
+	public String getEmployeeType() {
+		return employeeType;
+	}
 
-    public boolean isEsi() {
-        return esi;
-    }
+	public String getPartner() {
+		return partner;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getGrade() {
+		return grade;
+	}
 
-    public String getDesignation() {
-        return designation;
-    }
+	public boolean isEsi() {
+		return esi;
+	}
 
-    public String getFullname() {
-        return fullname;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getCrossmanager() {
-        return crossmanager;
-    }
+	public String getDesignation() {
+		return designation;
+	}
 
-    public Object getUanno() {
-        return uanno;
-    }
+	public String getFullname() {
+		return fullname;
+	}
 
-    public Object getAdharNo() {
-        return adharNo;
-    }
+	public String getCrossmanager() {
+		return crossmanager;
+	}
+
+	public Object getUanno() {
+		return uanno;
+	}
+
+	public Object getAdharNo() {
+		return adharNo;
+	}
 }

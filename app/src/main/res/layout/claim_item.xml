@@ -10,6 +10,7 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
     app:strokeColor="@color/divider"
+    android:id="@+id/claimCardView"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,10 +26,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Header: icon + project name / claim id + status -->
         <LinearLayout
             android:id="@+id/iconContainer"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_icon_circle"
@@ -38,13 +40,12 @@
             app:layout_constraintTop_toBottomOf="@id/topAccentStrip">
 
             <ImageView
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:importantForAccessibility="no"
                 android:src="@mipmap/ic_receipt" />
         </LinearLayout>
 
-        <!-- Project Name + Claim ID stacked -->
         <LinearLayout
             android:id="@+id/headerTextBlock"
             android:layout_width="0dp"
@@ -66,7 +67,7 @@
                 android:fontFamily="@font/quicksand_font_family"
                 android:maxLines="1"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="AI Development Project" />
 
@@ -92,7 +93,7 @@
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:textColor="@color/white"
-            android:textSize="11sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/topAccentStrip"
@@ -109,145 +110,278 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iconContainer" />
 
-        <ImageView
-            android:id="@+id/iconMeeting"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="14dp"
-            android:src="@drawable/ic_calendar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/headerDivider"
-            app:tint="@color/icon_tint" />
-
-        <TextView
-            android:id="@+id/meetingLabelText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:fontFamily="@font/quicksand_font_family"
-            android:text="Meeting"
-            android:textColor="@color/text_tertiary"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/iconMeeting"
-            app:layout_constraintStart_toEndOf="@+id/iconMeeting"
-            app:layout_constraintTop_toTopOf="@+id/iconMeeting" />
-
-        <TextView
-            android:id="@+id/meetingTypeText"
+        <!-- Row 1: Expense Type | Meeting Type -->
+        <LinearLayout
+            android:id="@+id/rowExpenseMeeting"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:fontFamily="@font/quicksand_font_family"
-            android:gravity="end"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/iconMeeting"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/meetingLabelText"
-            app:layout_constraintTop_toTopOf="@+id/iconMeeting"
-            tools:text="Client Meeting" />
-
-        <!-- Row 2: Purpose -->
-        <ImageView
-            android:id="@+id/iconPurpose"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"
-            android:src="@drawable/ic_info"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iconMeeting"
-            app:tint="@color/icon_tint" />
-
-        <TextView
-            android:id="@+id/purposeLabelText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:fontFamily="@font/quicksand_font_family"
-            android:text="Purpose"
-            android:textColor="@color/text_tertiary"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/iconPurpose"
-            app:layout_constraintStart_toEndOf="@+id/iconPurpose"
-            app:layout_constraintTop_toTopOf="@+id/iconPurpose" />
-
-        <TextView
-            android:id="@+id/purposeText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:fontFamily="@font/quicksand_font_family"
-            android:gravity="end"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/iconPurpose"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/purposeLabelText"
-            app:layout_constraintTop_toTopOf="@+id/iconPurpose"
-            tools:text="Requirement Gathering" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/headerDivider">
+
+            <!-- Expense Type block -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:importantForAccessibility="no"
+                        android:src="@mipmap/ic_wallet" />
+
+                    <TextView
+                        android:id="@+id/expenseLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Expense Type"
+                        android:textColor="@color/badge_text"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/expenseTypeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:maxLines="1"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Food" />
+            </LinearLayout>
+
+            <!-- Meeting Type block -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="TODO"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="@color/icon_tint" />
+
+                    <TextView
+                        android:id="@+id/meetingLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Meeting Type"
+                        android:textColor="@color/badge_text"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/meetingTypeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:maxLines="1"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Client Meeting" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <View
-            android:id="@+id/footerDivider"
+            android:id="@+id/footerDividerOne"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:background="@color/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iconPurpose" />
+            app:layout_constraintTop_toBottomOf="@+id/rowExpenseMeeting" />
 
-        <!-- Date -->
-        <ImageView
-            android:id="@+id/iconDate"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="14dp"
+        <!-- Row 2: Purpose | Date -->
+        <LinearLayout
+            android:id="@+id/rowPurposeDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/footerDividerOne">
+
+            <!-- Purpose block -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="TODO"
+                        android:src="@drawable/ic_info"
+                        app:tint="@color/icon_tint" />
+
+                    <TextView
+                        android:id="@+id/purposeLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Purpose"
+                        android:textColor="@color/badge_text"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/purposeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:maxLines="1"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Requirement Gathering" />
+            </LinearLayout>
+
+            <!-- Date block -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="TODO"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="@color/OccasionalLeave" />
+
+                    <TextView
+                        android:id="@+id/dateLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Date"
+                        android:textColor="@color/badge_text"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/claimDateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="24 Oct 2023" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/footerDividerTwo"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rowPurposeDate" />
+
+        <!-- Row 3: Amount | View details button -->
+        <LinearLayout
+            android:id="@+id/amountBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="26dp"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_calendar"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/footerDivider"
-            app:tint="@color/OccasionalLeave" />
+            app:layout_constraintTop_toBottomOf="@+id/footerDividerTwo">
 
-        <TextView
-            android:id="@+id/claimDateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:fontFamily="@font/quicksand_font_family"
-            android:textColor="@color/text_tertiary"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/iconDate"
-            app:layout_constraintStart_toEndOf="@+id/iconDate"
-            app:layout_constraintTop_toTopOf="@+id/iconDate"
-            tools:text="24 Oct 2023" />
+            <TextView
+                android:id="@+id/amountLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/quicksand_font_family"
+                android:text="Amount"
+                android:textColor="@color/badge_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/amountText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/bg_amount_chip"
-            android:fontFamily="@font/quicksand_font_family"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="5dp"
-            android:textColor="@color/leave_balance_positive"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/iconDate"
-            app:layout_constraintEnd_toStartOf="@+id/viewDetailsButton"
-            app:layout_constraintTop_toTopOf="@+id/iconDate"
-            tools:text="INR 450" />
+            <TextView
+                android:id="@+id/amountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/bg_amount_chip"
+                android:fontFamily="@font/quicksand_font_family"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:textColor="@color/leave_balance_positive"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="INR 450" />
+        </LinearLayout>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/viewDetailsButton"
@@ -260,9 +394,9 @@
             android:focusable="true"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_eye"
-            app:layout_constraintBottom_toBottomOf="@+id/iconDate"
+            app:layout_constraintBottom_toBottomOf="@+id/amountBlock"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/iconDate"
+            app:layout_constraintTop_toTopOf="@+id/amountBlock"
             app:shapeAppearanceOverlay="@style/CircularImageView"
             app:tint="@color/icon_tint" />
 

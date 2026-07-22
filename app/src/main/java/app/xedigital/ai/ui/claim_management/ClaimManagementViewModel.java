@@ -123,10 +123,10 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<String> fuelStation = new MutableLiveData<>("");
     private final APIInterface apiInterface;
     private final MutableLiveData<Boolean> _submissionSuccess = new MutableLiveData<>();
-    public int claimLength;
+    public double claimLength;
     public String hrMail;
     private Employee employeeCache;
-    private int bUemail;
+    private String bUemail;
     private String authTokenHeader;
 
     public ClaimManagementViewModel(@NonNull Application application) {
@@ -153,7 +153,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             @Override
             public void onResponse(@NonNull Call<ClaimLengthResponse> call, @NonNull Response<ClaimLengthResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    claimLength = response.body().getData().getCliamlength();
+                    claimLength = response.body().getData().getEmployeeCount();
                 }
             }
 
@@ -266,7 +266,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                             String firstName = emp.getFirstname() != null ? emp.getFirstname() : "";
                             String lastName = emp.getLastname() != null ? emp.getLastname() : "";
                             String fullName = (firstName + " " + lastName).trim();
-                            bUemail = Integer.parseInt(emp.getEmail() != null ? emp.getEmail() : "");
+                            bUemail = emp.getEmail();
 
                             if (!fullName.isEmpty()) {
                                 derivedEmployees.add(fullName);
@@ -439,7 +439,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         }
         payload.setBu(sanitize(selectedBusinessUnitId.getValue()));
         payload.setBuName(sanitize(selectedBusinessUnitName.getValue()));
-        payload.setBuEmail(bUemail == 0 ? "" : String.valueOf(bUemail));
+        payload.setBuEmail(bUemail);
         payload.setClaimDate(sanitize(claimDate.getValue()));
         payload.setProject(sanitize(projectName.getValue()));
         payload.setMeeting(sanitize(meetingType != null ? meetingType.toLowerCase() : ""));

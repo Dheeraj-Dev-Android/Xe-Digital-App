@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
     tools:context=".ui.claim_management.ApproveClaimDetailsFragment">
 
 
@@ -13,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:background="@color/background_light"
+        android:background="@drawable/fragment_dashboard_bg"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout

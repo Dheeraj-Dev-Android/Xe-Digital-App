@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:fontFamily="@font/quicksand_font_family"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.timesheet.DcrFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -59,7 +60,7 @@
                 android:fontFamily="@font/quicksand_font_family"
                 android:gravity="center"
                 android:text="No Records Available"
-                android:textColor="@color/purple_700"
+                android:textColor="@color/white"
                 android:textSize="16sp" />
         </LinearLayout>
 

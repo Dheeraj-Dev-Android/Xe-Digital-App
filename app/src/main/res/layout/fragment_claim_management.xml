@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fragment_dashboard_bg"
     android:fillViewport="true"
     tools:context=".ui.claim_management.ClaimManagementFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@color/background_light"
+        android:layout_marginTop="16dp"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
         android:paddingBottom="32dp">
@@ -20,18 +20,16 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:layout_marginBottom="16dp"
-            app:strokeColor="@color/stroke_color"
-            app:strokeWidth="1dp">
+            android:backgroundTint="#000C447C"
+            app:cardCornerRadius="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:paddingHorizontal="6dp"
-                android:paddingVertical="6dp">
+                android:backgroundTint="#000C447C">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/viewClaimChip"
@@ -39,10 +37,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="View Claim"
+                    android:backgroundTint="#000C447C"
+                    android:textColor="@color/white"
                     android:textStyle="bold"
-                    app:chipBackgroundColor="@color/chip_background"
-                    app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="@color/_000000"
+                    android:textSize="16sp"
+                    app:chipCornerRadius="6dp"
+                    app:chipStrokeColor="@color/background"
                     app:chipStrokeWidth="1dp" />
 
                 <View
@@ -56,9 +56,11 @@
                     android:layout_height="wrap_content"
                     android:text="Approve Claim"
                     android:textStyle="bold"
-                    app:chipBackgroundColor="@color/chip_background"
-                    app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="@color/_000000"
+                    android:backgroundTint="#000C447C"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:chipCornerRadius="6dp"
+                    app:chipStrokeColor="@color/background"
                     app:chipStrokeWidth="1dp" />
 
             </LinearLayout>
@@ -69,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="12dp"
-            android:background="@color/avatar_text"
+            android:background="@color/background"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -1932,6 +1934,7 @@
                 android:backgroundTint="@color/PrivilegeLeave"
                 android:paddingHorizontal="20dp"
                 android:text="Save"
+                android:visibility="invisible"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 app:cornerRadius="10dp"

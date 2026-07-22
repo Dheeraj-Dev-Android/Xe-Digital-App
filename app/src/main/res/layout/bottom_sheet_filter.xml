@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@drawable/fragment_dashboard_bg"
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +32,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/filter_by_date"
             android:textAppearance="?attr/textAppearanceHeadline6"
-            android:textColor="@color/colorPrimaryVariant"
+            android:textColor="@color/background"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dragHandle" />
@@ -45,13 +46,15 @@
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="24dp"
             android:hint="@string/start_date"
+            android:textColorHint="@color/white"
             app:boxBackgroundColor="@android:color/transparent"
             app:boxStrokeWidth="1dp"
+            app:boxStrokeColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/titleText"
             app:startIconDrawable="@drawable/ic_calendar"
-            app:startIconTint="?attr/colorPrimary">
+            app:startIconTint="@color/background">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/startDateEditText"
@@ -74,13 +77,15 @@
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
             android:hint="@string/end_date"
+            android:textColorHint="@color/white"
             app:boxBackgroundColor="@android:color/transparent"
             app:boxStrokeWidth="1dp"
+            app:boxStrokeColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/startDateLayout"
             app:startIconDrawable="@drawable/ic_calendar"
-            app:startIconTint="?attr/colorPrimary">
+            app:startIconTint="@color/background">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/endDateEditText"
@@ -114,8 +119,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="@string/clear"
+                android:backgroundTint="@color/error_color"
                 android:textAllCaps="false"
-                android:textColor="@color/RestrictedHoliday"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 app:cornerRadius="8dp" />
 
@@ -127,6 +133,7 @@
                 android:text="@string/apply_filter"
                 android:textAllCaps="false"
                 android:textStyle="bold"
+                android:textSize="14sp"
                 app:cornerRadius="8dp" />
 
         </LinearLayout>
