@@ -1,27 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-    activity_face_login.xml — Fixed layout
-
-    Changes from original:
-    ─────────────────────────────────────────────────────────────────────────
-    1. ProgressBar inside loadingPanel given android:id="@+id/progressBar"
-       so Java references compile (previously missing → NPE).
-
-    2. Added android:id="@+id/scannerLine" and android:id="@+id/faceGuide"
-       so toggleScannerAnimation() can find them (previously missing → NPE).
-       scannerLine is positioned inside the cameraCard area; faceGuide is the
-       full camera circle guide.
-
-    3. Added contentDescription to PreviewView and FaceOverlayView for
-       accessibility / lint compliance.
-
-    4. loadingPanel given proper ConstraintLayout anchors (top/bottom/start/end)
-       so the full-screen overlay is reliably anchored on all API levels.
-
-    5. Minor: statusModule constraint changed to
-       app:layout_constraintTop_toBottomOf="@id/cameraCard" so it doesn't
-       rely solely on a bottom constraint that can drift on small screens.
-    ─────────────────────────────────────────────────────────────────────────
--->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -58,7 +35,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
 
         <!-- Lock icon row -->
         <LinearLayout
@@ -125,25 +101,18 @@
         app:strokeColor="#5B5BFF"
         app:strokeWidth="2dp">
 
-        <!-- FIX: contentDescription added for accessibility -->
         <androidx.camera.view.PreviewView
             android:id="@+id/viewFinder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/camera_preview_desc" />
 
-        <!-- FIX: contentDescription added for accessibility -->
         <app.xedigital.ai.utills.FaceOverlayView
             android:id="@+id/faceOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/face_overlay_desc" />
 
-        <!--
-            FIX: scannerLine — referenced by toggleScannerAnimation() in Java.
-            Previously missing from XML → NullPointerException.
-            Positioned at the top of the camera circle; Java animates it downward.
-        -->
         <View
             android:id="@+id/scannerLine"
             android:layout_width="match_parent"
@@ -153,12 +122,6 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!--
-        FIX: faceGuide — referenced by toggleScannerAnimation() to get the
-        height of the guide area for the animation end-point.
-        Previously missing from XML → NullPointerException.
-        Overlaid on the camera card, same size.
-    -->
     <View
         android:id="@+id/faceGuide"
         android:layout_width="320dp"
@@ -218,11 +181,6 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
-        <!--
-            Main status text.
-            FIX: Java previously tried to find R.id.CaptureText which didn't exist → NPE.
-                 This view keeps the correct id="@+id/statusText" that Java now uses.
-        -->
         <TextView
             android:id="@+id/statusText"
             android:layout_width="wrap_content"
@@ -252,14 +210,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- ===== FLASH OVERLAY MODULE ===== -->
+    <View
+        android:id="@+id/flashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFF0000"
+        android:elevation="10dp"
+        android:visibility="gone" />
+
     <!-- ===== LOADING OVERLAY MODULE ===== -->
-    <!--
-        FIX 1: Added all four constraint anchors so the overlay reliably covers the
-                full screen (original had none → unpredictable positioning).
-        FIX 2: ProgressBar now has android:id="@+id/progressBar" so Java can reference it.
-                (Original ProgressBar had no id → Java's progressBar = findViewById(...)
-                 returned null → NPE on progressBar.setVisibility())
-    -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/loadingPanel"
         android:layout_width="0dp"
@@ -280,7 +240,6 @@
             android:orientation="vertical"
             android:padding="32dp">
 
-            <!-- Glowing card behind spinner -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="88dp"
                 android:layout_height="88dp"
@@ -290,7 +249,6 @@
                 app:strokeColor="#5B5BFF"
                 app:strokeWidth="1dp">
 
-                <!-- FIX: android:id added so Java can reference R.id.progressBar -->
                 <ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="44dp"

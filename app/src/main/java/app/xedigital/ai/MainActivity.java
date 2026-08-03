@@ -386,7 +386,6 @@ public class MainActivity extends AppCompatActivity {
     private void fetchUserData(String userId, String authToken, ImageView clientLogo) {
         String authHeaderValue = "jwt " + authToken;
 
-//        Call<UserModelResponse> call = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
         userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
         userCall.enqueue(new Callback<UserModelResponse>() {
             @Override
@@ -403,9 +402,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 String clientLogoUrl = userDataResponse.getData().getCompany().getLogo();
-//                Log.e(TAG, "Client logo URL: " + clientLogoUrl);
-
-                // Load Client image, or default if not available
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed()) {
                     if (clientLogoUrl != null && !clientLogoUrl.isEmpty()) {
                         Glide.with(MainActivity.this).load(clientLogoUrl).into(clientLogo);

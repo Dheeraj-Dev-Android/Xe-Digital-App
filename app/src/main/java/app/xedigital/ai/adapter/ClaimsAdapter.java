@@ -52,6 +52,7 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
         Log.d("ADAPTER_DEBUG", "getItemCount called: " + count);
         return count;
     }
+
     public void updateData(List<EmployeeClaimdataItem> filteredList) {
         this.claimList = filteredList;
         notifyDataSetChanged();

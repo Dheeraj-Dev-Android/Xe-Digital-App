@@ -13,10 +13,10 @@
         android:id="@+id/horizontalScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:background="#F5F5F5"
-        android:paddingTop="8dp"
+        android:fadeScrollbars="false"
+        android:paddingTop="12dp"
         android:paddingBottom="8dp"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -37,7 +37,6 @@
                 android:text="All"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#9E9E9E" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipApproved"
@@ -47,7 +46,6 @@
                 android:text="Approved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#4CAF50" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUnapproved"
@@ -57,7 +55,6 @@
                 android:text="Unapproved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#FF9800" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipRejected"
@@ -67,7 +64,6 @@
                 android:text="Rejected"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipCancelled"
@@ -78,7 +74,6 @@
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
 
-            <!--            android:onClick="onChipClicked"-->
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
@@ -87,8 +82,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:padding="10dp"
-        android:paddingTop="8dp"
+        android:padding="8dp"
         android:scrollbarStyle="outsideOverlay"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -13,10 +13,9 @@
         android:id="@+id/horizontalScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:background="#F5F5F5"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
+        android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@+id/leaveApprovalRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +28,6 @@
             android:paddingStart="16dp"
             android:paddingTop="8dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="8dp"
             app:singleSelection="false">
 
             <com.google.android.material.chip.Chip
@@ -40,7 +38,6 @@
                 android:text="All"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#9E9E9E" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipApproved"
@@ -50,7 +47,6 @@
                 android:text="Approved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#4CAF50" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUnapproved"
@@ -60,7 +56,6 @@
                 android:text="Unapproved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#FF9800" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipRejected"
@@ -70,7 +65,6 @@
                 android:text="Rejected"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipCancelled"
@@ -80,18 +74,14 @@
                 android:text="Cancelled"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-            <!--            android:onClick="onChipClicked"-->
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
-    <!-- End of Chips Filter Section -->
 
-    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/leaveApprovalRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
         android:scrollbarStyle="outsideOverlay"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

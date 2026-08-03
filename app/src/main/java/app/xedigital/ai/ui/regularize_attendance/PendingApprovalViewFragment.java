@@ -1,5 +1,6 @@
 package app.xedigital.ai.ui.regularize_attendance;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -67,9 +68,7 @@ public class PendingApprovalViewFragment extends Fragment {
 
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String formattedDateTime = dateTimeFormat.format(currentDateTime);
-        return formattedDateTime;
-
+        return dateTimeFormat.format(currentDateTime);
     }
 
     public void setListener(OnRegularizeApprovalActionListener listener) {
@@ -107,81 +106,99 @@ public class PendingApprovalViewFragment extends Fragment {
         binding = AttendanceApprovalBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        binding.empName.setText(item.getEmployee().getFullname());
-        binding.empPunchDate.setText(item.getPunchDate());
+        if (item != null) {
+            // Employee details
+            if (item.getEmployee() != null) {
+                binding.empName.setText(safeText(item.getEmployee().getFullname()));
+                binding.empEmail.setText(safeText(item.getEmployee().getEmail()));
+                binding.empContact.setText(safeText(item.getEmployee().getContact()));
+            } else {
+                binding.empName.setText("N/A");
+                binding.empEmail.setText("N/A");
+                binding.empContact.setText("N/A");
+            }
 
-        binding.empName.setText(item.getEmployee().getFullname());
-        binding.empEmail.setText(item.getEmployee().getEmail() + ",  " + item.getEmployee().getContact());
+            // Punch date formatting
+            binding.empPunchDate.setText(formatOrFallbackDate(item.getPunchDate()));
 
-        String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate());
-        binding.empPunchDate.setText("Punch Date : " + formattedPunchDate);
+            // Shift details
+            if (item.getShift() != null) {
+                String shiftName = safeText(item.getShift().getName());
+                String startTime = safeText(item.getShift().getStartTime());
+                String endTime = safeText(item.getShift().getEndTime());
 
-        binding.empShift.setText(item.getShift().getName() + " (" + item.getShift().getStartTime() + " - " + item.getShift().getEndTime() + ")");
-
-        String formattedPunchIn = DateTimeUtils.formatTime(item.getPunchIn());
-        binding.empPunchIn.setText(formattedPunchIn);
-
-        String formattedPunchOut = DateTimeUtils.formatTime(item.getPunchOut());
-        binding.empPunchOut.setText(formattedPunchOut);
-
-        binding.empPunchInAddress.setText(item.getPunchInAddress());
-        binding.empPunchOutAddress.setText(item.getPunchOutAddress());
-
-        String formattedAppliedPunchIn = DateTimeUtils.formatTime(item.getPunchInUpdated());
-        binding.appliedPunchIn.setText(formattedAppliedPunchIn);
-
-        String formattedAppliedPunchOut = DateTimeUtils.formatTime(item.getPunchOutUpdated());
-        binding.appliedPunchOut.setText(formattedAppliedPunchOut);
-
-        binding.appliedPunchInAddress.setText(item.getPunchInAddressUpdated());
-        binding.appliedPunchOutAddress.setText(item.getPunchOutAddressUpdated());
-
-        String formattedAppliedDate = DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate());
-        binding.appliedDate.setText("Applied Date : " + formattedAppliedDate);
-
-        binding.appliedStatusUpdateBy.setText(item.getApprovedByName());
-
-        String formattedUpdatedDate = DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate());
-        binding.appliedStatusUpdateDate.setText(formattedUpdatedDate);
-
-        binding.appliedStatus.setText(item.getStatus());
-        String status = item.getStatus();
-        binding.appliedStatus.setText(status);
-
-
-        if (status.equalsIgnoreCase("unapproved")) {
-            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.pending_status_color));
-        } else if (status.equalsIgnoreCase("Approved")) {
-            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.status_approved));
-        } else if (status.equalsIgnoreCase("Rejected")) {
-            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.status_rejected));
-        } else {
-            binding.appliedStatus.setTextColor(ContextCompat.getColor(binding.getRoot().getContext(), android.R.color.black));
-        }
-
-        if (item.getStatus().equals("unapproved")) {
-            binding.actionButtonsCard.setVisibility(View.VISIBLE);
-
-            binding.approveButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onApprove(item);
+                if (shiftName.equals("N/A") && startTime.equals("N/A") && endTime.equals("N/A")) {
+                    binding.empShift.setText("N/A");
+                } else {
+                    binding.empShift.setText(String.format("%s (%s - %s)", shiftName, startTime, endTime));
                 }
-                String attendanceId = item.getId();
-                handleApprove(attendanceId);
-            });
+            } else {
+                binding.empShift.setText("N/A");
+            }
 
-            binding.rejectButton.setOnClickListener(v -> {
-                String attendanceId = item.getId();
-                if (listener != null) {
-                    listener.onReject(item);
+            // Punch In/Out
+            binding.empPunchIn.setText(formatOrFallbackTime(item.getPunchIn()));
+            binding.empPunchOut.setText(formatOrFallbackTime(item.getPunchOut()));
+
+            // Addresses
+            binding.empPunchInAddress.setText(safeText(item.getPunchInAddress()));
+            binding.empPunchOutAddress.setText(safeText(item.getPunchOutAddress()));
+
+            // Applied Punch In/Out
+            binding.appliedPunchIn.setText(formatOrFallbackTime(item.getPunchInUpdated()));
+            binding.appliedPunchOut.setText(formatOrFallbackTime(item.getPunchOutUpdated()));
+
+            // Applied Addresses
+            binding.appliedPunchInAddress.setText(safeText(item.getPunchInAddressUpdated()));
+            binding.appliedPunchOutAddress.setText(safeText(item.getPunchOutAddressUpdated()));
+
+            // Applied Date
+            binding.appliedDate.setText(formatOrFallbackDate(item.getAppliedDate()));
+
+            // Status Update Metadata
+            binding.appliedStatusUpdateBy.setText(safeText(item.getApprovedByName()));
+            binding.appliedStatusUpdateDate.setText(formatOrFallbackDate(item.getApprovedDate()));
+
+            // Status handling
+            String status = item.getStatus();
+            binding.appliedStatus.setText(safeText(status));
+
+            if (status != null) {
+                if (status.equalsIgnoreCase("unapproved")) {
+                    binding.appliedStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(binding.getRoot().getContext(), R.color.pending_status_color)));
+                } else if (status.equalsIgnoreCase("Approved")) {
+                    binding.appliedStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(binding.getRoot().getContext(), R.color.status_approved)));
+                } else if (status.equalsIgnoreCase("Rejected")) {
+                    binding.appliedStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(binding.getRoot().getContext(), R.color.status_rejected)));
+                } else {
+                    binding.appliedStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(binding.getRoot().getContext(), android.R.color.black)));
                 }
-                handleReject(attendanceId);
-            });
-        } else {
-            binding.actionButtonsCard.setVisibility(View.GONE);
-            binding.actionButtonsCard.setVisibility(View.GONE);
-        }
 
+                if (status.equalsIgnoreCase("unapproved")) {
+                    binding.actionButtonsCard.setVisibility(View.VISIBLE);
+
+                    binding.approveButton.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onApprove(item);
+                        }
+                        String attendanceId = item.getId();
+                        handleApprove(attendanceId);
+                    });
+
+                    binding.rejectButton.setOnClickListener(v -> {
+                        String attendanceId = item.getId();
+                        if (listener != null) {
+                            listener.onReject(item);
+                        }
+                        handleReject(attendanceId);
+                    });
+                } else {
+                    binding.actionButtonsCard.setVisibility(View.GONE);
+                }
+            } else {
+                binding.actionButtonsCard.setVisibility(View.GONE);
+            }
+        }
 
         if (requireContext() instanceof FragmentActivity) {
             profileViewModel = new ViewModelProvider((FragmentActivity) requireContext()).get(ProfileViewModel.class);
@@ -204,6 +221,28 @@ public class PendingApprovalViewFragment extends Fragment {
         });
 
         return view;
+    }
+
+    // --- Helper Methods ---
+
+    private String safeText(String input) {
+        return (input != null && !input.trim().isEmpty()) ? input : "N/A";
+    }
+
+    private String formatOrFallbackDate(String rawDate) {
+        if (rawDate != null && !rawDate.trim().isEmpty()) {
+            String formatted = DateTimeUtils.getDayOfWeekAndDate(rawDate);
+            return (formatted != null && !formatted.trim().isEmpty()) ? formatted : "N/A";
+        }
+        return "N/A";
+    }
+
+    private String formatOrFallbackTime(String rawTime) {
+        if (rawTime != null && !rawTime.trim().isEmpty()) {
+            String formatted = DateTimeUtils.formatTime(rawTime);
+            return (formatted != null && !formatted.trim().isEmpty()) ? formatted : "N/A";
+        }
+        return "N/A";
     }
 
     private String resolveApproverIdentity() {
@@ -237,7 +276,7 @@ public class PendingApprovalViewFragment extends Fragment {
         requestBody.setStatus("Approved");
         requestBody.setApprovedByName(finalApprover);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
         String authToken = prefManager.getString("authToken", "");
         Log.i(TAG, "handleApprove: Dispatching PUT request. Payload json -> " + gson.toJson(requestBody));
 
@@ -270,7 +309,6 @@ public class PendingApprovalViewFragment extends Fragment {
         RegularizeUpdateRequest requestBody = new RegularizeUpdateRequest();
         requestBody.setStatus("Rejected");
         requestBody.setApprovedByName(reportingManager);
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String authToken = prefManager.getString("authToken", "");
 
         Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);

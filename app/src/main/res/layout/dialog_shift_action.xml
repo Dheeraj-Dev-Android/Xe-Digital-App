@@ -20,16 +20,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/white"
-        android:text="Enter Comments" />
+        android:text="Enter Comments"
+        android:textColor="@color/white" />
 
     <EditText
         android:id="@+id/etComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
-        android:textColor="@color/white"
-        android:lines="2" />
+        android:lines="2"
+        android:textColor="@color/white" />
 
 
     <LinearLayout
@@ -44,8 +44,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Reject"
             android:backgroundTint="@color/error_color"
+            android:text="Reject"
             android:textColor="@color/white" />
 
     </LinearLayout>

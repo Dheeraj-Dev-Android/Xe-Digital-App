@@ -22,6 +22,9 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
+    aaptOptions {
+        noCompress("tflite")
+    }
 
     signingConfigs {
         create("release") {
@@ -119,7 +122,4 @@ dependencies {
     implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-
-    // ── WorkManager — updated from 2.9.0 to fix R8/release build issues ──────
-    implementation("androidx.work:work-runtime:2.10.1")
 }

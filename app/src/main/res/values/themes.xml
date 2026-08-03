@@ -1,24 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <style name="Theme.XEDigital" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnPrimary">@color/white</item>
+
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
         <item name="colorOnSecondary">@color/black</item>
+
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowBackground">@color/background</item>
+
+        <item name="fontFamily">@font/quicksand_font_family</item>
+
         <item name="subMenuArrow">@drawable/ic_dropdown_adaptive_fore</item>
         <item name="android:groupIndicator">@drawable/ic_dropdown_adaptive_fore</item>
         <item name="android:itemBackground">@color/submenu_background</item>
     </style>
 
-    <style name="Theme.XEDigital.NoActionBar">
+    <style name="Theme.XEDigital.NoActionBar" parent="Theme.XEDigital">
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="fontFamily">@font/quicksand_font_family</item>
     </style>
 
     <style name="Theme.XEDigital.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -26,11 +32,13 @@
     <style name="Theme.XEDigital.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
+
+    <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
     </style>
 
     <style name="Widget.App.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
+
+    <item name="android:background">@android:color/transparent</item>
     </style>
 
     <style name="CircleImageView">

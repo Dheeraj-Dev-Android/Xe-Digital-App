@@ -19,8 +19,13 @@
 }
 
 # Explicit keep for your worker by full class name (belt + suspenders)
--keep class app.xedigital.ai.utills.ShiftTrackingWorker { *; }
+#-keep class app.xedigital.ai.utills.ShiftTrackingWorker { *; }
+# Keep ML Kit Face Detection classes
+-keep class com.google.mlkit.vision.face.** { *; }
+-keep class com.google.android.gms.vision.** { *; }
 
+# Keep Custom Overlay View
+-keep class app.xedigital.ai.utills.FaceOverlayView { *; }
 
 # ── Data Models ───────────────────────────────────────────────────────────────
 # Prevents R8 from renaming fields like startTime → a, which breaks JSON parsing

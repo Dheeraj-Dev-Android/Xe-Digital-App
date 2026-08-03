@@ -67,13 +67,8 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         return "N/A";
     }
 
-    //    @Override
-//    public void onFilterApplied(String startDate, String endDate) {
-//        attendanceViewModel.fetchAttendance(startDate, endDate);
-//    }
     @Override
     public void onFilterApplied(String startDate, String endDate) {
-        // Update the current filter dates when the filter is applied
         currentStartDate = startDate;
         currentEndDate = endDate;
         attendanceViewModel.fetchAttendance(startDate, endDate);
@@ -85,8 +80,6 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
 
         binding = FragmentAttendanceBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", null);
         attendanceViewModel.storeLoginData(authToken);

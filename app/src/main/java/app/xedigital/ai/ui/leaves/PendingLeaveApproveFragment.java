@@ -55,6 +55,8 @@ import retrofit2.Response;
 public class PendingLeaveApproveFragment extends Fragment {
     public static final String ARG_LEAVE_ID = "leave_id";
     private static final String TAG = "PendingLeaveApprove";
+    private static final String DEFAULT_NA = "N/A";
+
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private APIInterface apiInterface;
     private AppliedLeavesApproveItem item;
@@ -108,7 +110,6 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         Context context = getContext();
         if (context != null) {
-//            SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             securePrefManager = SecurePrefManager.getInstance(requireContext());
             userId = securePrefManager.getString("userId", "");
             authToken = securePrefManager.getString("authToken", "");
@@ -127,30 +128,44 @@ public class PendingLeaveApproveFragment extends Fragment {
             return view;
         }
 
-        // UI Binding Data Setup with Null Safety
-        binding.empName.setText(String.format("%s %s", item.getFirstname() != null ? item.getFirstname() : "", item.getLastname() != null ? item.getLastname() : "").trim());
-        binding.empEmail.setText(item.getEmail());
-        binding.empDesignation.setText(item.getDesignation());
-        binding.empLeaveType.setText(item.getLeavetype() != null && item.getLeavetype().getLeavetypeName() != null ? item.getLeavetype().getLeavetypeName() : "");
-        binding.empFromDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getFromDate()));
-        binding.empSelectTypeFrom.setText(item.getSelectTypeFrom());
-        binding.empToDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getToDate()));
-        binding.empSelectTypeTo.setText(item.getSelectTypeTo());
-        binding.empAppliedDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate()));
-        binding.empReason.setText(item.getReason());
-        binding.empContactNumber.setText(item.getContactNumber());
-        binding.empAddress.setText(item.getVacationAddress());
-        binding.empVacationAddress.setText(item.getVacationAddress());
-        binding.empLeavingStation.setText(item.getLeavingStation());
-        binding.empStatusUpdatedBy.setText(item.getApprovedByName());
-        binding.empStatusUpdatedDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate()));
-        binding.empComments.setText(item.getComment());
+        // Helper methods for null checks
+        String firstName = getValueOrDefault(item.getFirstname());
+        String lastName = getValueOrDefault(item.getLastname());
+        String fullName = (firstName.equalsIgnoreCase(DEFAULT_NA) && lastName.equalsIgnoreCase(DEFAULT_NA)) ? DEFAULT_NA : (getSanitizedName(item.getFirstname()) + " " + getSanitizedName(item.getLastname())).trim();
+
+        String leaveTypeName = (item.getLeavetype() != null) ? getValueOrDefault(item.getLeavetype().getLeavetypeName()) : DEFAULT_NA;
+
+        // Generate Avatar Initials
+        String initials = getInitials(item.getFirstname(), item.getLastname());
+
+        // UI Binding Data Setup with Null Safety & N/A Fallback
+        binding.empAvatarInitials.setText(initials);
+        binding.empName.setText(fullName);
+        binding.empEmail.setText(getValueOrDefault(item.getEmail()));
+        binding.empLeaveType.setText(leaveTypeName);
+        binding.empFromDate.setText(getFormattedDateOrDefault(item.getFromDate()));
+        binding.empSelectTypeFrom.setText(getValueOrDefault(item.getSelectTypeFrom()));
+        binding.empToDate.setText(getFormattedDateOrDefault(item.getToDate()));
+        binding.empSelectTypeTo.setText(getValueOrDefault(item.getSelectTypeTo()));
+        binding.empAppliedDate.setText(getFormattedDateOrDefault(item.getAppliedDate()));
+        binding.empReason.setText(getValueOrDefault(item.getReason()));
+        binding.empContactNumber.setText(getValueOrDefault(item.getContactNumber()));
+
+        // Home Address vs Vacation Address Fix
+        binding.empVacationAddress.setText(getValueOrDefault(item.getVacationAddress()));
+
+        binding.empLeavingStation.setText(getValueOrDefault(item.getLeavingStation()));
+        binding.empStatusUpdatedBy.setText(getValueOrDefault(item.getApprovedByName()));
+        binding.empStatusUpdatedDate.setText(getFormattedDateOrDefault(item.getApprovedDate()));
+        binding.empComments.setText(getValueOrDefault(item.getComment()));
+        binding.empTotalDays.setText(String.valueOf((int) totalDays));
+//        binding.empPlannedLeave.setText(getValueOrDefault(item.get));
 
         calculateTotalDaysAndCheckLeaveLimit();
 
         String status = item.getStatus() != null ? item.getStatus().toLowerCase() : "";
         Context context = binding.empStatusChip.getContext();
-        binding.empStatusChip.setText(status);
+        binding.empStatusChip.setText(getValueOrDefault(item.getStatus()));
 
         int chipBackgroundColor;
         if (status.equals("approved")) {
@@ -162,7 +177,7 @@ public class PendingLeaveApproveFragment extends Fragment {
         }
         binding.empStatusChip.setChipBackgroundColor(ColorStateList.valueOf(chipBackgroundColor));
 
-        if ("unapproved".equals(item.getStatus())) {
+        if ("unapproved".equalsIgnoreCase(item.getStatus())) {
             binding.leaveBtnApprove.setVisibility(View.VISIBLE);
             binding.leaveBtnReject.setVisibility(View.VISIBLE);
             binding.leaveBtnCancel.setVisibility(View.VISIBLE);
@@ -188,6 +203,45 @@ public class PendingLeaveApproveFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Helper to compute uppercase initials from first and last name
+     */
+    private String getInitials(String firstName, String lastName) {
+        StringBuilder initials = new StringBuilder();
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            initials.append(firstName.trim().charAt(0));
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            initials.append(lastName.trim().charAt(0));
+        }
+        return initials.length() > 0 ? initials.toString().toUpperCase(Locale.getDefault()) : "N/A";
+    }
+
+    /**
+     * Helper to return value or "N/A" if null/empty
+     */
+    private String getValueOrDefault(String value) {
+        return (value != null && !value.trim().isEmpty()) ? value : DEFAULT_NA;
+    }
+
+    /**
+     * Helper to safely format dates using DateTimeUtils or return "N/A"
+     */
+    private String getFormattedDateOrDefault(String rawDate) {
+        if (rawDate == null || rawDate.trim().isEmpty()) {
+            return DEFAULT_NA;
+        }
+        String formatted = DateTimeUtils.getDayOfWeekAndDate(rawDate);
+        return (formatted != null && !formatted.trim().isEmpty()) ? formatted : DEFAULT_NA;
+    }
+
+    /**
+     * Helper for name parsing
+     */
+    private String getSanitizedName(String name) {
+        return (name != null) ? name : "";
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -205,7 +259,6 @@ public class PendingLeaveApproveFragment extends Fragment {
     private long calculateTotalDays(String startDate, String endDate) {
         if (startDate == null || endDate == null) return 0;
         try {
-            // Handle full ISO timestamp (e.g., "2026-05-30T00:00:00.000Z")
             if (startDate.contains("T")) {
                 startDate = startDate.split("T")[0];
             }
@@ -213,7 +266,6 @@ public class PendingLeaveApproveFragment extends Fragment {
                 endDate = endDate.split("T")[0];
             }
 
-            // Now both strings are guaranteed to be in "yyyy-MM-dd" format
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate startDateObj = LocalDate.parse(startDate, formatter);
             LocalDate endDateObj = LocalDate.parse(endDate, formatter);
@@ -394,10 +446,8 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         if (getContext() == null) return;
 
-        // Web Rule Check: special leave id condition
         String leaveTypeId = (item.getLeavetype() != null) ? item.getLeavetype().getId() : "";
         if (leaveTypeId != null && !"615418abc2432d4d14990ecc".equals(leaveTypeId)) {
-            // Sequential API Chain Step 1: Update Count/Debit
             Call<ResponseBody> leaveCancel = apiInterface.LeavesUsedCount("jwt " + authToken, requestBody);
             leaveCancel.enqueue(new Callback<ResponseBody>() {
                 @Override
@@ -405,7 +455,6 @@ public class PendingLeaveApproveFragment extends Fragment {
                     if (!isAdded() || getView() == null) return;
 
                     if (response.isSuccessful()) {
-                        // Sequential API Chain Step 2: Update Application Status
                         callStatusUpdateAPI(leaveId, "Cancelled", comment);
                     } else {
                         showErrorMessage(response);
@@ -419,7 +468,6 @@ public class PendingLeaveApproveFragment extends Fragment {
                 }
             });
         } else {
-            // Bypass Count update directly update Application Status if id matches
             callStatusUpdateAPI(leaveId, "Cancelled", comment);
         }
     }
@@ -473,10 +521,8 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         if (getContext() == null) return;
 
-        // Web Rule Check: special leave id condition
         String leaveTypeId = (item.getLeavetype() != null) ? item.getLeavetype().getId() : "";
         if (leaveTypeId != null && !"615418abc2432d4d14990ecc".equals(leaveTypeId)) {
-            // Sequential API Chain Step 1: Update Count/Debit
             Call<ResponseBody> leaveReject = apiInterface.LeavesUsedCount("jwt " + authToken, requestBody);
             leaveReject.enqueue(new Callback<ResponseBody>() {
                 @Override
@@ -484,7 +530,6 @@ public class PendingLeaveApproveFragment extends Fragment {
                     if (!isAdded() || getView() == null) return;
 
                     if (response.isSuccessful()) {
-                        // Sequential API Chain Step 2: Update Application Status
                         callStatusUpdateAPI(leaveId, "Rejected", comment);
                     } else {
                         showErrorMessage(response);
@@ -498,7 +543,6 @@ public class PendingLeaveApproveFragment extends Fragment {
                 }
             });
         } else {
-            // Bypass Count update directly update Application Status if id matches
             callStatusUpdateAPI(leaveId, "Rejected", comment);
         }
     }
@@ -565,7 +609,6 @@ public class PendingLeaveApproveFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Nullify binding reference to prevent memory leaks
         binding = null;
     }
 

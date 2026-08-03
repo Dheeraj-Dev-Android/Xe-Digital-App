@@ -136,4 +136,30 @@
 
     <color name="bg_tint_green">#EAF3DE</color>
     <color name="bg_tint_cyan">#E1F5FE</color>
+
+    <!-- Profile screen -->
+    <color name="profile_card_background">#FFFFFFFF</color>
+    <color name="profile_text_primary">#FF212121</color>
+    <color name="profile_text_secondary">#FF757575</color>
+    <color name="profile_text_tertiary">#FF9E9E9E</color>
+    <color name="profile_divider">#FFEEEEEE</color>
+    <color name="profile_ring">#FF1976D2</color>
+
+    <!-- Profile section accents -->
+    <color name="accent_employee">#FF1976D2</color>
+    <color name="accent_reporting">#FF00897B</color>
+    <color name="accent_cross">#FFF57C00</color>
+    <!-- Attendance card gradient text -->
+    <color name="attendance_card_text">#FFFFFFFF</color>
+    <color name="attendance_card_subtext">#CCE3F2FF</color>
+
+    <!-- Time stat colors -->
+    <color name="time_total">#FF4CAF50</color>
+    <color name="time_overtime">#FFFF9800</color>
+    <color name="time_late">#FFF44336</color>
+
+    <!-- Stat card backgrounds -->
+    <color name="stat_total_bg">#FF4CAF50</color>
+    <color name="stat_overtime_bg">#FFFF9800</color>
+    <color name="stat_late_bg">#FFF44336</color>
 </resources>

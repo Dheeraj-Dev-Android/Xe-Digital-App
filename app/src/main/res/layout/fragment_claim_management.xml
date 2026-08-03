@@ -27,20 +27,20 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#000C447C"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:backgroundTint="#000C447C">
+                android:orientation="horizontal">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/viewClaimChip"
                     style="@style/Widget.MaterialComponents.Chip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="View Claim"
                     android:backgroundTint="#000C447C"
+                    android:text="View Claim"
                     android:textColor="@color/white"
-                    android:textStyle="bold"
                     android:textSize="16sp"
+                    android:textStyle="bold"
                     app:chipCornerRadius="6dp"
                     app:chipStrokeColor="@color/background"
                     app:chipStrokeWidth="1dp" />
@@ -54,11 +54,11 @@
                     style="@style/Widget.MaterialComponents.Chip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Approve Claim"
-                    android:textStyle="bold"
                     android:backgroundTint="#000C447C"
+                    android:text="Approve Claim"
                     android:textColor="@color/white"
                     android:textSize="16sp"
+                    android:textStyle="bold"
                     app:chipCornerRadius="6dp"
                     app:chipStrokeColor="@color/background"
                     app:chipStrokeWidth="1dp" />
@@ -1934,9 +1934,9 @@
                 android:backgroundTint="@color/PrivilegeLeave"
                 android:paddingHorizontal="20dp"
                 android:text="Save"
-                android:visibility="invisible"
                 android:textColor="@color/white"
                 android:textSize="14sp"
+                android:visibility="invisible"
                 app:cornerRadius="10dp"
                 app:elevation="0dp" />
 

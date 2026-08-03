@@ -27,7 +27,6 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private FragmentProfileBinding binding;
 
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -35,25 +34,23 @@ public class ProfileFragment extends Fragment {
         binding.profileLoader.setVisibility(View.VISIBLE);
         binding.emptyStateText.setVisibility(View.GONE);
         binding.profileCard.setVisibility(View.GONE);
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String userId = prefManager.getString("userId", null);
         String authToken = prefManager.getString("authToken", null);
 
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
-        // Show the ProgressBar initially
 
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
             binding.profileLoader.setVisibility(View.GONE);
-            // Check if userProfile or its nested data is null. If so, show empty state
+
             if (userProfile == null || userProfile.getData() == null || userProfile.getData().getEmployee() == null) {
                 binding.profileCard.setVisibility(View.GONE);
                 binding.emptyStateText.setVisibility(View.VISIBLE);
                 Toast.makeText(requireContext(), "Failed to fetch profile. Please check your network connection.", Toast.LENGTH_SHORT).show();
-                return; // Exit early if there's no profile data.
+                return;
             }
-
 
             Employee employee = userProfile.getData().getEmployee();
 

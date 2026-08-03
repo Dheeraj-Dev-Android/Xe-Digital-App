@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fragment_dashboard_bg"
     android:fillViewport="true"
     android:fontFamily="@font/quicksand_font_family"
-    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.timesheet.DcrFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout

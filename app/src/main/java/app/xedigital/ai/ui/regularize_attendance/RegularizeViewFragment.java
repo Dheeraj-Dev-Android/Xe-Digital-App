@@ -42,14 +42,14 @@ public class RegularizeViewFragment extends Fragment {
             AttendanceRegularizeAppliedItem item = regularizeAppliedItem;
 
             TextView empName = view.findViewById(R.id.empName);
-            empName.setText("Name : " + item.getEmployee().getFullname());
+            empName.setText(item.getEmployee().getFullname());
             TextView empEmail = view.findViewById(R.id.empEmail);
             empEmail.setText("Email : " + item.getEmployee().getEmail());
 
             TextView empPunchDate = view.findViewById(R.id.empPunchDate);
             String punchDate = item.getPunchDate();
             String formattedPunchDate = DateTimeUtils.getDayOfWeekAndDate(punchDate);
-            empPunchDate.setText("Punch Date : " + formattedPunchDate);
+            empPunchDate.setText(formattedPunchDate);
 
             TextView empShift = view.findViewById(R.id.empShift);
             empShift.setText(item.getShift().getName() + " (" + item.getShift().getStartTime() + " - " + item.getShift().getEndTime() + ")");

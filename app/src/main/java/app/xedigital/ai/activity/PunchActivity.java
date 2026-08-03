@@ -97,7 +97,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     private static final String TAG = "PunchActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
-    private static final String COLLECTION_NAME = "consultedgeglobalpvtltd_5e970n";
+//    private static final String COLLECTION_NAME = "consultedgeglobalpvtltd_5e970n";
 
     private static final String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
@@ -141,6 +141,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private LocationCallback locationCallback;
     private String currentAddress = "";
     private BioMetric bioMetric;
+    private String collectionName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +157,8 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         authToken = getIntent().getStringExtra("authToken");
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         userId = prefManager.getString("userId", null);
+        collectionName = prefManager.getString("collection", null);
+        Log.e(TAG, "collectionName: " + collectionName);
         employeeFirstName = prefManager.getString("empFirstName", "");
 
         if (authToken != null) {
@@ -491,7 +494,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private void prepareJsonAndSend(@NonNull String base64Image) {
         try {
             JSONObject json = new JSONObject();
-            json.put("collection_name", COLLECTION_NAME);
+            json.put("collection_name", collectionName);
             json.put("image", base64Image);
             RequestBody requestBody = create(MediaType.parse("application/json"), json.toString());
             sendImageToApi(requestBody);

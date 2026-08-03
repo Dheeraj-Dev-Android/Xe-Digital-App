@@ -2,8 +2,8 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="@drawable/fragment_dashboard_bg"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/fragment_dashboard_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -48,8 +48,8 @@
             android:hint="@string/start_date"
             android:textColorHint="@color/white"
             app:boxBackgroundColor="@android:color/transparent"
-            app:boxStrokeWidth="1dp"
             app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/titleText"
@@ -79,8 +79,8 @@
             android:hint="@string/end_date"
             android:textColorHint="@color/white"
             app:boxBackgroundColor="@android:color/transparent"
-            app:boxStrokeWidth="1dp"
             app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/startDateLayout"
@@ -118,8 +118,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="@string/clear"
                 android:backgroundTint="@color/error_color"
+                android:text="@string/clear"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -132,8 +132,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/apply_filter"
                 android:textAllCaps="false"
-                android:textStyle="bold"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 app:cornerRadius="8dp" />
 
         </LinearLayout>

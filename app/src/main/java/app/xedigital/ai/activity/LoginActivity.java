@@ -23,7 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
 
-import app.xedigital.ai.MainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
@@ -115,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
     private void navigateToFaceLogin(String token) {
         if (isFinishing() || isDestroyed()) return;
         isRedirectInProgress = true;
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, FaceLoginActivity.class);
         intent.putExtra("authToken", token);
         startActivity(intent);
         finish();
@@ -175,7 +174,6 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Logout", (dialog, which) -> {
                     dialog.dismiss();
-                    // Safe execution of clear operations across stored keys
                     SecurePrefManager.getInstance(LoginActivity.this).clearAll();
                     showLoginScreen();
                 })
@@ -230,15 +228,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    evaluateSessionWorkflow();
-                } else {
-                    proceedToAuthCheck();
-                }
-            });
-
     private boolean hasForegroundLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -250,6 +239,15 @@ public class LoginActivity extends AppCompatActivity {
         binding.btnSignIn.setVisibility(View.GONE);
         binding.logoCard.setVisibility(View.INVISIBLE);
     }
+
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    evaluateSessionWorkflow();
+                } else {
+                    proceedToAuthCheck();
+                }
+            });
 
     private boolean hasBackgroundLocationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

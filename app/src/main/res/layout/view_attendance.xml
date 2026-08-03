@@ -4,233 +4,342 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:background="@drawable/fragment_dashboard_bg"
+    android:clipToPadding="false"
+    android:fadeScrollbars="false"
+    android:fillViewport="true"
+    android:padding="16dp"
+    android:scrollbars="none"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color_white"
-        android:orientation="vertical"
-        tools:context=".MainActivity">
+        android:orientation="vertical">
 
-        <!-- Header -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:background="#FFFFFF"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#1C160C"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/dateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:drawableStart="@drawable/ic_calendar"
-                android:drawablePadding="10dp"
-                android:text="April 16, 2023"
-                android:textColor="#1C160C"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:drawableTint="@color/OccasionalLeave" />
-
-        </RelativeLayout>
-
-        <!-- Attendance Details -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/avatar_text"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="20dp">
 
-                <!-- Punch-In -->
+                <!-- Date Row -->
                 <TextView
-                    android:id="@+id/punchInLabel"
+                    android:id="@+id/dateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Punch-In"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:drawablePadding="8dp"
+                    android:text="April 16, 2023"
+                    android:textColor="@color/attendance_card_text"
+                    android:textSize="16sp"
                     android:textStyle="bold"
+                    app:drawableTint="@color/attendance_card_text"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/punchInTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="9:00AM"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    app:layout_constraintStart_toStartOf="@id/punchInLabel"
-                    app:layout_constraintTop_toBottomOf="@id/punchInLabel" />
-
-                <!-- Punch-Out -->
-                <TextView
-                    android:id="@+id/punchOutLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Punch-Out"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:textStyle="bold"
+                <!-- Divider line -->
+                <View
+                    android:id="@+id/hero_divider"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#33FFFFFF"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dateTextView" />
 
-                <TextView
-                    android:id="@+id/punchOutTime"
-                    android:layout_width="wrap_content"
+                <!-- Punch-In Column -->
+                <LinearLayout
+                    android:id="@+id/punch_in_container"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="6:00PM"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    app:layout_constraintEnd_toEndOf="@id/punchOutLabel"
-                    app:layout_constraintTop_toBottomOf="@id/punchOutLabel" />
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toStartOf="@+id/vertical_divider"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/hero_divider">
+
+                    <TextView
+                        android:id="@+id/punchInLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.05"
+                        android:text="Punch In"
+                        android:textColor="@color/attendance_card_subtext"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/punchInTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="9:00 AM"
+                        android:textColor="@color/attendance_card_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Vertical Divider -->
+                <View
+                    android:id="@+id/vertical_divider"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#33FFFFFF"
+                    app:layout_constraintBottom_toBottomOf="@id/punch_in_container"
+                    app:layout_constraintEnd_toStartOf="@+id/punch_out_container"
+                    app:layout_constraintStart_toEndOf="@+id/punch_in_container"
+                    app:layout_constraintTop_toBottomOf="@id/hero_divider" />
+
+                <!-- Punch-Out Column -->
+                <LinearLayout
+                    android:id="@+id/punch_out_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/vertical_divider"
+                    app:layout_constraintTop_toBottomOf="@id/hero_divider">
+
+                    <TextView
+                        android:id="@+id/punchOutLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.05"
+                        android:text="Punch Out"
+                        android:textColor="@color/attendance_card_subtext"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/punchOutTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="6:00 PM"
+                        android:textColor="@color/attendance_card_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- ============================================================ -->
+        <!-- CARD 2: TIME STATS — Total / Overtime / Late                 -->
+        <!-- ============================================================ -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/surface_color"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
-                <!-- Total Time -->
-                <RelativeLayout
-                    android:layout_width="0dp"
+                <!-- Section Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:padding="10dp">
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@color/colorPrimaryVariant" />
 
                     <TextView
-                        android:id="@+id/totalTimeLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Time"
-                        android:textAppearance="?attr/textAppearanceBody1"
+                        android:text="Time Summary"
+                        android:textColor="@color/primary_text"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/totalTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/totalTimeLabel"
-                        android:text="9h"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        android:textColor="#4CAF50"
-                        android:textStyle="bold" />
+                </LinearLayout>
 
-                </RelativeLayout>
-
-                <!-- Overtime -->
-                <RelativeLayout
-                    android:layout_width="0dp"
+                <!-- Stat Chips Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:padding="10dp">
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/overtimeLabel"
-                        android:layout_width="wrap_content"
+                    <!-- Total Time -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Over Time"
-                        android:textAppearance="?attr/textAppearanceBody1"
-                        android:textStyle="bold" />
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/stat_card_bg_green"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:id="@+id/overtimeTime"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/totalTimeLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.05"
+                            android:text="Total"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/totalTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="09:00hrs"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- Overtime -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/overtimeLabel"
-                        android:text="1h"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        android:textColor="#FF9800"
-                        android:textStyle="bold" />
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/stat_card_bg_orange"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                </RelativeLayout>
+                        <TextView
+                            android:id="@+id/overtimeLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.05"
+                            android:text="Overtime"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
 
-                <!-- Late -->
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="10dp">
+                        <TextView
+                            android:id="@+id/overtimeTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="1h"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/lateLabel"
-                        android:layout_width="wrap_content"
+                    </LinearLayout>
+
+                    <!-- Late -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Late Time"
-                        android:textAppearance="?attr/textAppearanceBody1"
-                        android:textStyle="bold" />
+                        android:layout_weight="1"
+                        android:background="@drawable/stat_card_bg_red"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:id="@+id/lateTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/lateLabel"
-                        android:text="0h"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        android:textColor="#F44336"
-                        android:textStyle="bold" />
-                </RelativeLayout>
+                        <TextView
+                            android:id="@+id/lateLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.05"
+                            android:text="Late"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/lateTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="0h"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Shift Information -->
+        <!-- ============================================================ -->
+        <!-- CARD 3: SHIFT INFORMATION                                     -->
+        <!-- ============================================================ -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/surface_color"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="20dp">
+
+                <!-- Accent + Title -->
+                <View
+                    android:id="@+id/shift_accent"
+                    android:layout_width="4dp"
+                    android:layout_height="18dp"
+                    android:background="@color/colorSecondaryVariant"
+                    app:layout_constraintBottom_toBottomOf="@id/shiftTitle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/shiftTitle" />
 
                 <TextView
                     android:id="@+id/shiftTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:text="Shift"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    android:textColor="@color/primary_text"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/shift_accent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/shiftDetail"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="14dp"
                     android:drawablePadding="8dp"
-                    android:text="09:00AM - 06:00PM"
-                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:text="09:00 AM  –  06:00 PM"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="14sp"
                     app:drawableStartCompat="@drawable/ic_clock"
-                    app:drawableTint="@color/OccasionalLeave"
+                    app:drawableTint="@color/colorSecondaryVariant"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@id/shiftTitle"
                     app:layout_constraintTop_toBottomOf="@id/shiftTitle" />
 
@@ -238,115 +347,154 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- ============================================================ -->
+        <!-- CARD 4: PUNCH ADDRESS                                         -->
+        <!-- ============================================================ -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/surface_color"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="20dp">
 
-                <!-- Title -->
+                <!-- Accent + Title -->
+                <View
+                    android:id="@+id/address_accent"
+                    android:layout_width="4dp"
+                    android:layout_height="18dp"
+                    android:background="@color/colorAccent"
+                    app:layout_constraintBottom_toBottomOf="@id/addressTitle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/addressTitle" />
+
                 <TextView
                     android:id="@+id/addressTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="10dp"
+                    android:layout_marginStart="10dp"
                     android:text="Punch Address"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    android:textColor="@color/primary_text"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    app:drawableStartCompat="@android:drawable/ic_dialog_map"
-                    app:drawableTint="@color/PrivilegeLeave"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/address_accent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Punch-In Address -->
+                <!-- Punch-In Label -->
                 <TextView
                     android:id="@+id/punchInAddressLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Punch-In"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    android:textStyle="bold"
+                    android:layout_marginTop="18dp"
+                    android:text="Punch In"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/addressTitle" />
 
+                <!-- Punch-In Address Value -->
                 <TextView
                     android:id="@+id/addressDetailIn"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text=" Punch In Address Details"
-                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:layout_marginTop="2dp"
+                    android:text="Punch In Address Details"
+                    android:textColor="@color/primary_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/punchInAddressLabel"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/punchInAddressLabel" />
 
-                <!-- Punch-Out Address -->
+                <!-- Divider -->
                 <View
                     android:id="@+id/view_line"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="10dp"
-                    android:background="#9A9A9A"
+                    android:layout_marginTop="14dp"
+                    android:background="@color/divider_color"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/addressDetailIn" />
 
+                <!-- Punch-Out Label -->
                 <TextView
                     android:id="@+id/punchOutAddressLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Punch-Out"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    android:textStyle="bold"
+                    android:layout_marginTop="14dp"
+                    android:text="Punch Out"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/view_line" />
 
+                <!-- Punch-Out Address Value -->
                 <TextView
                     android:id="@+id/addressDetailOut"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="2dp"
                     android:text="Punch Out Address Details"
-                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="@color/primary_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/punchOutAddressLabel"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/punchOutAddressLabel" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Attendance Log Information -->
+        <!-- ============================================================ -->
+        <!-- CARD 5: ATTENDANCE LOG                                        -->
+        <!-- ============================================================ -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/surface_color"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="20dp">
+
+                <!-- Accent -->
+                <View
+                    android:id="@+id/log_accent"
+                    android:layout_width="4dp"
+                    android:layout_height="18dp"
+                    android:background="@color/PrivilegeLeave"
+                    app:layout_constraintBottom_toBottomOf="@id/attendanceLogTitle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/attendanceLogTitle" />
 
                 <TextView
                     android:id="@+id/attendanceLogTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:text="Attendance Log"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    android:textColor="@color/primary_text"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btn_viewAttendanceLog"
+                    app:layout_constraintStart_toEndOf="@id/log_accent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageButton
@@ -358,7 +506,7 @@
                     android:padding="8dp"
                     android:src="@drawable/ic_eye"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/attendanceLogTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="@color/color_white"
+    android:background="@drawable/fragment_dashboard_bg"
     android:orientation="vertical"
     tools:context=".ui.regularize_attendance.RegularizeAppliedFragment">
 
@@ -12,10 +12,9 @@
         android:id="@+id/horizontalScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:background="#F5F5F5"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:fadeScrollbars="false"
+        android:paddingTop="14dp"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -81,7 +80,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
+        android:paddingTop="6dp"
         android:scrollbarStyle="outsideOverlay"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -126,7 +125,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="No Records Available"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
 
