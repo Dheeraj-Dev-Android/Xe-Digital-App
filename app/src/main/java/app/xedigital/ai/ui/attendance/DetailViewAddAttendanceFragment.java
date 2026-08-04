@@ -34,7 +34,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-
 public class DetailViewAddAttendanceFragment extends Fragment {
     private AddAttendanceRegularizeAppliedItem attendanceItem;
     private MaterialCardView actionButtonsCard;
@@ -44,25 +43,26 @@ public class DetailViewAddAttendanceFragment extends Fragment {
     }
 
     public static DetailViewAddAttendanceFragment newInstance(String param1, String param2) {
-
         return new DetailViewAddAttendanceFragment();
     }
 
     public static String getCurrentDateTimeInUTC() {
         Date currentDateTime = new Date();
-
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         dateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String formattedDateTime = dateTimeFormat.format(currentDateTime);
-//        Log.d("RegularizeApprovalAdapter", "getCurrentDateTimeInUTC: " + formattedDateTime);
-        return formattedDateTime;
+        return dateTimeFormat.format(currentDateTime);
+    }
 
+    /**
+     * Helper method to return "N/A" if the input string is null, empty, or contains only whitespace.
+     */
+    private String getSafeString(String value) {
+        return (value == null || value.trim().isEmpty()) ? "N/A" : value;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Nullable
@@ -72,52 +72,94 @@ public class DetailViewAddAttendanceFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail_view_add_attendance, container, false);
 
         actionButtonsCard = view.findViewById(R.id.actionButtonsCard);
+
         if (getArguments() != null) {
             attendanceItem = (AddAttendanceRegularizeAppliedItem) getArguments().getSerializable(RegularizeViewFragment.ARG_REGULARIZE_APPLIED_ITEM);
-//        AddAttendanceRegularizeAppliedItem attendanceItem = (AddAttendanceRegularizeAppliedItem) getArguments().getSerializable(RegularizeViewFragment.ARG_REGULARIZE_APPLIED_ITEM);
 
             if (attendanceItem != null) {
-                // Populate UI elements with attendance item details
+                // 1. Employee Name Check
                 TextView empNameTextView = view.findViewById(R.id.empName);
-                empNameTextView.setText(attendanceItem.getEmployee().getFirstname() + " " + attendanceItem.getEmployee().getLastname());
+                if (attendanceItem.getEmployee() != null) {
+                    String firstName = getSafeString(attendanceItem.getEmployee().getFirstname());
+                    String lastName = getSafeString(attendanceItem.getEmployee().getLastname());
+
+                    if (firstName.equals("N/A") && lastName.equals("N/A")) {
+                        empNameTextView.setText("N/A");
+                    } else {
+                        String fullName = (firstName.equals("N/A") ? "" : firstName) + " " +
+                                (lastName.equals("N/A") ? "" : lastName);
+                        empNameTextView.setText(fullName.trim());
+                    }
+                } else {
+                    empNameTextView.setText("N/A");
+                }
+
+                // 2. Punch Date
                 TextView empPunchDateTextView = view.findViewById(R.id.empPunchDate);
-                empPunchDateTextView.setText("Punch Date : " + DateTimeUtils.getDayOfWeekAndDate(attendanceItem.getPunchDate()));
+                String rawPunchDate = attendanceItem.getPunchDate();
+                String punchDate = rawPunchDate != null ? DateTimeUtils.getDayOfWeekAndDate(rawPunchDate) : null;
+                empPunchDateTextView.setText(getSafeString(punchDate));
 
+                // 3. Applied Date
                 TextView appliedDateTextView = view.findViewById(R.id.appliedDate);
-                appliedDateTextView.setText("Applied Date : " + DateTimeUtils.getDayOfWeekAndDate(attendanceItem.getAppliedDate()));
+                String rawAppliedDate = attendanceItem.getAppliedDate();
+                String appliedDate = rawAppliedDate != null ? DateTimeUtils.getDayOfWeekAndDate(rawAppliedDate) : null;
+                appliedDateTextView.setText(getSafeString(appliedDate));
 
+                // 4. Employee Email
                 TextView empEmailTextView = view.findViewById(R.id.empEmail);
-                empEmailTextView.setText(attendanceItem.getEmployee().getEmail());
+                String email = attendanceItem.getEmployee() != null ? attendanceItem.getEmployee().getEmail() : null;
+                empEmailTextView.setText(getSafeString(email));
 
+                // 5. Employee Contact
                 TextView empContactTextView = view.findViewById(R.id.empContact);
-                empContactTextView.setText(attendanceItem.getEmployee().getContact());
-                TextView empShift = view.findViewById(R.id.empShift);
-                empShift.setText(attendanceItem.getShift().getName() + " (" + attendanceItem.getShift().getStartTime() + " - " + attendanceItem.getShift().getEndTime() + ")");
+                String contact = attendanceItem.getEmployee() != null ? attendanceItem.getEmployee().getContact() : null;
+                empContactTextView.setText(getSafeString(contact));
 
+                // 6. Shift Details Check
+                TextView empShift = view.findViewById(R.id.empShift);
+                if (attendanceItem.getShift() != null) {
+                    String shiftName = getSafeString(attendanceItem.getShift().getName());
+                    String startTime = getSafeString(attendanceItem.getShift().getStartTime());
+                    String endTime = getSafeString(attendanceItem.getShift().getEndTime());
+
+                    if (shiftName.equals("N/A") && startTime.equals("N/A") && endTime.equals("N/A")) {
+                        empShift.setText("N/A");
+                    } else {
+                        empShift.setText(shiftName + " (" + startTime + " - " + endTime + ")");
+                    }
+                } else {
+                    empShift.setText("N/A");
+                }
+
+                // 7. Punch In
                 TextView empPunchIn = view.findViewById(R.id.empPunchIn);
                 String punchIn = attendanceItem.getPunchIn();
-                String formattedPunchIn = DateTimeUtils.extractTime(punchIn);
-                empPunchIn.setText(formattedPunchIn);
+                String formattedPunchIn = punchIn != null ? DateTimeUtils.extractTime(punchIn) : null;
+                empPunchIn.setText(getSafeString(formattedPunchIn));
 
+                // 8. Punch Out
                 TextView empPunchOut = view.findViewById(R.id.empPunchOut);
                 String punchOut = attendanceItem.getPunchOut();
-                String formattedPunchOut = DateTimeUtils.extractTime(punchOut);
-                empPunchOut.setText(formattedPunchOut);
+                String formattedPunchOut = punchOut != null ? DateTimeUtils.extractTime(punchOut) : null;
+                empPunchOut.setText(getSafeString(formattedPunchOut));
 
+                // 9. Punch In Address
                 TextView empPunchInAddress = view.findViewById(R.id.empPunchInAddress);
-                empPunchInAddress.setText(attendanceItem.getPunchInAddress());
+                empPunchInAddress.setText(getSafeString(attendanceItem.getPunchInAddress()));
 
+                // 10. Punch Out Address
                 TextView empPunchOutAddress = view.findViewById(R.id.empPunchOutAddress);
-                empPunchOutAddress.setText(attendanceItem.getPunchOutAddress());
+                empPunchOutAddress.setText(getSafeString(attendanceItem.getPunchOutAddress()));
 
+                // 11. Remarks
                 TextView remarks = view.findViewById(R.id.remarksValue);
-                remarks.setText(attendanceItem.getRemark());
+                remarks.setText(getSafeString(attendanceItem.getRemark()));
 
-                // Punch Details Card
+                // 12. Applied Status
                 TextView appliedStatusChip = view.findViewById(R.id.appliedStatus);
-                appliedStatusChip.setText(attendanceItem.getStatus());
-
-                String status = attendanceItem.getStatus();
+                String status = getSafeString(attendanceItem.getStatus());
+                appliedStatusChip.setText(status);
 
                 if (status.equalsIgnoreCase("approved")) {
                     appliedStatusChip.setTextColor(getResources().getColor(R.color.approved_color));
@@ -129,15 +171,21 @@ public class DetailViewAddAttendanceFragment extends Fragment {
                     appliedStatusChip.setTextColor(getResources().getColor(R.color.status_pending));
                 }
 
-                if (attendanceItem.getStatus().equalsIgnoreCase("Cancelled")) {
-                    actionButtonsCard.setVisibility(View.GONE);
+                if (status.equalsIgnoreCase("Cancelled")) {
+                    if (actionButtonsCard != null) {
+                        actionButtonsCard.setVisibility(View.GONE);
+                    }
                 }
-                TextView appliedStatusUpdateBy = view.findViewById(R.id.appliedStatusUpdateBy);
-                appliedStatusUpdateBy.setText(attendanceItem.getApprovedByName());
 
+                // 13. Status Updated By
+                TextView appliedStatusUpdateBy = view.findViewById(R.id.appliedStatusUpdateBy);
+                appliedStatusUpdateBy.setText(getSafeString(attendanceItem.getApprovedByName()));
+
+                // 14. Status Update Date
                 TextView appliedStatusUpdateDate = view.findViewById(R.id.appliedStatusUpdateDate);
-                String formattedUpdatedDate = DateTimeUtils.getDayOfWeekAndDate(attendanceItem.getApprovedDate());
-                appliedStatusUpdateDate.setText(formattedUpdatedDate);
+                String rawApprovedDate = attendanceItem.getApprovedDate();
+                String formattedUpdatedDate = rawApprovedDate != null ? DateTimeUtils.getDayOfWeekAndDate(rawApprovedDate) : null;
+                appliedStatusUpdateDate.setText(getSafeString(formattedUpdatedDate));
 
             } else {
                 Log.e("AttendanceItem", "Attendance item is null");
@@ -145,31 +193,46 @@ public class DetailViewAddAttendanceFragment extends Fragment {
         }
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(v -> updateAttendanceStatus());
+        if (cancelButton != null) {
+            cancelButton.setOnClickListener(v -> updateAttendanceStatus());
+        }
+
         return view;
     }
 
     private void refreshFragment() {
-//        Log.w("RegularizeApprovalAdapter", "refreshFragment: ");
-        FragmentManager fragmentManager = getParentFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.detach(this);
-        fragmentTransaction.attach(this);
-        fragmentTransaction.commit();
+        if (isAdded()) {
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.detach(this);
+            fragmentTransaction.attach(this);
+            fragmentTransaction.commit();
+        }
     }
 
     private void updateAttendanceStatus() {
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        if (!isAdded()) return;
+
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
         String attendanceId = attendanceItem != null ? attendanceItem.getId() : null;
+
         if (attendanceId == null) {
             return;
         }
 
         AddedAttendanceCancelRequest requestBody = new AddedAttendanceCancelRequest();
         requestBody.setStatus("Cancelled");
-        requestBody.setApprovedByName(attendanceItem.getEmployee().getFirstname() + " " + attendanceItem.getEmployee().getLastname());
+
+        // Safe check on Employee object during status update
+        String approverName = "N/A";
+        if (attendanceItem != null && attendanceItem.getEmployee() != null) {
+            String firstName = getSafeString(attendanceItem.getEmployee().getFirstname());
+            String lastName = getSafeString(attendanceItem.getEmployee().getLastname());
+            approverName = (firstName.equals("N/A") ? "" : firstName) + " " + (lastName.equals("N/A") ? "" : lastName);
+            approverName = approverName.trim().isEmpty() ? "N/A" : approverName.trim();
+        }
+        requestBody.setApprovedByName(approverName);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
 
         APIInterface apiService = APIClient.getInstance().AddAttendance();
@@ -177,10 +240,16 @@ public class DetailViewAddAttendanceFragment extends Fragment {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull retrofit2.Response<ResponseBody> response) {
+                if (!isAdded()) return;
+
                 if (response.isSuccessful()) {
                     refreshFragment();
                     Toast.makeText(requireContext(), "Attendance status updated", Toast.LENGTH_SHORT).show();
-                    requireActivity().runOnUiThread(() -> actionButtonsCard.setVisibility(View.GONE));
+                    requireActivity().runOnUiThread(() -> {
+                        if (actionButtonsCard != null) {
+                            actionButtonsCard.setVisibility(View.GONE);
+                        }
+                    });
                 } else {
                     Log.e("UpdateAttendance", "Error updating status: " + response.message());
                     Toast.makeText(requireContext(), "Error updating status", Toast.LENGTH_SHORT).show();
@@ -189,12 +258,11 @@ public class DetailViewAddAttendanceFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                if (!isAdded()) return;
 
                 Log.e("UpdateAttendance", "Error updating status: " + t.getMessage());
                 Toast.makeText(requireContext(), "Error updating status", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
-
 }

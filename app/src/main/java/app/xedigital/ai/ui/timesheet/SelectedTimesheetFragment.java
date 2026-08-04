@@ -2,6 +2,8 @@ package app.xedigital.ai.ui.timesheet;
 
 import android.os.Bundle;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.style.BulletSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,19 +59,37 @@ public class SelectedTimesheetFragment extends Fragment {
         TextView nextDayTextValue = view.findViewById(R.id.nextDayTextValue);
         TextView feelingOfTheday = view.findViewById(R.id.feelingOfDayTextValue);
 
-        // Populate views with data from selectedDcrItem
-        dateTextView.setText("Date : " + DateTimeUtils.getDayOfWeekAndDate(selectedDcrItem.getDcrDate()));
+        if (selectedDcrItem == null) {
+            dateTextView.setText("N/A");
+            inTimeTextView.setText("N/A");
+            outTimeTextView.setText("N/A");
+            reportTextValue.setText("N/A");
+            reportOutcomeTextValue.setText("N/A");
+            nextDayTextValue.setText("N/A");
+            feelingOfTheday.setText("N/A");
+            return;
+        }
+
+        // Date
+        String rawDate = selectedDcrItem.getDcrDate();
+        String formattedDate = (rawDate != null && !rawDate.trim().isEmpty())
+                ? DateTimeUtils.getDayOfWeekAndDate(rawDate)
+                : null;
+        dateTextView.setText(getValidText(formattedDate));
+
+        // Times
         inTimeTextView.setText(formatTime(selectedDcrItem.getInTime()));
         outTimeTextView.setText(formatTime(selectedDcrItem.getOutTime()));
 
-        reportTextValue.setText(Html.fromHtml(selectedDcrItem.getTodayReport(), Html.FROM_HTML_MODE_LEGACY));
-        reportOutcomeTextValue.setText(Html.fromHtml(selectedDcrItem.getOutcome(), Html.FROM_HTML_MODE_LEGACY));
-        nextDayTextValue.setText(Html.fromHtml(selectedDcrItem.getTommarowPlan(), Html.FROM_HTML_MODE_LEGACY));
-        feelingOfTheday.setText(Html.fromHtml(selectedDcrItem.getTodayFeeling(), Html.FROM_HTML_MODE_LEGACY));
+        // HTML Fields without list bullet dots
+        reportTextValue.setText(formatHtmlWithoutBullets(selectedDcrItem.getTodayReport()));
+        reportOutcomeTextValue.setText(formatHtmlWithoutBullets(selectedDcrItem.getOutcome()));
+        nextDayTextValue.setText(formatHtmlWithoutBullets(selectedDcrItem.getTommarowPlan()));
+        feelingOfTheday.setText(formatHtmlWithoutBullets(selectedDcrItem.getTodayFeeling()));
     }
 
     public String formatTime(String timeString) {
-        if (timeString == null || timeString.equals("1900-01-01T00:00:00.000Z")) {
+        if (timeString == null || timeString.trim().isEmpty() || timeString.equals("1900-01-01T00:00:00.000Z")) {
             return "N/A";
         }
 
@@ -82,5 +102,34 @@ public class SelectedTimesheetFragment extends Fragment {
             Log.e("DcrAdapter", "Error parsing time: " + e.getMessage());
             return "N/A";
         }
+    }
+
+    private String getValidText(String value) {
+        return (value == null || value.trim().isEmpty()) ? "N/A" : value.trim();
+    }
+
+    private CharSequence formatHtmlWithoutBullets(String value) {
+        String safeText = getValidText(value);
+        if ("N/A".equals(safeText)) {
+            return "N/A";
+        }
+
+        // Parse HTML to Spanned
+        SpannableStringBuilder spannable = new SpannableStringBuilder(
+                Html.fromHtml(safeText, Html.FROM_HTML_MODE_LEGACY)
+        );
+
+        // Find and remove all BulletSpans added by Android's HTML parser
+        BulletSpan[] bulletSpans = spannable.getSpans(0, spannable.length(), BulletSpan.class);
+        for (BulletSpan span : bulletSpans) {
+            spannable.removeSpan(span);
+        }
+
+        // Trim trailing newlines often left by Html.fromHtml
+        while (spannable.length() > 0 && spannable.charAt(spannable.length() - 1) == '\n') {
+            spannable.delete(spannable.length() - 1, spannable.length());
+        }
+
+        return spannable;
     }
 }

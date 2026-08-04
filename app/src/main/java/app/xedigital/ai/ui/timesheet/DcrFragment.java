@@ -39,9 +39,6 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
     private String currentStartDate = "";
     private String currentEndDate = "";
 
-//    public void onFilterApplied(String startDate, String endDate) {
-//        dcrViewModel.fetchEmployeeDcr(startDate, endDate);
-//    }
 
     @Override
     public void onFilterApplied(String startDate, String endDate) {
@@ -66,16 +63,12 @@ public class DcrFragment extends Fragment implements FilterAppliedListener {
         emptyStateContainer = binding.emptyStateContainer;
 
         loadingProgress.setVisibility(View.VISIBLE);
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", null);
         String userId = prefManager.getString("userId", null);
 
         dcrViewModel.storeLoginData(authToken);
 
-//        String startDate = "";
-//        String endDate = "";
-//        dcrViewModel.fetchEmployeeDcr(startDate, endDate);
         if (currentStartDate.isEmpty() && currentEndDate.isEmpty()) {
             dcrViewModel.fetchEmployeeDcr("", "");
         } else {

@@ -13,9 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
         holder.empName.setText(attendanceData.getEmployee().getFirstname() + " " + attendanceData.getEmployee().getLastname());
         holder.appliedDate.setText(DateTimeUtils.getDayOfWeekAndDate(attendanceData.getAppliedDate()));
         holder.empPunchDate.setText(DateTimeUtils.getDayOfWeekAndDate(attendanceData.getPunchDate()));
+        holder.subLabel.setText(attendanceData.getEmployee().getEmail());
         holder.statusChip.setText(attendanceData.getStatus());
         if (attendanceData.getStatus().equalsIgnoreCase("Approved")) {
             holder.statusChip.setChipBackgroundColorResource(R.color.status_approved);
@@ -96,8 +97,8 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
     }
 
     static class AttendanceViewHolder extends RecyclerView.ViewHolder {
-        public ShapeableImageView btnAppliedAddAttendance;
-        TextView empName;
+        public MaterialButton btnAppliedAddAttendance;
+        TextView empName, subLabel;
         TextView appliedDate;
         TextView empPunchDate;
         Chip statusChip;
@@ -106,6 +107,7 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
         public AttendanceViewHolder(@NonNull View itemView) {
             super(itemView);
             empName = itemView.findViewById(R.id.empName);
+            subLabel = itemView.findViewById(R.id.subLabel);
             appliedDate = itemView.findViewById(R.id.appliedDate);
             empPunchDate = itemView.findViewById(R.id.empPunchDate);
             statusChip = itemView.findViewById(R.id.statusChip);
