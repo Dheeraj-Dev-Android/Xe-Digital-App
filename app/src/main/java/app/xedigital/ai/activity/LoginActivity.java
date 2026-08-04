@@ -3,10 +3,8 @@ package app.xedigital.ai.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,7 +17,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
 
@@ -37,10 +34,11 @@ public class LoginActivity extends AppCompatActivity {
     private View loadingOverlay;
     private boolean isRedirectInProgress = false;
 
-    private AlertDialog backgroundDialog;
+    // private AlertDialog backgroundDialog;
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
 
+    /*
     private final ActivityResultLauncher<String> backgroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
@@ -53,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                     showAlertDialog("Shift tracking requires background location 'Allow all the time' to run properly when closed.");
                 }
             });
+    */
 
     private void checkPermissionsAndNavigate(String token) {
         SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
@@ -63,8 +62,54 @@ public class LoginActivity extends AppCompatActivity {
             });
             return;
         }
+
+        /*
+        if (!hasBackgroundLocationPermission()) {
+            showBackgroundPermissionDialog(token);
+            return;
+        }
+        */
+
         navigateToFaceLogin(token);
     }
+
+    private void proceedToAuthCheck() {
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        String authToken = prefManager.getString("authToken", null);
+        String cachedToken = prefManager.getString("cachedTokenPermission", null);
+        boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
+        if (isFallback) {
+            showLoginScreen();
+            return;
+        }
+        if (cachedToken != null) {
+            if (hasForegroundLocationPermission() /* && hasBackgroundLocationPermission() */) {
+                navigateToFaceLogin(cachedToken);
+            } else {
+                checkPermissionsAndNavigate(cachedToken);
+            }
+        } else if (authToken != null && !isRedirectInProgress) {
+            checkPermissionsAndNavigate(authToken);
+        } else {
+            showLoginScreen();
+        }
+    }    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+
+                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+                String cachedToken = prefManager.getString("cachedTokenPermission", null);
+
+                if (fineGranted || coarseGranted) {
+                    if (cachedToken != null) {
+                        checkPermissionsAndNavigate(cachedToken);
+                    }
+                } else {
+                    showLoginScreen();
+                    showAlertDialog("Foreground location permission is required for shift tracking.");
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,26 +134,34 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void proceedToAuthCheck() {
+    @Override
+    protected void onDestroy() {
+        /*
+        if (backgroundDialog != null && backgroundDialog.isShowing()) {
+            backgroundDialog.dismiss();
+        }
+        */
+        if (batteryDialog != null && batteryDialog.isShowing()) {
+            batteryDialog.dismiss();
+        }
+        if (infoDialog != null && infoDialog.isShowing()) {
+            infoDialog.dismiss();
+        }
+        super.onDestroy();
+    }    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    evaluateSessionWorkflow();
+                } else {
+                    proceedToAuthCheck();
+                }
+            });
+
+    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-        String authToken = prefManager.getString("authToken", null);
-        String cachedToken = prefManager.getString("cachedTokenPermission", null);
-        boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
-        if (isFallback) {
-            showLoginScreen();
-            return;
-        }
-        if (cachedToken != null) {
-            if (hasForegroundLocationPermission() && hasBackgroundLocationPermission()) {
-                navigateToFaceLogin(cachedToken);
-            } else {
-                checkPermissionsAndNavigate(cachedToken);
-            }
-        } else if (authToken != null && !isRedirectInProgress) {
-            checkPermissionsAndNavigate(authToken);
-        } else {
-            showLoginScreen();
-        }
+        prefManager.putString("userId", userId);
+        prefManager.putString("emailId", emailId);
+        prefManager.putString("authToken", authToken);
     }
 
     private void navigateToFaceLogin(String token) {
@@ -127,18 +180,11 @@ public class LoginActivity extends AppCompatActivity {
         evaluateSessionWorkflow();
     }
 
-    @Override
-    protected void onDestroy() {
-        if (backgroundDialog != null && backgroundDialog.isShowing()) {
-            backgroundDialog.dismiss();
-        }
-        if (batteryDialog != null && batteryDialog.isShowing()) {
-            batteryDialog.dismiss();
-        }
-        if (infoDialog != null && infoDialog.isShowing()) {
-            infoDialog.dismiss();
-        }
-        super.onDestroy();
+    private void showLoginScreen() {
+        binding.layoutEmail.setVisibility(View.VISIBLE);
+        binding.layoutPassword.setVisibility(View.VISIBLE);
+        binding.btnSignIn.setVisibility(View.VISIBLE);
+        binding.logoCard.setVisibility(View.VISIBLE);
     }
 
     private void evaluateSessionWorkflow() {
@@ -152,6 +198,11 @@ public class LoginActivity extends AppCompatActivity {
         proceedToAuthCheck();
     }
 
+
+
+
+
+    /*
     private void showBackgroundPermissionDialog(String token) {
         if (isFinishing() || isDestroyed()) return;
         if (backgroundDialog != null && backgroundDialog.isShowing()) return;
@@ -181,20 +232,7 @@ public class LoginActivity extends AppCompatActivity {
 
         backgroundDialog.show();
     }
-
-    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
-        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-        prefManager.putString("userId", userId);
-        prefManager.putString("emailId", emailId);
-        prefManager.putString("authToken", authToken);
-    }
-
-    private void showLoginScreen() {
-        binding.layoutEmail.setVisibility(View.VISIBLE);
-        binding.layoutPassword.setVisibility(View.VISIBLE);
-        binding.btnSignIn.setVisibility(View.VISIBLE);
-        binding.logoCard.setVisibility(View.VISIBLE);
-    }
+    */
 
     private void callLoginApi(String email, String password) {
         showLoading(true);
@@ -240,23 +278,6 @@ public class LoginActivity extends AppCompatActivity {
         binding.logoCard.setVisibility(View.INVISIBLE);
     }
 
-    private boolean hasBackgroundLocationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        }
-        return true;
-    }
-
-    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    evaluateSessionWorkflow();
-                } else {
-                    proceedToAuthCheck();
-                }
-            });
-
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
 
@@ -279,24 +300,17 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /*
+    private boolean hasBackgroundLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+    */
 
-    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
-                boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
 
-                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-                String cachedToken = prefManager.getString("cachedTokenPermission", null);
-
-                if (fineGranted || coarseGranted) {
-                    if (cachedToken != null) {
-                        checkPermissionsAndNavigate(cachedToken);
-                    }
-                } else {
-                    showLoginScreen();
-                    showAlertDialog("Foreground location permission is required for shift tracking.");
-                }
-            });
 
 
 }

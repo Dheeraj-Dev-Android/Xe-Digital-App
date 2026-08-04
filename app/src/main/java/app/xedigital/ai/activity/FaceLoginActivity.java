@@ -632,7 +632,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         isProcessingLiveness = false;
         challengeSatisfied = false;
         isBlinking = false;
-        isAnalyzing.set(false);
+        isAnalyzing.set(true);
 
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
@@ -648,7 +648,16 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 showFallbackLoginAlert();
             } else {
                 String displayMsg = (errorMessage != null) ? errorMessage : "Verification failed";
-                new AlertDialog.Builder(this).setTitle("Verification Failed").setMessage(displayMsg + "\n\nAttempt " + attemptCount + " of 3").setPositiveButton("Retry", (dialog, which) -> resetAndRetryChallenge()).setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin()).setCancelable(false).show();
+                new AlertDialog.Builder(this)
+                        .setTitle("Verification Failed")
+                        .setMessage(displayMsg + "\n\nAttempt " + attemptCount + " of 3")
+                        .setPositiveButton("Retry", (dialog, which) -> {
+                            isAnalyzing.set(false);
+                            resetAndRetryChallenge();
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin())
+                        .setCancelable(false)
+                        .show();
             }
         });
     }
@@ -661,24 +670,24 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             toggleScannerAnimation(false);
             isAnalyzing.set(true);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Multiple Failed Attempts");
-            builder.setMessage("Face recognition failed 3 times. Please choose an alternative login method:");
-            builder.setCancelable(false);
+            boolean canUseDeviceSecurity = bioMetric != null && bioMetric.isDeviceSecurityAvailable();
 
-            boolean canUseBiometrics = bioMetric != null && bioMetric.isBiometricAvailable();
+            if (canUseDeviceSecurity) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Multiple Failed Attempts");
+                builder.setMessage("Face recognition failed 3 times. Verify your identity using your device PIN/Pattern/Biometrics or proceed to manual login:");
+                builder.setCancelable(false);
 
-            if (canUseBiometrics) {
-                builder.setPositiveButton("Biometric Login", (dialog, which) -> {
+                builder.setPositiveButton("Device Lock / Biometrics", (dialog, which) -> {
                     if (bioMetric != null) bioMetric.authenticate(true);
                 });
                 builder.setNeutralButton("Manual Login", (dialog, which) -> navigateToManualLogin());
+                builder.setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin());
+                builder.show();
             } else {
-                builder.setPositiveButton("Manual Login", (dialog, which) -> navigateToManualLogin());
+                // FALLBACK: Direct launch to manual login if no security lock/biometrics exist
+                navigateToManualLogin();
             }
-
-            builder.setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin());
-            builder.show();
         });
     }
 
@@ -726,7 +735,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     public void onAuthenticationSucceeded() {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
-            updateStatus("Biometric Verified!");
+            updateStatus("Authentication Verified!");
             handleSuccess();
         });
     }
@@ -735,7 +744,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     public void onAuthenticationError(int errorCode, CharSequence errString) {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
-            showFallbackLoginAlert();
+            navigateToManualLogin();
         });
     }
 
@@ -743,7 +752,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     public void onAuthenticationFailed() {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
-            updateStatus("Biometric authentication failed.");
+            updateStatus("Device authentication failed.");
         });
     }
 

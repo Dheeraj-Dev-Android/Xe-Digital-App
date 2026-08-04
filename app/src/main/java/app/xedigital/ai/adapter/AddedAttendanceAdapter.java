@@ -24,9 +24,7 @@ import app.xedigital.ai.model.addedAttendanceList.AddAttendanceRegularizeApplied
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendanceAdapter.AttendanceViewHolder> {
-
     private List<AddAttendanceRegularizeAppliedItem> attendanceDataList;
-
 
     public AddedAttendanceAdapter(List<AddAttendanceRegularizeAppliedItem> attendanceDataList) {
         this.attendanceDataList = attendanceDataList;
@@ -47,8 +45,6 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
         holder.appliedDate.setText(DateTimeUtils.getDayOfWeekAndDate(attendanceData.getAppliedDate()));
         holder.empPunchDate.setText(DateTimeUtils.getDayOfWeekAndDate(attendanceData.getPunchDate()));
         holder.statusChip.setText(attendanceData.getStatus());
-
-
         if (attendanceData.getStatus().equalsIgnoreCase("Approved")) {
             holder.statusChip.setChipBackgroundColorResource(R.color.status_approved);
         } else if (attendanceData.getStatus().equalsIgnoreCase("unapproved")) {
