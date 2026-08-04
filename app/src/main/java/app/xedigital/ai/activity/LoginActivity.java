@@ -240,6 +240,14 @@ public class LoginActivity extends AppCompatActivity {
         binding.logoCard.setVisibility(View.INVISIBLE);
     }
 
+    private boolean hasBackgroundLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -248,14 +256,6 @@ public class LoginActivity extends AppCompatActivity {
                     proceedToAuthCheck();
                 }
             });
-
-    private boolean hasBackgroundLocationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        }
-        return true;
-    }
 
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;

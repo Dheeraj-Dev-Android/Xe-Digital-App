@@ -44,8 +44,8 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
         AddAttendanceRegularizeAppliedItem attendanceData = attendanceDataList.get(position);
 
         holder.empName.setText(attendanceData.getEmployee().getFirstname() + " " + attendanceData.getEmployee().getLastname());
-        holder.appliedDate.setText("Applied Date : " + DateTimeUtils.getDayOfWeekAndDate(attendanceData.getAppliedDate()));
-        holder.empPunchDate.setText("Punch Date : " + DateTimeUtils.getDayOfWeekAndDate(attendanceData.getPunchDate()));
+        holder.appliedDate.setText(DateTimeUtils.getDayOfWeekAndDate(attendanceData.getAppliedDate()));
+        holder.empPunchDate.setText(DateTimeUtils.getDayOfWeekAndDate(attendanceData.getPunchDate()));
         holder.statusChip.setText(attendanceData.getStatus());
 
 

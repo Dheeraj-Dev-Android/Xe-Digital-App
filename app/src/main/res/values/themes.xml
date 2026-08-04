@@ -33,12 +33,12 @@
 
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
 
-    <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
     </style>
 
     <style name="Widget.App.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
 
-    <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
     <style name="CircleImageView">

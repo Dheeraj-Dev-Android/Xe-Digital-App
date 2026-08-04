@@ -71,6 +71,23 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     private static final String TAG = "FaceLoginActivity";
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
+    private String authToken;
+    private String storedUserId;
+    private PreviewView previewView;
+    private Preview preview;
+    private ImageCapture imageCapture;
+    private ImageAnalysis imageAnalysis;
+    private CameraSelector cameraSelector;
+    private ProcessCameraProvider cameraProvider;
+    private FaceDetector detector;
+    private volatile boolean isProcessingLiveness = false;
+    private boolean isBlinking = false;
+    private boolean challengeSatisfied = false;
+    private LivenessChallenge currentChallenge;
+    private TextView statusText;
+    private FaceOverlayView faceOverlay;
+    private View loadingPanel;
+    private ObjectAnimator scannerAnimator;
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
         if (isFinishing() || isDestroyed()) return;
         if (isGranted) {
@@ -82,25 +99,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             }
         }
     });
-    private String authToken;
-    private String storedUserId;
-    private PreviewView previewView;
-    private Preview preview;
-    private ImageCapture imageCapture;
-    private ImageAnalysis imageAnalysis;
-    private CameraSelector cameraSelector;
-    private ProcessCameraProvider cameraProvider;
-
-    private FaceDetector detector;
-    private volatile boolean isProcessingLiveness = false;
-    private boolean isBlinking = false;
-    private boolean challengeSatisfied = false;
-    private LivenessChallenge currentChallenge;
-
-    private TextView statusText;
-    private FaceOverlayView faceOverlay;
-    private View loadingPanel;
-    private ObjectAnimator scannerAnimator;
     private String COLLECTION_NAME;
     private SecurePrefManager securePrefManager;
     private BioMetric bioMetric;

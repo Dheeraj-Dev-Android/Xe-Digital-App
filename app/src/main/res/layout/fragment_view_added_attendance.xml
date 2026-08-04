@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fragment_dashboard_bg"
     android:orientation="vertical"
     tools:context=".ui.attendance.ViewAddedAttendanceFragment">
 
@@ -12,10 +13,9 @@
         android:id="@+id/horizontalScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:background="#F5F5F5"
-        android:paddingTop="8dp"
+        android:paddingTop="12dp"
         android:paddingBottom="8dp"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -80,9 +80,7 @@
         android:id="@+id/AddAttendanceRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="5dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
         android:scrollbarStyle="outsideOverlay"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -131,6 +129,4 @@
             android:textColor="@color/purple_700"
             android:textSize="16sp" />
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

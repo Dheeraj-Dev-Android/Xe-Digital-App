@@ -13,6 +13,7 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
+    app:rippleColor="@color/ripple_color"
     app:strokeColor="@color/stroke_color"
     app:strokeWidth="1dp">
 
@@ -21,86 +22,169 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/layout_padding">
 
+        <!-- ===== HEADER ROW: Icon + Employee Name ===== -->
+
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/btn_viewAppliedAddAttendance"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:background="@drawable/circular_background"
+            android:contentDescription="@string/view_attendance"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_eye"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/CircularImageView"
             app:tint="@color/icon_tint" />
 
-        <LinearLayout
-            android:id="@+id/linearLayout4"
+        <TextView
+            android:id="@+id/labelEmpName"
+            style="@style/TextAppearance.Material3.LabelSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/content_margin"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:letterSpacing="0.05"
+            android:text="Employee Name"
+            android:textAllCaps="true"
+            android:textColor="@color/text_tertiary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_viewAppliedAddAttendance"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="@id/btn_viewAppliedAddAttendance" />
 
-            <TextView
-                android:id="@+id/empName"
-                style="@style/TextAppearance.Material3.TitleMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/text_spacing"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/statusChip"
-                tools:text="Employee Name : " />
+        <TextView
+            android:id="@+id/empName"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/content_margin"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_viewAppliedAddAttendance"
+            app:layout_constraintTop_toBottomOf="@id/labelEmpName"
+            tools:text="John Doe" />
 
-            <TextView
-                android:id="@+id/appliedDate"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:text="Applied Date : "
-                android:textColor="@color/text_tertiary"
-                android:textStyle="bold" />
+        <!-- Barrier ensures divider sits below the taller of icon / name block -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/headerBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="btn_viewAppliedAddAttendance,empName" />
 
-            <TextView
-                android:id="@+id/empPunchDate"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:text="Punch Date : "
-                android:textColor="@color/text_tertiary"
-                android:textStyle="bold" />
+        <!-- ===== DIVIDER ===== -->
 
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_margin"
+            android:background="@color/stroke_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerBarrier" />
+
+        <!-- ===== ROW 1: Applied Date + Punch Date ===== -->
+
+        <LinearLayout
+            android:id="@+id/dateRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_margin"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider">
+
+            <!-- Applied Date -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
+                    style="@style/TextAppearance.Material3.LabelSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="Status : "
-                    android:textColor="@color/text_tertiary"
-                    android:textStyle="bold" />
+                    android:letterSpacing="0.05"
+                    android:text="Applied Date"
+                    android:textAllCaps="true"
+                    android:textColor="@color/text_tertiary" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/statusChip"
+                <TextView
+                    android:id="@+id/appliedDate"
+                    style="@style/TextAppearance.Material3.BodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    app:chipBackgroundColor="@color/status_approved"
-                    app:chipMinHeight="25dp"
-                    app:elevation="2dp"
-                    tools:text="Approved" />
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    tools:text="12 Jan 2024" />
             </LinearLayout>
+
+            <!-- Punch Date -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.Material3.LabelSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.05"
+                    android:text="Punch Date"
+                    android:textAllCaps="true"
+                    android:textColor="@color/text_tertiary" />
+
+                <TextView
+                    android:id="@+id/empPunchDate"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    tools:text="12 Jan, 09:15 AM" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ===== ROW 2: Status (full width, own line) ===== -->
+
+        <LinearLayout
+            android:id="@+id/statusRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_margin"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dateRow">
+
+            <TextView
+                style="@style/TextAppearance.Material3.LabelSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.05"
+                android:text="Status"
+                android:textAllCaps="true"
+                android:textColor="@color/text_tertiary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/statusChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:chipBackgroundColor="@color/status_approved"
+                app:chipMinHeight="26dp"
+                app:elevation="0dp"
+                tools:text="Approved" />
 
         </LinearLayout>
 
