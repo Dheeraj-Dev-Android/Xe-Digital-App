@@ -10,8 +10,4 @@ public class Data {
     public int getEmployeeCount() {
         return employeeCount;
     }
-
-    public void setEmployeeCount(int employeeCount) {
-        this.employeeCount = employeeCount;
-    }
 }
