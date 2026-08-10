@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class AppliedLeavesApproveItem implements Serializable {
+public class AppliedLeavesItem implements Serializable {
 
     @SerializedName("reason")
     private String reason;
@@ -180,4 +180,5 @@ public class AppliedLeavesApproveItem implements Serializable {
     public String getStatus() {
         return status;
     }
+
 }

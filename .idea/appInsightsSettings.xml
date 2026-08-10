@@ -7,10 +7,10 @@
         <entry key="Android Vitals">
           <value>
             <InsightsFilterSettings>
-              <option name="failureTypes">
-                <list>
-                  <option value="ANR" />
-                </list>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="app.xedigital.ai" />
+                </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="SEVEN_DAYS" />
@@ -23,7 +23,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="app.xedigital" />
+                  <option name="appId" value="app.xedigital.ai" />
                   <option name="mobileSdkAppId" value="1:1026884675633:android:8599ffe587a67f19910d10" />
                   <option name="projectId" value="xe-digital-7087b" />
                   <option name="projectNumber" value="1026884675633" />

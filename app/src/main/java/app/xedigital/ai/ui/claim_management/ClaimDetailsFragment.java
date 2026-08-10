@@ -32,7 +32,6 @@ import app.xedigital.ai.model.employeeClaim.EmployeeClaimdataItem;
 
 public class ClaimDetailsFragment extends Fragment {
 
-    // ---- Existing TextView IDs (unchanged) ----
     private TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtComment;
     private TextView txtTravelCategory, txtModeOfTransport, txtFromTo, txtDistance, txtRestaurant, txtPersons;
     private TextView txtTotalAmount, txtAppliedDate, txtStatus, txtStatusRm, txtStatusHr, txtTravelRefId;
@@ -40,7 +39,6 @@ public class ClaimDetailsFragment extends Fragment {
     private TextView txtFuelType, txtFuelStation, txtFuelQuantity, txtVehicleNumber, txtTollPlaza, txtTollLocation;
     private TextView txtParkingLocation, txtParkingDate, txtAccommodationType, txtAccommodationName, txtCheckIn, txtCheckOut;
 
-    // ---- New Row / Card container views for hide-if-empty logic ----
     private View rowDateTravelRef, rowStatusRmHr;
     private View cardExpenseBilling, rowExpenseTypeCategory, rowBillNumberPeriod;
     private View cardFuelToll, rowFuelTypeStation, rowFuelQuantityVehicle, rowTollPlazaLocation;

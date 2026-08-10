@@ -21,7 +21,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,7 +78,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize views
         claimsRecyclerView = view.findViewById(R.id.claimsRecyclerView);
         filterButton = view.findViewById(R.id.filterButton);
         loadingProgress = view.findViewById(R.id.loadingProgress);
@@ -87,7 +85,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
         fromDateEditText = view.findViewById(R.id.fromDateEditText);
         toDateEditText = view.findViewById(R.id.toDateEditText);
 
-        // Setup RecyclerView
         claimsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         claimsAdapter = new ClaimsAdapter(claimList);
         claimsAdapter.setOnClaimClickListener(this);
@@ -112,8 +109,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
 
                         Toast.makeText(requireContext(), "To date cannot be before from date", Toast.LENGTH_SHORT).show();
                     } else {
-                        // Filter claims by date range
-//                        filterClaimsByDateRange(fromDate, toDate);
                         new Handler().postDelayed(() -> {
                             loadingProgress.setVisibility(View.VISIBLE);
                             filterClaimsByDateRange(fromDate, toDate);
@@ -150,7 +145,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
         loadingProgress.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
 
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
         String token = "jwt " + authToken;
@@ -175,7 +169,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                         } else {
                             claimsAdapter.updateData(claimList);
                             emptyStateContainer.setVisibility(View.GONE);
-//                            Log.d("API Response", "Data fetched successfully");
                         }
                     } else {
                         emptyStateContainer.setVisibility(View.VISIBLE);
@@ -205,7 +198,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                 SimpleDateFormat filterDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String formattedClaimDate = filterDateFormat.format(claimDate);
 
-                // Check if the claim date is within the selected range
                 if (formattedClaimDate.compareTo(fromDate) >= 0 && formattedClaimDate.compareTo(toDate) <= 0) {
                     filteredList.add(claim);
                 }
@@ -213,7 +205,6 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
                 e.printStackTrace();
             }
         }
-//        claimsAdapter.updateData(filteredList);
         requireActivity().runOnUiThread(() -> {
             claimsAdapter.updateData(filteredList);
             loadingProgress.setVisibility(View.GONE);
@@ -222,9 +213,8 @@ public class ViewClaimFragment extends Fragment implements ClaimsAdapter.OnClaim
 
     @Override
     public void onClaimClick(EmployeeClaimdataItem claim) {
-        // Create a bundle to pass data to the new fragment
         Bundle bundle = new Bundle();
-        bundle.putSerializable("claimData", (Serializable) claim);
+        bundle.putSerializable("claimData", claim);
 
         ClaimDetailsFragment fragment = new ClaimDetailsFragment();
         fragment.setArguments(bundle);

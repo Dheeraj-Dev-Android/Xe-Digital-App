@@ -23,7 +23,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.List;
 
 import app.xedigital.ai.R;
-import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesApproveItem;
+import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesItem;
 import app.xedigital.ai.ui.leaves.ApproveLeaveFragment;
 import app.xedigital.ai.utills.DateTimeUtils;
 
@@ -31,9 +31,9 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
     private final String authToken;
     private final String userId;
     private final Context context;
-    private List<AppliedLeavesApproveItem> items;
+    private List<AppliedLeavesItem> items;
 
-    public LeaveApprovalAdapter(List<AppliedLeavesApproveItem> items, String authToken, String userId, ApproveLeaveFragment approveLeaveFragment, Context context) {
+    public LeaveApprovalAdapter(List<AppliedLeavesItem> items, String authToken, String userId, ApproveLeaveFragment approveLeaveFragment, Context context) {
         this.items = items;
         this.authToken = authToken;
         this.userId = userId;
@@ -49,7 +49,7 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AppliedLeavesApproveItem item = items.get(position);
+        AppliedLeavesItem item = items.get(position);
         holder.empName.setText((item.getFirstname() != null ? item.getFirstname() : "") + " " + (item.getLastname() != null ? item.getLastname() : ""));
         String name = trim(item.getFirstname()) + " " + trim(item.getLastname());
         holder.empAvatar.setText(getInitials(name));
@@ -85,12 +85,12 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
 
         holder.btnViewDetailLeave.setOnClickListener(v -> {
             if (position != RecyclerView.NO_POSITION) {
-                AppliedLeavesApproveItem appliedLeavesApproveItem = items.get(position);
-                String leaveId = appliedLeavesApproveItem.getId();
+                AppliedLeavesItem AppliedLeavesItem = items.get(position);
+                String leaveId = AppliedLeavesItem.getId();
 
-                if (leaveId != null && appliedLeavesApproveItem != null) {
+                if (leaveId != null && AppliedLeavesItem != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_LEAVE_ID, appliedLeavesApproveItem);
+                    bundle.putSerializable(ARG_LEAVE_ID, AppliedLeavesItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_approve_leaves_to_nav_approve_leave_data, bundle);
                 } else {
                     Toast.makeText(context, "Leave ID is null", Toast.LENGTH_SHORT).show();
@@ -101,12 +101,12 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
         });
         holder.leaveApprovalCard.setOnClickListener(v -> {
             if (position != RecyclerView.NO_POSITION) {
-                AppliedLeavesApproveItem appliedLeavesApproveItem = items.get(position);
-                String leaveId = appliedLeavesApproveItem.getId();
+                AppliedLeavesItem AppliedLeavesItem = items.get(position);
+                String leaveId = AppliedLeavesItem.getId();
 
-                if (leaveId != null && appliedLeavesApproveItem != null) {
+                if (leaveId != null && AppliedLeavesItem != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(ARG_LEAVE_ID, appliedLeavesApproveItem);
+                    bundle.putSerializable(ARG_LEAVE_ID, AppliedLeavesItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_approve_leaves_to_nav_approve_leave_data, bundle);
                 } else {
                     Toast.makeText(context, "Leave ID is null", Toast.LENGTH_SHORT).show();
@@ -134,7 +134,7 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
 
 
     // Inside LeaveApprovalAdapter Class
-    public void updateList(List<AppliedLeavesApproveItem> newLeaves) {
+    public void updateList(List<AppliedLeavesItem> newLeaves) {
         this.items = newLeaves;
         notifyDataSetChanged();
     }

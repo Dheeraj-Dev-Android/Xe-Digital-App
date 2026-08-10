@@ -39,7 +39,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.databinding.LeaveApprovalBinding;
-import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesApproveItem;
+import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesItem;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.usedLeave.UsedLeaveRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
@@ -56,7 +56,7 @@ public class PendingLeaveApproveFragment extends Fragment {
     private static final String DEFAULT_NA = "N/A";
 
     private APIInterface apiInterface;
-    private AppliedLeavesApproveItem item;
+    private AppliedLeavesItem item;
     private String reportingManager = "";
     private String managerId = "";
     private double totalDays;
@@ -71,7 +71,7 @@ public class PendingLeaveApproveFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static PendingLeaveApproveFragment newInstance(AppliedLeavesApproveItem item) {
+    public static PendingLeaveApproveFragment newInstance(AppliedLeavesItem item) {
         PendingLeaveApproveFragment fragment = new PendingLeaveApproveFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_LEAVE_ID, item);
@@ -95,10 +95,9 @@ public class PendingLeaveApproveFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                item = getArguments().getSerializable(ARG_LEAVE_ID, AppliedLeavesApproveItem.class);
+                item = getArguments().getSerializable(ARG_LEAVE_ID, AppliedLeavesItem.class);
             } else {
-                @SuppressWarnings("deprecation")
-                AppliedLeavesApproveItem oldItem = (AppliedLeavesApproveItem) getArguments().getSerializable(ARG_LEAVE_ID);
+                @SuppressWarnings("deprecation") AppliedLeavesItem oldItem = (AppliedLeavesItem) getArguments().getSerializable(ARG_LEAVE_ID);
                 item = oldItem;
             }
         }
@@ -134,9 +133,7 @@ public class PendingLeaveApproveFragment extends Fragment {
 
         String firstName = getValueOrDefault(item.getFirstname());
         String lastName = getValueOrDefault(item.getLastname());
-        String fullName = (firstName.equalsIgnoreCase(DEFAULT_NA) && lastName.equalsIgnoreCase(DEFAULT_NA))
-                ? DEFAULT_NA
-                : (getSanitizedName(item.getFirstname()) + " " + getSanitizedName(item.getLastname())).trim();
+        String fullName = (firstName.equalsIgnoreCase(DEFAULT_NA) && lastName.equalsIgnoreCase(DEFAULT_NA)) ? DEFAULT_NA : (getSanitizedName(item.getFirstname()) + " " + getSanitizedName(item.getLastname())).trim();
 
         String leaveTypeName = (item.getLeavetype() != null) ? getValueOrDefault(item.getLeavetype().getLeavetypeName()) : DEFAULT_NA;
         String initials = getInitials(item.getFirstname(), item.getLastname());
@@ -281,8 +278,7 @@ public class PendingLeaveApproveFragment extends Fragment {
         String selectTypeFrom = item.getSelectTypeFrom();
         String selectTypeTo = item.getSelectTypeTo();
 
-        if (fromDate == null || fromDate.isEmpty()
-                || toDate == null || toDate.isEmpty()) {
+        if (fromDate == null || fromDate.isEmpty() || toDate == null || toDate.isEmpty()) {
             totalDays = 0;
             finalUsedDays = 0;
             return;
@@ -311,23 +307,17 @@ public class PendingLeaveApproveFragment extends Fragment {
     private double computeFinalUsedDays(long tDays, String selectTypeFrom, String selectTypeTo) {
         double fUsedDays = tDays;
 
-        if ("First Half Day".equalsIgnoreCase(selectTypeFrom)
-                && "First Half Day".equalsIgnoreCase(selectTypeTo)) {
+        if ("First Half Day".equalsIgnoreCase(selectTypeFrom) && "First Half Day".equalsIgnoreCase(selectTypeTo)) {
             fUsedDays -= 0.5;
 
-        } else if ("First Half Day".equalsIgnoreCase(selectTypeFrom)
-                && "Second Half Day".equalsIgnoreCase(selectTypeTo)) {
+        } else if ("First Half Day".equalsIgnoreCase(selectTypeFrom) && "Second Half Day".equalsIgnoreCase(selectTypeTo)) {
             fUsedDays = tDays; // no change
 
-        } else if ("Second Half Day".equalsIgnoreCase(selectTypeFrom)
-                && "Second Half Day".equalsIgnoreCase(selectTypeTo)) {
+        } else if ("Second Half Day".equalsIgnoreCase(selectTypeFrom) && "Second Half Day".equalsIgnoreCase(selectTypeTo)) {
             fUsedDays -= 0.5;
         }
 
-        Log.d(TAG, "computeFinalUsedDays → tDays=" + tDays
-                + ", from=" + selectTypeFrom
-                + ", to=" + selectTypeTo
-                + ", fUsedDays=" + fUsedDays);
+        Log.d(TAG, "computeFinalUsedDays → tDays=" + tDays + ", from=" + selectTypeFrom + ", to=" + selectTypeTo + ", fUsedDays=" + fUsedDays);
 
         return fUsedDays;
     }
@@ -608,10 +598,10 @@ public class PendingLeaveApproveFragment extends Fragment {
     }
 
     public interface OnLeaveApprovalActionListener {
-        void onApprove(AppliedLeavesApproveItem item);
+        void onApprove(AppliedLeavesItem item);
 
-        void onReject(AppliedLeavesApproveItem item);
+        void onReject(AppliedLeavesItem item);
 
-        void onCancel(AppliedLeavesApproveItem item);
+        void onCancel(AppliedLeavesItem item);
     }
 }

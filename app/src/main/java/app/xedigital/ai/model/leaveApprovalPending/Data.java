@@ -6,11 +6,10 @@ import java.util.List;
 
 public class Data {
 
-    @SerializedName("appliedLeavesApprove")
-    private List<AppliedLeavesApproveItem> appliedLeavesApprove;
+    @SerializedName("appliedLeaves")
+    private List<AppliedLeavesItem> appliedLeaves;
 
-    public List<AppliedLeavesApproveItem> getAppliedLeaves() {
-        return appliedLeavesApprove;
+    public List<AppliedLeavesItem> getAppliedLeaves() {
+        return appliedLeaves;
     }
-
 }

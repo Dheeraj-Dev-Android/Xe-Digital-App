@@ -2,7 +2,9 @@ package app.xedigital.ai.model.leaveType;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LeavetypesItem {
+import java.io.Serializable;
+
+public class LeavetypesItem implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

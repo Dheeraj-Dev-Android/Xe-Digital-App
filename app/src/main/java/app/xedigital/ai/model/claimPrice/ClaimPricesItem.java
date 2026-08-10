@@ -2,7 +2,9 @@ package app.xedigital.ai.model.claimPrice;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ClaimPricesItem {
+import java.io.Serializable;
+
+public class ClaimPricesItem implements Serializable {
 
     @SerializedName("shared")
     private String shared;

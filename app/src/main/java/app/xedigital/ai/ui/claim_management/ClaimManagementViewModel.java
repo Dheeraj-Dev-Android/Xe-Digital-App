@@ -448,7 +448,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setCurrency(sanitize(currency));
         payload.setTotalamount(sanitize(totalAmount.getValue()));
         payload.setRemark(sanitize(remarks.getValue()));
-        payload.setStatus("Pending");
         payload.setConfbutton(false);
         payload.setModeofcal("general");
         payload.setModeofcalPascal("");
