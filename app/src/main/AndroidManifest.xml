@@ -40,6 +40,9 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
 
     <!-- ── Application ────────────────────────────────────────────────────── -->
     <application
@@ -54,6 +57,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.XEDigital"
         android:usesCleartextTraffic="false"
+        android:extractNativeLibs="true"
+        android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
 
         <provider
@@ -140,6 +145,9 @@
         <meta-data
             android:name="com.google.mlkit.vision.dependencies"
             android:value="face" />
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="optional" />
 
     </application>
 

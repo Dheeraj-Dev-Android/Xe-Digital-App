@@ -70,7 +70,6 @@ public class AttendanceByManagerFragment extends Fragment {
         tvSelectedEmployee = view.findViewById(R.id.tvSelectedEmployee);
         layoutEmployeePicker = view.findViewById(R.id.layoutEmployeePicker);
         Button btnSearch = view.findViewById(R.id.btnSearch);
-//        Button btnRetry = view.findViewById(R.id.btnRetry);
         RecyclerView recyclerView = view.findViewById(R.id.rvAttendance);
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
@@ -98,10 +97,6 @@ public class AttendanceByManagerFragment extends Fragment {
             showLoading();
             triggerSearch();
         });
-//        btnRetry.setOnClickListener(v -> {
-//            showLoading();
-//            triggerSearch();
-//        });
 
         // Observers
         mViewModel.getTeamMemberData().observe(getViewLifecycleOwner(), response -> {
@@ -132,7 +127,6 @@ public class AttendanceByManagerFragment extends Fragment {
             showEmptyState();
         });
 
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String token = prefManager.getString("authToken", null);
         String managerId = prefManager.getString("userId", null);
@@ -164,7 +158,6 @@ public class AttendanceByManagerFragment extends Fragment {
         layoutEmptyState.setVisibility(View.GONE);
         swipeRefresh.setVisibility(View.VISIBLE);
 
-        // Formatters
         SimpleDateFormat apiFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat displayFmt = new SimpleDateFormat("dd MMM yyyy, EEEE", Locale.getDefault());
 
@@ -198,14 +191,31 @@ public class AttendanceByManagerFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            // 3. Pre-calculate Times (Only for work days)
+            // 3. Pre-calculate Times using Dynamic Shift Parameters
             if (!punchData.isFullDayLeave()) {
-                String total = DateTimeUtils.calculateTotalTime(punchData.getPunchIn(), punchData.getPunchOut());
+                String rawPunchIn = punchData.getPunchIn();
+                String rawPunchOut = punchData.getPunchOut();
+
+                // Calculate Total Time
+                String total = DateTimeUtils.calculateTotalTime(rawPunchIn, rawPunchOut);
                 punchData.setTotalTime(total);
-                punchData.setOvertime(DateTimeUtils.calculateOvertime(total));
+
+                // Extract shift boundaries safely
+                String shiftStart = "09:00";
+                String shiftEnd = "18:00";
+
                 if (punchData.getShift() != null) {
-                    punchData.setLateTime(DateTimeUtils.calculateLateTime(punchData.getPunchIn(), punchData.getShift().getStartTime()));
+                    if (punchData.getShift().getStartTime() != null && !punchData.getShift().getStartTime().isEmpty()) {
+                        shiftStart = punchData.getShift().getStartTime();
+                    }
+                    if (punchData.getShift().getEndTime() != null && !punchData.getShift().getEndTime().isEmpty()) {
+                        shiftEnd = punchData.getShift().getEndTime();
+                    }
                 }
+
+                // Calculate Late Time & Overtime dynamically
+                punchData.setLateTime(DateTimeUtils.calculateLateTime(rawPunchIn, shiftStart));
+                punchData.setOvertime(DateTimeUtils.calculateOvertime(total, shiftStart, shiftEnd));
             }
         }
         managerAdapter.updateList(data);
@@ -260,13 +270,11 @@ public class AttendanceByManagerFragment extends Fragment {
         swipeRefresh.setVisibility(View.GONE);
     }
 
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_pending_regularize_attendance, menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

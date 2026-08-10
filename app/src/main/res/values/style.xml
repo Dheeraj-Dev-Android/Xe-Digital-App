@@ -97,5 +97,17 @@
         <item name="cornerSize">28dp</item>
     </style>
 
+    <style name="HolidayChip" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">@color/RestrictedHoliday</item>
+        <item name="chipCornerRadius">8dp</item>
+        <item name="chipMinHeight">22dp</item>
+        <item name="chipStartPadding">6dp</item>
+        <item name="chipEndPadding">8dp</item>
+        <item name="closeIconEnabled">false</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 </resources>

@@ -129,8 +129,11 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
         FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL).setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL).build();
         detector = FaceDetection.getClient(options);
+
+        // Show loading indicator and fetch company collection before allowing camera initialization
+        setLoadingVisible(true);
+        updateStatus("Fetching user configuration...");
         fetchUserData(storedUserId, authToken);
-        checkInstructionsAndPermissions();
     }
 
     private void checkInstructionsAndPermissions() {
@@ -240,6 +243,10 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 if (securePrefManager != null) {
                     securePrefManager.putString("collection", COLLECTION_NAME);
                 }
+
+                // Hide loading overlay and proceed with permission/camera checks now that COLLECTION_NAME exists
+                setLoadingVisible(false);
+                checkInstructionsAndPermissions();
             }
 
             @Override
@@ -307,8 +314,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     private String getInstructionText(LivenessChallenge challenge) {
         if (challenge == null) return "Waiting...";
         switch (challenge) {
-            case BLINK:
-                return "Please Blink Your Eyes";
             case TURN_LEFT:
                 return "Turn Your Face Left";
             case TURN_RIGHT:
@@ -366,14 +371,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
         float headY = face.getHeadEulerAngleY();
         float headX = face.getHeadEulerAngleX();
-        float leftEye = face.getLeftEyeOpenProbability() != null ? face.getLeftEyeOpenProbability() : 1.0f;
-        float rightEye = face.getRightEyeOpenProbability() != null ? face.getRightEyeOpenProbability() : 1.0f;
 
         switch (currentChallenge) {
-            case BLINK:
-                if (leftEye < 0.25f && rightEye < 0.25f) isBlinking = true;
-                if (isBlinking && leftEye > 0.6f && rightEye > 0.6f) challengeSatisfied = true;
-                break;
             case TURN_LEFT:
                 if (headY > 20) challengeSatisfied = true;
                 break;
@@ -648,16 +647,10 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 showFallbackLoginAlert();
             } else {
                 String displayMsg = (errorMessage != null) ? errorMessage : "Verification failed";
-                new AlertDialog.Builder(this)
-                        .setTitle("Verification Failed")
-                        .setMessage(displayMsg + "\n\nAttempt " + attemptCount + " of 3")
-                        .setPositiveButton("Retry", (dialog, which) -> {
-                            isAnalyzing.set(false);
-                            resetAndRetryChallenge();
-                        })
-                        .setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin())
-                        .setCancelable(false)
-                        .show();
+                new AlertDialog.Builder(this).setTitle("Verification Failed").setMessage(displayMsg + "\n\nAttempt " + attemptCount + " of 3").setPositiveButton("Retry", (dialog, which) -> {
+                    isAnalyzing.set(false);
+                    resetAndRetryChallenge();
+                }).setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin()).setCancelable(false).show();
             }
         });
     }
@@ -685,7 +678,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 builder.setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin());
                 builder.show();
             } else {
-                // FALLBACK: Direct launch to manual login if no security lock/biometrics exist
                 navigateToManualLogin();
             }
         });
@@ -783,6 +775,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     }
 
     private enum LivenessChallenge {
-        BLINK, TURN_LEFT, TURN_RIGHT, TILT_UP, TILT_DOWN
+        TURN_LEFT, TURN_RIGHT, TILT_UP, TILT_DOWN
     }
 }

@@ -1,5 +1,6 @@
 package app.xedigital.ai.adapter;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,27 +42,55 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         VisitorsItem visitor = visitors.get(position);
 
-        // Bind data to views in the new layout
-        holder.tvVisitorName.setText(visitor.getName() != null ? visitor.getName() : "N/A");
-        holder.tvEmail.setText((visitor.getEmail() != null ? visitor.getEmail() : "N/A"));
-        holder.tvContact.setText((visitor.getContact() != null ? visitor.getContact() : "N/A"));
-        holder.tvCompanyFrom.setText("Company From: " + (visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A"));
+        // NPE Safety: Prevent crash if the list contains a null object
+        if (visitor == null) return;
+
+        Context context = holder.itemView.getContext();
+
+        // Bind data safely using the helper method
+        holder.tvVisitorName.setText(getDisplayValue(visitor.getName()));
+        holder.tvEmail.setText(getDisplayValue(visitor.getEmail()));
+        holder.tvContact.setText(getDisplayValue(visitor.getContact()));
+        holder.tvCompanyFrom.setText(getDisplayValue(visitor.getCompanyFrom()));
+
+        // Safe handling for whomToMeet to prevent solitary spaces (e.g., " ")
         if (visitor.getWhomToMeet() != null) {
-            String firstName = visitor.getWhomToMeet().getFirstname() != null ? visitor.getWhomToMeet().getFirstname() : "";
-            String lastName = visitor.getWhomToMeet().getLastname() != null ? visitor.getWhomToMeet().getLastname() : "";
-            holder.tvMeetingWith.setText("Meeting With: " + firstName + " " + lastName);
+            String firstName = getDisplayValue(visitor.getWhomToMeet().getFirstname());
+            String lastName = getDisplayValue(visitor.getWhomToMeet().getLastname());
+
+            if (firstName.equals("N/A") && lastName.equals("N/A")) {
+                holder.tvMeetingWith.setText("N/A");
+            } else if (firstName.equals("N/A")) {
+                holder.tvMeetingWith.setText(lastName);
+            } else if (lastName.equals("N/A")) {
+                holder.tvMeetingWith.setText(firstName);
+            } else {
+                holder.tvMeetingWith.setText(firstName + " " + lastName);
+            }
         } else {
-            holder.tvMeetingWith.setText("Meeting With: N/A");
+            holder.tvMeetingWith.setText("N/A");
         }
+
+        // Image loading: safe string trim check
         String profileImagePath = visitor.getProfileImagePath();
-        if (profileImagePath != null && !profileImagePath.isEmpty()) {
-            Glide.with(holder.itemView.getContext()).load(profileImagePath).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).circleCrop().into(holder.ivVisitorProfile);
+        if (profileImagePath != null && !profileImagePath.trim().isEmpty()) {
+            Glide.with(context)
+                    .load(profileImagePath)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .circleCrop()
+                    .into(holder.ivVisitorProfile);
         } else {
-            Glide.with(holder.itemView.getContext()).load(R.drawable.ic_profile_placeholder).circleCrop().into(holder.ivVisitorProfile);
+            Glide.with(context)
+                    .load(R.drawable.ic_profile_placeholder)
+                    .circleCrop()
+                    .into(holder.ivVisitorProfile);
             Log.w("VisitorsAdapter", "Profile image path is null or empty for visitor: " + visitor.getName());
         }
+
+        // Status logic
         String status = visitor.getApprovalStatus();
-        if (status == null || status.isEmpty()) {
+        if (status == null || status.trim().isEmpty()) {
             status = "Pending";
         }
 
@@ -74,10 +103,10 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
         } else if (status.equalsIgnoreCase("Rejected")) {
             holder.chipApprovalStatus.setChipBackgroundColorResource(R.color.status_rejected);
         } else {
-            // Handle other status values or set a default color
             holder.chipApprovalStatus.setChipBackgroundColorResource(R.color.icon_tint);
         }
-        // Add click listener to the card
+
+        // Click listener
         holder.cardViewVisitor.setOnClickListener(v -> {
             if (clickListener != null) {
                 clickListener.onVisitorClicked(visitor);
@@ -93,6 +122,13 @@ public class VisitorsAdapter extends RecyclerView.Adapter<VisitorsAdapter.ViewHo
     public void updateVisitors(List<VisitorsItem> visitorsItems) {
         this.visitors = visitorsItems != null ? visitorsItems : new ArrayList<>();
         notifyDataSetChanged();
+    }
+
+    /**
+     * Helper method to return "N/A" if string is null or completely blank.
+     */
+    private String getDisplayValue(String value) {
+        return (value == null || value.trim().isEmpty()) ? "N/A" : value;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

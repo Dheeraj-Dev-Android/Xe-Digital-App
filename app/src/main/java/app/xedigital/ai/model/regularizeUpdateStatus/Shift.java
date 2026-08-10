@@ -4,115 +4,203 @@ import com.google.gson.annotations.SerializedName;
 
 public class Shift {
 
+    @SerializedName("_id")
+    private String id;
+
+    @SerializedName("startTime")
+    private String startTime;
+
+    @SerializedName("endTime")
+    private String endTime;
+
+    @SerializedName("format")
+    private int format;
+
+    @SerializedName("comment")
+    private String comment;
+
+    @SerializedName("active")
+    private boolean active;
+
+    @SerializedName("name")
+    private String name;
+
+    @SerializedName("shiftType")
+    private String shiftType;
+
     @SerializedName("fromHour")
     private int fromHour;
 
     @SerializedName("fromMinutes")
     private int fromMinutes;
 
-    @SerializedName("format")
-    private int format;
-
-    @SerializedName("active")
-    private boolean active;
-
     @SerializedName("toHour")
     private int toHour;
-
-    @SerializedName("createdAt")
-    private String createdAt;
 
     @SerializedName("toMinutes")
     private int toMinutes;
 
-    @SerializedName("createdBy")
-    private String createdBy;
-
-    @SerializedName("__v")
-    private int v;
-
-    @SerializedName("name")
-    private String name;
-
-    @SerializedName("startTime")
-    private String startTime;
+    @SerializedName("timeWaiver")
+    private int timeWaiver;
 
     @SerializedName("company")
     private String company;
 
-    @SerializedName("_id")
-    private String id;
+    @SerializedName("createdBy")
+    private String createdBy;
 
-    @SerializedName("endTime")
-    private String endTime;
-
-    @SerializedName("timeWaiver")
-    private int timeWaiver;
+    @SerializedName("createdAt")
+    private String createdAt;
 
     @SerializedName("updatedAt")
     private String updatedAt;
 
-    public void setFromHour(int fromHour) {
-        this.fromHour = fromHour;
+    @SerializedName("__v")
+    private int v;
+
+    // Getters
+    public String getId() {
+        return id;
     }
 
-    public void setFromMinutes(int fromMinutes) {
-        this.fromMinutes = fromMinutes;
+    // Setters
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setFormat(int format) {
-        this.format = format;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public void setToHour(int toHour) {
-        this.toHour = toHour;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setToMinutes(int toMinutes) {
-        this.toMinutes = toMinutes;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setV(int v) {
-        this.v = v;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public String getStartTime() {
+        return startTime;
     }
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public String getEndTime() {
+        return endTime;
     }
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
+    public int getFormat() {
+        return format;
+    }
+
+    public void setFormat(int format) {
+        this.format = format;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(String shiftType) {
+        this.shiftType = shiftType;
+    }
+
+    public int getFromHour() {
+        return fromHour;
+    }
+
+    public void setFromHour(int fromHour) {
+        this.fromHour = fromHour;
+    }
+
+    public int getFromMinutes() {
+        return fromMinutes;
+    }
+
+    public void setFromMinutes(int fromMinutes) {
+        this.fromMinutes = fromMinutes;
+    }
+
+    public int getToHour() {
+        return toHour;
+    }
+
+    public void setToHour(int toHour) {
+        this.toHour = toHour;
+    }
+
+    public int getToMinutes() {
+        return toMinutes;
+    }
+
+    public void setToMinutes(int toMinutes) {
+        this.toMinutes = toMinutes;
+    }
+
+    public int getTimeWaiver() {
+        return timeWaiver;
+    }
+
     public void setTimeWaiver(int timeWaiver) {
         this.timeWaiver = timeWaiver;
     }
 
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getV() {
+        return v;
+    }
+
+    public void setV(int v) {
+        this.v = v;
     }
 }

@@ -12,27 +12,22 @@ android {
     defaultConfig {
         applicationId = "app.xedigital.ai"
         minSdk = 28
-        //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.13"
+        versionCode = 3
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
-    aaptOptions {
-        noCompress("tflite")
-    }
 
     signingConfigs {
         create("release") {
-            // Replace with your actual keystore credentials
-            storeFile = file("C:\\Users\\Dheeraj.t\\AndroidStudioProjects\\Xe Digital\\key.jks")
-            storePassword = "xedigital"
-            keyAlias = "key"
-            keyPassword = "xedigital"
+            storeFile = file(providers.gradleProperty("KEYSTORE_FILE").orElse("key.jks").get())
+            storePassword = providers.gradleProperty("KEYSTORE_PASSWORD").orElse("").get()
+            keyAlias = providers.gradleProperty("KEY_ALIAS").orElse("").get()
+            keyPassword = providers.gradleProperty("KEY_PASSWORD").orElse("").get()
         }
     }
 

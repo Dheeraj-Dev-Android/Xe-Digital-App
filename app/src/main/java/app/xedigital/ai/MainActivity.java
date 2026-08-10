@@ -53,20 +53,21 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
     private static final String TAG = "MainActivity";
+
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
-    private final boolean isShowingNoInternetDialog = false;
-    private final boolean isShowingSlowNetworkDialog = false;
-    FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseAnalytics mFirebaseAnalytics;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
     private AlertDialog noInternetDialog;
     private AlertDialog slowNetworkDialog;
+
     private boolean isAttendanceSubmenuVisible = false;
     private boolean isLeavesSubmenuVisible = false;
     private boolean isTeamSubVisible = false;
     private boolean isDcrSubmenuVisible = false;
-    private NavigationView navigationView;
     private boolean isNetworkChangeReceiverRegistered = false;
+
+    private NavigationView navigationView;
     private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
     private View slowInternetLayout;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView profileName;
     private TextView profileEmail;
     private ImageView clientLogo;
+
     private Call<UserProfileResponse> profileCall;
     private Call<UserModelResponse> userCall;
 
@@ -83,29 +85,51 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        noInternetDialog = new AlertDialog.Builder(this).setTitle("No Internet Connection").setMessage("Please check your internet connection and try again.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).create();
+        // 1. Inflate binding & set content view FIRST
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.appBarMain.toolbar);
 
-        // Create the slow network alert dialog
-        slowNetworkDialog = new AlertDialog.Builder(this).setTitle("Slow Network Connection").setMessage("Your network connection is slow. Some features might be affected.").setPositiveButton("OK", null).setCancelable(true).create();
+        // 2. Initialize UI components safely after layout inflation
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
         slowInternetLayout = findViewById(R.id.slowInternetLayout);
         tvSpeed = findViewById(R.id.tvSpeed);
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
         if (dismissButton != null) {
             dismissButton.setOnClickListener(v -> {
-                slowInternetLayout.setVisibility(View.GONE);
-//                Toast.makeText(MainActivity.this, "Dismiss button clicked", Toast.LENGTH_SHORT).show();
+                if (slowInternetLayout != null) {
+                    slowInternetLayout.setVisibility(View.GONE);
+                }
             });
         }
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        setSupportActionBar(binding.appBarMain.toolbar);
+        // 3. Setup Dialogs
+        noInternetDialog = new AlertDialog.Builder(this)
+                .setTitle("No Internet Connection")
+                .setMessage("Please check your internet connection and try again.")
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .create();
 
+        slowNetworkDialog = new AlertDialog.Builder(this)
+                .setTitle("Slow Network Connection")
+                .setMessage("Your network connection is slow. Some features might be affected.")
+                .setPositiveButton("OK", null)
+                .setCancelable(true)
+                .create();
+
+        // 4. Setup Navigation Drawer
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents, R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy, R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member, R.id.nav_team_member_leave, R.id.nav_meeting_room, R.id.nav_team_member_timesheet, R.id.nav_logout).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment,
+                R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents,
+                R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy,
+                R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu,
+                R.id.nav_team_member, R.id.nav_team_member_leave, R.id.nav_meeting_room,
+                R.id.nav_team_member_timesheet, R.id.nav_logout
+        ).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -116,142 +140,139 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // Set click listener for attendance menu item
+        // Toggle Listeners
         MenuItem attendanceItem = navigationView.getMenu().findItem(R.id.nav_attendance_menu);
-        attendanceItem.setOnMenuItemClickListener(item -> {
-            toggleAttendanceVisibility(navigationView.getMenu());
-            return true;
-        });
-        MenuItem teamMemberItem = navigationView.getMenu().findItem(R.id.nav_team_member);
-        teamMemberItem.setOnMenuItemClickListener(item -> {
-            toggleTeamMemberVisibility(navigationView.getMenu());
-            return true;
-        });
-
-        MenuItem leavesItem = navigationView.getMenu().findItem(R.id.nav_leaves_menu);
-        leavesItem.setOnMenuItemClickListener(item -> {
-            toggleLeavesVisibility(navigationView.getMenu());
-            return true;
-        });
-
-        MenuItem dcrItem = navigationView.getMenu().findItem(R.id.nav_dcr_menu);
-        dcrItem.setOnMenuItemClickListener(item -> {
-            toggleDcrVisibility(navigationView.getMenu());
-            return true;
-        });
-
-        // Initialize header view elements
-        View headerView = navigationView.getHeaderView(0);
-        profileImage = headerView.findViewById(R.id.imageView);
-        profileName = headerView.findViewById(R.id.textView);
-        profileEmail = headerView.findViewById(R.id.subtitleText);
-        clientLogo = headerView.findViewById(R.id.clientLogo);
-
-
-        if (navigationView != null) {
-            fetchUserProfileData();
-        } else {
-            Log.e(TAG, "Navigation view is null, cannot fetch user profile");
+        if (attendanceItem != null) {
+            attendanceItem.setOnMenuItemClickListener(item -> {
+                toggleAttendanceVisibility(navigationView.getMenu());
+                return true;
+            });
         }
 
+        MenuItem teamMemberItem = navigationView.getMenu().findItem(R.id.nav_team_member);
+        if (teamMemberItem != null) {
+            teamMemberItem.setOnMenuItemClickListener(item -> {
+                toggleTeamMemberVisibility(navigationView.getMenu());
+                return true;
+            });
+        }
+
+        MenuItem leavesItem = navigationView.getMenu().findItem(R.id.nav_leaves_menu);
+        if (leavesItem != null) {
+            leavesItem.setOnMenuItemClickListener(item -> {
+                toggleLeavesVisibility(navigationView.getMenu());
+                return true;
+            });
+        }
+
+        MenuItem dcrItem = navigationView.getMenu().findItem(R.id.nav_dcr_menu);
+        if (dcrItem != null) {
+            dcrItem.setOnMenuItemClickListener(item -> {
+                toggleDcrVisibility(navigationView.getMenu());
+                return true;
+            });
+        }
+
+        // Header view elements
+        View headerView = navigationView.getHeaderView(0);
+        if (headerView != null) {
+            profileImage = headerView.findViewById(R.id.imageView);
+            profileName = headerView.findViewById(R.id.textView);
+            profileEmail = headerView.findViewById(R.id.subtitleText);
+            clientLogo = headerView.findViewById(R.id.clientLogo);
+        }
+
+        fetchUserProfileData();
     }
 
     public void showNoInternetLayout() {
-        findViewById(R.id.noInternetLayout).setVisibility(View.VISIBLE);
+        View noInternetView = findViewById(R.id.noInternetLayout);
+        if (noInternetView != null) {
+            noInternetView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void hideNoInternetLayout() {
-        findViewById(R.id.noInternetLayout).setVisibility(View.GONE);
+        View noInternetView = findViewById(R.id.noInternetLayout);
+        if (noInternetView != null) {
+            noInternetView.setVisibility(View.GONE);
+        }
     }
 
     public void showSlowInternetLayout(double speed) {
         if (slowInternetLayout != null) {
             slowInternetLayout.setVisibility(View.VISIBLE);
             String speedText = String.format("Current speed: %.2f Mbps", speed / 1000);
-            tvSpeed.setText(speedText);
-        } else {
-            Log.e("MainActivity", "FrameLayout for slow internet is null.");
+            if (tvSpeed != null) {
+                tvSpeed.setText(speedText);
+            }
         }
     }
 
     public void hideSlowInternetLayout() {
-        findViewById(R.id.slowInternetLayout).setVisibility(View.GONE);
+        if (slowInternetLayout != null) {
+            slowInternetLayout.setVisibility(View.GONE);
+        }
     }
 
     private void toggleAttendanceVisibility(Menu menu) {
-        MenuItem attendanceItem = menu.findItem(R.id.nav_attendance_menu);
-
-        // Toggle visibility of submenu items
         boolean newVisibility = !isAttendanceSubmenuVisible;
-        menu.findItem(R.id.nav_attendance).setVisible(newVisibility);
-        menu.findItem(R.id.nav_addAttendanceFragment).setVisible(newVisibility);
-        menu.findItem(R.id.nav_regularizeAppliedFragment).setVisible(newVisibility);
-        menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_attendance) != null)
+            menu.findItem(R.id.nav_attendance).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_addAttendanceFragment) != null)
+            menu.findItem(R.id.nav_addAttendanceFragment).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_regularizeAppliedFragment) != null)
+            menu.findItem(R.id.nav_regularizeAppliedFragment).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_pendingApprovalFragment) != null)
+            menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(newVisibility);
 
-        // Change icon based on visibility
-//        attendanceItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isAttendanceSubmenuVisible = newVisibility;
-
-        // Refresh the navigation menu to reflect the changes
         navigationView.invalidate();
     }
 
     private void toggleLeavesVisibility(Menu menu) {
-        MenuItem leavesItem = menu.findItem(R.id.nav_leaves_menu);
-
-        // Toggle visibility of submenu items
         boolean newVisibility = !isLeavesSubmenuVisible;
-        menu.findItem(R.id.nav_leaves).setVisible(newVisibility);
-        menu.findItem(R.id.nav_leaves_data).setVisible(newVisibility);
-        menu.findItem(R.id.nav_applied_leaves).setVisible(newVisibility);
-        menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_leaves) != null)
+            menu.findItem(R.id.nav_leaves).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_leaves_data) != null)
+            menu.findItem(R.id.nav_leaves_data).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_applied_leaves) != null)
+            menu.findItem(R.id.nav_applied_leaves).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_approve_leaves) != null)
+            menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
 
-        // Change icon based on visibility
-//        leavesItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isLeavesSubmenuVisible = newVisibility;
-
-        // Refresh the navigation menu to reflect the changes
         navigationView.invalidate();
     }
 
     private void toggleTeamMemberVisibility(Menu menu) {
-        MenuItem teamMemberItem = menu.findItem(R.id.nav_team_member);
-
-        // Toggle visibility of submenu items
         boolean newVisibility = !isTeamSubVisible;
-        menu.findItem(R.id.navTeam_member).setVisible(newVisibility);
-        menu.findItem(R.id.navManager_attendance_menu).setVisible(newVisibility);
-        menu.findItem(R.id.nav_team_member_leave).setVisible(newVisibility);
-        menu.findItem(R.id.nav_team_member_timesheet).setVisible(newVisibility);
+        if (menu.findItem(R.id.navTeam_member) != null)
+            menu.findItem(R.id.navTeam_member).setVisible(newVisibility);
+        if (menu.findItem(R.id.navManager_attendance_menu) != null)
+            menu.findItem(R.id.navManager_attendance_menu).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_team_member_leave) != null)
+            menu.findItem(R.id.nav_team_member_leave).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_team_member_timesheet) != null)
+            menu.findItem(R.id.nav_team_member_timesheet).setVisible(newVisibility);
 
-        // Change icon based on visibility
         isTeamSubVisible = newVisibility;
-
-        // Refresh the navigation menu to reflect the changes
         navigationView.invalidate();
     }
 
     private void toggleDcrVisibility(Menu menu) {
-        MenuItem dcrItem = menu.findItem(R.id.nav_dcr_menu);
-
-        // Toggle visibility of submenu items
         boolean newVisibility = !isDcrSubmenuVisible;
-        menu.findItem(R.id.nav_dcr).setVisible(newVisibility);
-        menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_dcr) != null)
+            menu.findItem(R.id.nav_dcr).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_dcr_form) != null)
+            menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
 
-        // Change icon based on visibility
-//        dcrItem.setIcon(newVisibility ? R.drawable.ic_dropdown_up_adaptive_fore : R.drawable.ic_dropdown_adaptive_fore);
         isDcrSubmenuVisible = newVisibility;
-
-        // Refresh the navigation menu to reflect the changes
         navigationView.invalidate();
     }
 
-
     private void handleLogout() {
         SecurePrefManager.getInstance(MainActivity.this).clearAll();
-
-        // Redirect to LoginActivity with fallback flag to prevent session auto-checks
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         intent.putExtra("isFallback", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -275,11 +296,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_PUNCH_ACTIVITY) {
             if (resultCode == Activity.RESULT_OK) {
-                // Handle successful punch, navigate to a different fragment
                 NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
                 navController.navigate(R.id.nav_dashboard);
             } else {
-                // You might want to check for specific result codes for different errors
                 Toast.makeText(this, "Attendance Punch failed", Toast.LENGTH_SHORT).show();
             }
         }
@@ -288,15 +307,12 @@ public class MainActivity extends AppCompatActivity {
     public void onRetryButtonClicked(View view) {
         if (NetworkUtils.isNetworkAvailable(this)) {
             hideNoInternetLayout();
-
         } else {
-
             Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void onOpenSettingsButtonClicked(View view) {
-        // Code to open network settings
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 
@@ -308,13 +324,6 @@ public class MainActivity extends AppCompatActivity {
         if (userId == null || authToken == null) {
             handleProfileFetchFailure("User not found", profileImage, profileName, profileEmail, clientLogo);
             return;
-        }
-        if (profileImage == null || profileName == null || profileEmail == null) {
-            View headerView = navigationView.getHeaderView(0);
-            profileImage = headerView.findViewById(R.id.imageView);
-            profileName = headerView.findViewById(R.id.textView);
-            profileEmail = headerView.findViewById(R.id.subtitleText);
-            clientLogo = headerView.findViewById(R.id.clientLogo);
         }
 
         fetchUserProfile(userId, authToken, profileImage, profileName, profileEmail);
@@ -344,34 +353,40 @@ public class MainActivity extends AppCompatActivity {
                 String profileImageUrl = userProfileResponse.getData().getEmployee().getProfileImageUrl();
                 String email = userProfileResponse.getData().getEmployee().getEmail();
 
-                String fullName = firstName + " " + lastName;
+                String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
                 SpannableString spannableString = new SpannableString(fullName);
 
-                // Apply formatting to first letter of first name // Apply formatting to first letter of last name
-                if (!firstName.isEmpty()) {
+                if (firstName != null && !firstName.isEmpty()) {
                     spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     spannableString.setSpan(new RelativeSizeSpan(1.3f), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
 
-
-                if (!lastName.isEmpty()) {
-                    int lastNameStartIndex = firstName.length() + 1;
-                    spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if (lastName != null && !lastName.isEmpty()) {
+                    int lastNameStartIndex = (firstName != null ? firstName.length() : 0) + 1;
+                    if (lastNameStartIndex < spannableString.length()) {
+                        spannableString.setSpan(new ForegroundColorSpan(Color.rgb(255, 165, 0)), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannableString.setSpan(new StyleSpan(Typeface.BOLD), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannableString.setSpan(new RelativeSizeSpan(1.3f), lastNameStartIndex, lastNameStartIndex + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }
                 }
-                profileName.setText(spannableString);
-                profileEmail.setText(email);
 
-                // Load profile image, or default if not available
-                if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed()) {
+                if (profileName != null) profileName.setText(spannableString);
+                if (profileEmail != null) profileEmail.setText(email);
+
+                if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && profileImage != null) {
                     if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.ic_profile_placeholder) // Shown while loading
-                                .error(R.drawable.ic_profile_placeholder).into(profileImage);
+                        Glide.with(MainActivity.this)
+                                .load(profileImageUrl)
+                                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                                .placeholder(R.drawable.ic_profile_placeholder)
+                                .error(R.drawable.ic_profile_placeholder)
+                                .into(profileImage);
                     } else {
-                        Glide.with(MainActivity.this).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.ic_profile_placeholder) // Shown while loading
-                                .error(R.drawable.ic_profile_placeholder).into(profileImage);
+                        Glide.with(MainActivity.this)
+                                .load(R.drawable.ic_profile_placeholder)
+                                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                                .into(profileImage);
                     }
                 }
             }
@@ -402,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 String clientLogoUrl = userDataResponse.getData().getCompany().getLogo();
-                if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed()) {
+                if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && clientLogo != null) {
                     if (clientLogoUrl != null && !clientLogoUrl.isEmpty()) {
                         Glide.with(MainActivity.this).load(clientLogoUrl).into(clientLogo);
                     } else {
@@ -414,24 +429,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "User data fetch failed: " + t.getMessage());
-
             }
         });
     }
 
     private void handleProfileFetchFailure(String message, ImageView profileImage, TextView profileName, TextView profileEmail, ImageView clientLogo) {
-        if (isFinishing() || isDestroyed()) {
-            return;
-        }
+        if (isFinishing() || isDestroyed()) return;
 
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
-        if (profileName != null) {
-            profileName.setText(getString(R.string.guest_name));
-        }
-        if (profileEmail != null) {
-            profileEmail.setText(getString(R.string.guest_email));
-        }
+        if (profileName != null) profileName.setText(getString(R.string.guest_name));
+        if (profileEmail != null) profileEmail.setText(getString(R.string.guest_email));
 
         if (profileImage != null) {
             Glide.with(getApplicationContext()).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
@@ -444,54 +452,35 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (!isNetworkChangeReceiverRegistered) {
-            IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
-            registerReceiver(networkChangeReceiver, filter);
-            isNetworkChangeReceiverRegistered = true;
-        }
+        registerNetworkReceiver();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (isNetworkChangeReceiverRegistered) {
-            try {
-                unregisterReceiver(networkChangeReceiver);
-                isNetworkChangeReceiverRegistered = false;
-            } catch (IllegalArgumentException e) {
-//                Log.e(TAG, "Error unregistering NetworkChangeReceiver", e);
-            }
-        }
+        unregisterNetworkReceiver();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (noInternetDialog != null && noInternetDialog.isShowing()) {
-            noInternetDialog.dismiss();
-        }
-        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) {
-            slowNetworkDialog.dismiss();
-        }
-        // Cancel active network requests
+        if (noInternetDialog != null && noInternetDialog.isShowing()) noInternetDialog.dismiss();
+        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) slowNetworkDialog.dismiss();
+
         if (profileCall != null) profileCall.cancel();
         if (userCall != null) userCall.cancel();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void registerNetworkReceiver() {
         if (!isNetworkChangeReceiverRegistered) {
-            IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
-            registerReceiver(networkChangeReceiver, filter);
-            isNetworkChangeReceiverRegistered = true;
+            try {
+                IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+                registerReceiver(networkChangeReceiver, filter);
+                isNetworkChangeReceiverRegistered = true;
+            } catch (Exception e) {
+                Log.e(TAG, "Error registering NetworkChangeReceiver", e);
+            }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterNetworkReceiver();
     }
 
     private void unregisterNetworkReceiver() {
@@ -500,9 +489,8 @@ public class MainActivity extends AppCompatActivity {
                 unregisterReceiver(networkChangeReceiver);
                 isNetworkChangeReceiverRegistered = false;
             } catch (IllegalArgumentException e) {
-//                Log.e(TAG, "Error unregistering receiver: " + e.getMessage());
+                Log.e(TAG, "Error unregistering receiver: " + e.getMessage());
             }
         }
     }
-
 }

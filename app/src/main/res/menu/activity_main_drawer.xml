@@ -131,7 +131,8 @@
     <item
         android:id="@+id/nav_shifts"
         android:icon="@drawable/ic_shift"
-        android:title="@string/menu_shifts" />
+        android:title="@string/menu_shifts"
+        android:visible="false" />
 
     <item
         android:id="@+id/nav_holidays"
@@ -149,20 +150,6 @@
         android:icon="@drawable/ic_document"
         android:title="@string/menu_documents_upload" />
 
-    <!--    <item-->
-    <!--        android:id="@+id/nav_payroll"-->
-    <!--        android:icon="@drawable/ic_payroll"-->
-    <!--        android:title="Payroll (Coming Soon*)" />-->
-
-    <!--    <item-->
-    <!--        android:id="@+id/nav_about_us"-->
-    <!--        android:icon="@drawable/ic_info"-->
-    <!--        android:title="About XeDigital.ai" />-->
-
-    <!--    <item-->
-    <!--        android:id="@+id/nav_permission"-->
-    <!--        android:icon="@drawable/ic_security"-->
-    <!--        android:title="Permissions" />-->
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/ic_settings"

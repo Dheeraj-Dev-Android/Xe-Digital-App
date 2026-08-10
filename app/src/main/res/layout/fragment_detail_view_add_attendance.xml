@@ -350,8 +350,8 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="#FEF2F2"
                         android:orientation="vertical"
                         android:padding="12dp">
@@ -399,8 +399,8 @@
                         android:id="@+id/empPunchInAddressLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Punch In Address"
                         android:letterSpacing="0.08"
+                        android:text="Punch In Address"
                         android:textColor="#6B7280"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -427,8 +427,8 @@
                         android:id="@+id/empPunchOutAddressLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Punch Out Address"
                         android:letterSpacing="0.08"
+                        android:text="Punch Out Address"
                         android:textColor="#6B7280"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -500,8 +500,8 @@
                         android:id="@+id/statusLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Status"
                         android:letterSpacing="0.08"
+                        android:text="Status"
                         android:textColor="#DC2626"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -530,8 +530,8 @@
                         android:id="@+id/remarksLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Remarks"
                         android:letterSpacing="0.08"
+                        android:text="Remarks"
                         android:textColor="#6B7280"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -588,8 +588,8 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
                         android:background="#F8FAFC"
                         android:orientation="vertical"
                         android:padding="12dp">
@@ -644,9 +644,9 @@
                     android:layout_height="52dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
+                    android:letterSpacing="0.05"
                     android:text="Cancel"
                     android:textColor="@android:color/white"
-                    android:letterSpacing="0.05"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:backgroundTint="#EF4444"

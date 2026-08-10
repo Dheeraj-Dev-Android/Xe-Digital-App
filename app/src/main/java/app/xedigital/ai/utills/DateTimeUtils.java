@@ -2,359 +2,228 @@ package app.xedigital.ai.utills;
 
 import android.util.Log;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class DateTimeUtils {
 
-    private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String TAG = "DateTimeUtils";
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
 
-    //    public static String calculateTotalTime(String punchInTime, String punchOutTime) {
-//        if (punchInTime == null || punchOutTime == null || punchInTime.equals("N/A") || punchOutTime.equals("N/A")) {
-//            return "N/A";
-//        }
-//
-//        SimpleDateFormat format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//        format.setTimeZone(TimeZone.getDefault());
-//        try {
-//            Date punchIn = format.parse(punchInTime);
-//            Date punchOut = format.parse(punchOutTime);
-//
-//            if (punchOut != null && punchIn != null) {
-//                long differenceInMillis = punchOut.getTime() - punchIn.getTime();
-//                long diffHours = differenceInMillis / (60 * 60 * 1000);
-//                long diffMinutes = (differenceInMillis % (60 * 60 * 1000)) / (60 * 1000);
-//
-//                return String.format(Locale.getDefault(), "%02d:%02d Hrs", diffHours, diffMinutes);
-//            }
-//        } catch (ParseException e) {
-//            Log.e("DateTimeUtils", "Error calculating total time: " + e.getMessage());
-//        }
-//        return "N/A";
-//    }
-//    public static String calculateTotalTime(String punchIn, String punchOut) {
-//        if (punchIn == null || punchOut == null || punchIn.isEmpty() || punchOut.isEmpty()) {
-//            return "00:00";
-//        }
-//
-//        // This matches: 2026-02-13T06:16:39.801Z
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-//        sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // API dates with 'Z' are usually UTC
-//
-//        try {
-//            Date d1 = sdf.parse(punchIn);
-//            Date d2 = sdf.parse(punchOut);
-//
-//            long diff = d2.getTime() - d1.getTime();
-//            long hours = diff / (60 * 60 * 1000);
-//            long minutes = (diff / (60 * 1000)) % 60;
-//
-//            return String.format(Locale.getDefault(), "%02d:%02d Hrs", hours, minutes);
-//        } catch (Exception e) {
-//            Log.e("DateTimeUtils", "Error parsing ISO date: " + e.getMessage());
-//            return "00:00";
-//        }
-//    }
+    // Thread-safe formatters
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).withZone(UTC_ZONE);
+    private static final DateTimeFormatter READABLE_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault());
+    private static final DateTimeFormatter TIME_12H_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault());
+    private static final DateTimeFormatter TIME_12H_FORMATTER_NO_SPACE = DateTimeFormatter.ofPattern("hh:mma", Locale.getDefault());
+    private static final DateTimeFormatter SHIFT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault());
+
     public static String calculateTotalTime(String punchIn, String punchOut) {
-        // 1. Safety check for null, empty, or "N/A"
-        if (punchIn == null || punchOut == null ||
-                punchIn.isEmpty() || punchOut.isEmpty() ||
-                punchIn.equalsIgnoreCase("N/A") || punchOut.equalsIgnoreCase("N/A")) {
+        if (isInvalidInput(punchIn) || isInvalidInput(punchOut)) {
             return "00:00 Hrs";
         }
 
         try {
-            Date d1 = parseFlexibleDate(punchIn);
-            Date d2 = parseFlexibleDate(punchOut);
+            LocalTime time1 = parseFlexibleTime(punchIn);
+            LocalTime time2 = parseFlexibleTime(punchOut);
 
-            if (d1 == null || d2 == null) return "00:00 Hrs";
+            if (time1 == null || time2 == null) return "00:00 Hrs";
 
-            long diff = d2.getTime() - d1.getTime();
+            Duration duration = Duration.between(time1, time2);
+            if (duration.isNegative()) {
+                duration = duration.plusDays(1); // Overnight shift handling
+            }
 
-            // If punch out is technically 'before' punch in (e.g. overnight shift),
-            // you might need to add 24 hours logic here.
+            long hours = duration.toHours();
+            long minutes = duration.toMinutes() % 60;
 
-            long hours = diff / (60 * 60 * 1000);
-            long minutes = (diff / (60 * 1000)) % 60;
-
-            return String.format(Locale.getDefault(), "%02d:%02d Hrs", Math.abs(hours), Math.abs(minutes));
+            return String.format(Locale.getDefault(), "%02d:%02d Hrs", hours, minutes);
         } catch (Exception e) {
-            Log.e("DateTimeUtils", "Error calculating total time: " + e.getMessage());
+            Log.e(TAG, "Error calculating total time: " + e.getMessage());
             return "00:00 Hrs";
         }
     }
 
-
     public static String formatToReadableDate(String isoString) {
-        if (isoString == null || isoString.isEmpty()) return "";
+        if (isInvalidInput(isoString)) return "";
         try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat(ISO_FORMAT, Locale.getDefault());
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = inputFormat.parse(isoString);
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-            return date != null ? outputFormat.format(date) : "";
-        } catch (ParseException e) {
-            e.printStackTrace();
+            Instant instant = Instant.parse(isoString);
+            LocalDate date = instant.atZone(UTC_ZONE).toLocalDate();
+            return date.format(READABLE_DATE_FORMATTER);
+        } catch (Exception e) {
             return isoString;
         }
     }
 
-    /**
-     * Helper to determine which format the string is in and parse it
-     */
-    private static Date parseFlexibleDate(String dateStr) {
-        if (dateStr.contains("T")) {
-            // It's ISO Format
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                return sdf.parse(dateStr);
-            } catch (ParseException e) {
-                return null;
-            }
-        } else {
-            // It's 12-hour format like "10:59 am"
-            try {
-                return new SimpleDateFormat("hh:mm a", Locale.getDefault()).parse(dateStr);
-            } catch (ParseException e) {
-                return null;
-            }
+    public static String extractTime(String dateTimeString) {
+        if (isInvalidInput(dateTimeString)) return "N/A";
+        try {
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            return offsetDateTime.toLocalTime().format(TIME_12H_FORMATTER);
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting time: " + e.getMessage());
+            return "N/A";
         }
     }
 
-    public static Date parseAnyDate(String dateStr) {
-        if (dateStr == null) return null;
+    public static String calculateLateTime(String punchInTime, String shiftStartTime) {
+        if (isInvalidInput(punchInTime) || isInvalidInput(shiftStartTime)) {
+            return "0 Min's";
+        }
 
-        // Try ISO format with milliseconds
         try {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(dateStr);
+            LocalTime punchIn = parseFlexibleTime(punchInTime);
+            LocalTime shiftStart = parseFlexibleTime(shiftStartTime);
+
+            if (punchIn != null && shiftStart != null && punchIn.isAfter(shiftStart)) {
+                long lateMinutes = Duration.between(shiftStart, punchIn).toMinutes();
+
+                if (lateMinutes < 60) {
+                    return lateMinutes + " Min's";
+                } else {
+                    return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateMinutes / 60, lateMinutes % 60);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error calculating late time: " + e.getMessage() + " for input: " + punchInTime);
+        }
+        return "0 Min's";
+    }
+
+    public static String calculateOvertime(String totalTimeStr, String shiftStartTime, String shiftEndTime) {
+        if (isInvalidInput(totalTimeStr) || totalTimeStr.equalsIgnoreCase("00:00 Hrs")) {
+            return "0 Min's";
+        }
+
+        try {
+            String cleaned = totalTimeStr.replace("Hrs", "").trim();
+            String[] parts = cleaned.split(":");
+            if (parts.length < 2) return "0 Min's";
+
+            int hours = Integer.parseInt(parts[0].trim());
+            int minutes = Integer.parseInt(parts[1].trim());
+            int totalWorkedMinutes = (hours * 60) + minutes;
+
+            // Calculate standard shift duration from employee shift times
+            LocalTime shiftStart = parseFlexibleTime(shiftStartTime);
+            LocalTime shiftEnd = parseFlexibleTime(shiftEndTime);
+
+            int standardWorkMinutes = 9 * 60; // 9 Hours default fallback
+            if (shiftStart != null && shiftEnd != null) {
+                Duration shiftDuration = Duration.between(shiftStart, shiftEnd);
+                if (shiftDuration.isNegative()) {
+                    shiftDuration = shiftDuration.plusDays(1); // Overnight shift support
+                }
+                standardWorkMinutes = (int) shiftDuration.toMinutes();
+            }
+
+            if (totalWorkedMinutes > standardWorkMinutes) {
+                int overtimeMinutes = totalWorkedMinutes - standardWorkMinutes;
+                if (overtimeMinutes >= 60) {
+                    return String.format(Locale.getDefault(), "%02d:%02d Hrs", overtimeMinutes / 60, overtimeMinutes % 60);
+                } else {
+                    return String.format(Locale.getDefault(), "%d Min's", overtimeMinutes);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error calculating overtime: " + e.getMessage());
+        }
+        return "0 Min's";
+    }
+
+    public static String formatTime(String timeString) {
+        if (isInvalidInput(timeString) || timeString.equals("1900-01-01T00:00:00.000Z")) {
+            return "N/A";
+        }
+        try {
+            LocalTime parsedLocalTime = parseFlexibleTime(timeString);
+            if (parsedLocalTime != null) {
+                return parsedLocalTime.format(TIME_12H_FORMATTER);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing time: " + e.getMessage());
+        }
+        return "N/A";
+    }
+
+    public static String getDayOfWeekAndDate(String dateString) {
+        if (isInvalidInput(dateString) || dateString.equals("1900-01-01T00:00:00.000Z")) {
+            return "N/A";
+        }
+
+        try {
+            Instant instant = Instant.parse(dateString);
+            ZonedDateTime dateTime = instant.atZone(UTC_ZONE);
+            String dayOfWeek = dateTime.format(DateTimeFormatter.ofPattern("EEE", Locale.getDefault()));
+            String dateOnly = dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.getDefault()));
+            return dayOfWeek + ", " + dateOnly;
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting day of week and date: " + e.getMessage());
+        }
+        return "N/A";
+    }
+
+    public static String getCurrentDateInISOFormat() {
+        return ZonedDateTime.now(UTC_ZONE).format(ISO_FORMATTER);
+    }
+
+    public static String getMonthDayFromISO(String isoDate) {
+        if (isInvalidInput(isoDate)) return "";
+        try {
+            Instant instant = Instant.parse(isoDate);
+            LocalDate dob = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+            return dob.format(DateTimeFormatter.ofPattern("MM-dd"));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static LocalTime parseFlexibleTime(String dateStr) {
+        if (isInvalidInput(dateStr)) return null;
+
+        String cleanStr = dateStr.trim();
+
+        if (cleanStr.contains("T")) {
+            try {
+                Instant instant = Instant.parse(cleanStr);
+                return instant.atZone(IST_ZONE).toLocalTime();
+            } catch (Exception ignored) {
+            }
+        }
+
+        try {
+            return LocalTime.parse(cleanStr.toUpperCase(Locale.getDefault()), TIME_12H_FORMATTER);
         } catch (Exception ignored) {
         }
 
-        // Try ISO format without milliseconds
         try {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).parse(dateStr);
+            return LocalTime.parse(cleanStr.toUpperCase(Locale.getDefault()), TIME_12H_FORMATTER_NO_SPACE);
         } catch (Exception ignored) {
         }
 
-        // Try standard format
         try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateStr);
+            return LocalTime.parse(cleanStr, SHIFT_TIME_FORMATTER);
         } catch (Exception ignored) {
         }
 
         return null;
     }
 
-    public static String extractTime(String dateTimeString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, formatter);
-        int hour = offsetDateTime.toLocalTime().getHour();
-        int minute = offsetDateTime.toLocalTime().getMinute();
-        String amPm = (hour < 12 || hour == 24) ? "AM" : "PM";
-        hour = (hour > 12) ? hour - 12 : hour; // Adjust hour for 12-hour format
-        hour = (hour == 0) ? 12 : hour; // Handle midnight (0 hour)
-        return String.format("%02d:%02d %s", hour, minute, amPm);
-    }
+    private static boolean isInvalidInput(String input) {
+        if (input == null) return true;
 
-    public static String calculateLateTime(String punchInTime, String shiftStartTime) {
-        if (punchInTime == null || shiftStartTime == null ||
-                punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
-            return "0 Min's";
-        }
-
-        try {
-            SimpleDateFormat punchFormat;
-            // Check if the input is ISO format or already formatted 12h time
-            if (punchInTime.contains("T")) {
-                punchFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                punchFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            } else {
-                punchFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-            }
-
-            SimpleDateFormat shiftFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-            Date punchInDate = punchFormat.parse(punchInTime);
-            Date shiftStartDate = shiftFormat.parse(shiftStartTime);
-
-            if (punchInDate != null && shiftStartDate != null) {
-                // Normalize both to the same reference date for accurate comparison
-                Calendar calPunch = Calendar.getInstance();
-                calPunch.setTime(punchInDate);
-
-                Calendar calShift = Calendar.getInstance();
-                calShift.setTime(shiftStartDate);
-                // Match the year/month/day so we only compare hours and minutes
-                calShift.set(calPunch.get(Calendar.YEAR), calPunch.get(Calendar.MONTH), calPunch.get(Calendar.DAY_OF_MONTH));
-
-                if (calPunch.after(calShift)) {
-                    long lateInMillis = calPunch.getTimeInMillis() - calShift.getTimeInMillis();
-                    long lateMinutes = lateInMillis / (60 * 1000);
-
-                    if (lateMinutes < 60) {
-                        return lateMinutes + " Min's";
-                    } else {
-                        return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateMinutes / 60, lateMinutes % 60);
-                    }
-                }
-            }
-        } catch (ParseException e) {
-            Log.e("DateTimeUtils", "Error calculating late time: " + e.getMessage() + " for input: " + punchInTime);
-        }
-        return "0 Min's";
-    }
-//    public static String calculateLateTime(String punchInTime, String shiftStartTime) {
-//        if (punchInTime == null || shiftStartTime == null || punchInTime.equals("N/A") || shiftStartTime.equals("N/A")) {
-//            return "N/A";
-//        }
-//        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-//        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//        SimpleDateFormat shiftFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-//        SimpleDateFormat time12Format = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-//        try {
-//            Date punchInISO = isoFormat.parse(punchInTime);
-//            if (punchInISO != null) {
-//                String punchIn12 = time12Format.format(punchInISO);
-//
-//                Date shiftStart = shiftFormat.parse(shiftStartTime);
-//                Date punchIn = time12Format.parse(punchIn12);
-//
-//                if (punchIn != null && punchIn.after(shiftStart)) {
-//                    if (shiftStart != null) {
-//                        long lateInMillis = punchIn.getTime() - shiftStart.getTime();
-//                        long lateMinutes = lateInMillis / (60 * 1000);
-//
-//                        if (lateMinutes < 60) {
-//                            return lateMinutes + " Min's";
-//                        } else {
-//                            long lateHours = lateMinutes / 60;
-//                            long remainingMinutes = lateMinutes % 60;
-//                            return String.format(Locale.getDefault(), "%02d:%02d Hrs", lateHours, remainingMinutes);
-//                        }
-//                    }
-//                } else {
-//                    return "0 Min's";
-//                }
-//            }
-//        } catch (ParseException e) {
-//            Log.e("DateTimeUtils", "Error calculating late time: " + e.getMessage());
-//        }
-//        return "N/A";
-//    }
-
-
-    public static String calculateOvertime(String totalTime) {
-        if (totalTime == null || totalTime.equals("N/A") || totalTime.trim().isEmpty() || totalTime.trim().equals(":00")) {
-            return "N/A";
-        }
-        totalTime = totalTime.replace(" Hrs", "");
-        if (!totalTime.contains(":")) {
-            totalTime += ":00";
-        }
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        try {
-            Date totalTimeDate = format.parse(totalTime);
-            if (totalTimeDate != null) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(totalTimeDate);
-
-                int totalHours = calendar.get(Calendar.HOUR_OF_DAY);
-                int totalMinutes = calendar.get(Calendar.MINUTE);
-                int totalTimeInMinutes = (totalHours * 60) + totalMinutes;
-
-                if (totalTimeInMinutes > (9 * 60)) {
-                    int overtimeMinutes = totalTimeInMinutes - (9 * 60);
-                    if (overtimeMinutes >= 60) {
-                        int overtimeHours = overtimeMinutes / 60;
-                        int remainingMinutes = overtimeMinutes % 60;
-                        return String.format(Locale.getDefault(), "%02d:%02d Hrs", overtimeHours, remainingMinutes);
-                    } else {
-                        return String.format(Locale.getDefault(), "%02d Min's", overtimeMinutes);
-                    }
-                } else {
-                    return "0 Min's";
-                }
-            }
-        } catch (ParseException e) {
-            Log.e("DateTimeUtils", "Error calculating overtime: " + e.getMessage());
-        }
-        return "N/A";
-    }
-
-
-    public static String formatTime(String timeString) {
-        if (timeString == null || timeString.equals("1900-01-01T00:00:00.000Z")) {
-            return "N/A";
-        }
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-        outputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
-        try {
-            Date date = inputFormat.parse(timeString);
-            if (date != null) {
-                return outputFormat.format(date);
-            }
-        } catch (ParseException e) {
-            Log.e("DateTimeUtils", "Error parsing time: " + e.getMessage());
-        }
-        return "N/A";
-    }
-
-    public static String getDayOfWeekAndDate(String dateString) {
-        if (dateString == null || dateString.equals("1900-01-01T00:00:00.000Z")) {
-            return "N/A";
-        }
-
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-        try {
-            Date date = inputFormat.parse(dateString);
-            if (date != null) {
-                String dayOfWeek = dayOfWeekFormat.format(date);
-                String dateOnly = outputDateFormat.format(date);
-                return dayOfWeek + ", " + dateOnly;
-            }
-        } catch (ParseException e) {
-            Log.e("DateTimeUtils", "Error getting day of week and date: " + e.getMessage());
-        }
-        return "N/A";
-    }
-
-
-    public static String getCurrentDateInISOFormat() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return sdf.format(new Date());
-    }
-
-    public static void main(String[] args) {
-        String currentDate = getCurrentDateInISOFormat();
-        System.out.println(currentDate);
-    }
-
-    public static String getMonthDayFromISO(String isoDate) {
-        try {
-            Instant instant = Instant.parse(isoDate);  // parse ISO format
-            LocalDate dob = instant.atZone(ZoneId.systemDefault()).toLocalDate();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
-            return dob.format(formatter);  // e.g., "08-23"
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
+        String trimmed = input.trim();
+        return trimmed.isEmpty()
+                || trimmed.equalsIgnoreCase("N/A")
+                || trimmed.equalsIgnoreCase("NA")
+                || trimmed.equalsIgnoreCase("NULL")
+                || trimmed.equalsIgnoreCase("NONE");
     }
 }

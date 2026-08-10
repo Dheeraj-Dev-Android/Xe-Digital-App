@@ -70,7 +70,7 @@ public class VisitorsItem implements Serializable {
     private String purposeOfmeeting;
 
     @SerializedName("visitorCategory")
-    private Object visitorCategory;
+    private String visitorCategory;
 
     @SerializedName("itemImageUploadedPath")
     private String itemImageUploadedPath;
@@ -174,7 +174,7 @@ public class VisitorsItem implements Serializable {
         return purposeOfmeeting;
     }
 
-    public Object getVisitorCategory() {
+    public String getVisitorCategory() {
         return visitorCategory;
     }
 

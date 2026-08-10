@@ -124,9 +124,45 @@
     <string name="quick_actions">Quick actions</string>
     <string name="attendance_detail">Attendance</string>
     <string name="apply_leave">Apply leave</string>
-    <string name="add_timesheet">Add Timesheet</string>
+    <string name="add_timesheet">Timesheet</string>
     <string name="book_meeting">Book meeting</string>
     <string name="notifications">Notifications</string>
+    <string name="view_profile">View Profile</string>
 
+    <string name="app_logo">App Logo</string>
+    <string name="permission_check">Permission Check</string>
 
+    <!-- Login Screen -->
+    <string name="email_icon">Email Icon</string>
+    <string name="password_icon">Password Icon</string>
+    <string name="or_continue_with">or continue with</string>
+    <string name="authenticating">Authenticating</string>
+    <string name="verifying_credentials">Verifying your credentials</string>
+
+    <!-- Permissions -->
+    <string name="camera_permission">Camera - For attendance verification</string>
+    <string name="location_permission">Location - For geo-based tracking</string>
+    <string name="biometric_permission">Biometric - For secure authentication</string>
+
+    <!-- Feature descriptions -->
+    <string name="feature_fast_secure">Fast &amp; Secure</string>
+    <string name="feature_real_time">Real-time Tracking</string>
+    <string name="feature_easy_analytics">Easy Analytics</string>
+    <string name="feature_fast_secure_desc">Secure login with industry-standard encryption</string>
+    <string name="feature_real_time_desc">Track attendance instantly across all devices</string>
+    <string name="feature_easy_analytics_desc">Detailed reports and insights at your fingertips</string>
+
+    <string name="today">TODAY</string>
+    <string name="holidays">Holidays</string>
+    <string name="empty_state_subtitle">No holidays found for this period.\nPull down to refresh.</string>
+    <string name="policy_date_prefix">Updated: %s</string>
+    <string name="policies">Policies</string>
+    <string name="active">Active</string>
+    <string name="no_policies_found">No Policies Found</string>
+    <string name="empty_policy_subtitle">There are no policies available right now.\nPull down to refresh.</string>
+    <string name="visitors">Visitors</string>
+    <string name="add_pre_approved">Add Pre-Approved</string>
+    <string name="check_in_visitors">Check In Visitors</string>
+    <string name="no_visitors_found">No Visitors Found</string>
+    <string name="empty_visitors_subtitle">No visitors to display.\nPull down to refresh or add new visitors.</string>
 </resources>

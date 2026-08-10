@@ -4,332 +4,922 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
+    android:background="@drawable/fragment_dashboard_bg"
     android:fillViewport="true"
-    tools:context=".ui.vms.VisitorsDetailFragment">
+    android:paddingTop="8dp">
 
-    <!-- Single card fills the scroll content; no wrapper ConstraintLayout needed -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardViewVisitor"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginVertical="12dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true">
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <!-- LinearLayout replaces ConstraintLayout: content is purely vertical -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardViewVisitor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
 
-            <!-- Profile Image -->
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivVisitorProfile"
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/circular_background"
-                android:padding="4dp"
-                android:scaleType="centerCrop"
-                app:shapeAppearanceOverlay="@style/CircularImageView" />
-
-            <!-- Visitor Name -->
-            <TextView
-                android:id="@+id/tvVisitorName"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:textColor="@color/text_primary"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                tools:text="Visitor Name" />
+                android:background="@drawable/gradient_attendance_card">
 
-            <!-- Approval Status Chip -->
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipApprovalStatus"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                app:chipBackgroundColor="@color/status_chip_background"
-                tools:text="Approved" />
-
-            <!-- ── Contact Information ── -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/contactInfoSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardBackgroundColor="@color/surface_variant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <!-- Guideline splits email/phone row into two columns -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/heroGuideline"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    app:layout_constraintGuide_percent="0.5" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Contact Information"
-                        android:textColor="@color/avatar_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <!-- ── Profile row: avatar | name + subtitle | chip ── -->
 
-                    <TextView
-                        android:id="@+id/tvEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:drawableStart="@drawable/ic_email"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        app:drawableTint="@color/_000000"
-                        tools:text="visitor@example.com" />
+                <!-- Profile Image — left anchor -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivVisitorProfile"
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="20dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:strokeColor="#44FFFFFF"
+                    app:strokeWidth="2.5dp" />
 
-                    <TextView
-                        android:id="@+id/tvContact"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawableStart="@drawable/ic_phone"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="+91234567890" />
+                <!-- Visitor Name — middle, top-aligned to avatar -->
+                <TextView
+                    android:id="@+id/tvVisitorName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/chipApprovalStatus"
+                    app:layout_constraintStart_toEndOf="@id/ivVisitorProfile"
+                    app:layout_constraintTop_toTopOf="@id/ivVisitorProfile"
+                    tools:text="XeDigital.ai" />
 
-                    <!-- Fixed: was missing drawableStart -->
-                    <TextView
-                        android:id="@+id/tvCompanyFrom"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="XeDigital.ai" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <!-- Guest subtitle — sits just below name, same column -->
+                <TextView
+                    android:id="@+id/tvVisitorSubtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="3dp"
+                    android:alpha="0.8"
+                    android:text="Guest Visitor"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toStartOf="@id/chipApprovalStatus"
+                    app:layout_constraintStart_toEndOf="@id/ivVisitorProfile"
+                    app:layout_constraintTop_toBottomOf="@id/tvVisitorName" />
 
-            <!-- ── Meeting Details ── -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/meetingDetailsSection"
+                <!-- Approval Status Chip — right anchor, vertically centered to avatar -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipApprovalStatus"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    app:chipCornerRadius="14dp"
+                    app:chipMinHeight="26dp"
+                    app:layout_constraintBottom_toBottomOf="@id/ivVisitorProfile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/ivVisitorProfile"
+                    tools:text="Approved" />
+
+                <!-- Barrier below the profile row -->
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/profileRowBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="ivVisitorProfile,tvVisitorSubtitle,chipApprovalStatus" />
+
+                <!-- Thin divider below profile row -->
+                <View
+                    android:id="@+id/heroDivider"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_marginTop="6dp"
+                    android:alpha="0.2"
+                    android:background="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profileRowBarrier" />
+
+                <!-- ── Email/Phone row ── -->
+
+                <!-- Email label — left column -->
+                <TextView
+                    android:id="@+id/tvEmailLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="14dp"
+                    android:alpha="0.65"
+                    android:letterSpacing="0.05"
+                    android:text="Email Address"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toStartOf="@id/heroGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/heroDivider" />
+
+                <!-- Email value — left column -->
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:drawablePadding="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/heroGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmailLabel"
+                    tools:text="xedigital.ai@example.com" />
+
+                <!-- Phone label — right column -->
+                <TextView
+                    android:id="@+id/tvContactLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="16dp"
+                    android:alpha="0.65"
+                    android:letterSpacing="0.05"
+                    android:text="Phone Number"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/heroGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/heroDivider" />
+
+                <!-- Phone value — right column -->
+                <TextView
+                    android:id="@+id/tvContact"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="16dp"
+                    android:drawablePadding="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/heroGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvContactLabel"
+                    tools:text="+91234567890" />
+
+                <!-- Bottom spacer -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvContact" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══════════════════════════════════════════════
+             CONTACT INFORMATION CARD
+        ═══════════════════════════════════════════════ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/contactInfoSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="@color/surface_variant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
+                android:padding="12dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <View
+                    android:id="@+id/accentContact"
+                    android:layout_width="4dp"
+                    android:layout_height="14dp"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:letterSpacing="0.04"
+                    android:text="Contact Information"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/accentContact"
+                    app:layout_constraintStart_toEndOf="@id/accentContact"
+                    app:layout_constraintTop_toTopOf="@id/accentContact" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/contactGuideline"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    app:layout_constraintGuide_percent="0.5" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Meeting Details"
-                        android:textColor="@color/avatar_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvCompanyFromLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="6dp"
+                    android:alpha="0.6"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Visiting From"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@id/contactGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accentContact" />
 
-                    <TextView
-                        android:id="@+id/tvWhomToMeet"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Meeting With: Xedigital.ai" />
+                <TextView
+                    android:id="@+id/tvCompanyFrom"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/contactGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvCompanyFromLabel"
+                    tools:text="XeDigital.ai" />
 
-                    <TextView
-                        android:id="@+id/tvPurposeOfMeeting"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Purpose: Business Discussion" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tvMeetingOverStatus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Status: Completed" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+        <!-- ═══════════════════════════════════════════════
+             MEETING DETAILS CARD
+        ═══════════════════════════════════════════════ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/meetingDetailsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
 
-            <!-- ── Other Details ── -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/otherDetailsSection"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="@color/surface_variant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
+                android:padding="12dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <View
+                    android:id="@+id/accentMeeting"
+                    android:layout_width="4dp"
+                    android:layout_height="14dp"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:letterSpacing="0.04"
+                    android:text="Meeting Details"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/accentMeeting"
+                    app:layout_constraintStart_toEndOf="@id/accentMeeting"
+                    app:layout_constraintTop_toTopOf="@id/accentMeeting" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/meetingGuideline"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
-                    <!-- Serial Number -->
-                    <TextView
-                        android:id="@+id/tvSerialNumber"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Serial Number: 12345" />
+                    app:layout_constraintGuide_percent="0.5" />
 
-                    <!-- Visitor Category -->
-                    <TextView
-                        android:id="@+id/tvVisitorCategory"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Category: Business" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <!-- Meeting With — left -->
+                <TextView
+                    android:id="@+id/tvWhomToMeetLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Meeting With"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@id/meetingGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accentMeeting" />
 
-            <!-- ── Time Details ── -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/timeDetailsSection"
+                <TextView
+                    android:id="@+id/tvWhomToMeet"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/meetingGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvWhomToMeetLabel"
+                    tools:text="Xedigital.ai" />
+
+                <!-- Purpose — right -->
+                <TextView
+                    android:id="@+id/tvPurposeLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="14dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Purpose"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/meetingGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/accentMeeting" />
+
+                <TextView
+                    android:id="@+id/tvPurposeOfMeeting"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/meetingGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvPurposeLabel"
+                    tools:text="Business Discussion" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/meetingRow1Barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="tvWhomToMeet,tvPurposeOfMeeting" />
+
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="3dp"
+                    android:alpha="0.4"
+                    android:background="@color/divider_color"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/meetingRow1Barrier" />
+
+                <!-- Meeting Status — full width -->
+                <TextView
+                    android:id="@+id/tvMeetingOverStatusLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Meeting Status"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+                <TextView
+                    android:id="@+id/tvMeetingOverStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvMeetingOverStatusLabel"
+                    tools:text="Completed" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══════════════════════════════════════════════
+             OTHER DETAILS CARD
+        ═══════════════════════════════════════════════ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/otherDetailsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="@color/surface_variant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
+                android:padding="12dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <View
+                    android:id="@+id/accentOther"
+                    android:layout_width="4dp"
+                    android:layout_height="14dp"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:letterSpacing="0.04"
+                    android:text="Other Details"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/accentOther"
+                    app:layout_constraintStart_toEndOf="@id/accentOther"
+                    app:layout_constraintTop_toTopOf="@id/accentOther" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/otherGuideline"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    app:layout_constraintGuide_percent="0.5" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Time Details"
-                        android:textColor="@color/avatar_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <!-- Serial Number — left -->
+                <TextView
+                    android:id="@+id/tvSerialNumberLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Serial Number"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@id/otherGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accentOther" />
 
-                    <TextView
-                        android:id="@+id/tvCheckinDateTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Check-in: Jan 1, 2024 09:00 AM" />
+                <TextView
+                    android:id="@+id/tvSerialNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/otherGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvSerialNumberLabel"
+                    tools:text="12345" />
 
-                    <TextView
-                        android:id="@+id/tvCheckoutDateTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Check-out: Jan 1, 2024 05:00 PM" />
+                <!-- Visitor Category — right -->
+                <TextView
+                    android:id="@+id/tvVisitorCategoryLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="14dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Visitor Category"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/otherGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/accentOther" />
 
-                    <TextView
-                        android:id="@+id/tvMeetingOverDateTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Meeting Over: Jan 1, 2024 04:30 PM" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/tvVisitorCategory"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/otherGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvVisitorCategoryLabel"
+                    tools:text="Business" />
 
-            <!-- ── Pre-approval Details ── -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/preApprovalSection"
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══════════════════════════════════════════════
+             TIME DETAILS CARD
+        ═══════════════════════════════════════════════ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/timeDetailsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="4dp"
-                app:cardBackgroundColor="@color/surface_variant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
+                android:padding="12dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <View
+                    android:id="@+id/accentTime"
+                    android:layout_width="4dp"
+                    android:layout_height="14dp"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:letterSpacing="0.04"
+                    android:text="Time Details"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/accentTime"
+                    app:layout_constraintStart_toEndOf="@id/accentTime"
+                    app:layout_constraintTop_toTopOf="@id/accentTime" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/timeGuideline"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    app:layout_constraintGuide_percent="0.5" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pre-approval Details"
-                        android:textColor="@color/avatar_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <!-- Check-In — left -->
+                <TextView
+                    android:id="@+id/tvCheckinLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Check-In Time"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@id/timeGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accentTime" />
 
-                    <TextView
-                        android:id="@+id/tvPreApprovedDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawableStart="@drawable/ic_calendar"
-                        android:drawablePadding="8dp"
-                        android:drawableTint="@color/_000000"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Pre-approval Date: Jan 1, 2024" />
+                <TextView
+                    android:id="@+id/tvCheckinDateTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/timeGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvCheckinLabel"
+                    tools:text="Jan 1, 2024 09:00 AM" />
 
-                    <TextView
-                        android:id="@+id/tvPreApproved"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Pre-approved: Yes" />
+                <!-- Check-Out — right -->
+                <TextView
+                    android:id="@+id/tvCheckoutLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="14dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Check-Out Time"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/timeGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/accentTime" />
 
-                    <TextView
-                        android:id="@+id/tvVisitorVisited"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
-                        tools:text="Visitor Visited: Yes" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/tvCheckoutDateTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/timeGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvCheckoutLabel"
+                    tools:text="Jan 1, 2024 05:00 PM" />
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/timeRow1Barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="tvCheckinDateTime,tvCheckoutDateTime" />
 
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.4"
+                    android:background="@color/divider_color"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/timeRow1Barrier" />
+
+                <!-- Meeting Over — full width -->
+                <TextView
+                    android:id="@+id/tvMeetingOverLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Meeting Over At"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider2" />
+
+                <TextView
+                    android:id="@+id/tvMeetingOverDateTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvMeetingOverLabel"
+                    tools:text="Jan 1, 2024 04:30 PM" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══════════════════════════════════════════════
+             PRE-APPROVAL DETAILS CARD
+        ═══════════════════════════════════════════════ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/preApprovalSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp">
+
+                <View
+                    android:id="@+id/accentPreApproval"
+                    android:layout_width="4dp"
+                    android:layout_height="14dp"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:letterSpacing="0.04"
+                    android:text="Pre-Approval Details"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/accentPreApproval"
+                    app:layout_constraintStart_toEndOf="@id/accentPreApproval"
+                    app:layout_constraintTop_toTopOf="@id/accentPreApproval" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/preApprovalGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <!-- Pre-Approved — left -->
+                <TextView
+                    android:id="@+id/tvPreApprovedLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Pre-Approved"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@id/preApprovalGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accentPreApproval" />
+
+                <TextView
+                    android:id="@+id/tvPreApproved"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/preApprovalGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvPreApprovedLabel"
+                    tools:text="Yes" />
+
+                <!-- Visitor Visited — right -->
+                <TextView
+                    android:id="@+id/tvVisitorVisitedLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="14dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Visitor Visited"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/preApprovalGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/accentPreApproval" />
+
+                <TextView
+                    android:id="@+id/tvVisitorVisited"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/preApprovalGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvVisitorVisitedLabel"
+                    tools:text="Yes" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/preApprovalRow1Barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="tvPreApproved,tvVisitorVisited" />
+
+                <View
+                    android:id="@+id/dividerPreApproval"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.4"
+                    android:background="@color/divider_color"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/preApprovalRow1Barrier" />
+
+                <!-- Pre-Approved Date — full width -->
+                <TextView
+                    android:id="@+id/tvPreApprovedDateLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.8"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="2dp"
+                    android:text="Pre-Approved Date"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dividerPreApproval" />
+
+                <TextView
+                    android:id="@+id/tvPreApprovedDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:drawablePadding="8dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="2dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvPreApprovedDateLabel"
+                    tools:text="January 1, 2024" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>

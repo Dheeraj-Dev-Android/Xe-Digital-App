@@ -272,7 +272,7 @@ public interface APIInterface {
     @PUT("leaves/used/debit")
     retrofit2.Call<ResponseBody> LeavesUsedDebit(@Header("Authorization") String token, @Body DebitLeaveRequest requestBody);
 
-    @PUT(" leaves/used/count")
+    @PUT("leaves/used/count")
     retrofit2.Call<ResponseBody> LeavesUsedCount(@Header("Authorization") String token, @Body UsedLeaveRequest requestBody);
 
     @PUT("leaves/status/{managerId}")

@@ -39,50 +39,76 @@ public class VisitorsDetailFragment extends Fragment {
         if (getArguments() != null) {
             visitor = (VisitorsItem) getArguments().getSerializable(ARG_VISITOR);
         }
-
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentVisitorsDetailBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
+
         if (visitor != null) {
-            binding.tvVisitorName.setText(visitor.getName() != null ? visitor.getName() : "N/A");
-            binding.tvSerialNumber.setText("Serial Number: " + (visitor.getSerialNumber() != null ? visitor.getSerialNumber() : "N/A"));
-            binding.tvVisitorCategory.setText("Category: " + (visitor.getVisitorCategory() != null ? visitor.getVisitorCategory() : "N/A"));
-            binding.tvEmail.setText((visitor.getEmail() != null ? visitor.getEmail() : "N/A"));
-            binding.tvContact.setText((visitor.getContact() != null ? visitor.getContact() : "N/A"));
-            binding.tvCompanyFrom.setText("Company From: " + (visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A"));
+            // Apply helper method for null and blank string checks
+            binding.tvVisitorName.setText(getDisplayValue(visitor.getName()));
+            binding.tvSerialNumber.setText(getDisplayValue(visitor.getSerialNumber()));
+            binding.tvVisitorCategory.setText(getDisplayValue(visitor.getVisitorCategory()));
+            binding.tvEmail.setText(getDisplayValue(visitor.getEmail()));
+            binding.tvContact.setText(getDisplayValue(visitor.getContact()));
+            binding.tvCompanyFrom.setText(getDisplayValue(visitor.getCompanyFrom()));
+
+            // Safe handling of whomToMeet to avoid blank names or solitary spaces
             if (visitor.getWhomToMeet() != null) {
-                String firstName = visitor.getWhomToMeet().getFirstname() != null ? visitor.getWhomToMeet().getFirstname() : "";
-                String lastName = visitor.getWhomToMeet().getLastname() != null ? visitor.getWhomToMeet().getLastname() : "";
-                binding.tvWhomToMeet.setText("Meeting With: " + firstName + " " + lastName);
+                String firstName = getDisplayValue(visitor.getWhomToMeet().getFirstname());
+                String lastName = getDisplayValue(visitor.getWhomToMeet().getLastname());
+
+                if (firstName.equals("N/A") && lastName.equals("N/A")) {
+                    binding.tvWhomToMeet.setText("N/A");
+                } else if (firstName.equals("N/A")) {
+                    binding.tvWhomToMeet.setText(lastName);
+                } else if (lastName.equals("N/A")) {
+                    binding.tvWhomToMeet.setText(firstName);
+                } else {
+                    binding.tvWhomToMeet.setText(firstName + " " + lastName);
+                }
             } else {
-                binding.tvWhomToMeet.setText("Meeting With: N/A");
+                binding.tvWhomToMeet.setText("N/A");
             }
-            binding.tvPurposeOfMeeting.setText("Meeting Purpose: " + (visitor.getPurposeOfmeeting() != null ? visitor.getPurposeOfmeeting() : "N/A"));
-            binding.tvMeetingOverStatus.setText("Meeting Status: " + (visitor.getMeetingOverStatus() != null ? visitor.getMeetingOverStatus() : "N/A"));
 
-            binding.tvCheckinDateTime.setText("Check-in: " + (visitor.getSignIn() != null ? DateTimeUtils.getDayOfWeekAndDate(visitor.getSignIn()) : "N/A"));
-            binding.tvCheckoutDateTime.setText("Check-out: " + (visitor.getSignOut() != null ? DateTimeUtils.getDayOfWeekAndDate(visitor.getSignOut()) : "N/A"));
-            binding.tvMeetingOverDateTime.setText("Meeting Over: " + (visitor.getMeetingOverDate() != null ? DateTimeUtils.getDayOfWeekAndDate(visitor.getMeetingOverDate()) : "N/A"));
+            binding.tvPurposeOfMeeting.setText(getDisplayValue(visitor.getPurposeOfmeeting()));
+            binding.tvMeetingOverStatus.setText(getDisplayValue(visitor.getMeetingOverStatus()));
 
-            binding.tvPreApproved.setText("Pre-approved: " + (visitor.isIsPreApproved() ? "Yes" : "No"));
-            binding.tvPreApprovedDate.setText("Pre-approval Date: " + DateTimeUtils.getDayOfWeekAndDate(visitor.getPreApprovedDate()));
-            binding.tvVisitorVisited.setText("Visitor Visited: " + (visitor.isIsVisitorVisited() ? "Yes" : "No"));
+            // Dates: Safe formatting to prevent NPEs inside DateTimeUtils
+            binding.tvCheckinDateTime.setText(formatDateSafely(visitor.getSignIn()));
+            binding.tvCheckoutDateTime.setText(formatDateSafely(visitor.getSignOut()));
+            binding.tvMeetingOverDateTime.setText(formatDateSafely(visitor.getMeetingOverDate()));
+
+            // Fixed NPE risk here: Added safety wrapper around getPreApprovedDate
+            binding.tvPreApprovedDate.setText(formatDateSafely(visitor.getPreApprovedDate()));
+
+            binding.tvPreApproved.setText((visitor.isIsPreApproved() ? "Yes" : "No"));
+            binding.tvVisitorVisited.setText((visitor.isIsVisitorVisited() ? "Yes" : "No"));
 
             String profileImagePath = visitor.getProfileImagePath();
-            if (profileImagePath != null && !profileImagePath.isEmpty()) {
-                Glide.with(requireContext()).load(profileImagePath).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).circleCrop().into(binding.ivVisitorProfile);
-            } else {
-                Glide.with(requireContext()).load(R.drawable.ic_profile_placeholder).circleCrop().into(binding.ivVisitorProfile);
-                Log.w("VisitorsAdapter", "Profile image path is null or empty for visitor: " + visitor.getName());
+
+            // Safe Context check for Glide to prevent IllegalStateException if Fragment is detached
+            if (getContext() != null) {
+                if (profileImagePath != null && !profileImagePath.trim().isEmpty()) {
+                    Glide.with(getContext())
+                            .load(profileImagePath)
+                            .placeholder(R.drawable.ic_profile_placeholder)
+                            .error(R.drawable.ic_profile_placeholder)
+                            .circleCrop()
+                            .into(binding.ivVisitorProfile);
+                } else {
+                    Glide.with(getContext())
+                            .load(R.drawable.ic_profile_placeholder)
+                            .circleCrop()
+                            .into(binding.ivVisitorProfile);
+                    Log.w("VisitorsAdapter", "Profile image path is null or empty for visitor: " + visitor.getName());
+                }
             }
 
             String status = visitor.getApprovalStatus();
-
-            if (status == null || status.isEmpty()) {
+            if (status == null || status.trim().isEmpty()) {
                 status = "Pending";
             }
 
@@ -95,12 +121,41 @@ public class VisitorsDetailFragment extends Fragment {
             } else if (status.equalsIgnoreCase("Rejected")) {
                 binding.chipApprovalStatus.setChipBackgroundColorResource(R.color.status_rejected);
             } else {
-                // Handle other status values or set a default color
                 binding.chipApprovalStatus.setChipBackgroundColorResource(R.color.icon_tint);
             }
-
         }
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Prevents memory leaks with View Binding in Fragments
+        binding = null;
+    }
+
+    /**
+     * Helper method to return "N/A" if string is null or completely blank.
+     */
+    private String getDisplayValue(String value) {
+        return (value == null || value.trim().isEmpty()) ? "N/A" : value;
+    }
+
+    /**
+     * Helper method to handle date formatting safely to prevent NullPointerExceptions.
+     * Adjust parameter type (String, Long, Object) if your date getter returns a different format.
+     */
+    private String formatDateSafely(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return "N/A";
+        }
+        try {
+            String formatted = DateTimeUtils.getDayOfWeekAndDate(dateStr);
+            return (formatted == null || formatted.trim().isEmpty()) ? "N/A" : formatted;
+        } catch (Exception e) {
+            Log.e("VisitorsDetailFragment", "Date formatting error", e);
+            return "N/A";
+        }
     }
 }

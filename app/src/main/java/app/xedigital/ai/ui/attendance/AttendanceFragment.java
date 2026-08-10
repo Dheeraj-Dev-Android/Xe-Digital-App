@@ -130,7 +130,11 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
     }
 
     private void showNoDataAlert() {
-        new AlertDialog.Builder(requireContext()).setTitle("Attendance").setMessage("No Attendance data available For this Month use Filter to get previous months attendance").setPositiveButton("OK", null).show();
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Attendance")
+                .setMessage("No Attendance data available For this Month use Filter to get previous months attendance")
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private List<EmployeePunchDataItem> parseAttendanceData(EmployeeAttendanceResponse attendanceResponse) {
@@ -141,29 +145,45 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
             List<EmployeePunchDataItem> punchDataList = data.getEmployeePunchData();
             if (punchDataList != null) {
                 for (EmployeePunchDataItem punchData : punchDataList) {
-
                     String date = punchData.getPunchDateFormat();
                     String day = getDayOfWeek(date);
                     punchData.setDayOfWeek(day);
-                    String punchInTime = DateTimeUtils.formatTime(punchData.getPunchIn());
-                    String punchOutTime = DateTimeUtils.formatTime(punchData.getPunchOut());
-                    String totalTime = DateTimeUtils.calculateTotalTime(punchInTime, punchOutTime);
 
+                    String rawPunchIn = punchData.getPunchIn();
+                    String rawPunchOut = punchData.getPunchOut();
+
+                    // Calculate Total Working Time using raw inputs directly
+                    String totalTime = DateTimeUtils.calculateTotalTime(rawPunchIn, rawPunchOut);
                     punchData.setTotalTime(totalTime);
-                    attendanceDataList.add(punchData);
-                    String overtime = DateTimeUtils.calculateOvertime(totalTime);
-                    punchData.setOvertime(overtime);
+
+                    // Extract shift boundaries safely
+                    String shiftStart = "09:00";
+                    String shiftEnd = "18:00";
 
                     if (punchData.getShift() != null) {
-                        String lateTime = DateTimeUtils.calculateLateTime(punchData.getPunchIn(), punchData.getShift().getStartTime());
-                        punchData.setLateTime(lateTime);
+                        if (punchData.getShift().getStartTime() != null && !punchData.getShift().getStartTime().isEmpty()) {
+                            shiftStart = punchData.getShift().getStartTime();
+                        }
+                        if (punchData.getShift().getEndTime() != null && !punchData.getShift().getEndTime().isEmpty()) {
+                            shiftEnd = punchData.getShift().getEndTime();
+                        }
                     }
+
+                    // Calculate Late Time and Overtime based on employee's shift times
+                    String lateTime = DateTimeUtils.calculateLateTime(rawPunchIn, shiftStart);
+                    punchData.setLateTime(lateTime);
+
+                    String overtime = DateTimeUtils.calculateOvertime(totalTime, shiftStart, shiftEnd);
+                    punchData.setOvertime(overtime);
+
+                    attendanceDataList.add(punchData);
                 }
             }
         }
         return attendanceDataList;
     }
 
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
@@ -174,7 +194,6 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_attendance_fragment, menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

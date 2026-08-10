@@ -97,13 +97,45 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.btnRegularize.setVisibility(View.VISIBLE);
             holder.leaveTypeName.setVisibility(View.GONE);
 
-            holder.punchInTextView.setText(DateTimeUtils.formatTime(attendanceItem.getPunchIn()));
-            holder.punchOutTextView.setText(DateTimeUtils.formatTime(attendanceItem.getPunchOut()));
-            holder.totalTimeTextView.setText(attendanceList.get(position).getTotalTime());
-            holder.overTimeTextView.setText(attendanceList.get(position).getOvertime());
-            holder.lateTimeTextView.setText(attendanceList.get(position).getLateTime());
+            holder.punchInTextView.setText(DateTimeUtils.formatTime(punchIn));
+            holder.punchOutTextView.setText(DateTimeUtils.formatTime(punchOut));
+
+            // Extract employee's dynamic shift details safely
+            String shiftStart = "09:00"; // Default fallback start time
+            String shiftEnd = "18:00";   // Default fallback end time
+
+            if (attendanceItem.getShift() != null) {
+                if (attendanceItem.getShift().getStartTime() != null && !attendanceItem.getShift().getStartTime().isEmpty()) {
+                    shiftStart = attendanceItem.getShift().getStartTime();
+                }
+                if (attendanceItem.getShift().getEndTime() != null && !attendanceItem.getShift().getEndTime().isEmpty()) {
+                    shiftEnd = attendanceItem.getShift().getEndTime();
+                }
+            }
+
+            // 1. Total Time Evaluation
+            String totalTime = attendanceItem.getTotalTime();
+            if (isInvalidValue(totalTime)) {
+                totalTime = DateTimeUtils.calculateTotalTime(punchIn, punchOut);
+            }
+            holder.totalTimeTextView.setText(totalTime);
+
+            // 2. Late Time Evaluation
+            String lateTime = attendanceItem.getLateTime();
+            if (isInvalidValue(lateTime)) {
+                lateTime = DateTimeUtils.calculateLateTime(punchIn, shiftStart);
+            }
+            holder.lateTimeTextView.setText(lateTime);
+
+            // 3. Overtime Evaluation
+            String overTime = attendanceItem.getOvertime();
+            if (isInvalidValue(overTime)) {
+                overTime = DateTimeUtils.calculateOvertime(totalTime, shiftStart, shiftEnd);
+            }
+            holder.overTimeTextView.setText(overTime);
+
         } else {
-            //  No leave, holiday, or punch data - show LOP/LWP
+            // No leave, holiday, or punch data - show LOP/LWP
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.leaveTypeName.setVisibility(View.VISIBLE);
             holder.leaveTypeName.setText("Leave Name : Loss of Pay (LOP) / Leave Without Pay (LWP)");
@@ -116,7 +148,16 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.btnViewAttendance.setVisibility(View.GONE);
             holder.btnRegularize.setVisibility(View.GONE);
         }
+    }
 
+    private boolean isInvalidValue(String val) {
+        if (val == null) return true;
+        String trimmed = val.trim();
+        return trimmed.isEmpty()
+                || trimmed.equalsIgnoreCase("0")
+                || trimmed.equalsIgnoreCase("00:00 Hrs")
+                || trimmed.equalsIgnoreCase("0 Min's")
+                || trimmed.equalsIgnoreCase("N/A");
     }
 
     @Override
@@ -146,7 +187,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             leaveTypeName = itemView.findViewById(R.id.leaveNameTextView);
             btnViewAttendance = itemView.findViewById(R.id.btn_viewAttendance);
             btnRegularize = itemView.findViewById(R.id.btn_regularize);
-
 
             btnViewAttendance.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition();

@@ -79,7 +79,6 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
-
         </FrameLayout>
 
         <!-- Content Section -->
@@ -161,7 +160,7 @@
                             android:layout_height="16dp"
                             android:layout_marginEnd="4dp"
                             android:contentDescription="Seats"
-                            android:src="@drawable/ic_calendar"
+                            android:src="@drawable/ic_visitor"
                             app:tint="#10B981" />
 
                         <TextView
@@ -174,9 +173,7 @@
                             android:textStyle="bold" />
 
                     </LinearLayout>
-
                 </LinearLayout>
-
             </LinearLayout>
 
             <!-- Floor & Location Row -->
@@ -232,7 +229,6 @@
                             android:textStyle="bold" />
 
                     </LinearLayout>
-
                 </LinearLayout>
 
                 <!-- Location -->
@@ -280,29 +276,20 @@
                             android:textStyle="bold" />
 
                     </LinearLayout>
-
                 </LinearLayout>
-
             </LinearLayout>
 
-            <!-- Reserve Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReserve"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:letterSpacing="0.05"
+                android:layout_gravity="end"
                 android:text="Reserve Room"
-                android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
-                app:backgroundTint="#0379A6"
-                app:cornerRadius="12dp"
-                app:elevation="2dp" />
+                app:cornerRadius="12dp" />
 
         </LinearLayout>
-
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

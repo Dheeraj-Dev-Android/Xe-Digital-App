@@ -207,7 +207,6 @@ public class DashboardFragment extends Fragment {
         updateGreetingText();
 
         binding.punchButton.setOnClickListener(v -> {
-//            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
             String userId = prefManager.getString("userId", "");
             String authToken = prefManager.getString("authToken", "");
@@ -218,9 +217,6 @@ public class DashboardFragment extends Fragment {
             intent.putExtra("name", name);
             startActivity(intent);
         });
-
-
-        // --- QUICK ACTION NAVIGATIONS ---
 
         binding.quickActionsCard.findViewById(R.id.btnQuickAttendance).setOnClickListener(v -> {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_attendance);
@@ -234,8 +230,8 @@ public class DashboardFragment extends Fragment {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_dcr_form);
         });
 
-        binding.quickActionsCard.findViewById(R.id.btnQuickBookMeeting).setOnClickListener(v -> {
-            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_meeting_room);
+        binding.quickActionsCard.findViewById(R.id.btnQuickProfile).setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_profile);
         });
         return root;
     }
@@ -251,7 +247,6 @@ public class DashboardFragment extends Fragment {
         attendanceViewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
         leavesViewModel = new ViewModelProvider(this).get(LeavesViewModel.class);
 
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
         String userId = prefManager.getString("userId", "");
@@ -348,18 +343,22 @@ public class DashboardFragment extends Fragment {
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
             if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
                 new Thread(() -> {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    String currentDate = dateFormat.format(new Date());
+                    // Thread-safe instance for background thread
+                    SimpleDateFormat threadLocalDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    String currentDate = threadLocalDateFormat.format(new Date());
+
                     List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
                         try {
-                            Date punchDate = DATE_FORMAT_YYYY_MM_DD.parse(punchData.getPunchDateFormat());
-                            String formattedPunchDate = DATE_FORMAT_YYYY_MM_DD.format(punchDate);
+                            if (punchData.getPunchDateFormat() == null) return false;
+                            Date punchDate = threadLocalDateFormat.parse(punchData.getPunchDateFormat());
+                            String formattedPunchDate = threadLocalDateFormat.format(punchDate);
                             return formattedPunchDate.equals(currentDate);
                         } catch (ParseException e) {
                             e.printStackTrace();
                             return false;
                         }
                     }).collect(Collectors.toList());
+
                     requireActivity().runOnUiThread(() -> {
                         if (binding != null) {
                             boolean isDataAvailable = !currentPunchData.isEmpty();
@@ -373,7 +372,6 @@ public class DashboardFragment extends Fragment {
                                         LocalDate localPunchDate = LocalDate.parse(punchDateStr);
                                         LocalDate today = LocalDate.now();
                                         isToday = localPunchDate.equals(today);
-
                                     } catch (DateTimeParseException e) {
                                         e.printStackTrace();
                                         isToday = false;
@@ -381,15 +379,27 @@ public class DashboardFragment extends Fragment {
                                 }
                             }
 
-
                             if (isDataAvailable && isToday) {
-                                punchIn = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchIn());
-                                punchOut = DateTimeUtils.formatTime(currentPunchData.get(0).getPunchOut());
+                                String rawPunchIn = currentPunchData.get(0).getPunchIn();
+                                String rawPunchOut = currentPunchData.get(0).getPunchOut();
 
-                                binding.tvPunchInTime.setText("Punch In: " + punchIn);
-                                binding.tvPunchOutTime.setText("Punch Out: " + punchOut);
+                                punchIn = DateTimeUtils.formatTime(rawPunchIn);
+                                punchOut = DateTimeUtils.formatTime(rawPunchOut);
 
-                                if (punchIn != null && !punchIn.trim().isEmpty() && !punchIn.equals("-")) {
+                                binding.tvPunchInTimeValue.setText(punchIn != null && !punchIn.isEmpty() ? punchIn : "--:--");
+                                binding.tvPunchOutTimeValue.setText(punchOut != null && !punchOut.isEmpty() ? punchOut : "--:--");
+
+                                // Thorough check to ensure user actually punched in today
+                                boolean isValidPunchIn = rawPunchIn != null
+                                        && !rawPunchIn.trim().isEmpty()
+                                        && !rawPunchIn.equalsIgnoreCase("null")
+                                        && !rawPunchIn.equals("-")
+                                        && !rawPunchIn.startsWith("00:00")
+                                        && punchIn != null
+                                        && !punchIn.trim().isEmpty()
+                                        && !punchIn.equals("-");
+
+                                if (isValidPunchIn) {
                                     binding.tvPunchStatusValue.setText("Punched In");
                                     binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
@@ -406,8 +416,7 @@ public class DashboardFragment extends Fragment {
                 }).start();
             } else {
                 if (binding != null) {
-                    binding.tvPunchInTime.setText("Punch In: --:--");
-                    binding.tvPunchOutTime.setText("Punch Out: --:--");
+                    resetPunchUI();
                     punchCardView.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(requireContext(), "No attendance data available", Toast.LENGTH_SHORT).show();
@@ -459,7 +468,7 @@ public class DashboardFragment extends Fragment {
         } else if (hour >= 17 && hour < 22) {
             greeting = "Good Evening ! ";
         } else {
-            greeting = "Good Night ! "; // Covers 10 PM to 3:59 AM
+            greeting = "Good Night ! ";
         }
 
         binding.tvGreeting.setText(greeting);
@@ -469,8 +478,8 @@ public class DashboardFragment extends Fragment {
         if (binding == null) return;
 
         // Reset Times
-        binding.tvPunchInTime.setText("Punch In: --:--");
-        binding.tvPunchOutTime.setText("Punch Out: --:--");
+        binding.tvPunchInTimeValue.setText("--:--");
+        binding.tvPunchOutTimeValue.setText("--:--");
 
         // Reset Status Value
         binding.tvPunchStatusValue.setText("Not Punched Yet");
@@ -478,7 +487,7 @@ public class DashboardFragment extends Fragment {
 
         // Reset Button Label & Text Color
         binding.tvPunchButtonLabel.setText("Punch In");
-        binding.tvPunchButtonLabel.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme())); // Change to your default label color
+        binding.tvPunchButtonLabel.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
         // Reset Card Background
         binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
@@ -551,8 +560,8 @@ public class DashboardFragment extends Fragment {
         tvEmployeeContactValue = root.findViewById(R.id.tvEmployeeContactValue);
         tvEmployeeEmailValue = root.findViewById(R.id.tvEmployeeEmailValue);
         ivEmployeeProfile = root.findViewById(R.id.ivEmployeeProfile);
-        tvPunchInTime = root.findViewById(R.id.tvPunchInTime);
-        tvPunchOutTime = root.findViewById(R.id.tvPunchOutTime);
+        tvPunchInTime = root.findViewById(R.id.tvPunchInTimeValue);
+        tvPunchOutTime = root.findViewById(R.id.tvPunchOutTimeValue);
         birthdayCardView = root.findViewById(R.id.includedBirthdayCarousel);
         if (birthdayCardView != null) {
             rvBirthdayCarousel = birthdayCardView.findViewById(R.id.rvBirthdayCarousel);
@@ -616,7 +625,6 @@ public class DashboardFragment extends Fragment {
             }
         }
 
-        // Sort the filtered birthdays in ascending order (Day 1 to Day 31)
         currentMonthBirthdays.sort((emp1, emp2) -> {
             int day1 = getDayFromDob(emp1.getDateOfBirth());
             int day2 = getDayFromDob(emp2.getDateOfBirth());
@@ -638,7 +646,6 @@ public class DashboardFragment extends Fragment {
                 if (segments[0].length() == 4) {
                     return Integer.parseInt(segments[2]);
                 } else if (segments[2].length() == 4) {
-                    // Format: dd-MM-yyyy -> Day is at index 0 (e.g. 16-08-1998 -> 16)
                     return Integer.parseInt(segments[0]);
                 }
             }

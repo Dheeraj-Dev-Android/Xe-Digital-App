@@ -4,21 +4,355 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_white"
+    android:background="@drawable/fragment_dashboard_bg"
     android:fontFamily="@font/quicksand_font_family"
     tools:context=".ui.policy.PolicyFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/policyRecyclerView"
+    <!-- SwipeRefreshLayout + RecyclerView -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:clipToPadding="false"
-        android:padding="12dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/policyRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Loading state — placeholder views stacked inline -->
+    <FrameLayout
+        android:id="@+id/loading_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp">
+
+            <!-- Shimmer placeholder 1 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="14dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <View
+                        android:id="@+id/shimmer_icon_1"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_shimmer_shape_round"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/shimmer_name_1"
+                        android:layout_width="0dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="40dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_1"
+                        app:layout_constraintTop_toTopOf="@id/shimmer_icon_1" />
+
+                    <View
+                        android:id="@+id/shimmer_date_1"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="80dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_1"
+                        app:layout_constraintTop_toBottomOf="@id/shimmer_name_1" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Shimmer placeholder 2 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="14dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <View
+                        android:id="@+id/shimmer_icon_2"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_shimmer_shape_round"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/shimmer_name_2"
+                        android:layout_width="0dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="40dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_2"
+                        app:layout_constraintTop_toTopOf="@id/shimmer_icon_2" />
+
+                    <View
+                        android:id="@+id/shimmer_date_2"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="80dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_2"
+                        app:layout_constraintTop_toBottomOf="@id/shimmer_name_2" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Shimmer placeholder 3 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="14dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <View
+                        android:id="@+id/shimmer_icon_3"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_shimmer_shape_round"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/shimmer_name_3"
+                        android:layout_width="0dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="40dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_3"
+                        app:layout_constraintTop_toTopOf="@id/shimmer_icon_3" />
+
+                    <View
+                        android:id="@+id/shimmer_date_3"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="80dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_3"
+                        app:layout_constraintTop_toBottomOf="@id/shimmer_name_3" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Shimmer placeholder 4 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="14dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <View
+                        android:id="@+id/shimmer_icon_4"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_shimmer_shape_round"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/shimmer_name_4"
+                        android:layout_width="0dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="40dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_4"
+                        app:layout_constraintTop_toTopOf="@id/shimmer_icon_4" />
+
+                    <View
+                        android:id="@+id/shimmer_date_4"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="80dp"
+                        android:background="@drawable/bg_shimmer_shape"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shimmer_icon_4"
+                        app:layout_constraintTop_toBottomOf="@id/shimmer_name_4" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Real ProgressBar (fallback, usually hidden) -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:indeterminateTint="@color/text_primary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
+    <!-- Empty state -->
+    <LinearLayout
+        android:id="@+id/emptyStateView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
+
+        <!-- Icon card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:cardBackgroundColor="@color/empty_state_icon_background"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:alpha="0.85"
+                android:contentDescription="@string/empty_state_image"
+                android:src="@drawable/ic_empty_state" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Title -->
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:text="@string/no_policies_found"
+            android:textAlignment="center"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:alpha="0.75"
+            android:fontFamily="@font/quicksand_font_family"
+            android:text="@string/empty_policy_subtitle"
+            android:textAlignment="center"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Retry button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:paddingHorizontal="32dp"
+            android:text="@string/retry"
+            android:textStyle="bold"
+            app:backgroundTint="@color/retry_button_background"
+            app:cornerRadius="16dp" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

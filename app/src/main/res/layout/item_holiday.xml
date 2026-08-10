@@ -4,97 +4,153 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
+    android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="6dp"
     android:clickable="true"
     android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
     android:stateListAnimator="@animator/card_state_list_anim"
     app:cardBackgroundColor="@color/card_background"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="2dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
     app:rippleColor="@color/ripple_color"
     app:strokeColor="@color/stroke_color"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
-        <!-- Holiday Icon with improved styling -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/holiday_icon"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:contentDescription="@string/holiday_icon"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:src="@mipmap/ic_holiday"
+        <!-- Dynamic accent bar -->
+        <View
+            android:id="@+id/holiday_type_indicator"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:layout_marginVertical="14dp"
+            android:background="@drawable/bg_accent_bar"
+            android:backgroundTint="@color/RestrictedHoliday"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/CircularImageView"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Content container for better alignment -->
+        <!-- FIX: added full constraints (start/end/top) to this wrapper -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            app:layout_constraintBottom_toBottomOf="@id/holiday_icon"
+            android:paddingVertical="14dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/holiday_icon"
-            app:layout_constraintTop_toTopOf="@id/holiday_icon">
+            app:layout_constraintStart_toEndOf="@id/holiday_type_indicator"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Date text with improved readability -->
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/holiday_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:alpha="0.7"
-                android:letterSpacing="0.03"
-                android:textColor="@color/text_primary"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toStartOf="@id/holiday_restricted"
+            <!-- Icon container -->
+            <FrameLayout
+                android:id="@+id/holiday_icon_container"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_icon_light"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="January 26, 2026" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Restricted chip with simplified styling -->
-            <com.google.android.material.chip.Chip
-                android:id="@+id/holiday_restricted"
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/holiday_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/holiday_icon"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    android:src="@mipmap/ic_holiday"
+                    tools:src="@tools:sample/avatars" />
+
+            </FrameLayout>
+
+            <!-- Today badge -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/holiday_today_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Restricted Holiday"
-                android:text="Restricted"
-                android:textColor="@color/white"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_today_badge"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="@string/today"
+                android:textColor="@color/on_today_badge"
                 android:textSize="10sp"
-                app:chipBackgroundColor="@color/RestrictedHoliday"
-                app:chipEndPadding="8dp"
-                app:chipIconEnabled="false"
-                app:chipMinHeight="24dp"
-                app:chipStartPadding="8dp"
-                app:closeIconEnabled="false"
-                app:ensureMinTouchTargetSize="false"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@id/holiday_icon_container"
+                app:layout_constraintTop_toBottomOf="@id/holiday_icon_container"
+                tools:visibility="visible" />
 
-            <!-- Holiday name with better hierarchy -->
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/holiday_name"
+            <!-- Content container -->
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:lineSpacingExtra="2dp"
-                android:maxLines="2"
-                android:textColor="@color/text_secondary"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:layout_marginStart="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/holiday_icon_container"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/holiday_date"
-                tools:text="Republic Day" />
+                app:layout_constraintStart_toEndOf="@id/holiday_icon_container"
+                app:layout_constraintTop_toTopOf="@id/holiday_icon_container">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/holiday_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="2"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@id/holiday_restricted"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Republic Day" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/holiday_restricted"
+                    style="@style/HolidayChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="Restricted Holiday"
+                    android:text="Restricted"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/holiday_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:letterSpacing="0.02"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toStartOf="@id/holiday_countdown"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/holiday_name"
+                    tools:text="January 26, 2026" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/holiday_countdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_countdown_pill"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:textColor="@color/countdown_text"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/holiday_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/holiday_date"
+                    tools:text="IN 12 DAYS"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

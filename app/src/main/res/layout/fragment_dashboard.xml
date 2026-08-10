@@ -316,7 +316,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="4">
+                        android:weightSum="4"
+                        tools:ignore="DisableBaselineAlignment">
 
                         <!-- Attendance detail -->
                         <LinearLayout
@@ -439,7 +440,7 @@
 
                         <!-- Book meeting -->
                         <LinearLayout
-                            android:id="@+id/btnQuickBookMeeting"
+                            android:id="@+id/btnQuickProfile"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -460,8 +461,8 @@
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:layout_gravity="center"
-                                    android:contentDescription="@string/book_meeting"
-                                    android:src="@drawable/ic_videocam"
+                                    android:contentDescription="@string/view_profile"
+                                    android:src="@drawable/ic_profile_placeholder"
                                     app:tint="@color/OccasionalLeave" />
                             </FrameLayout>
 
@@ -470,7 +471,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:gravity="center"
-                                android:text="@string/book_meeting"
+                                android:text="@string/view_profile"
                                 android:textColor="@color/avatar_bg"
                                 android:textSize="10.5sp"
                                 android:textStyle="bold"
@@ -778,48 +779,78 @@
 
                     <!-- Punch in / punch out stat tiles -->
 
-                    <TextView
-                        android:id="@+id/punchInLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                    <!-- Punch in / punch out stat tiles -->
 
-                    <TextView
-                        android:id="@+id/tvPunchInTime"
+                    <LinearLayout
+                        android:id="@+id/punchInContainer"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:background="@drawable/bg_stat_tile"
                         android:backgroundTint="@color/primary_text_color"
+                        android:orientation="vertical"
                         android:padding="10dp"
-                        android:text="Punch In : "
-                        android:textColor="@color/progress_fill"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/tvPunchOutTime"
+                        app:layout_constraintEnd_toStartOf="@id/punchOutContainer"
                         app:layout_constraintHorizontal_chainStyle="spread"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/dividerAfterRows" />
+                        app:layout_constraintTop_toBottomOf="@id/dividerAfterRows">
 
-                    <TextView
-                        android:id="@+id/punchOutLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        <TextView
+                            android:id="@+id/tvPunchInLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Punch In"
+                            android:textColor="@color/gray_hint"
+                            android:textSize="12sp" />
 
-                    <TextView
-                        android:id="@+id/tvPunchOutTime"
+                        <TextView
+                            android:id="@+id/tvPunchInTimeValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                            android:autoSizeTextType="uniform"
+                            android:text="09:00 AM"
+                            android:textColor="@color/progress_fill"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/punchOutContainer"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:background="@drawable/bg_stat_tile"
                         android:backgroundTint="@color/primary_text_color"
+                        android:orientation="vertical"
                         android:padding="10dp"
-                        android:text="Punch Out : "
-                        android:textColor="@color/SickLeave"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/tvPunchInTime"
-                        app:layout_constraintTop_toTopOf="@id/tvPunchInTime" />
+                        app:layout_constraintStart_toEndOf="@id/punchInContainer"
+                        app:layout_constraintTop_toTopOf="@id/punchInContainer">
+
+                        <TextView
+                            android:id="@+id/tvPunchOutLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Punch Out"
+                            android:textColor="@color/gray_hint"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvPunchOutTimeValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                            android:autoSizeTextType="uniform"
+                            android:text="05:00 PM"
+                            android:textColor="@color/SickLeave"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

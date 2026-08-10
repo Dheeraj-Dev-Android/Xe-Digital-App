@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/stroke_color"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Shimmer icon placeholder -->
+        <View
+            android:id="@+id/shimmer_icon"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_shimmer_shape_round"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Shimmer name placeholder -->
+        <View
+            android:id="@+id/shimmer_name"
+            android:layout_width="0dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="60dp"
+            android:background="@drawable/bg_shimmer_shape"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/shimmer_icon"
+            app:layout_constraintTop_toTopOf="@id/shimmer_icon" />
+
+        <!-- Shimmer date placeholder -->
+        <View
+            android:id="@+id/shimmer_date"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="100dp"
+            android:background="@drawable/bg_shimmer_shape"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/shimmer_icon"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_name" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -25,8 +25,6 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -57,7 +55,6 @@ public class PendingLeaveApproveFragment extends Fragment {
     private static final String TAG = "PendingLeaveApprove";
     private static final String DEFAULT_NA = "N/A";
 
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private APIInterface apiInterface;
     private AppliedLeavesApproveItem item;
     private String reportingManager = "";
@@ -100,7 +97,8 @@ public class PendingLeaveApproveFragment extends Fragment {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                 item = getArguments().getSerializable(ARG_LEAVE_ID, AppliedLeavesApproveItem.class);
             } else {
-                @SuppressWarnings("deprecation") AppliedLeavesApproveItem oldItem = (AppliedLeavesApproveItem) getArguments().getSerializable(ARG_LEAVE_ID);
+                @SuppressWarnings("deprecation")
+                AppliedLeavesApproveItem oldItem = (AppliedLeavesApproveItem) getArguments().getSerializable(ARG_LEAVE_ID);
                 item = oldItem;
             }
         }
@@ -128,17 +126,22 @@ public class PendingLeaveApproveFragment extends Fragment {
             return view;
         }
 
-        // Helper methods for null checks
+        // Calculate days before updating UI to prevent display of 0 or crashing
+        calculateTotalDaysAndCheckLeaveLimit();
+
+        // Format leave days for text display (hides decimal when integer)
+        String formattedDays = (totalDays % 1 == 0) ? String.valueOf((int) totalDays) : String.valueOf(totalDays);
+
         String firstName = getValueOrDefault(item.getFirstname());
         String lastName = getValueOrDefault(item.getLastname());
-        String fullName = (firstName.equalsIgnoreCase(DEFAULT_NA) && lastName.equalsIgnoreCase(DEFAULT_NA)) ? DEFAULT_NA : (getSanitizedName(item.getFirstname()) + " " + getSanitizedName(item.getLastname())).trim();
+        String fullName = (firstName.equalsIgnoreCase(DEFAULT_NA) && lastName.equalsIgnoreCase(DEFAULT_NA))
+                ? DEFAULT_NA
+                : (getSanitizedName(item.getFirstname()) + " " + getSanitizedName(item.getLastname())).trim();
 
         String leaveTypeName = (item.getLeavetype() != null) ? getValueOrDefault(item.getLeavetype().getLeavetypeName()) : DEFAULT_NA;
-
-        // Generate Avatar Initials
         String initials = getInitials(item.getFirstname(), item.getLastname());
 
-        // UI Binding Data Setup with Null Safety & N/A Fallback
+        // UI Binding Data Setup
         binding.empAvatarInitials.setText(initials);
         binding.empName.setText(fullName);
         binding.empEmail.setText(getValueOrDefault(item.getEmail()));
@@ -150,18 +153,14 @@ public class PendingLeaveApproveFragment extends Fragment {
         binding.empAppliedDate.setText(getFormattedDateOrDefault(item.getAppliedDate()));
         binding.empReason.setText(getValueOrDefault(item.getReason()));
         binding.empContactNumber.setText(getValueOrDefault(item.getContactNumber()));
-
-        // Home Address vs Vacation Address Fix
         binding.empVacationAddress.setText(getValueOrDefault(item.getVacationAddress()));
-
         binding.empLeavingStation.setText(getValueOrDefault(item.getLeavingStation()));
         binding.empStatusUpdatedBy.setText(getValueOrDefault(item.getApprovedByName()));
         binding.empStatusUpdatedDate.setText(getFormattedDateOrDefault(item.getApprovedDate()));
         binding.empComments.setText(getValueOrDefault(item.getComment()));
-        binding.empTotalDays.setText(String.valueOf((int) totalDays));
-//        binding.empPlannedLeave.setText(getValueOrDefault(item.get));
+        binding.empTotalDays.setText(formattedDays);
 
-        calculateTotalDaysAndCheckLeaveLimit();
+        Log.d(TAG, "Calculated Leave Total Days: " + formattedDays);
 
         String status = item.getStatus() != null ? item.getStatus().toLowerCase() : "";
         Context context = binding.empStatusChip.getContext();
@@ -203,9 +202,6 @@ public class PendingLeaveApproveFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Helper to compute uppercase initials from first and last name
-     */
     private String getInitials(String firstName, String lastName) {
         StringBuilder initials = new StringBuilder();
         if (firstName != null && !firstName.trim().isEmpty()) {
@@ -214,19 +210,13 @@ public class PendingLeaveApproveFragment extends Fragment {
         if (lastName != null && !lastName.trim().isEmpty()) {
             initials.append(lastName.trim().charAt(0));
         }
-        return initials.length() > 0 ? initials.toString().toUpperCase(Locale.getDefault()) : "N/A";
+        return initials.length() > 0 ? initials.toString().toUpperCase(Locale.getDefault()) : DEFAULT_NA;
     }
 
-    /**
-     * Helper to return value or "N/A" if null/empty
-     */
     private String getValueOrDefault(String value) {
         return (value != null && !value.trim().isEmpty()) ? value : DEFAULT_NA;
     }
 
-    /**
-     * Helper to safely format dates using DateTimeUtils or return "N/A"
-     */
     private String getFormattedDateOrDefault(String rawDate) {
         if (rawDate == null || rawDate.trim().isEmpty()) {
             return DEFAULT_NA;
@@ -235,9 +225,6 @@ public class PendingLeaveApproveFragment extends Fragment {
         return (formatted != null && !formatted.trim().isEmpty()) ? formatted : DEFAULT_NA;
     }
 
-    /**
-     * Helper for name parsing
-     */
     private String getSanitizedName(String name) {
         return (name != null) ? name : "";
     }
@@ -256,59 +243,93 @@ public class PendingLeaveApproveFragment extends Fragment {
         });
     }
 
+    /**
+     * Matches TypeScript: totalDay(sDate, eDate)
+     * Strips time portion from ISO dates before parsing.
+     */
     private long calculateTotalDays(String startDate, String endDate) {
         if (startDate == null || endDate == null) return 0;
         try {
-            if (startDate.contains("T")) {
-                startDate = startDate.split("T")[0];
-            }
-            if (endDate.contains("T")) {
-                endDate = endDate.split("T")[0];
-            }
+            // Strip time portion if ISO format
+            if (startDate.contains("T")) startDate = startDate.split("T")[0];
+            if (endDate.contains("T")) endDate = endDate.split("T")[0];
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate startDateObj = LocalDate.parse(startDate, formatter);
             LocalDate endDateObj = LocalDate.parse(endDate, formatter);
 
-            return ChronoUnit.DAYS.between(startDateObj, endDateObj) + 1;
+            // Math.abs for safety + 1 to include both dates
+            long diff = Math.abs(ChronoUnit.DAYS.between(startDateObj, endDateObj));
+            return diff + 1;
+
         } catch (DateTimeParseException e) {
-            Log.e(TAG, "Error parsing dates after sanitization: " + e.getMessage());
+            Log.e(TAG, "Error parsing dates: " + e.getMessage());
             return 0;
         }
     }
 
+    /**
+     * Matches TypeScript flow:
+     * 1. Get tDays from totalDay()
+     * 2. Get fUsedDays from finalUsedDays()
+     */
     private void calculateTotalDaysAndCheckLeaveLimit() {
         if (item == null) return;
+
         String fromDate = item.getFromDate();
         String toDate = item.getToDate();
-        String leaveCategoryFrom = item.getSelectTypeFrom();
-        String leaveCategoryTo = item.getSelectTypeTo();
+        String selectTypeFrom = item.getSelectTypeFrom();
+        String selectTypeTo = item.getSelectTypeTo();
 
-        if (fromDate != null && !fromDate.isEmpty() && toDate != null && !toDate.isEmpty()) {
-            long totalDaysInDateRange = calculateTotalDays(fromDate, toDate);
-
-            if ("First Half Day".equals(leaveCategoryFrom) && "First Half Day".equals(leaveCategoryTo)) {
-                totalDays = 0.5;
-            } else if ("Second Half Day".equals(leaveCategoryFrom) && "Second Half Day".equals(leaveCategoryTo)) {
-                totalDays = 0.5;
-            } else {
-                totalDays = totalDaysInDateRange;
-            }
-            finalUsedDays(totalDays);
+        if (fromDate == null || fromDate.isEmpty()
+                || toDate == null || toDate.isEmpty()) {
+            totalDays = 0;
+            finalUsedDays = 0;
+            return;
         }
+
+        // Step 1: Raw tDays
+        long tDays = calculateTotalDays(fromDate, toDate);
+        Log.d(TAG, "tDays (raw): " + tDays);
+
+        // Step 2: finalUsedDays using same logic as TypeScript
+        totalDays = tDays;
+        finalUsedDays = computeFinalUsedDays(tDays, selectTypeFrom, selectTypeTo);
+
+        Log.d(TAG, "totalDays=" + totalDays + ", finalUsedDays=" + finalUsedDays);
     }
 
-    public void finalUsedDays(double totalDays) {
-        if (item == null) return;
-        String leaveCategoryFrom = item.getSelectTypeFrom();
-        String leaveCategoryTo = item.getSelectTypeTo();
-        finalUsedDays = totalDays;
+    /**
+     * Matches TypeScript finalUsedDays() exactly.
+     * Uses item's selectTypeFrom/selectTypeTo values from API.
+     * <p>
+     * firsthalf  + firsthalf  → tDays - 0.5
+     * firsthalf  + secondhalf → tDays (no change)
+     * secondhalf + secondhalf → tDays - 0.5
+     * anything else           → tDays (no change)
+     */
+    private double computeFinalUsedDays(long tDays, String selectTypeFrom, String selectTypeTo) {
+        double fUsedDays = tDays;
 
-        if ("First Half Day".equals(leaveCategoryFrom) && "First Half Day".equals(leaveCategoryTo)) {
-            finalUsedDays = 0.5;
-        } else if ("Second Half Day".equals(leaveCategoryFrom) && "Second Half Day".equals(leaveCategoryTo)) {
-            finalUsedDays = 0.5;
+        if ("First Half Day".equalsIgnoreCase(selectTypeFrom)
+                && "First Half Day".equalsIgnoreCase(selectTypeTo)) {
+            fUsedDays -= 0.5;
+
+        } else if ("First Half Day".equalsIgnoreCase(selectTypeFrom)
+                && "Second Half Day".equalsIgnoreCase(selectTypeTo)) {
+            fUsedDays = tDays; // no change
+
+        } else if ("Second Half Day".equalsIgnoreCase(selectTypeFrom)
+                && "Second Half Day".equalsIgnoreCase(selectTypeTo)) {
+            fUsedDays -= 0.5;
         }
+
+        Log.d(TAG, "computeFinalUsedDays → tDays=" + tDays
+                + ", from=" + selectTypeFrom
+                + ", to=" + selectTypeTo
+                + ", fUsedDays=" + fUsedDays);
+
+        return fUsedDays;
     }
 
     private void showCommentPopup(final String action, final String leaveId) {
@@ -369,7 +390,7 @@ public class PendingLeaveApproveFragment extends Fragment {
         if (item == null) return;
 
         LeaveUpdateRequest requestBody = new LeaveUpdateRequest();
-        requestBody.setStatus("Approved");
+        requestBody.setStatus("approved");
         requestBody.setApprovedBy(managerId);
         requestBody.setApprovedByName(reportingManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
@@ -408,41 +429,7 @@ public class PendingLeaveApproveFragment extends Fragment {
             return;
         }
 
-        UsedLeaveRequest requestBody = new UsedLeaveRequest();
-        requestBody.setId(item.getId());
-        requestBody.setEmployeeCode(item.getEmployeeCode());
-        requestBody.setDesignation(item.getDesignation());
-        requestBody.setFirstname(item.getFirstname());
-        requestBody.setLastname(item.getLastname());
-        requestBody.setEmail(item.getEmail());
-        requestBody.setContact(item.getContact());
-        requestBody.setFromDate(item.getFromDate());
-        requestBody.setSelectTypeFrom(item.getSelectTypeFrom());
-        requestBody.setToDate(item.getToDate());
-        requestBody.setSelectTypeTo(item.getSelectTypeTo());
-        requestBody.setReason(item.getReason());
-        requestBody.setLeavingStation(item.getLeavingStation());
-        requestBody.setVacationAddress(item.getVacationAddress());
-        requestBody.setContactNumber(item.getContactNumber());
-        requestBody.setAppliedDate(item.getAppliedDate());
-        requestBody.setAppliedBy(item.getAppliedBy());
-
-        if (item.getLeavetype() != null) {
-            app.xedigital.ai.model.usedLeave.Leavetype targetLeaveType = new app.xedigital.ai.model.usedLeave.Leavetype();
-            targetLeaveType.setId(item.getLeavetype().getId());
-            targetLeaveType.setLeavetypeName(item.getLeavetype().getLeavetypeName());
-            requestBody.setLeavetype(targetLeaveType);
-        }
-
-        requestBody.setCreatedAt(item.getCreatedAt());
-        requestBody.setUpdatedAt(item.getUpdatedAt());
-        requestBody.setStatus("cancelled");
-        requestBody.setApprovedBy(managerId);
-        requestBody.setApprovedByName(reportingManager);
-        requestBody.setApprovedDate(getCurrentDateTimeInUTC());
-        requestBody.setComment(comment.trim());
-        requestBody.setTDays((int) totalDays);
-        requestBody.setFUsedDays(finalUsedDays);
+        UsedLeaveRequest requestBody = buildUsedLeaveRequest("cancelled", comment);
 
         if (getContext() == null) return;
 
@@ -455,7 +442,7 @@ public class PendingLeaveApproveFragment extends Fragment {
                     if (!isAdded() || getView() == null) return;
 
                     if (response.isSuccessful()) {
-                        callStatusUpdateAPI(leaveId, "Cancelled", comment);
+                        callStatusUpdateAPI(leaveId, "cancelled", comment);
                     } else {
                         showErrorMessage(response);
                     }
@@ -468,7 +455,7 @@ public class PendingLeaveApproveFragment extends Fragment {
                 }
             });
         } else {
-            callStatusUpdateAPI(leaveId, "Cancelled", comment);
+            callStatusUpdateAPI(leaveId, "cancelled", comment);
         }
     }
 
@@ -481,6 +468,37 @@ public class PendingLeaveApproveFragment extends Fragment {
             return;
         }
 
+        UsedLeaveRequest requestBody = buildUsedLeaveRequest("rejected", comment);
+
+        if (getContext() == null) return;
+
+        String leaveTypeId = (item.getLeavetype() != null) ? item.getLeavetype().getId() : "";
+        if (leaveTypeId != null && !"615418abc2432d4d14990ecc".equals(leaveTypeId)) {
+            Call<ResponseBody> leaveReject = apiInterface.LeavesUsedCount("jwt " + authToken, requestBody);
+            leaveReject.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                    if (!isAdded() || getView() == null) return;
+
+                    if (response.isSuccessful()) {
+                        callStatusUpdateAPI(leaveId, "Rejected", comment);
+                    } else {
+                        showErrorMessage(response);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                    if (!isAdded()) return;
+                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            callStatusUpdateAPI(leaveId, "Rejected", comment);
+        }
+    }
+
+    private UsedLeaveRequest buildUsedLeaveRequest(String status, String comment) {
         UsedLeaveRequest requestBody = new UsedLeaveRequest();
         requestBody.setId(item.getId());
         requestBody.setEmployeeCode(item.getEmployeeCode());
@@ -511,40 +529,17 @@ public class PendingLeaveApproveFragment extends Fragment {
             requestBody.setLeavetype(targetLeaveType);
         }
 
-        requestBody.setStatus("rejected");
+        requestBody.setCreatedAt(item.getCreatedAt());
+        requestBody.setUpdatedAt(item.getUpdatedAt());
+        requestBody.setStatus(status);
         requestBody.setApprovedBy(managerId);
         requestBody.setApprovedByName(reportingManager);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
         requestBody.setComment(comment.trim());
-        requestBody.setTDays((int) totalDays);
+        requestBody.setTDays((int) Math.ceil(totalDays));
         requestBody.setFUsedDays(finalUsedDays);
 
-        if (getContext() == null) return;
-
-        String leaveTypeId = (item.getLeavetype() != null) ? item.getLeavetype().getId() : "";
-        if (leaveTypeId != null && !"615418abc2432d4d14990ecc".equals(leaveTypeId)) {
-            Call<ResponseBody> leaveReject = apiInterface.LeavesUsedCount("jwt " + authToken, requestBody);
-            leaveReject.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                    if (!isAdded() || getView() == null) return;
-
-                    if (response.isSuccessful()) {
-                        callStatusUpdateAPI(leaveId, "Rejected", comment);
-                    } else {
-                        showErrorMessage(response);
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                    if (!isAdded()) return;
-                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            callStatusUpdateAPI(leaveId, "Rejected", comment);
-        }
+        return requestBody;
     }
 
     private void callStatusUpdateAPI(String leaveId, final String status, String comment) {

@@ -133,4 +133,21 @@
     <color name="stat_total_bg">#1A4CAF50</color>
     <color name="stat_overtime_bg">#1AFF9800</color>
     <color name="stat_late_bg">#1AF44336</color>
+
+    <color name="icon_gradient_start">#FF9C86FF</color>
+    <color name="icon_gradient_end">#FF6C4CE0</color>
+    <color name="today_badge_background">#FF4A3B00</color>
+    <color name="on_today_badge">#FFFFD873</color>
+    <color name="countdown_background">#332F2BFF</color>
+    <color name="countdown_text">#FFB9AEFF</color>
+    <color name="chip_year_background">#2A9C86FF</color>
+    <color name="empty_state_icon_background">#2A9C86FF</color>
+    <color name="retry_button_background">#FF9C86FF</color>
+    <color name="shimmer_color">#1AFFFFFF</color>
+    <color name="policy_default">#FFB9AEFF</color>
+    <color name="policy_travel">#FF4DB6AC</color>
+    <color name="policy_hr">#FFEF9A9A</color>
+    <color name="policy_finance">#FFFFCC80</color>
+    <color name="policy_active">#FF81C784</color>
+    <color name="policy_inactive">#FFEF9A9A</color>
 </resources>

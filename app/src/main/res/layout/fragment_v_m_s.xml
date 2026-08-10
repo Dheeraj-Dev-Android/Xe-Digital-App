@@ -1,99 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.vms.VmsFragment">
 
-    <!-- Chip navigation sits outside the scroll, always visible -->
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/navigationChipGroup"
-        android:layout_width="match_parent"
+    <!-- Top surface holding chip navigation -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/chipSurfaceCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="4dp"
-        app:chipSpacingHorizontal="4dp"
-        app:chipSpacingVertical="4dp"
-        app:singleSelection="true">
+        android:layout_marginTop="6dp"
+        android:background="@drawable/gradient_attendance_card"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/preApprovedVisitorChip"
-            style="@style/Widget.MaterialComponents.Chip.Action"
+        <!-- Chip navigation group — modern, Material 3 style, centered -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/navigationChipGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Pre-Approved Visitors"
-            android:textColor="@color/avatar_text"
-            android:textSize="12sp"
-            app:chipBackgroundColor="@color/chip_background"
-            app:chipIcon="@drawable/ic_add_person"
-            app:chipStrokeColor="@color/_000000"
-            app:chipStrokeWidth="1dp"
-            app:iconStartPadding="2dp"
-            app:rippleColor="@color/_000000" />
+            android:layout_gravity="center_horizontal"
+            android:padding="12dp"
+            app:chipSpacingHorizontal="10dp"
+            app:singleSelection="false">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/checkVisitorsChip"
-            style="@style/Widget.MaterialComponents.Chip.Action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Check In Visitors"
-            android:textColor="@color/avatar_text"
-            android:textSize="12sp"
-            app:chipBackgroundColor="@color/chip_background"
-            app:chipIcon="@drawable/ic_check_in"
-            app:chipStrokeColor="@color/_000000"
-            app:chipStrokeWidth="1dp"
-            app:iconStartPadding="2dp"
-            app:rippleColor="@color/avatar_text" />
-    </com.google.android.material.chip.ChipGroup>
+            <!-- Add Pre-Approved Visitors chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/preApprovedVisitorChip"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="@string/add_pre_approved"
+                android:textColor="@color/avatar_text"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:chipBackgroundColor="@color/chip_background"
+                app:chipCornerRadius="12dp"
+                app:chipEndPadding="14dp"
+                app:chipIcon="@drawable/ic_add_person"
+                app:chipIconSize="18dp"
+                app:chipStartPadding="10dp"
+                app:closeIconEnabled="false"
+                app:ensureMinTouchTargetSize="false"
+                app:rippleColor="@color/colorPrimary" />
 
-    <!-- Divider replaces the unnecessary MaterialCardView wrapper -->
+            <!-- Check In Visitors chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/checkVisitorsChip"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="@string/check_in_visitors"
+                android:textColor="@color/avatar_text"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:chipBackgroundColor="@color/chip_background"
+                app:chipCornerRadius="12dp"
+                app:chipEndPadding="14dp"
+                app:chipIcon="@drawable/ic_check_in"
+                app:chipIconSize="18dp"
+                app:closeIconEnabled="false"
+                app:ensureMinTouchTargetSize="false"
+                app:rippleColor="@color/colorPrimary" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </com.google.android.material.card.MaterialCardView>
+    <!-- Subtle hairline divider under the elevated surface -->
     <View
         android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/avatar_text" />
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:alpha="0.08"
+        android:background="@color/chip_year_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chipSurfaceCard" />
 
-    <!-- FrameLayout lets loading/empty/list overlap correctly -->
+    <!-- FrameLayout for loading/empty/content overlay -->
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider">
 
-        <androidx.core.widget.NestedScrollView
+        <!-- SwipeRefreshLayout + RecyclerView -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:scrollbars="vertical">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/VisitorsListRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#F5F5F5"
+                android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:padding="16dp" />
+                android:paddingHorizontal="4dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <!-- Loading indicator, centered in the remaining space -->
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/loadingProgress"
+        <!-- Loading indicator — centered floating pill -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:indeterminate="true"
-            android:visibility="gone"
-            app:indicatorColor="@color/colorPrimary"
-            app:indicatorSize="48dp"
-            app:trackColor="@color/avatar_text"
-            app:trackCornerRadius="4dp"
-            app:trackThickness="4dp" />
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="6dp">
 
-        <!-- Empty state, centered in the remaining space -->
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/loadingProgress"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="16dp"
+                android:visibility="gone"
+                app:indicatorColor="@color/colorPrimary"
+                app:indicatorSize="48dp"
+                app:trackColor="@color/chip_background"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="4dp"
+                tools:visibility="visible" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Empty state — centered overlay -->
         <LinearLayout
             android:id="@+id/emptyStateContainer"
             android:layout_width="wrap_content"
@@ -101,24 +139,55 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:paddingHorizontal="32dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-            <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:contentDescription="No visitors found"
-                android:src="@drawable/ic_empty_state" />
+            <!-- Icon card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="112dp"
+                android:layout_height="112dp"
+                app:cardBackgroundColor="@color/empty_state_icon_background"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
-            <TextView
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:alpha="0.9"
+                    android:contentDescription="@string/empty_state_image"
+                    android:src="@drawable/ic_empty_state" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Empty state title -->
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/emptyStateText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="No Visitors Found"
-                android:textColor="@color/purple_700"
-                android:textSize="18sp" />
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="@string/no_visitors_found"
+                android:textColor="@color/text_primary"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <!-- Empty state subtitle -->
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:alpha="0.7"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:text="@string/empty_visitors_subtitle"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
         </LinearLayout>
 
     </FrameLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

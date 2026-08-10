@@ -72,23 +72,19 @@ public class MeetingRoomAdapter extends RecyclerView.Adapter<MeetingRoomAdapter.
         }
 
         public void bind(RoomDataItem item) {
-            // Bind text data fields with clean fallbacks
             textRoomName.setText(item.getRoomName() != null ? item.getRoomName() : "Unnamed Room");
             textRoomCode.setText(item.getRoomCode() != null ? item.getRoomCode() : "N/A");
             textFloor.setText(item.getFloor() != null ? item.getFloor() : "N/A");
             textSeats.setText(item.getSeats() != null ? item.getSeats() : "0");
             textLocation.setText(item.getLocation() != null ? item.getLocation() : "N/A");
 
-            // Safe validation handling for images coming from AWS S3 endpoints
             String imageUrl = item.getDocFileURL();
             if (imageUrl != null && !imageUrl.trim().isEmpty()) {
                 Glide.with(itemView.getContext()).load(imageUrl).format(DecodeFormat.PREFER_RGB_565).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.ic_meeting_room).error(R.drawable.ic_meeting_room).into(imageRoom);
             } else {
-                // Instantly defaults locally if URL is null or empty string
                 imageRoom.setImageResource(R.drawable.ic_meeting_room);
             }
 
-            // Click interaction listener for the dynamic item reservation button
             btnReserve.setOnClickListener(v -> {
                 String selectedRoom = item.getRoomName() != null ? item.getRoomName() : "Room";
                 Toast.makeText(itemView.getContext(), "Initiating booking for: " + selectedRoom, Toast.LENGTH_SHORT).show();

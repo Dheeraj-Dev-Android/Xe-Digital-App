@@ -3,9 +3,11 @@ package app.xedigital.ai.model.regularizeList;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Employee implements Serializable {
 
+    // ✅ Existing fields (keep all)
     @SerializedName("joiningType")
     private String joiningType;
 
@@ -84,6 +86,62 @@ public class Employee implements Serializable {
     @SerializedName("fullname")
     private String fullname;
 
+    // ❌ MISSING fields — ADD THESE
+    @SerializedName("addpayroll")
+    private boolean addpayroll;
+
+    @SerializedName("address")
+    private String address;         // nullable in payload
+
+    @SerializedName("adharNo")
+    private String adharNo;         // nullable in payload
+
+    @SerializedName("components")
+    private List<Component> components;
+
+    @SerializedName("crossmanager")
+    private String crossmanager;
+
+    @SerializedName("ctc")
+    private long ctc;
+
+    @SerializedName("differentlyAbled")
+    private String differentlyAbled; // nullable in payload
+
+    @SerializedName("epf")
+    private boolean epf;
+
+    @SerializedName("esi")
+    private boolean esi;
+
+    @SerializedName("fatherName")
+    private String fatherName;      // nullable in payload
+
+    @SerializedName("panNo")
+    private String panNo;           // nullable in payload
+
+    @SerializedName("pfAccountNo")
+    private String pfAccountNo;     // nullable in payload
+
+    @SerializedName("pincode")
+    private String pincode;         // nullable in payload
+
+    @SerializedName("state")
+    private String state;           // nullable in payload
+
+    @SerializedName("totalMonthlySalary")
+    private double totalMonthlySalary;
+
+    @SerializedName("totalYearlySalary")
+    private String totalYearlySalary; // nullable in payload
+
+    @SerializedName("uanno")
+    private String uanno;           // nullable in payload
+
+    @SerializedName("bu")
+    private String bu;
+
+    // ✅ Existing getters (keep all)
     public String getJoiningType() {
         return joiningType;
     }
@@ -186,5 +244,78 @@ public class Employee implements Serializable {
 
     public String getFullname() {
         return fullname;
+    }
+
+    // ✅ New getters for added fields
+    public boolean isAddpayroll() {
+        return addpayroll;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getAdharNo() {
+        return adharNo;
+    }
+
+    public List<Component> getComponents() {
+        return components;
+    }
+
+    public String getCrossmanager() {
+        return crossmanager;
+    }
+
+    public long getCtc() {
+        return ctc;
+    }
+
+    public String getDifferentlyAbled() {
+        return differentlyAbled;
+    }
+
+    public boolean isEpf() {
+        return epf;
+    }
+
+    public boolean isEsi() {
+        return esi;
+    }
+
+    public String getFatherName() {
+        return fatherName;
+    }
+
+    public String getPanNo() {
+        return panNo;
+    }
+
+    public String getPfAccountNo() {
+        return pfAccountNo;
+    }
+
+    public String getPincode() {
+        return pincode;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public double getTotalMonthlySalary() {
+        return totalMonthlySalary;
+    }
+
+    public String getTotalYearlySalary() {
+        return totalYearlySalary;
+    }
+
+    public String getUanno() {
+        return uanno;
+    }
+
+    public String getBu() {
+        return bu;
     }
 }

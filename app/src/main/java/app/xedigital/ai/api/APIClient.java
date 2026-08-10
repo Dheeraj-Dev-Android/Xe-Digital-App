@@ -24,25 +24,11 @@ public class APIClient {
 //            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 //        }
 
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-                .retryOnConnectionFailure(true)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(loggingInterceptor).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).build();
 
-        retrofit1 = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpClient)
-                .build();
+        retrofit1 = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
 
-        retrofit2 = new Retrofit.Builder()
-                .baseUrl(BASE_URL_2)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpClient)
-                .build();
+        retrofit2 = new Retrofit.Builder().baseUrl(BASE_URL_2).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
     }
 
     public static synchronized APIClient getInstance() {
