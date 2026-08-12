@@ -14,70 +14,6 @@
         android:padding="16dp"
         android:paddingBottom="24dp">
 
-        <!--        <LinearLayout-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:gravity="center"-->
-        <!--            android:orientation="vertical"-->
-        <!--            android:paddingTop="8dp"-->
-        <!--            android:paddingBottom="24dp">-->
-
-        <!--            <FrameLayout-->
-        <!--                android:id="@+id/frameAvatar"-->
-        <!--                android:layout_width="96dp"-->
-        <!--                android:layout_height="96dp">-->
-
-        <!--                <View-->
-        <!--                    android:layout_width="96dp"-->
-        <!--                    android:layout_height="96dp"-->
-        <!--                    android:background="@drawable/bg_avatar_ring" />-->
-
-        <!--                <de.hdodenhof.circleimageview.CircleImageView-->
-        <!--                    android:id="@+id/imageViewProfile"-->
-        <!--                    android:layout_width="100dp"-->
-        <!--                    android:layout_height="100dp"-->
-        <!--                    android:layout_gravity="center"-->
-        <!--                    android:src="@mipmap/ic_default_profile"-->
-        <!--                    app:civ_border_color="@color/white"-->
-        <!--                    app:civ_border_width="2dp" />-->
-
-        <!--                <FrameLayout-->
-        <!--                    android:id="@+id/btnPickImage"-->
-        <!--                    android:layout_width="48dp"-->
-        <!--                    android:layout_height="48dp"-->
-        <!--                    android:layout_gravity="bottom|end"-->
-        <!--                    android:background="@drawable/bg_camera_badge"-->
-        <!--                    android:clickable="true"-->
-        <!--                    android:contentDescription="Change profile photo"-->
-        <!--                    android:focusable="true">-->
-
-        <!--                    <ImageView-->
-        <!--                        android:layout_width="26dp"-->
-        <!--                        android:layout_height="26dp"-->
-        <!--                        android:layout_gravity="center"-->
-        <!--                        android:src="@android:drawable/ic_menu_camera"-->
-        <!--                        app:tint="@color/gradient_start" />-->
-        <!--                </FrameLayout>-->
-
-        <!--            </FrameLayout>-->
-
-        <!--            <TextView-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_marginTop="10dp"-->
-        <!--                android:text="Profile Photo"-->
-        <!--                android:textColor="@android:color/black"-->
-        <!--                android:textSize="14sp"-->
-        <!--                android:textStyle="bold" />-->
-
-        <!--        </LinearLayout>-->
-
-        <!--        <View-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="1dp"-->
-        <!--            android:layout_marginBottom="20dp"-->
-        <!--            android:background="@color/divider_color" />-->
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -122,8 +58,7 @@
                         android:id="@+id/spinnerRole"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
-                        android:hint="Select role"
+                        android:hint=""
                         android:inputType="none"
                         android:textColor="@color/_000000"
                         android:textSize="14sp" />
@@ -157,8 +92,7 @@
                         android:id="@+id/spinnerStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
-                        android:hint="Select status"
+                        android:hint=""
                         android:inputType="none"
                         android:textColor="@color/_000000"
                         android:textSize="14sp" />
@@ -277,7 +211,7 @@
                 android:id="@+id/editTextEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter email address"
+                android:hint="Email address"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/_000000"
                 android:textSize="14sp" />
@@ -314,7 +248,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
+            android:layout_marginBottom="8dp"
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -328,6 +262,108 @@
                 android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- ── Real-time Password Strength Checker Panel ── -->
+        <LinearLayout
+            android:id="@+id/passwordRulesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:background="@drawable/bg_password_rules"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Password requirements"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ruleLength"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  12 to 16 characters"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleUppercase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  At least one uppercase letter (A-Z)"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleLowercase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  At least one lowercase letter (a-z)"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  At least one number (0-9)"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleSpecial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  At least one special character (!@#$%...)"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleNoSpaceComma"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  No spaces or commas"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleNoName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  Must not contain your name"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleNoSequential"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="8dp"
+                android:text="  No sequential characters (1234, abcd)"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/ruleNoRepeated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="8dp"
+                android:text="  No repeated characters (aaaa, 1111)"
+                android:textSize="12sp" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -372,13 +408,12 @@
                 android:layout_height="52dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:text="Clear form"
+                android:backgroundTint="@color/error_color"
+                android:text="Clear"
                 android:textAllCaps="false"
-                android:textColor="@color/_000000"
+                android:textColor="@color/white"
                 android:textSize="15sp"
-                app:cornerRadius="8dp"
-                app:strokeColor="@color/_000000"
-                app:strokeWidth="1dp" />
+                app:cornerRadius="8dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonUpdate"
@@ -388,11 +423,12 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/_000000"
-                android:text="Update profile"
+                android:text="Update"
                 android:textAllCaps="false"
                 android:textSize="15sp"
                 app:cornerRadius="8dp"
                 app:elevation="2dp" />
+
         </LinearLayout>
 
         <ProgressBar

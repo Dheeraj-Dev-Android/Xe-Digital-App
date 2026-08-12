@@ -1297,35 +1297,63 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+                <!-- Edit Claim -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnDocumentView"
+                    android:id="@+id/btnEditClaim"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="54dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:text="View Document"
-                    android:textAllCaps="false"
-                    android:textColor="#4F46E5"
-                    android:textStyle="bold"
+                    android:contentDescription="Edit Claim"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:cornerRadius="28dp"
-                    app:icon="@android:drawable/ic_menu_gallery"
-                    app:iconTint="#4F46E5"
-                    app:strokeColor="#4F46E5"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="22dp"
+                    app:iconTint="@color/white"
+                    app:strokeColor="@color/white"
                     app:strokeWidth="1.5dp" />
 
+                <!-- Upload Document -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPrintClaim"
+                    android:id="@+id/btnUploadDocument"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:contentDescription="Upload Document"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:cornerRadius="28dp"
+                    app:icon="@android:drawable/ic_menu_upload"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="22dp"
+                    app:iconTint="@color/white"
+                    app:strokeColor="@color/white"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- View Document -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDocumentView"
                     android:layout_width="0dp"
                     android:layout_height="54dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="#4F46E5"
-                    android:text="Print Claim"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
+                    android:contentDescription="View Document"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:cornerRadius="28dp"
-                    app:icon="@android:drawable/ic_menu_send"
+                    app:icon="@drawable/ic_eye"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="22dp"
                     app:iconTint="#FFFFFF" />
 
             </LinearLayout>

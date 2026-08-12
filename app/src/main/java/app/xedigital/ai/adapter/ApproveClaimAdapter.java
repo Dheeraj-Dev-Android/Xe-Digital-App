@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,7 +53,6 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
     public ApproveClaimAdapter(List<EmployeeClaimdataItem> claimList) {
         this.claimList = claimList;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -65,13 +65,15 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ClaimViewHolder holder, int position) {
-        EmployeeClaimdataItem currentClaim = claimList.get(position);
-        holder.bind(currentClaim, listener);
+        if (claimList != null && position < claimList.size()) {
+            EmployeeClaimdataItem currentClaim = claimList.get(position);
+            holder.bind(currentClaim, listener);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return claimList.size();
+        return claimList != null ? claimList.size() : 0;
     }
 
     public void updateData(List<EmployeeClaimdataItem> filteredList) {
@@ -108,27 +110,26 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             viewDetailsButton = itemView.findViewById(R.id.viewDetailsButton);
             actionButton = itemView.findViewById(R.id.actionButton);
 
-
             viewDetailsButton.setOnClickListener(v -> {
-//                Log.d("ClaimViewHolder", "View Details button clicked");
                 int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && listener != null) {
+                if (position != RecyclerView.NO_POSITION && claimList != null && position < claimList.size() && listener != null) {
                     listener.onClaimClick(claimList.get(position));
                 }
             });
 
             actionButton.setOnClickListener(v -> {
                 int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
+                if (position != RecyclerView.NO_POSITION && claimList != null && position < claimList.size()) {
                     EmployeeClaimdataItem claim = claimList.get(position);
+                    if (claim == null) return;
 
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog);
                     builder.setTitle("Claim Action");
-                    String message = "Choose an action for this claim:\nClaim ID: " + claim.getClaimId();
+                    String claimIdText = claim.getClaimId() != null ? claim.getClaimId() : "N/A";
+                    String message = "Choose an action for this claim:\nClaim ID: " + claimIdText;
                     builder.setMessage(message);
 
                     builder.setPositiveButton("approve", (dialog, which) -> updateClaimStatus(claim, "approved", ""));
-
                     builder.setNeutralButton("cancel", null);
                     builder.setNegativeButton("reject", null);
 
@@ -140,43 +141,51 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
                     dialog.setOnShowListener(dialogInterface -> {
                         TextView errorTextView = new TextView(context);
-                        errorTextView.setTextColor(Color.RED); // Set error text color
+                        errorTextView.setTextColor(Color.RED);
                         errorTextView.setVisibility(View.GONE);
                         ViewGroup layout = (ViewGroup) commentInput.getParent();
-                        layout.addView(errorTextView, layout.indexOfChild(commentInput) + 1);
+                        if (layout != null) {
+                            layout.addView(errorTextView, layout.indexOfChild(commentInput) + 1);
+                        }
 
                         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        positiveButton.setTextColor(ContextCompat.getColor(context, R.color.status_approved));
+                        if (positiveButton != null) {
+                            positiveButton.setTextColor(ContextCompat.getColor(context, R.color.status_approved));
+                        }
 
                         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                        negativeButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
-                        negativeButton.setEnabled(false);
-                        negativeButton.setOnClickListener(view -> {
-                            String comment = commentInput.getText().toString().trim();
-                            if (comment.isEmpty()) {
-                                errorTextView.setText("Fill the comment");
-                                errorTextView.setVisibility(View.VISIBLE);
-                            } else {
-                                errorTextView.setVisibility(View.GONE);
-                                updateClaimStatus(claim, "rejected", comment);
-                                dialog.dismiss();
-                            }
-                        });
+                        if (negativeButton != null) {
+                            negativeButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
+                            negativeButton.setEnabled(false);
+                            negativeButton.setOnClickListener(view -> {
+                                String comment = commentInput.getText() != null ? commentInput.getText().toString().trim() : "";
+                                if (comment.isEmpty()) {
+                                    errorTextView.setText("Fill the comment");
+                                    errorTextView.setVisibility(View.VISIBLE);
+                                } else {
+                                    errorTextView.setVisibility(View.GONE);
+                                    updateClaimStatus(claim, "rejected", comment);
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
 
                         Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-                        neutralButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
-                        neutralButton.setEnabled(false);
-                        neutralButton.setOnClickListener(view -> {
-                            String comment = commentInput.getText().toString().trim();
-                            if (comment.isEmpty()) {
-                                errorTextView.setText("Fill the comment");
-                                errorTextView.setVisibility(View.VISIBLE);
-                            } else {
-                                errorTextView.setVisibility(View.GONE);
-                                updateClaimStatus(claim, "cancelled", comment);
-                                dialog.dismiss();
-                            }
-                        });
+                        if (neutralButton != null) {
+                            neutralButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
+                            neutralButton.setEnabled(false);
+                            neutralButton.setOnClickListener(view -> {
+                                String comment = commentInput.getText() != null ? commentInput.getText().toString().trim() : "";
+                                if (comment.isEmpty()) {
+                                    errorTextView.setText("Fill the comment");
+                                    errorTextView.setVisibility(View.VISIBLE);
+                                } else {
+                                    errorTextView.setVisibility(View.GONE);
+                                    updateClaimStatus(claim, "cancelled", comment);
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
 
                         commentInput.addTextChangedListener(new TextWatcher() {
                             @Override
@@ -185,9 +194,9 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
                             @Override
                             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                boolean hasComment = !s.toString().trim().isEmpty();
-                                negativeButton.setEnabled(hasComment);
-                                neutralButton.setEnabled(hasComment);
+                                boolean hasComment = s != null && !s.toString().trim().isEmpty();
+                                if (negativeButton != null) negativeButton.setEnabled(hasComment);
+                                if (neutralButton != null) neutralButton.setEnabled(hasComment);
                             }
 
                             @Override
@@ -201,53 +210,80 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             });
         }
 
-
         public void bind(EmployeeClaimdataItem currentClaim, OnClaimClickListener listener) {
-            txtClaimId.setText("Claim ID : " + (currentClaim.getClaimId() != null ? currentClaim.getClaimId() : "N/A"));
-            txtProjectName.setText(currentClaim.getProject());
-            txtMeetingType.setText(currentClaim.getMeeting());
-            txtPurposeOfMeeting.setText(currentClaim.getPerposeofmeet());
-            txtTotalAmount.setText(currentClaim.getCurrency() + " " + currentClaim.getTotalamount());
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-            try {
-                Date date = inputFormat.parse(currentClaim.getClaimDate());
-                txtAppliedDate.setText(outputFormat.format(date));
-            } catch (Exception e) {
-                // Handle parsing error
-                txtAppliedDate.setText(currentClaim.getClaimDate());
+            if (currentClaim == null) return;
+
+            // Display "N/A" for null/empty values
+            String claimId = currentClaim.getClaimId();
+            txtClaimId.setText("Claim ID : " + (!TextUtils.isEmpty(claimId) ? claimId : "N/A"));
+
+            String projectName = currentClaim.getProject();
+            txtProjectName.setText(!TextUtils.isEmpty(projectName) ? projectName : "N/A");
+
+            String meetingType = currentClaim.getMeeting();
+            txtMeetingType.setText(!TextUtils.isEmpty(meetingType) ? meetingType : "N/A");
+
+            String purpose = currentClaim.getPerposeofmeet();
+            txtPurposeOfMeeting.setText(!TextUtils.isEmpty(purpose) ? purpose : "N/A");
+
+            String currency = currentClaim.getCurrency();
+            String amount = String.valueOf(currentClaim.getTotalamount());
+            if (!TextUtils.isEmpty(currency) && !TextUtils.isEmpty(amount)) {
+                txtTotalAmount.setText(currency + " " + amount);
+            } else if (!TextUtils.isEmpty(amount)) {
+                txtTotalAmount.setText(amount);
+            } else {
+                txtTotalAmount.setText("N/A");
+            }
+
+            // Date formatting with safety check
+            String claimDateStr = currentClaim.getClaimDate();
+            if (!TextUtils.isEmpty(claimDateStr)) {
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+                try {
+                    Date date = inputFormat.parse(claimDateStr);
+                    if (date != null) {
+                        txtAppliedDate.setText(outputFormat.format(date));
+                    } else {
+                        txtAppliedDate.setText(claimDateStr);
+                    }
+                } catch (Exception e) {
+                    txtAppliedDate.setText(claimDateStr);
+                }
+            } else {
+                txtAppliedDate.setText("N/A");
             }
 
             TextView statusText = itemView.findViewById(R.id.statusText);
             String status = currentClaim.getStatusRm() != null ? currentClaim.getStatusRm() : (currentClaim.getStatusHr() != null ? currentClaim.getStatusHr() : "Pending");
-            statusText.setText(status);
-
-            Drawable background = statusText.getBackground();
-            if (background instanceof GradientDrawable) {
-                GradientDrawable gradientDrawable = (GradientDrawable) background;
-                int backgroundColor;
-                if (status.equalsIgnoreCase("Unapproved")) {
-                    backgroundColor = ContextCompat.getColor(context, R.color.pending_status_color);
-                } else if (status.equalsIgnoreCase("Pending")) {
-                    backgroundColor = ContextCompat.getColor(context, R.color.pending_status_color);
-                } else if (status.equalsIgnoreCase("Approved")) {
-                    backgroundColor = ContextCompat.getColor(context, R.color.approved_status_color);
-                } else if (status.equalsIgnoreCase("Rejected")) {
-                    backgroundColor = ContextCompat.getColor(context, R.color.rejected_status_color);
-                } else if (status.equalsIgnoreCase("Cancelled")) {
-                    backgroundColor = ContextCompat.getColor(context, R.color.rejected_status_color);
-                } else {
-                    backgroundColor = ContextCompat.getColor(context, R.color.default_status_color);
+            if (statusText != null) {
+                statusText.setText(status);
+                Drawable background = statusText.getBackground();
+                if (background instanceof GradientDrawable) {
+                    GradientDrawable gradientDrawable = (GradientDrawable) background;
+                    int backgroundColor;
+                    if (status.equalsIgnoreCase("Unapproved") || status.equalsIgnoreCase("Pending")) {
+                        backgroundColor = ContextCompat.getColor(context, R.color.pending_status_color);
+                    } else if (status.equalsIgnoreCase("Approved")) {
+                        backgroundColor = ContextCompat.getColor(context, R.color.approved_status_color);
+                    } else if (status.equalsIgnoreCase("Rejected") || status.equalsIgnoreCase("Cancelled")) {
+                        backgroundColor = ContextCompat.getColor(context, R.color.rejected_status_color);
+                    } else {
+                        backgroundColor = ContextCompat.getColor(context, R.color.default_status_color);
+                    }
+                    gradientDrawable.setColor(backgroundColor);
                 }
+            }
 
-                gradientDrawable.setColor(backgroundColor);
+            if (actionButton != null) {
+                if (status.equalsIgnoreCase("Unapproved")) {
+                    actionButton.setVisibility(View.VISIBLE);
+                } else {
+                    actionButton.setVisibility(View.GONE);
+                }
             }
-            // Conditionally show/hide the action button
-            if (status.equalsIgnoreCase("Unapproved")) {
-                actionButton.setVisibility(View.VISIBLE);
-            } else {
-                actionButton.setVisibility(View.GONE);
-            }
+
             viewDetailsButton.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onClaimClick(currentClaim);
@@ -264,18 +300,16 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             ProfileViewModel profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
             profileViewModel.storeLoginData(userId, authToken);
             profileViewModel.fetchUserProfile();
-
             profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(itemView)), userProfile -> {
                 if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee() != null) {
                     String reportingManagerFirstName = userProfile.getData().getEmployee().getFirstname();
                     String reportingManagerLastName = userProfile.getData().getEmployee().getLastname();
                     String reportingManagerId = userProfile.getData().getEmployee().getId();
-
                     if (reportingManagerFirstName != null && reportingManagerLastName != null && reportingManagerId != null) {
                         String reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
                         String reportingManagerEmail = userProfile.getData().getEmployee().getEmail();
-
                         try {
+
                             JSONObject requestBody = new JSONObject(new Gson().toJson(claim));
                             requestBody.put("status", status);
                             requestBody.put("comment", comment);
@@ -285,23 +319,19 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
                             String currentDate = dateFormat.format(new Date());
                             requestBody.put("approvedDate", currentDate);
-
                             RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), requestBody.toString());
-
                             APIInterface apiInterface = APIClient.getInstance().ClaimUpdateStatus();
                             retrofit2.Call<ResponseBody> call = apiInterface.claimStatus("jwt " + authToken, claimId, body);
-
                             call.enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull retrofit2.Response<ResponseBody> response) {
                                     if (response.isSuccessful()) {
-                                        // Handle success
+// Handle success
                                         claim.setStatusRm(status);
                                         notifyItemChanged(getAdapterPosition());
                                     } else {
-                                        // Handle error
+// Handle error
                                         Log.e("ClaimViewHolder", "Error updating claim status: " + response.message());
-
                                     }
                                 }
 
@@ -316,6 +346,8 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                     } else {
                         Log.w("ClaimViewHolder", "Reporting manager information not available");
                     }
+                } else {
+                    Log.w("ClaimViewHolder", "User profile or employee data is null");
                 }
             });
         }

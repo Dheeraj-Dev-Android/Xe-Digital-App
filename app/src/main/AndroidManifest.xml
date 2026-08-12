@@ -49,6 +49,7 @@
         android:name=".MyApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:extractNativeLibs="true"
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -57,7 +58,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.XEDigital"
         android:usesCleartextTraffic="false"
-        android:extractNativeLibs="true"
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
 

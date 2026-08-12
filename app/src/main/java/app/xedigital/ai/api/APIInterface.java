@@ -202,6 +202,10 @@ public interface APIInterface {
     @GET("claims/claimPrices")
     Call<ClaimPriceResponse> getClaimPrices(@Header("Authorization") String authToken);
 
+    //    https://app.xedigital.ai/api/v1/claims/claim/6a7974c784d68811d00b9af9
+    @GET("claims/claim/{claimId}")
+    Call<ResponseBody> getClaimById(@Header("Authorization") String authToken, @Path("claimId") String claimId);
+
     @GET("bus/getAll?active=true")
     Call<BusinessUnitResponse> getBusinessUnit(@Header("Authorization") String authToken);
 

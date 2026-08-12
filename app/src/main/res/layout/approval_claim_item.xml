@@ -3,11 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/stroke_color"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@color/surface_color"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border_light"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -16,236 +17,268 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Top Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/claimIdText"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Claim ID: CL001"
-                android:textColor="@color/avatar_text"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/claimIdText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Claim ID: CL001"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Claim Request"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/statusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_background"
+                android:gravity="center"
+                android:minWidth="72dp"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
                 android:text="Pending"
-                android:textColor="@color/color_white"
-                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Detail Section -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guidelineCenter"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
+                android:padding="14dp">
 
-            <TextView
-                android:id="@+id/lblClaimDate"
-                style="@style/ClaimDetailTextWithIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_calendar"
-                android:drawablePadding="6dp"
-                android:drawableTint="@color/_000000"
-                android:text="Date"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineCenter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
 
-            <TextView
-                android:id="@+id/claimDateText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="12 Dec 2024"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toStartOf="@id/guidelineCenter"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lblClaimDate" />
+                <TextView
+                    android:id="@+id/lblClaimDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/icon_tint"
+                    android:text="Date"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/lblProject"
-                style="@style/ClaimDetailTextWithIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:drawableStart="@drawable/ic_project"
-                android:drawablePadding="6dp"
-                android:drawableTint="@color/_000000"
-                android:text="Project"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/guidelineCenter"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/claimDateText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="12 Dec 2024"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineCenter"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lblClaimDate" />
 
-            <TextView
-                android:id="@+id/projectNameText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Project Name"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guidelineCenter"
-                app:layout_constraintTop_toBottomOf="@id/lblProject" />
+                <TextView
+                    android:id="@+id/lblProject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:drawableStart="@drawable/ic_project"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/icon_tint"
+                    android:text="Project"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/lblMeetingType"
-                style="@style/ClaimDetailTextWithIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:drawableStart="@drawable/ic_meeting"
-                android:drawablePadding="6dp"
-                android:drawableTint="@color/_000000"
-                android:text="Meeting Type"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/claimDateText" />
+                <TextView
+                    android:id="@+id/projectNameText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Project Name"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+                    app:layout_constraintTop_toBottomOf="@id/lblProject" />
 
-            <TextView
-                android:id="@+id/meetingTypeText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Regular"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toStartOf="@id/guidelineCenter"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lblMeetingType" />
+                <TextView
+                    android:id="@+id/lblMeetingType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:drawableStart="@drawable/ic_meeting"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/icon_tint"
+                    android:text="Meeting Type"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/claimDateText" />
 
-            <TextView
-                android:id="@+id/lblPurpose"
-                style="@style/ClaimDetailTextWithIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:drawableStart="@drawable/ic_purpose"
-                android:drawablePadding="6dp"
-                android:drawableTint="@color/_000000"
-                android:text="Purpose"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/guidelineCenter"
-                app:layout_constraintTop_toBottomOf="@id/projectNameText" />
+                <TextView
+                    android:id="@+id/meetingTypeText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="Regular"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineCenter"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lblMeetingType" />
 
-            <TextView
-                android:id="@+id/purposeText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Team Discussion"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guidelineCenter"
-                app:layout_constraintStart_toStartOf="@id/guidelineCenter"
-                app:layout_constraintTop_toBottomOf="@id/lblPurpose" />
+                <TextView
+                    android:id="@+id/lblPurpose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="16dp"
+                    android:drawableStart="@drawable/ic_purpose"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/icon_tint"
+                    android:text="Purpose"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+                    app:layout_constraintTop_toBottomOf="@id/projectNameText" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/purposeText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="Team Discussion"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+                    app:layout_constraintTop_toBottomOf="@id/lblPurpose" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:alpha="0.5"
-            android:background="?android:attr/listDivider" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- Bottom Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="14dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Amount"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/amountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:text="₹ 1,500"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
+            <!-- View Details - Eye Icon Only -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardBackgroundColor="@color/icon_background"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_light"
+                app:strokeWidth="1dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/viewDetailsButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:paddingVertical="8dp"
-                    android:text="Detail View"
-                    android:textSize="13sp"
-                    app:cornerRadius="8dp" />
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="View Detail"
+                    app:icon="@drawable/ic_eye"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="22dp"
+                    app:iconTint="@color/colorPrimary"
+                    app:rippleColor="@color/ripple_color" />
+            </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/actionButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:paddingVertical="8dp"
-                    android:text="Take Action"
-                    android:textSize="13sp"
-                    app:cornerRadius="8dp" />
+            <!-- Take Action - Text Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/actionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:text="Take Action"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/colorPrimary"
+                app:cornerRadius="14dp"
+                app:rippleColor="@color/ripple_color" />
 
-            </LinearLayout>
         </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

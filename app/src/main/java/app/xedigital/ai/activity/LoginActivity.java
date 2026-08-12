@@ -78,10 +78,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         proceedToAuthCheck();
-    }    private final ActivityResultLauncher<String> notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        isCheckingPermissions = false;
-        proceedToAuthCheck();
-    });
+    }
 
     private void proceedToAuthCheck() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
@@ -107,6 +104,16 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        prefManager.putString("userId", userId);
+        prefManager.putString("emailId", emailId);
+        prefManager.putString("authToken", authToken);
+    }    private final ActivityResultLauncher<String> notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        isCheckingPermissions = false;
+        proceedToAuthCheck();
+    });
+
     private void checkPermissionsAndNavigate(String token) {
         SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
         if (!hasForegroundLocationPermission()) {
@@ -116,27 +123,7 @@ public class LoginActivity extends AppCompatActivity {
         navigateToFaceLogin(token);
     }
 
-    private void storeInSharedPreferences(String userId, String emailId, String authToken) {
-        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-        prefManager.putString("userId", userId);
-        prefManager.putString("emailId", emailId);
-        prefManager.putString("authToken", authToken);
-    }    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-        boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
-        boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
 
-        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-        String cachedToken = prefManager.getString("cachedTokenPermission", null);
-
-        if (fineGranted || coarseGranted) {
-            if (cachedToken != null) {
-                checkPermissionsAndNavigate(cachedToken);
-            }
-        } else {
-            showLoginScreen();
-            showAlertDialog("Foreground location permission is required for shift tracking.");
-        }
-    });
 
     private void navigateToFaceLogin(String token) {
         if (isFinishing() || isDestroyed()) return;
@@ -179,6 +166,23 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+        boolean fineGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+        boolean coarseGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        String cachedToken = prefManager.getString("cachedTokenPermission", null);
+
+        if (fineGranted || coarseGranted) {
+            if (cachedToken != null) {
+                checkPermissionsAndNavigate(cachedToken);
+            }
+        } else {
+            showLoginScreen();
+            showAlertDialog("Foreground location permission is required for shift tracking.");
+        }
+    });
+
     private boolean hasForegroundLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
@@ -220,14 +224,11 @@ public class LoginActivity extends AppCompatActivity {
         binding.logoCard.setVisibility(View.INVISIBLE);
     }
 
-
-
     private void showLoading(boolean show) {
         if (loadingOverlay != null) {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
-
 
 
 

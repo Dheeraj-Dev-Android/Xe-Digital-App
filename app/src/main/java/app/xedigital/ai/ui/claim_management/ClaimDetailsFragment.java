@@ -46,13 +46,15 @@ public class ClaimDetailsFragment extends Fragment {
     private View cardMeetingDetails, rowProjectMeeting;
     private View cardTravelDetails, rowTravelCategoryMode, rowRouteDistance, rowRestaurantPersons;
 
-    private MaterialButton btnDocumentView, btnPrintClaim;
+    // Updated: removed btnPrintClaim, added btnEditClaim and btnUploadDocument
+    private MaterialButton btnEditClaim, btnUploadDocument, btnDocumentView;
     private EmployeeClaimdataItem claimData;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_claim_details, container, false);
 
+        // ---- TextViews ----
         txtClaimId = view.findViewById(R.id.txtClaimId);
         txtProjectName = view.findViewById(R.id.txtProjectName);
         txtMeetingType = view.findViewById(R.id.txtMeetingType);
@@ -70,20 +72,17 @@ public class ClaimDetailsFragment extends Fragment {
         txtStatusRm = view.findViewById(R.id.txtStatusRm);
         txtStatusHr = view.findViewById(R.id.txtStatusHr);
         txtTravelRefId = view.findViewById(R.id.txtTravelRefId);
-
         txtExpenseType = view.findViewById(R.id.txtExpenseType);
         txtExpenseCategory = view.findViewById(R.id.txtExpenseCategory);
         txtBillNumber = view.findViewById(R.id.txtBillNumber);
         txtBillingPeriod = view.findViewById(R.id.txtBillingPeriod);
         txtClaimState = view.findViewById(R.id.txtClaimState);
-
         txtFuelType = view.findViewById(R.id.txtFuelType);
         txtFuelStation = view.findViewById(R.id.txtFuelStation);
         txtFuelQuantity = view.findViewById(R.id.txtFuelQuantity);
         txtVehicleNumber = view.findViewById(R.id.txtVehicleNumber);
         txtTollPlaza = view.findViewById(R.id.txtTollPlaza);
         txtTollLocation = view.findViewById(R.id.txtTollLocation);
-
         txtParkingLocation = view.findViewById(R.id.txtParkingLocation);
         txtParkingDate = view.findViewById(R.id.txtParkingDate);
         txtAccommodationType = view.findViewById(R.id.txtAccommodationType);
@@ -91,34 +90,31 @@ public class ClaimDetailsFragment extends Fragment {
         txtCheckIn = view.findViewById(R.id.txtCheckIn);
         txtCheckOut = view.findViewById(R.id.txtCheckOut);
 
-        // New row/card containers
+        // ---- Row / Card containers ----
         rowDateTravelRef = view.findViewById(R.id.rowDateTravelRef);
         rowStatusRmHr = view.findViewById(R.id.rowStatusRmHr);
-
         cardExpenseBilling = view.findViewById(R.id.cardExpenseBilling);
         rowExpenseTypeCategory = view.findViewById(R.id.rowExpenseTypeCategory);
         rowBillNumberPeriod = view.findViewById(R.id.rowBillNumberPeriod);
-
         cardFuelToll = view.findViewById(R.id.cardFuelToll);
         rowFuelTypeStation = view.findViewById(R.id.rowFuelTypeStation);
         rowFuelQuantityVehicle = view.findViewById(R.id.rowFuelQuantityVehicle);
         rowTollPlazaLocation = view.findViewById(R.id.rowTollPlazaLocation);
-
         cardParkingAccommodation = view.findViewById(R.id.cardParkingAccommodation);
         rowParkingLocationDate = view.findViewById(R.id.rowParkingLocationDate);
         rowAccommodationTypeName = view.findViewById(R.id.rowAccommodationTypeName);
         boxCheckInOut = view.findViewById(R.id.boxCheckInOut);
-
         cardMeetingDetails = view.findViewById(R.id.cardMeetingDetails);
         rowProjectMeeting = view.findViewById(R.id.rowProjectMeeting);
-
         cardTravelDetails = view.findViewById(R.id.cardTravelDetails);
         rowTravelCategoryMode = view.findViewById(R.id.rowTravelCategoryMode);
         rowRouteDistance = view.findViewById(R.id.rowRouteDistance);
         rowRestaurantPersons = view.findViewById(R.id.rowRestaurantPersons);
 
+        // ---- Buttons ----
+        btnEditClaim = view.findViewById(R.id.btnEditClaim);
+        btnUploadDocument = view.findViewById(R.id.btnUploadDocument);
         btnDocumentView = view.findViewById(R.id.btnDocumentView);
-        btnPrintClaim = view.findViewById(R.id.btnPrintClaim);
 
         return view;
     }
@@ -129,12 +125,31 @@ public class ClaimDetailsFragment extends Fragment {
 
         if (getArguments() != null) {
             claimData = (EmployeeClaimdataItem) getArguments().getSerializable("claimData");
-
             if (claimData != null) {
                 bindClaimData();
+                setupEditButton();
             }
         }
 
+        // ---- Edit Claim ----
+        btnEditClaim.setOnClickListener(v -> {
+            if (claimData != null) {
+                // TODO: Navigate to Edit Claim screen and pass claimData
+                Toast.makeText(requireContext(), "Edit Claim coming soon.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // ---- Upload Document ----
+        btnUploadDocument.setOnClickListener(v -> {
+            if (claimData != null) {
+                // TODO: Open file picker / camera to upload document
+                Toast.makeText(requireContext(), "Upload Document coming soon.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), "No claim data available.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // ---- View Document ----
         btnDocumentView.setOnClickListener(v -> {
             if (claimData != null && claimData.getDocFileURL() != null) {
                 List<String> documentUrls = Collections.singletonList(claimData.getDocFileURL());
@@ -154,14 +169,17 @@ public class ClaimDetailsFragment extends Fragment {
                 Toast.makeText(requireContext(), "No document available.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        btnPrintClaim.setOnClickListener(v -> {
-            if (claimData != null) {
-                Toast.makeText(requireContext(), "This Feature coming soon.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(requireContext(), "No claim data available to print.", Toast.LENGTH_SHORT).show();
-            }
-        });
+    // ================================================================
+    //  EDIT BUTTON — enabled only if RM status is Cancelled or Rejected
+    // ================================================================
+    private void setupEditButton() {
+        String statusRm = claimData.getStatusRm();
+        boolean canEdit = statusRm != null && (statusRm.trim().equalsIgnoreCase("cancelled") || statusRm.trim().equalsIgnoreCase("rejected"));
+
+        btnEditClaim.setEnabled(canEdit);
+        btnEditClaim.setAlpha(canEdit ? 1.0f : 0.4f);
     }
 
     // ================================================================
@@ -169,19 +187,21 @@ public class ClaimDetailsFragment extends Fragment {
     // ================================================================
     private void bindClaimData() {
 
-        // -------- Hero (always essential, but Travel Ref/RM/HR can hide) --------
+        // -------- Hero --------
         txtClaimId.setText(claimData.getClaimId() != null ? claimData.getClaimId() : String.valueOf(claimData.getId()));
+
         txtStatus.setText(isValid(claimData.getStatus()) ? claimData.getStatus() : "N/A");
 
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-        String appliedDateStr = null;
+        String appliedDateStr;
         try {
             Date date = inputFormat.parse(claimData.getClaimDate());
             appliedDateStr = outputFormat.format(date);
         } catch (Exception e) {
             appliedDateStr = claimData.getClaimDate();
         }
+
         boolean hasAppliedDate = bindText(txtAppliedDate, appliedDateStr);
         boolean hasTravelRef = bindText(txtTravelRefId, claimData.getTravelRefId());
         setVisibleIfAny(rowDateTravelRef, hasAppliedDate, hasTravelRef);
@@ -190,7 +210,7 @@ public class ClaimDetailsFragment extends Fragment {
         boolean hasStatusHr = bindText(txtStatusHr, claimData.getStatusHr());
         setVisibleIfAny(rowStatusRmHr, hasStatusRm, hasStatusHr);
 
-        // Total amount — always shown (core info)
+        // Total amount — always shown
         String currency = claimData.getCurrency() != null ? claimData.getCurrency() : "";
         txtTotalAmount.setText((currency + " " + claimData.getTotalamount()).trim());
 
@@ -235,8 +255,7 @@ public class ClaimDetailsFragment extends Fragment {
         boolean hasCheckOut = bindText(txtCheckOut, claimData.getCheckout());
         setVisibleIfAny(boxCheckInOut, hasCheckIn, hasCheckOut);
 
-        setVisibleIfAny(cardParkingAccommodation, hasParkingLocation, hasParkingDate,
-                hasAccommodationType, hasAccommodationName, hasCheckIn, hasCheckOut);
+        setVisibleIfAny(cardParkingAccommodation, hasParkingLocation, hasParkingDate, hasAccommodationType, hasAccommodationName, hasCheckIn, hasCheckOut);
 
         // -------- Meeting Details --------
         boolean hasProjectName = bindText(txtProjectName, claimData.getProject());
@@ -278,15 +297,14 @@ public class ClaimDetailsFragment extends Fragment {
         }
         setVisibleIfAny(rowRestaurantPersons, hasRestaurant, hasPersons);
 
-        setVisibleIfAny(cardTravelDetails, hasTravelCategory, hasModeOfTransport,
-                routeBound, hasDistance, hasRestaurant, hasPersons);
+        setVisibleIfAny(cardTravelDetails, hasTravelCategory, hasModeOfTransport, routeBound, hasDistance, hasRestaurant, hasPersons);
     }
 
+    // ================================================================
+    //  HELPERS
+    // ================================================================
     private boolean isValid(String value) {
-        return value != null
-                && !value.trim().isEmpty()
-                && !value.trim().equalsIgnoreCase("null")
-                && !value.trim().equalsIgnoreCase("N/A");
+        return value != null && !value.trim().isEmpty() && !value.trim().equalsIgnoreCase("null") && !value.trim().equalsIgnoreCase("N/A");
     }
 
     private boolean bindText(TextView tv, String value) {
@@ -300,7 +318,6 @@ public class ClaimDetailsFragment extends Fragment {
         }
         return has;
     }
-
 
     private void setVisibleIfAny(View container, boolean... flags) {
         if (container == null) return;
