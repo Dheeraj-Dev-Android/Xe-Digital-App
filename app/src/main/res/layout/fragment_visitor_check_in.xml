@@ -103,20 +103,10 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:letterSpacing="0.02"
-                        android:text="Welcome To"
+                        android:text="Welcome "
                         android:textColor="@color/primary_dark"
                         android:textSize="@dimen/welcome_text_size"
                         android:textStyle="bold" />
-
-                    <!-- Company name subtitle -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center"
-                        android:text="@string/consultedge_global"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
 
                     <!-- Accent divider -->
                     <View

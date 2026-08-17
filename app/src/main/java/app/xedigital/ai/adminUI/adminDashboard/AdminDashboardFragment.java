@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,36 +44,38 @@ import app.xedigital.ai.model.Admin.LeaveGraph.Data;
 
 public class AdminDashboardFragment extends Fragment {
 
+    private static final String TAG = "AdminDashboardFragment";
     private static final int SCROLL_INTERVAL = 3000;
     private static final String FALLBACK_SHORT = "N/A";
+
     private final Handler scrollHandler = new Handler(Looper.getMainLooper());
-
-    private final Runnable scrollRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (isAdded() && birthdayAdapter != null && birthdayRecyclerView != null) {
-                int itemCount = birthdayAdapter.getItemCount();
-                if (itemCount > 0) {
-                    currentPosition = (currentPosition + 1) % itemCount;
-                    birthdayRecyclerView.smoothScrollToPosition(currentPosition);
-                    scrollHandler.postDelayed(this, SCROLL_INTERVAL);
-                }
-            }
-        }
-    };
-
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
     private String token;
-
     private TextView totalSignin, totalSignout, totalEmployees, totalBranches;
     private TextView birthdayCount;
     private RecyclerView birthdayRecyclerView;
     private LinearLayout emptyBirthdayState;
     private PieChart leavesBarChart;
     private int currentPosition = 0;
-
     private boolean shouldAutoScroll = false;
+    private final Runnable scrollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isAdded() || birthdayAdapter == null || birthdayRecyclerView == null) {
+                return;
+            }
+            int itemCount = birthdayAdapter.getItemCount();
+            if (itemCount > 1) {
+                currentPosition = (currentPosition + 1) % itemCount;
+                birthdayRecyclerView.smoothScrollToPosition(currentPosition);
+                scrollHandler.postDelayed(this, SCROLL_INTERVAL);
+            } else {
+                // Stop auto-scroll silently if items dropped to 1 or 0
+                shouldAutoScroll = false;
+            }
+        }
+    };
     private MaterialCardView btnPunchAttendance;
 
     public static AdminDashboardFragment newInstance() {
@@ -105,8 +108,13 @@ public class AdminDashboardFragment extends Fragment {
             setDashboardDefaultTexts();
         }
         btnPunchAttendance.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(view);
-            navController.navigate(R.id.nav_visitorCheckInFragment);
+            try {
+                NavController navController = Navigation.findNavController(v);
+                // Use action ID — not raw destination ID
+                navController.navigate(R.id.action_dashboard_to_visitorCheckIn);
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "NavController not found: " + e.getMessage());
+            }
         });
     }
 
@@ -162,14 +170,21 @@ public class AdminDashboardFragment extends Fragment {
                 emptyBirthdayState.setVisibility(View.GONE);
 
                 currentPosition = 0;
-                shouldAutoScroll = true;
-                scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
+
+                // FIX: Only enable auto-scroll when there are multiple items.
+                // Scrolling a single-item list is wasteful and looks broken.
+                if (birthdayEmployees.size() > 1) {
+                    shouldAutoScroll = true;
+                    scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
+                } else {
+                    shouldAutoScroll = false;
+                }
             } else {
                 birthdayCount.setText("0");
                 birthdayAdapter.updateBirthdayEmployees(new ArrayList<>());
                 birthdayRecyclerView.setVisibility(View.GONE);
                 emptyBirthdayState.setVisibility(View.VISIBLE);
-                shouldAutoScroll = false; // FIX: nothing to scroll
+                shouldAutoScroll = false;
             }
         });
 
@@ -206,6 +221,7 @@ public class AdminDashboardFragment extends Fragment {
 
     private void updatePieChart(Data leaveGraphData) {
         if (leavesBarChart == null) return;
+
         if (leaveGraphData == null || leaveGraphData.getGraphData() == null || leaveGraphData.getGraphLabels() == null) {
             showChartEmptyState();
             return;
@@ -260,6 +276,8 @@ public class AdminDashboardFragment extends Fragment {
 
         leavesBarChart.setData(data);
 
+        // FIX: Pass pre-summed total to OptimizedMarkerView
+        // so it doesn't recalculate on every highlight tap
         OptimizedMarkerView mv = new OptimizedMarkerView(leavesBarChart.getContext(), R.layout.marker_view, values);
         mv.setChartView(leavesBarChart);
         leavesBarChart.setMarker(mv);
@@ -268,14 +286,11 @@ public class AdminDashboardFragment extends Fragment {
         leavesBarChart.invalidate();
     }
 
-    // FIX: Restart auto-scroll when fragment resumes (e.g. returning from
-    // backstack or app foreground). Without this, the carousel silently
-    // stopped scrolling forever after any pause, since LiveData observers
-    // don't re-fire on lifecycle resume alone.
     @Override
     public void onResume() {
         super.onResume();
-        if (shouldAutoScroll && birthdayAdapter != null && birthdayAdapter.getItemCount() > 0) {
+        // Restart scroll only if conditions still valid after resume
+        if (shouldAutoScroll && birthdayAdapter != null && birthdayAdapter.getItemCount() > 1) {
             scrollHandler.removeCallbacks(scrollRunnable);
             scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
         }
@@ -291,8 +306,8 @@ public class AdminDashboardFragment extends Fragment {
     public void onDestroyView() {
         scrollHandler.removeCallbacks(scrollRunnable);
 
-        // FIX: Null out view references to avoid holding onto destroyed Views
-        // if the Fragment instance outlives its View (e.g. on the backstack).
+        // Null out all view references to prevent memory leaks
+        // when fragment stays on back stack but view is destroyed
         totalSignin = null;
         totalSignout = null;
         totalEmployees = null;
@@ -307,13 +322,26 @@ public class AdminDashboardFragment extends Fragment {
         super.onDestroyView();
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // OptimizedMarkerView
+    // FIX: Total is computed ONCE in constructor, not on every tap
+    // ─────────────────────────────────────────────────────────────
     private static class OptimizedMarkerView extends MarkerView {
+
         private final TextView markerTextView;
-        private final List<Integer> valueList;
+        private final float precomputedTotal; // computed once
 
         public OptimizedMarkerView(Context context, int layoutResource, List<Integer> values) {
             super(context, layoutResource);
-            this.valueList = values != null ? values : new ArrayList<>();
+
+            // Pre-calculate total here instead of in refreshContent
+            float sum = 0f;
+            if (values != null) {
+                for (Integer val : values) {
+                    if (val != null) sum += val;
+                }
+            }
+            this.precomputedTotal = sum;
             this.markerTextView = findViewById(R.id.marker_text);
         }
 
@@ -321,12 +349,12 @@ public class AdminDashboardFragment extends Fragment {
         public void refreshContent(Entry e, Highlight highlight) {
             if (e instanceof PieEntry && markerTextView != null) {
                 PieEntry pieEntry = (PieEntry) e;
-                float total = 0f;
-                for (Integer val : valueList) {
-                    if (val != null) total += val;
-                }
-                float percentage = (total > 0) ? (pieEntry.getValue() / total) * 100f : 0f;
+
+                // FIX: Use pre-computed total — O(1) instead of O(n) per tap
+                float percentage = (precomputedTotal > 0) ? (pieEntry.getValue() / precomputedTotal) * 100f : 0f;
+
                 String label = pieEntry.getLabel() != null ? pieEntry.getLabel() : "Data Not Available";
+
                 markerTextView.setText(String.format(Locale.US, "%s\n%.1f%%", label, percentage));
             }
             super.refreshContent(e, highlight);

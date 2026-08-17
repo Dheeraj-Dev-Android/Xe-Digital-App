@@ -44,6 +44,7 @@ import retrofit2.Response;
 public class AdminMainActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminMainActivity";
+
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
     private ActivityAdminMainBinding binding;
     private AppBarConfiguration mAppBarConfiguration;
@@ -51,7 +52,6 @@ public class AdminMainActivity extends AppCompatActivity {
     private UserViewModel userViewModel;
     private FirebaseAnalytics mFirebaseAnalytics;
     private boolean isNetworkChangeReceiverRegistered = false;
-    private boolean isVisitorSubMenuVisible = false;
 
     private SlowInternetConnectionBinding slowInternetBinding;
     private NoInternetConnectionBinding noInternetBinding;
@@ -61,64 +61,94 @@ public class AdminMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        // Inflate main layout
         binding = ActivityAdminMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Bind included layouts
-        slowInternetBinding = SlowInternetConnectionBinding.bind(binding.getRoot().findViewById(R.id.slowInternetLayout));
-        noInternetBinding = NoInternetConnectionBinding.bind(binding.getRoot().findViewById(R.id.noInternetLayout));
+        slowInternetBinding = SlowInternetConnectionBinding.bind(
+                binding.getRoot().findViewById(R.id.slowInternetLayout));
+        noInternetBinding = NoInternetConnectionBinding.bind(
+                binding.getRoot().findViewById(R.id.noInternetLayout));
 
-        // Firebase Analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // Setup toolbar
         setSupportActionBar(binding.adminAppBarMain.adminToolbar);
 
-        // Setup navigation
         DrawerLayout drawer = binding.adminDrawerLayout;
         NavigationView navigationView = binding.adminNavView;
-        navController = Navigation.findNavController(this, R.id.admin_nav_host_fragment_content_main);
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorCheckInFragment, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_logout).setOpenableLayout(drawer).build();
+        navController = Navigation.findNavController(
+                this, R.id.admin_nav_host_fragment_content_main);
 
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        // ── Top-level destinations ───────────────────────────────────────
+        // These are destinations where the hamburger icon shows instead of
+        // the back arrow. Add ONLY screens that should show the hamburger.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_admin_dashboard          // ← ONLY dashboard is top-level
+        ).setOpenableLayout(drawer).build();
+
+        // FIX: Removed nav_visitorCheckInFragment and others from top-level
+        // destinations. They should show a back arrow, not the hamburger.
+        // Having them as top-level prevented the back arrow from appearing,
+        // making users think back navigation was broken.
+
+        NavigationUI.setupActionBarWithNavController(
+                this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        // Handle dismiss slow internet layout
-        slowInternetBinding.btnDismiss.setOnClickListener(v -> slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
-
+        slowInternetBinding.btnDismiss.setOnClickListener(
+                v -> slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
 
         if (navigationView != null) {
             fetchUserProfileData();
         } else {
-            Log.e(TAG, "Navigation view is null, cannot fetch user profile");
+            Log.e(TAG, "Navigation view is null");
         }
 
+        // Logout menu item
         MenuItem logout = navigationView.getMenu().findItem(R.id.nav_logout);
         logout.setOnMenuItemClickListener(item -> {
             handleLogout();
             return true;
         });
+
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // If the Navigation Drawer is open, close it first
-                if (binding.adminDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    binding.adminDrawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    // If we are on the Dashboard, this will exit the app
-                    // rather than going back to a previous screen/activity.
-                    finishAffinity();
-                }
-            }
-        });
+        setupBackPressedHandling(drawer);
     }
 
+    // ── FIX: Back pressed logic ──────────────────────────────────────────
+    // Old code called finishAffinity() for any non-drawer-open state,
+    // which killed the app from any fragment. Now we correctly:
+    //   1. Close drawer if open
+    //   2. Let NavController pop back stack if not on start destination
+    //   3. Only finish the app when on the start (dashboard) destination
+    private void setupBackPressedHandling(DrawerLayout drawer) {
+        getOnBackPressedDispatcher().addCallback(
+                this, new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
 
-    // Internet UI Handlers
+                        // Priority 1: Close drawer if it's open
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                            return;
+                        }
+
+                        // Priority 2: Let NavController handle the back stack
+                        // This pops VisitorCheckInFragment → back to Dashboard, etc.
+                        if (navController.navigateUp()) {
+                            return; // NavController handled it ✅
+                        }
+
+                        // Priority 3: We're on the start destination (Dashboard)
+                        // with nothing left to pop — exit the app
+                        finish();
+                    }
+                });
+    }
+
+    // ── Internet UI Handlers ─────────────────────────────────────────────
+
     public void showNoInternetLayout() {
         noInternetBinding.getRoot().setVisibility(View.VISIBLE);
     }
@@ -131,7 +161,6 @@ public class AdminMainActivity extends AppCompatActivity {
         slowInternetBinding.slowInternetContainer.setVisibility(View.GONE);
     }
 
-
     public void showSlowInternetLayout(double speed) {
         slowInternetBinding.slowInternetContainer.setVisibility(View.VISIBLE);
         String speedText = String.format("Current Speed: %.2f Mbps", speed / 1000);
@@ -139,13 +168,9 @@ public class AdminMainActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        // Access the same SharedPreferences file used in Login
         SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
+        sharedPreferences.edit().clear().apply();
 
-        // Redirect to Login and clear the activity stack
         Intent intent = new Intent(this, AdminLoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -167,7 +192,8 @@ public class AdminMainActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<UserDetailsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
+            public void onResponse(@NonNull Call<UserDetailsResponse> call,
+                                   @NonNull Response<UserDetailsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     UserDetailsResponse userDetails = response.body();
                     userViewModel.setUserDetails(userDetails);
@@ -178,7 +204,8 @@ public class AdminMainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<UserDetailsResponse> call,
+                                  @NonNull Throwable t) {
                 Log.e(TAG, "API failure: " + t.getMessage());
             }
         });
@@ -191,16 +218,19 @@ public class AdminMainActivity extends AppCompatActivity {
         TextView nameText = headerView.findViewById(R.id.textView);
         TextView subtitleText = headerView.findViewById(R.id.subtitleText);
         ImageView profileImage = headerView.findViewById(R.id.imageView);
-        String FirstName = userDetails.getData().getUser().getFirstname();
-        String LastName = userDetails.getData().getUser().getLastname();
 
-        nameText.setText(FirstName + LastName);
+        String firstName = userDetails.getData().getUser().getFirstname();
+        String lastName = userDetails.getData().getUser().getLastname();
+
+        // FIX: Added space between first and last name
+        nameText.setText(firstName + " " + lastName);
         subtitleText.setText(userDetails.getData().getUser().getEmail());
 
-        // Load profile image if exists (use Glide or Picasso)
         if (userDetails.getData() != null) {
-            Glide.with(this).load(userDetails.getData().getCompany().getLogo()).placeholder(R.drawable.ic_profile_placeholder).into(profileImage);
-
+            Glide.with(this)
+                    .load(userDetails.getData().getCompany().getLogo())
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .into(profileImage);
         }
     }
 
@@ -251,6 +281,8 @@ public class AdminMainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
+        // This handles the toolbar back arrow / hamburger clicks
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
     }
 }

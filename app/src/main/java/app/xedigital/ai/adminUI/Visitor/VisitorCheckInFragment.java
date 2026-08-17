@@ -28,12 +28,14 @@ import app.xedigital.ai.utills.UserViewModel;
 public class VisitorCheckInFragment extends Fragment {
 
     private Handler handler;
+    private FragmentVisitorCheckInBinding binding;
+
+    // Keeping local view references for animation safety checks
     private View loadingAnimation;
     private View mainContentCard;
     private View punchInButton;
     private View punchOutButton;
     private View manualCheckInButton;
-    private FragmentVisitorCheckInBinding binding;
 
     public static VisitorCheckInFragment newInstance() {
         return new VisitorCheckInFragment();
@@ -46,7 +48,6 @@ public class VisitorCheckInFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentVisitorCheckInBinding.inflate(inflater, container, false);
         return binding.getRoot();
-//        return inflater.inflate(R.layout.fragment_visitor_check_in, container, false);
     }
 
     @Override
@@ -54,16 +55,18 @@ public class VisitorCheckInFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Use 'requireActivity()' to get the SAME instance of the ViewModel
-        UserViewModel viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        handler = new Handler(Looper.getMainLooper());
+
+        // Observe company details via shared ViewModel
+        UserViewModel viewModel = new ViewModelProvider(requireActivity())
+                .get(UserViewModel.class);
 
         viewModel.getUserDetails().observe(getViewLifecycleOwner(), userDetails -> {
+            if (binding == null) return; // guard: binding may be null if destroyed
             if (userDetails != null && userDetails.getData() != null) {
-                // 1. Update Company Name
                 String companyName = userDetails.getData().getCompany().getName();
-                binding.welcomeText.setText("Welcome To " + companyName);
+                binding.welcomeText.setText("Welcome " + companyName);
 
-                // 2. Update Company Logo using Glide
                 String logoUrl = userDetails.getData().getCompany().getLogo();
                 Glide.with(this)
                         .load(logoUrl)
@@ -72,11 +75,9 @@ public class VisitorCheckInFragment extends Fragment {
             }
         });
 
-        handler = new Handler(Looper.getMainLooper());
-
         initializeViews(view);
         setupInitialVisibility();
-        setupClickListeners();
+        setupClickListeners(view);
         startLoadingSequence();
     }
 
@@ -89,20 +90,38 @@ public class VisitorCheckInFragment extends Fragment {
     }
 
     private void setupInitialVisibility() {
-        mainContentCard.setVisibility(View.INVISIBLE);
-        punchInButton.setVisibility(View.INVISIBLE);
-        manualCheckInButton.setVisibility(View.INVISIBLE);
-        punchOutButton.setVisibility(View.INVISIBLE);
-        loadingAnimation.setVisibility(View.VISIBLE);
+        if (mainContentCard != null) mainContentCard.setVisibility(View.INVISIBLE);
+        if (punchInButton != null) punchInButton.setVisibility(View.INVISIBLE);
+        if (manualCheckInButton != null) manualCheckInButton.setVisibility(View.INVISIBLE);
+        if (punchOutButton != null) punchOutButton.setVisibility(View.INVISIBLE);
+        if (loadingAnimation != null) loadingAnimation.setVisibility(View.VISIBLE);
     }
 
-    private void setupClickListeners() {
-        punchInButton.setOnClickListener(v -> navigateTo(AdminPunchActivity.class));
-        punchOutButton.setOnClickListener(v -> navigateTo(AdminCheckOutActivity.class));
-        manualCheckInButton.setOnClickListener(v -> {
-            animateButtonPress(manualCheckInButton);
-            startActivity(new Intent(requireContext(), AdminManualCheckIn.class));
-        });
+    private void setupClickListeners(View view) {
+
+        if (punchInButton != null) {
+            punchInButton.setOnClickListener(v -> navigateTo(v, AdminPunchActivity.class));
+        }
+
+        if (punchOutButton != null) {
+            punchOutButton.setOnClickListener(v -> navigateTo(v, AdminCheckOutActivity.class));
+        }
+
+        if (manualCheckInButton != null) {
+            manualCheckInButton.setOnClickListener(v -> {
+                animateButtonPress(v);
+                if (getContext() != null) {
+                    startActivity(new Intent(requireContext(), AdminManualCheckIn.class));
+                }
+            });
+        }
+    }
+
+    private void navigateTo(View clickedView, Class<?> destination) {
+        animateButtonPress(clickedView);
+        if (getContext() != null) {
+            startActivity(new Intent(requireContext(), destination));
+        }
     }
 
     private void startLoadingSequence() {
@@ -110,17 +129,22 @@ public class VisitorCheckInFragment extends Fragment {
     }
 
     private void startDashboardAnimations() {
+        if (!isAdded() || loadingAnimation == null) return;
+
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(loadingAnimation, "alpha", 1f, 0f);
         fadeOut.setDuration(500);
         fadeOut.start();
 
         handler.postDelayed(() -> {
+            if (!isAdded() || loadingAnimation == null) return;
             loadingAnimation.setVisibility(View.GONE);
             animateMainContent();
         }, 500);
     }
 
     private void animateMainContent() {
+        if (!isAdded() || mainContentCard == null) return;
+
         mainContentCard.setVisibility(View.VISIBLE);
         mainContentCard.setAlpha(0f);
         mainContentCard.setTranslationY(-100f);
@@ -134,7 +158,11 @@ public class VisitorCheckInFragment extends Fragment {
         contentSet.setInterpolator(new DecelerateInterpolator());
         contentSet.start();
 
-        handler.postDelayed(this::animateButtons, 400);
+        handler.postDelayed(() -> {
+            // FIX: Guard before animating buttons
+            if (!isAdded()) return;
+            animateButtons();
+        }, 400);
     }
 
     private void animateButtons() {
@@ -144,6 +172,8 @@ public class VisitorCheckInFragment extends Fragment {
     }
 
     private void animateButton(View button, long delay) {
+        if (button == null || !isAdded()) return;
+
         button.setVisibility(View.VISIBLE);
         button.setAlpha(0f);
         button.setScaleX(0.5f);
@@ -161,12 +191,9 @@ public class VisitorCheckInFragment extends Fragment {
         buttonSet.start();
     }
 
-    private void navigateTo(Class<?> destination) {
-        animateButtonPress(requireView().findFocus());
-        startActivity(new Intent(requireContext(), destination));
-    }
-
     private void animateButtonPress(View button) {
+        if (button == null) return;
+
         ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(button, "scaleX", 1f, 0.95f);
         ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(button, "scaleY", 1f, 0.95f);
         ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(button, "scaleX", 0.95f, 1f);
@@ -191,6 +218,14 @@ public class VisitorCheckInFragment extends Fragment {
         resetButtonStates();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+    }
+
     private void resetButtonStates() {
         if (punchInButton != null) {
             punchInButton.setScaleX(1f);
@@ -208,9 +243,20 @@ public class VisitorCheckInFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
+            handler = null;
         }
+
+        // Null local view references
+        loadingAnimation = null;
+        mainContentCard = null;
+        punchInButton = null;
+        punchOutButton = null;
+        manualCheckInButton = null;
+
+        binding = null;
+
+        super.onDestroyView();
     }
 }
