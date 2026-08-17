@@ -41,4 +41,44 @@
     <dimen name="progress_bar_size">120dp</dimen>
     <dimen name="loading_text_size">22sp</dimen>
     <dimen name="loading_text_margin_top">20dp</dimen>
+    <!--
+       Large tablet: circle = 46% of screen width
+       0.73 - 0.27 = 0.46
+   -->
+    <item name="camera_guide_left" format="float" type="dimen">0.27</item>
+    <item name="camera_guide_right" format="float" type="dimen">0.73</item>
+
+    <!-- TEXT SIZES -->
+    <dimen name="text_size_title">38sp</dimen>
+    <dimen name="text_size_subtitle">15sp</dimen>
+    <dimen name="text_size_footer">14sp</dimen>
+    <dimen name="text_size_badge">12sp</dimen>
+    <dimen name="text_size_capture">22sp</dimen>
+    <dimen name="text_size_loading">20sp</dimen>
+    <dimen name="text_size_qr_title">26sp</dimen>
+
+    <!-- CORNER DECORATORS -->
+    <dimen name="corner_long">40dp</dimen>
+    <dimen name="corner_short">5dp</dimen>
+    <dimen name="corner_margin">12dp</dimen>
+
+    <!-- CAPTURE OVERLAY -->
+    <dimen name="capture_overlay_width">360dp</dimen>
+
+    <!-- QR CARD -->
+    <dimen name="qr_card_padding">44dp</dimen>
+    <dimen name="qr_icon_size">88dp</dimen>
+    <dimen name="qr_icon_text_size">34sp</dimen>
+    <dimen name="qr_image_size">360dp</dimen>
+    <dimen name="qr_label_width">400dp</dimen>
+
+    <!-- LOADING SPINNER -->
+    <dimen name="spinner_size">120dp</dimen>
+    <dimen name="spinner_inner_size">64dp</dimen>
+    <dimen name="dialog_card_width">420dp</dimen>
+    <dimen name="dialog_icon_size">88dp</dimen>
+    <dimen name="dialog_icon_text_size">34sp</dimen>
+    <dimen name="dialog_title_size">24sp</dimen>
+    <dimen name="dialog_message_size">15sp</dimen>
+    <dimen name="dialog_button_text_size">15sp</dimen>
 </resources>

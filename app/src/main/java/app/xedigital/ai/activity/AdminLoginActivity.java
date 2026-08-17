@@ -251,10 +251,6 @@ public class AdminLoginActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    // ================================================================
-    //  STYLED ALERT DIALOGS WITH BACKGROUND BLUR
-    // ================================================================
-
     /**
      * Single-button styled dialog (backward-compatible convenience overload).
      */

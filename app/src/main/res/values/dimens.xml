@@ -95,6 +95,42 @@
     <dimen name="loading_text_size">16sp</dimen>
     <dimen name="loading_text_margin_top">12dp</dimen>
     <dimen name="birthday_item_spacing">12dp</dimen>
+    <item name="camera_guide_left" format="float" type="dimen">0.11</item>
+    <item name="camera_guide_right" format="float" type="dimen">0.89</item>
+
+    <!-- TEXT SIZES -->
+    <dimen name="text_size_title">26sp</dimen>
+    <dimen name="text_size_subtitle">11sp</dimen>
+    <dimen name="text_size_footer">12sp</dimen>
+    <dimen name="text_size_badge">10sp</dimen>
+    <dimen name="text_size_capture">17sp</dimen>
+    <dimen name="text_size_loading">16sp</dimen>
+    <dimen name="text_size_qr_title">19sp</dimen>
+
+    <!-- CORNER DECORATORS -->
+    <dimen name="corner_long">24dp</dimen>
+    <dimen name="corner_short">3dp</dimen>
+    <dimen name="corner_margin">8dp</dimen>
+
+    <!-- CAPTURE OVERLAY -->
+    <dimen name="capture_overlay_width">220dp</dimen>
+
+    <!-- QR CARD -->
+    <dimen name="qr_card_padding">28dp</dimen>
+    <dimen name="qr_icon_size">56dp</dimen>
+    <dimen name="qr_icon_text_size">22sp</dimen>
+    <dimen name="qr_image_size">220dp</dimen>
+    <dimen name="qr_label_width">260dp</dimen>
+
+    <!-- LOADING SPINNER -->
+    <dimen name="spinner_size">88dp</dimen>
+    <dimen name="spinner_inner_size">44dp</dimen>
+    <dimen name="dialog_card_width">300dp</dimen>
+    <dimen name="dialog_icon_size">64dp</dimen>
+    <dimen name="dialog_icon_text_size">26sp</dimen>
+    <dimen name="dialog_title_size">19sp</dimen>
+    <dimen name="dialog_message_size">12.5sp</dimen>
+    <dimen name="dialog_button_text_size">12.5sp</dimen>
 
 </resources>
 
