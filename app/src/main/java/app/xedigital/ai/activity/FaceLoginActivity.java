@@ -88,6 +88,11 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     private FaceOverlayView faceOverlay;
     private View loadingPanel;
     private ObjectAnimator scannerAnimator;
+    private String COLLECTION_NAME;
+    private SecurePrefManager securePrefManager;
+    private BioMetric bioMetric;
+    private int attemptCount;
+
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
         if (isFinishing() || isDestroyed()) return;
         if (isGranted) {
@@ -99,10 +104,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             }
         }
     });
-    private String COLLECTION_NAME;
-    private SecurePrefManager securePrefManager;
-    private BioMetric bioMetric;
-    private int attemptCount;
+
+    // ─── Lifecycle ────────────────────────────────────────────────────────────
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +113,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         setContentView(R.layout.activity_face_login);
 
         securePrefManager = SecurePrefManager.getInstance(this);
-
         authToken = getIntent().getStringExtra("authToken");
         storedUserId = securePrefManager.getString("userId", null);
-
         bioMetric = new BioMetric(this, this, this);
         attemptCount = 0;
 
@@ -129,12 +130,70 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
         FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL).setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL).build();
         detector = FaceDetection.getClient(options);
-
-        // Show loading indicator and fetch company collection before allowing camera initialization
-        setLoadingVisible(true);
-        updateStatus("Fetching user configuration...");
-        fetchUserData(storedUserId, authToken);
+        loadCollectionAndProceed();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        backgroundExecutor.shutdownNow();
+        if (detector != null) detector.close();
+        if (scannerAnimator != null) {
+            scannerAnimator.cancel();
+            scannerAnimator = null;
+        }
+    }
+
+    private void loadCollectionAndProceed() {
+        COLLECTION_NAME = securePrefManager.getString("collection", null);
+        if (COLLECTION_NAME != null && !COLLECTION_NAME.isEmpty()) {
+            checkInstructionsAndPermissions();
+        } else {
+            setLoadingVisible(true);
+            updateStatus("Fetching user configuration...");
+            fetchUserData(storedUserId, authToken);
+        }
+    }
+
+    private void fetchUserData(String userId, String authToken) {
+        if (userId == null || authToken == null) {
+            handleError("User session credentials missing.");
+            return;
+        }
+
+        String authHeaderValue = "jwt " + authToken;
+        Call<UserModelResponse> userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
+        userCall.enqueue(new Callback<UserModelResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
+                if (!response.isSuccessful() || response.body() == null) {
+                    handleError("Failed to fetch user configuration.");
+                    return;
+                }
+
+                UserModelResponse userDataResponse = response.body();
+                if (!userDataResponse.isSuccess() || userDataResponse.getData() == null || userDataResponse.getData().getCompany() == null) {
+                    handleError("Company metadata not found.");
+                    return;
+                }
+
+                COLLECTION_NAME = userDataResponse.getData().getCompany().getCollectionName();
+                if (securePrefManager != null) {
+                    securePrefManager.putString("collection", COLLECTION_NAME);
+                }
+                setLoadingVisible(false);
+                checkInstructionsAndPermissions();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
+                handleError("Network connection failed during setup.");
+            }
+        });
+    }
+
+    // ─── Instructions & Permissions ───────────────────────────────────────────
 
     private void checkInstructionsAndPermissions() {
         if (isFinishing() || isDestroyed()) return;
@@ -177,7 +236,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
     private void showPermissionDeniedAlert() {
         if (isFinishing() || isDestroyed()) return;
-        new AlertDialog.Builder(this).setTitle("Camera Access Required").setMessage("To login to your account using face recognition, you must grant camera access. Please enable it in settings.").setPositiveButton("OK", (dialog, which) -> safelyExitToLogin()).setCancelable(false).show();
+        new AlertDialog.Builder(this).setTitle("Camera Access Required").setMessage("To login to your account using face recognition, " + "you must grant camera access. Please enable it in settings.").setPositiveButton("OK", (dialog, which) -> safelyExitToLogin()).setCancelable(false).show();
     }
 
     private void showLivenessInstructions(boolean launchedFromButton) {
@@ -187,86 +246,24 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
         AlertDialog infoDialog = new AlertDialog.Builder(this).setView(dialogView).setPositiveButton("I'm Ready", (dialog, which) -> {
             dialog.dismiss();
-
             if (!launchedFromButton && securePrefManager != null) {
                 securePrefManager.putBoolean("instructionsSeen", true);
             }
-
             verifyCameraPermission();
         }).setCancelable(launchedFromButton).create();
 
         infoDialog.show();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        backgroundExecutor.shutdownNow();
-        if (detector != null) {
-            detector.close();
-        }
-        if (scannerAnimator != null) {
-            scannerAnimator.cancel();
-            scannerAnimator = null;
-        }
-    }
-
-    private void fetchUserData(String userId, String authToken) {
-        if (userId == null || authToken == null) {
-            Log.e(TAG, "User ID or AuthToken is missing. Cannot fetch user data.");
-            handleError("User session credentials missing.");
-            return;
-        }
-
-        String authHeaderValue = "jwt " + authToken;
-
-        Call<UserModelResponse> userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
-        userCall.enqueue(new Callback<UserModelResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
-                if (isFinishing() || isDestroyed()) return;
-
-                if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "User data fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()));
-                    handleError("Failed to fetch user configuration.");
-                    return;
-                }
-
-                UserModelResponse userDataResponse = response.body();
-                if (!userDataResponse.isSuccess() || userDataResponse.getData() == null || userDataResponse.getData().getCompany() == null) {
-                    Log.e(TAG, "User data fetch failed: " + userDataResponse.getMessage());
-                    handleError("Company metadata not found.");
-                    return;
-                }
-
-                COLLECTION_NAME = userDataResponse.getData().getCompany().getCollectionName();
-                if (securePrefManager != null) {
-                    securePrefManager.putString("collection", COLLECTION_NAME);
-                }
-
-                // Hide loading overlay and proceed with permission/camera checks now that COLLECTION_NAME exists
-                setLoadingVisible(false);
-                checkInstructionsAndPermissions();
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
-                Log.e(TAG, "User data fetch failed: " + t.getMessage());
-                handleError("Network connection failed during setup.");
-            }
-        });
-    }
+    // ─── Camera ───────────────────────────────────────────────────────────────
 
     private void startCamera() {
         if (isFinishing() || isDestroyed()) return;
-
         ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(this);
         future.addListener(() -> {
             try {
                 if (isFinishing() || isDestroyed()) return;
-
                 cameraProvider = future.get();
-
                 if (previewView == null || previewView.getSurfaceProvider() == null) {
                     Log.e(TAG, "PreviewView surface context is null.");
                     return;
@@ -274,12 +271,9 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
                 preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
                 imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build();
-
                 imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).setTargetResolution(new android.util.Size(480, 640)).build();
                 imageAnalysis.setAnalyzer(backgroundExecutor, this::analyzeFace);
-
                 cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
                 cameraProvider.unbindAll();
@@ -302,6 +296,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             }
         }
     }
+
+    // ─── Liveness Challenge ───────────────────────────────────────────────────
 
     private void setRandomChallenge() {
         LivenessChallenge[] challenges = LivenessChallenge.values();
@@ -326,6 +322,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 return "Follow the prompt";
         }
     }
+
+    // ─── Face Analysis ────────────────────────────────────────────────────────
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void analyzeFace(@NonNull ImageProxy imageProxy) {
@@ -368,7 +366,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
     private void processChallenge(@NonNull Face face) {
         if (isProcessingLiveness || challengeSatisfied) return;
-
         float headY = face.getHeadEulerAngleY();
         float headX = face.getHeadEulerAngleX();
 
@@ -389,7 +386,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
         if (challengeSatisfied && !isProcessingLiveness) {
             isProcessingLiveness = true;
-
             runOnUiThread(() -> {
                 if (cameraProvider != null && imageAnalysis != null) {
                     try {
@@ -404,17 +400,17 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         }
     }
 
+    // ─── Image Capture ────────────────────────────────────────────────────────
+
     private void captureImage() {
         if (imageCapture == null) {
             handleError("Camera capture pipeline is uninitialized.");
             return;
         }
-
         File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + "_photo.jpg");
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
-
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults results) {
                 if (isFinishing() || isDestroyed()) {
@@ -427,7 +423,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                         BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
                         bmpOptions.inSampleSize = 2;
                         Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath(), bmpOptions);
-
                         if (bitmap == null) {
                             handleError("Failed to decode captured face image.");
                             return;
@@ -438,7 +433,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                         Bitmap scaled = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
 
                         String base64 = convertImageToBase64(scaled);
-
                         bitmap.recycle();
                         scaled.recycle();
                         deleteQuietly(photoFile);
@@ -464,59 +458,22 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         });
     }
 
-    private void resetAndRetryChallenge() {
-        runOnUiThread(() -> {
-            if (isFinishing() || isDestroyed()) return;
-            setRandomChallenge();
-            if (cameraProvider != null && imageAnalysis != null && cameraSelector != null && preview != null && imageCapture != null) {
-                try {
-                    cameraProvider.unbindAll();
-                    cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
-                } catch (Exception e) {
-                    Log.e(TAG, "Rebinding camera pipeline failed", e);
-                }
-            }
-        });
-    }
+    // ─── API Calls ────────────────────────────────────────────────────────────
 
     private void prepareJsonAndSend(String base64Image) {
         if (COLLECTION_NAME == null) {
-            handleError("Company collection record missing. Please re-login.");
+            handleError("Company Record missing. Please re-login.");
             return;
         }
-
         try {
             JSONObject json = new JSONObject();
             json.put("collection_name", COLLECTION_NAME);
             json.put("image", base64Image);
-
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json.toString());
-
             sendImageToApi(requestBody);
-
         } catch (JSONException e) {
             Log.e(TAG, "JSON encoding error", e);
             handleError("Failed to prepare image data for server validation.");
-        }
-    }
-
-    private String convertImageToBase64(@NonNull Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
-    }
-
-    private File getOutputDirectory() {
-        File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "FaceLogin");
-        if (!dir.exists() && !dir.mkdirs()) {
-            Log.e(TAG, "Failed to create output directory");
-        }
-        return dir;
-    }
-
-    private void deleteQuietly(@NonNull File file) {
-        if (file.exists() && !file.delete()) {
-            Log.w(TAG, "Could not delete temp file: " + file.getAbsolutePath());
         }
     }
 
@@ -532,12 +489,10 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (isFinishing() || isDestroyed()) return;
-
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String bodyStr = response.body().string();
                         JSONObject json = new JSONObject(bodyStr);
-
                         if (!json.has("data") || json.isNull("data")) {
                             handleError("Server response is missing required registration data.");
                             return;
@@ -549,7 +504,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                         callFaceDetailApi(token, faceBody);
 
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "Response parse error", e);
                         handleError("Error parsing verification response: " + e.getMessage());
                     }
                 } else {
@@ -574,9 +528,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (isFinishing() || isDestroyed()) return;
-
                 setLoadingVisible(false);
-
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String bodyStr = response.body().string();
@@ -593,14 +545,13 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                             handleError("Employee records mismatch.");
                             return;
                         }
-
                         String recognizedId = employee.optString("_id");
-
                         if (storedUserId != null && storedUserId.equals(recognizedId)) {
                             handleSuccess();
                         } else {
                             handleError("Unauthorized User Profile Detected.");
                         }
+
                     } catch (Exception e) {
                         Log.e(TAG, "Face detail parse error", e);
                         handleError("Data Parsing Error: " + e.getMessage());
@@ -616,6 +567,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             }
         });
     }
+
+    // ─── Result Handlers ──────────────────────────────────────────────────────
 
     private void handleSuccess() {
         attemptCount = 0;
@@ -655,6 +608,21 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         });
     }
 
+    private void resetAndRetryChallenge() {
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            setRandomChallenge();
+            if (cameraProvider != null && imageAnalysis != null && cameraSelector != null && preview != null && imageCapture != null) {
+                try {
+                    cameraProvider.unbindAll();
+                    cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+                } catch (Exception e) {
+                    Log.e(TAG, "Rebinding camera pipeline failed", e);
+                }
+            }
+        });
+    }
+
     private void showFallbackLoginAlert() {
         if (isFinishing() || isDestroyed()) return;
 
@@ -662,33 +630,23 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             safeUnbindCamera();
             toggleScannerAnimation(false);
             isAnalyzing.set(true);
-
             boolean canUseDeviceSecurity = bioMetric != null && bioMetric.isDeviceSecurityAvailable();
-
             if (canUseDeviceSecurity) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Multiple Failed Attempts");
-                builder.setMessage("Face recognition failed 3 times. Verify your identity using your device PIN/Pattern/Biometrics or proceed to manual login:");
-                builder.setCancelable(false);
-
-                builder.setPositiveButton("Device Lock / Biometrics", (dialog, which) -> {
+                new AlertDialog.Builder(this).setTitle("Multiple Failed Attempts").setMessage("Face recognition failed 3 times. Verify your identity " + "using your device PIN/Pattern/Biometrics or proceed to manual login:").setCancelable(false).setPositiveButton("Device Lock / Biometrics", (dialog, which) -> {
                     if (bioMetric != null) bioMetric.authenticate(true);
-                });
-                builder.setNeutralButton("Manual Login", (dialog, which) -> navigateToManualLogin());
-                builder.setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin());
-                builder.show();
+                }).setNeutralButton("Manual Login", (dialog, which) -> navigateToManualLogin()).setNegativeButton("Cancel", (dialog, which) -> safelyExitToLogin()).show();
             } else {
                 navigateToManualLogin();
             }
         });
     }
 
+    // ─── Navigation ───────────────────────────────────────────────────────────
+
     private void navigateToManualLogin() {
         if (isFinishing() || isDestroyed()) return;
-
         safeUnbindCamera();
         toggleScannerAnimation(false);
-
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("isFallback", true);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -698,10 +656,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
     private void safelyExitToLogin() {
         if (isFinishing() || isDestroyed()) return;
-
         safeUnbindCamera();
         toggleScannerAnimation(false);
-
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("isFallback", true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -709,19 +665,7 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         finish();
     }
 
-    private void updateStatus(String text) {
-        runOnUiThread(() -> {
-            if (statusText != null) statusText.setText(text);
-        });
-    }
-
-    private void setLoadingVisible(boolean visible) {
-        runOnUiThread(() -> {
-            if (loadingPanel != null) {
-                loadingPanel.setVisibility(visible ? View.VISIBLE : View.GONE);
-            }
-        });
-    }
+    // ─── Biometric Callbacks ──────────────────────────────────────────────────
 
     @Override
     public void onAuthenticationSucceeded() {
@@ -745,6 +689,22 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
             updateStatus("Device authentication failed.");
+        });
+    }
+
+    // ─── UI Helpers ───────────────────────────────────────────────────────────
+
+    private void updateStatus(String text) {
+        runOnUiThread(() -> {
+            if (statusText != null) statusText.setText(text);
+        });
+    }
+
+    private void setLoadingVisible(boolean visible) {
+        runOnUiThread(() -> {
+            if (loadingPanel != null) {
+                loadingPanel.setVisibility(visible ? View.VISIBLE : View.GONE);
+            }
         });
     }
 
@@ -773,6 +733,30 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             }
         });
     }
+
+    // ─── File Helpers ─────────────────────────────────────────────────────────
+
+    private String convertImageToBase64(@NonNull Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+    }
+
+    private File getOutputDirectory() {
+        File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "FaceLogin");
+        if (!dir.exists() && !dir.mkdirs()) {
+            Log.e(TAG, "Failed to create output directory");
+        }
+        return dir;
+    }
+
+    private void deleteQuietly(@NonNull File file) {
+        if (file.exists() && !file.delete()) {
+            Log.w(TAG, "Could not delete temp file: " + file.getAbsolutePath());
+        }
+    }
+
+    // ─── Enums ────────────────────────────────────────────────────────────────
 
     private enum LivenessChallenge {
         TURN_LEFT, TURN_RIGHT, TILT_UP, TILT_DOWN

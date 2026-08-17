@@ -18,13 +18,7 @@ public class SecurePrefManager {
         try {
             String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
 
-            sharedPreferences = EncryptedSharedPreferences.create(
-                    PREF_FILE_NAME,
-                    masterKeyAlias,
-                    context.getApplicationContext(),
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
+            sharedPreferences = EncryptedSharedPreferences.create(PREF_FILE_NAME, masterKeyAlias, context.getApplicationContext(), EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV, EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
             sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
@@ -52,6 +46,14 @@ public class SecurePrefManager {
 
     public boolean getBoolean(String key, boolean defaultValue) {
         return sharedPreferences.getBoolean(key, defaultValue);
+    }
+
+    public void remove(String key) {
+        sharedPreferences.edit().remove(key).apply();
+    }
+
+    public boolean contains(String key) {
+        return sharedPreferences.contains(key);
     }
 
     public void clearAll() {
