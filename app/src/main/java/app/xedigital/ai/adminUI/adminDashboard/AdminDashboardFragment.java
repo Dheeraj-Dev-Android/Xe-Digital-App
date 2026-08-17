@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +32,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +43,10 @@ import app.xedigital.ai.model.Admin.LeaveGraph.Data;
 
 public class AdminDashboardFragment extends Fragment {
 
-    private final int SCROLL_INTERVAL = 3000;
-    private final android.os.Handler scrollHandler = new android.os.Handler();
+    private static final int SCROLL_INTERVAL = 3000;
+    private static final String FALLBACK_SHORT = "N/A";
+    private final Handler scrollHandler = new Handler(Looper.getMainLooper());
+
     private final Runnable scrollRunnable = new Runnable() {
         @Override
         public void run() {
@@ -53,15 +60,20 @@ public class AdminDashboardFragment extends Fragment {
             }
         }
     };
+
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
     private String token;
+
     private TextView totalSignin, totalSignout, totalEmployees, totalBranches;
     private TextView birthdayCount;
     private RecyclerView birthdayRecyclerView;
     private LinearLayout emptyBirthdayState;
-    private int currentPosition = 0;
     private PieChart leavesBarChart;
+    private int currentPosition = 0;
+
+    private boolean shouldAutoScroll = false;
+    private MaterialCardView btnPunchAttendance;
 
     public static AdminDashboardFragment newInstance() {
         return new AdminDashboardFragment();
@@ -92,6 +104,10 @@ public class AdminDashboardFragment extends Fragment {
         } else {
             setDashboardDefaultTexts();
         }
+        btnPunchAttendance.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(view);
+            navController.navigate(R.id.nav_visitorCheckInFragment);
+        });
     }
 
     private void initializeViews(View view) {
@@ -103,6 +119,7 @@ public class AdminDashboardFragment extends Fragment {
         birthdayRecyclerView = view.findViewById(R.id.birthdayRecyclerView);
         emptyBirthdayState = view.findViewById(R.id.emptyBirthdayState);
         leavesBarChart = view.findViewById(R.id.pieChart);
+        btnPunchAttendance = view.findViewById(R.id.btnPunchAttendance);
     }
 
     private void setupRecyclerView() {
@@ -121,7 +138,6 @@ public class AdminDashboardFragment extends Fragment {
 
         mViewModel.getDashboardData().observe(getViewLifecycleOwner(), data -> {
             if (data != null) {
-                // Wrap conversions defensively to confirm fields exist safely
                 String totalVisitors = String.valueOf(data.getTotalVisitors());
                 String checkInVisitors = String.valueOf(data.getTotalSigninVisitors());
                 String checkOutVisitors = String.valueOf(data.getTotalSignoutVisitors());
@@ -137,6 +153,7 @@ public class AdminDashboardFragment extends Fragment {
 
         mViewModel.getBirthdayData().observe(getViewLifecycleOwner(), birthdayEmployees -> {
             scrollHandler.removeCallbacks(scrollRunnable);
+
             if (birthdayEmployees != null && !birthdayEmployees.isEmpty()) {
                 birthdayCount.setText(String.valueOf(birthdayEmployees.size()));
                 birthdayAdapter.updateBirthdayEmployees(birthdayEmployees);
@@ -145,12 +162,14 @@ public class AdminDashboardFragment extends Fragment {
                 emptyBirthdayState.setVisibility(View.GONE);
 
                 currentPosition = 0;
+                shouldAutoScroll = true;
                 scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
             } else {
                 birthdayCount.setText("0");
                 birthdayAdapter.updateBirthdayEmployees(new ArrayList<>());
                 birthdayRecyclerView.setVisibility(View.GONE);
                 emptyBirthdayState.setVisibility(View.VISIBLE);
+                shouldAutoScroll = false; // FIX: nothing to scroll
             }
         });
 
@@ -170,11 +189,10 @@ public class AdminDashboardFragment extends Fragment {
     }
 
     private void setDashboardDefaultTexts() {
-        String missingLabel = "Data Not Available";
-        if (totalSignin != null) totalSignin.setText(missingLabel);
-        if (totalSignout != null) totalSignout.setText(missingLabel);
-        if (totalEmployees != null) totalEmployees.setText(missingLabel);
-        if (totalBranches != null) totalBranches.setText(missingLabel);
+        if (totalSignin != null) totalSignin.setText(FALLBACK_SHORT);
+        if (totalSignout != null) totalSignout.setText(FALLBACK_SHORT);
+        if (totalEmployees != null) totalEmployees.setText(FALLBACK_SHORT);
+        if (totalBranches != null) totalBranches.setText(FALLBACK_SHORT);
     }
 
     private void showChartEmptyState() {
@@ -250,6 +268,19 @@ public class AdminDashboardFragment extends Fragment {
         leavesBarChart.invalidate();
     }
 
+    // FIX: Restart auto-scroll when fragment resumes (e.g. returning from
+    // backstack or app foreground). Without this, the carousel silently
+    // stopped scrolling forever after any pause, since LiveData observers
+    // don't re-fire on lifecycle resume alone.
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (shouldAutoScroll && birthdayAdapter != null && birthdayAdapter.getItemCount() > 0) {
+            scrollHandler.removeCallbacks(scrollRunnable);
+            scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
+        }
+    }
+
     @Override
     public void onPause() {
         scrollHandler.removeCallbacks(scrollRunnable);
@@ -259,6 +290,20 @@ public class AdminDashboardFragment extends Fragment {
     @Override
     public void onDestroyView() {
         scrollHandler.removeCallbacks(scrollRunnable);
+
+        // FIX: Null out view references to avoid holding onto destroyed Views
+        // if the Fragment instance outlives its View (e.g. on the backstack).
+        totalSignin = null;
+        totalSignout = null;
+        totalEmployees = null;
+        totalBranches = null;
+        birthdayCount = null;
+        birthdayRecyclerView = null;
+        emptyBirthdayState = null;
+        leavesBarChart = null;
+        birthdayAdapter = null;
+        btnPunchAttendance = null;
+
         super.onDestroyView();
     }
 

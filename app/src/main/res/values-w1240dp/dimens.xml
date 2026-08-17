@@ -27,7 +27,7 @@
     <dimen name="action_button_corner_radius">75dp</dimen>
     <dimen name="action_button_padding">16dp</dimen>
     <dimen name="action_icon_size">60dp</dimen>
-    <dimen name="action_text_size">14sp</dimen>
+    <dimen name="action_text_size">12sp</dimen>
     <dimen name="action_text_margin_top">8dp</dimen>
     <dimen name="button_spacing">24dp</dimen>
     <dimen name="buttons_margin_top">40dp</dimen>

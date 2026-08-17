@@ -103,7 +103,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
         private final TextView birthdayDate;
         private final TextView department;
         private final TextView email;
-        private final TextView contact;
         private final String fallbackText = "Data Not Available";
 
         public BirthdayViewHolder(@NonNull View itemView) {
@@ -114,7 +113,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
             birthdayDate = itemView.findViewById(R.id.birthdayDate);
             department = itemView.findViewById(R.id.department);
             email = itemView.findViewById(R.id.email);
-            contact = itemView.findViewById(R.id.contact);
         }
 
         public void bind(EmployeesItem employee) {
@@ -143,7 +141,6 @@ public class BirthdayEmployeesAdapter extends RecyclerView.Adapter<BirthdayEmplo
             }
 
             email.setText((employee.getEmail() != null && !employee.getEmail().trim().isEmpty()) ? employee.getEmail() : fallbackText);
-            contact.setText((employee.getContact() != null && !employee.getContact().trim().isEmpty()) ? employee.getContact() : fallbackText);
 
             setBirthdayDate(employee.getDateOfBirth());
             loadProfileImage(employee);

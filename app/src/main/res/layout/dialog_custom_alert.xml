@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Blurred screenshot of the screen behind -->
+    <ImageView
+        android:id="@+id/blurBackgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop" />
+
+    <!-- Subtle dark scrim on top of blur for extra contrast -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#40000000" />
+
+    <!-- The actual alert card, centered -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_dialog_rounded"
+        android:elevation="8dp">
+
+        <!-- Icon badge -->
+        <FrameLayout
+            android:id="@+id/iconContainer"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="28dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/iconBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/circle_shape" />
+
+            <ImageView
+                android:id="@+id/dialogIcon"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                tools:src="@drawable/ic_error_outline" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:textColor="@color/primary_dark"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iconContainer"
+            tools:text="Verification Failed" />
+
+        <TextView
+            android:id="@+id/dialogMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialogTitle"
+            tools:text="We couldn't verify your account. Please check your connection and try again." />
+
+        <!-- Button row: supports single button OR Retry+Cancel pair -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialogMessage">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialogNegativeButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:stateListAnimator="@null"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:textColor="@color/primary_dark"
+                android:visibility="gone"
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/primary_dark"
+                app:strokeWidth="1.5dp"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialogPositiveButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primary_dark"
+                android:fontFamily="sans-serif-medium"
+                android:stateListAnimator="@null"
+                android:text="OK"
+                android:textAllCaps="false"
+                android:textColor="@color/surface_white"
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

@@ -80,7 +80,7 @@
     <dimen name="action_button_corner_radius">45dp</dimen>
     <dimen name="action_button_padding">8dp</dimen>
     <dimen name="action_icon_size">36dp</dimen>
-    <dimen name="action_text_size">9sp</dimen>
+    <dimen name="action_text_size">8sp</dimen>
     <dimen name="action_text_margin_top">4dp</dimen>
     <dimen name="button_spacing">8dp</dimen>
     <dimen name="buttons_margin_top">20dp</dimen>

@@ -1,89 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="6dp">
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_birthday_card"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Employee Header -->
+        <!-- ===== Top Row: Avatar + Name/Code + Birthday Badge ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:baselineAligned="false"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Profile Image -->
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profileImage"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginEnd="16dp"
-                android:contentDescription="Profile Image"
-                android:src="@drawable/ic_profile_placeholder" />
+            <!-- Profile image with ring + cake badge -->
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginEnd="14dp">
 
+                <View
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/circle_shape"
+                    android:backgroundTint="@color/birthday_card_divider" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Profile Image"
+                    android:src="@drawable/ic_profile_placeholder"
+                    app:civ_border_color="@color/birthday_card_divider"
+                    app:civ_border_width="2dp" />
+
+                <!-- Small cake badge pinned bottom-right -->
+                <FrameLayout
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="bottom|end">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/circle_shape"
+                        android:backgroundTint="#FFB74D" />
+
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Birthday"
+                        android:src="@mipmap/cake" />
+                </FrameLayout>
+
+            </FrameLayout>
+
+            <!-- Name + Code -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Employee Name -->
                 <TextView
                     android:id="@+id/employeeName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
                     android:text="Xe Digital.ai"
-                    android:textColor="#212121"
-                    android:textSize="16sp"
+                    android:textColor="@color/birthday_card_text_primary"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
-                <!-- Employee Code -->
                 <TextView
                     android:id="@+id/employeeCode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:text="EMP001"
-                    android:textColor="#757575"
-                    android:textSize="14sp"
+                    android:textColor="@color/birthday_card_text_secondary"
+                    android:textSize="12sp"
                     tools:text="EMP001" />
 
             </LinearLayout>
 
-            <!-- Birthday Badge -->
+            <!-- Birthday Date Badge -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/birthday_badge_background"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/gradient_birthday_badge"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp">
 
-                <!--                <ImageView-->
-                <!--                    android:layout_width="16dp"-->
-                <!--                    android:layout_height="16dp"-->
-                <!--                    android:layout_marginEnd="4dp"-->
-                <!--                    android:contentDescription="Birthday Icon"-->
-                <!--                    android:src="@mipmap/cake" />-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="🎂"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/birthdayDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="July 15"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
                     tools:text="July 15" />
 
@@ -91,118 +136,141 @@
 
         </LinearLayout>
 
-        <!-- Employee Details -->
+        <!-- ===== Divider ===== -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="@color/birthday_card_divider" />
+
+        <!-- ===== Detail Chips — VERTICAL stack ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/details_background"
-            android:orientation="vertical"
-            android:padding="12dp">
+            android:orientation="vertical">
 
-            <!-- Department -->
+            <!-- Department Chip -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_detail_chip"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="10dp">
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:contentDescription="Department Icon"
-                    android:src="@drawable/ic_business"
-                    app:tint="#666666" />
+                <!-- Icon badge -->
+                <FrameLayout
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Department: "
-                    android:textColor="#666666"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/circle_shape"
+                        android:backgroundTint="#FFF3E0" />
 
-                <TextView
-                    android:id="@+id/department"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Technology Consulting"
-                    android:textColor="#424242"
-                    android:textSize="14sp"
-                    tools:text="Engineering" />
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Department Icon"
+                        android:src="@drawable/ic_business"
+                        app:tint="@color/birthday_card_icon_tint" />
+                </FrameLayout>
 
-            </LinearLayout>
-
-            <!-- Email -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:contentDescription="Email Icon"
-                    android:src="@drawable/ic_email"
-                    app:tint="#666666" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Email: "
-                    android:textColor="#666666"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/email"
+                <!-- Label + Value -->
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="abc.d@efgh.com"
-                    android:textColor="#424242"
-                    android:textSize="14sp"
-                    tools:text="abc.d@efgh.com" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Department"
+                        android:textColor="@color/birthday_card_text_secondary"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/department"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="Technology Consulting"
+                        android:textColor="@color/birthday_card_text_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="Technology Consulting" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Contact -->
+            <!-- Email Chip -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_detail_chip"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="10dp">
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:contentDescription="Phone Icon"
-                    android:src="@drawable/ic_phone"
-                    app:tint="#666666" />
+                <!-- Icon badge -->
+                <FrameLayout
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/circle_shape"
+                        android:backgroundTint="#FFF3E0" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Email Icon"
+                        android:src="@drawable/ic_email"
+                        app:tint="@color/birthday_card_icon_tint" />
+                </FrameLayout>
+
+                <!-- Label + Value -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Contact: "
-                    android:textColor="#666666"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/contact"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="+91 9559576432"
-                    android:textColor="#424242"
-                    android:textSize="14sp"
-                    tools:text="+1 234 567 8900" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email"
+                        android:textColor="@color/birthday_card_text_secondary"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="abc.d@efgh.com"
+                        android:textColor="@color/birthday_card_text_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="abc.d@efgh.com" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -210,4 +278,4 @@
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
