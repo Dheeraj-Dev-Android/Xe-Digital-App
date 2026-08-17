@@ -119,11 +119,13 @@
     <item
         android:id="@id/nav_meeting_room"
         android:icon="@drawable/ic_calendar"
-        android:title="@string/menu_meeting_room" />
+        android:title="@string/menu_meeting_room"
+        android:visible="false" />
     <item
         android:id="@+id/nav_claim_management"
         android:icon="@drawable/ic_payments"
-        android:title="@string/menu_claim_management" />
+        android:title="@string/menu_claim_management"
+        android:visible="false" />
     <item
         android:id="@+id/nav_vms"
         android:icon="@drawable/ic_visitor"
@@ -148,7 +150,8 @@
     <item
         android:id="@+id/nav_documents"
         android:icon="@drawable/ic_document"
-        android:title="@string/menu_documents_upload" />
+        android:title="@string/menu_documents_upload"
+        android:visible="false" />
 
     <item
         android:id="@+id/nav_settings"
