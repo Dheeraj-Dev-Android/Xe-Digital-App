@@ -1,7 +1,6 @@
 package app.xedigital.ai;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -15,19 +14,18 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -44,6 +42,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityMainBinding;
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.NetworkUtils;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
@@ -51,15 +50,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+
     private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
     private static final String TAG = "MainActivity";
 
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
+
+    private ActivityMainBinding binding;
     private FirebaseAnalytics mFirebaseAnalytics;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
-    private AlertDialog noInternetDialog;
-    private AlertDialog slowNetworkDialog;
 
     private boolean isAttendanceSubmenuVisible = false;
     private boolean isLeavesSubmenuVisible = false;
@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean isNetworkChangeReceiverRegistered = false;
 
     private NavigationView navigationView;
-    private FrameLayout slowInternetContainer;
     private TextView tvSpeed;
     private View slowInternetLayout;
     private ImageView profileImage;
@@ -79,21 +78,20 @@ public class MainActivity extends AppCompatActivity {
     private Call<UserProfileResponse> profileCall;
     private Call<UserModelResponse> userCall;
 
+    private boolean isNoInternetDialogShowing = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        // 1. Inflate binding & set content view FIRST
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarMain.toolbar);
 
-        // 2. Initialize UI components safely after layout inflation
-        slowInternetContainer = findViewById(R.id.slowInternetContainer);
         slowInternetLayout = findViewById(R.id.slowInternetLayout);
         tvSpeed = findViewById(R.id.tvSpeed);
+
         ImageButton dismissButton = findViewById(R.id.btnDismiss);
         if (dismissButton != null) {
             dismissButton.setOnClickListener(v -> {
@@ -103,77 +101,69 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // 3. Setup Dialogs
-        noInternetDialog = new AlertDialog.Builder(this)
-                .setTitle("No Internet Connection")
-                .setMessage("Please check your internet connection and try again.")
-                .setPositiveButton("OK", (dialog, which) -> finish())
-                .setCancelable(false)
-                .create();
-
-        slowNetworkDialog = new AlertDialog.Builder(this)
-                .setTitle("Slow Network Connection")
-                .setMessage("Your network connection is slow. Some features might be affected.")
-                .setPositiveButton("OK", null)
-                .setCancelable(true)
-                .create();
-
-        // 4. Setup Navigation Drawer
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
-
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_dashboard, R.id.nav_profile, R.id.nav_attendance, R.id.nav_addAttendanceFragment,
-                R.id.nav_regularizeAppliedFragment, R.id.nav_claim_management, R.id.nav_dcr, R.id.nav_documents,
-                R.id.nav_holidays, R.id.nav_leaves, R.id.nav_applied_leaves, R.id.nav_payroll, R.id.nav_policy,
-                R.id.nav_shifts, R.id.nav_vms, R.id.navTeam_member, R.id.navManager_attendance_menu,
-                R.id.nav_team_member, R.id.nav_team_member_leave, R.id.nav_meeting_room,
-                R.id.nav_team_member_timesheet, R.id.nav_logout
+
+                // ── Main items ─────────────────────────────────────────
+                R.id.nav_dashboard, R.id.nav_profile, R.id.nav_vms, R.id.nav_holidays, R.id.nav_policy, R.id.nav_settings, R.id.nav_payroll, R.id.nav_documents, R.id.nav_claim_management, R.id.nav_meeting_room, R.id.nav_shifts,
+
+                // ── Attendance submenu ─────────────────────────────────
+                R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_pendingApprovalFragment,
+
+                // ── Leaves submenu ─────────────────────────────────────
+                R.id.nav_leaves, R.id.nav_leaves_data, R.id.nav_applied_leaves, R.id.nav_approve_leaves,
+
+                // ── Team submenu ───────────────────────────────────────
+                R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member_leave, R.id.nav_team_member_timesheet,
+
+                // ── DCR submenu ────────────────────────────────────────
+                R.id.nav_dcr, R.id.nav_dcr_form
+
         ).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
 
-        navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener(MenuItem -> {
-            handleLogout();
-            return true;
-        });
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            boolean handled = false;
 
-        // Toggle Listeners
-        MenuItem attendanceItem = navigationView.getMenu().findItem(R.id.nav_attendance_menu);
-        if (attendanceItem != null) {
-            attendanceItem.setOnMenuItemClickListener(item -> {
+            if (id == R.id.nav_dashboard) {
+                navigateToDashboard();
+                handled = true;
+
+            } else if (id == R.id.nav_attendance_menu) {
                 toggleAttendanceVisibility(navigationView.getMenu());
                 return true;
-            });
-        }
 
-        MenuItem teamMemberItem = navigationView.getMenu().findItem(R.id.nav_team_member);
-        if (teamMemberItem != null) {
-            teamMemberItem.setOnMenuItemClickListener(item -> {
-                toggleTeamMemberVisibility(navigationView.getMenu());
-                return true;
-            });
-        }
-
-        MenuItem leavesItem = navigationView.getMenu().findItem(R.id.nav_leaves_menu);
-        if (leavesItem != null) {
-            leavesItem.setOnMenuItemClickListener(item -> {
+            } else if (id == R.id.nav_leaves_menu) {
                 toggleLeavesVisibility(navigationView.getMenu());
                 return true;
-            });
-        }
 
-        MenuItem dcrItem = navigationView.getMenu().findItem(R.id.nav_dcr_menu);
-        if (dcrItem != null) {
-            dcrItem.setOnMenuItemClickListener(item -> {
+            } else if (id == R.id.nav_dcr_menu) {
                 toggleDcrVisibility(navigationView.getMenu());
                 return true;
-            });
-        }
 
-        // Header view elements
+            } else if (id == R.id.nav_team_member) {
+                toggleTeamMemberVisibility(navigationView.getMenu());
+                return true;
+
+            } else if (id == R.id.nav_logout) {
+                showLogoutConfirmationDialog();
+                return true;
+
+            } else {
+                handled = navigateToDestination(id);
+            }
+
+            if (handled) {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+
+            return handled;
+        });
+
         View headerView = navigationView.getHeaderView(0);
         if (headerView != null) {
             profileImage = headerView.findViewById(R.id.imageView);
@@ -182,13 +172,60 @@ public class MainActivity extends AppCompatActivity {
             clientLogo = headerView.findViewById(R.id.clientLogo);
         }
 
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            int destId = destination.getId();
+            navigationView.setCheckedItem(destId);
+            if (destId == R.id.nav_dashboard) {
+                collapseAllSubmenus();
+            }
+        });
+
         fetchUserProfileData();
     }
+
+    private void navigateToDashboard() {
+        NavOptions navOptions = new NavOptions.Builder()
+                .setPopUpTo(R.id.nav_dashboard, true).setLaunchSingleTop(true).build();
+        try {
+            navController.navigate(R.id.nav_dashboard, null, navOptions);
+        } catch (Exception e) {
+            Log.e(TAG, "Navigation to dashboard failed: " + e.getMessage());
+        }
+    }
+
+    private boolean navigateToDestination(int destinationId) {
+        try {
+            NavOptions navOptions = new NavOptions.Builder().setLaunchSingleTop(true).build();
+
+            navController.navigate(destinationId, null, navOptions);
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Navigation failed for id: " + destinationId + " -> " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void collapseAllSubmenus() {
+        Menu menu = navigationView.getMenu();
+        if (isAttendanceSubmenuVisible) toggleAttendanceVisibility(menu);
+        if (isLeavesSubmenuVisible) toggleLeavesVisibility(menu);
+        if (isTeamSubVisible) toggleTeamMemberVisibility(menu);
+        if (isDcrSubmenuVisible) toggleDcrVisibility(menu);
+    }
+
 
     public void showNoInternetLayout() {
         View noInternetView = findViewById(R.id.noInternetLayout);
         if (noInternetView != null) {
             noInternetView.setVisibility(View.VISIBLE);
+        }
+
+        if (!isNoInternetDialogShowing && !isFinishing() && !isDestroyed()) {
+            isNoInternetDialogShowing = true;
+            CustomDialogHelper.showErrorDialog(this, "No Internet Connection", "Please check your internet connection" + " and try again." + "\n\nMake sure Wi-Fi or mobile data" + " is turned on.", () -> {
+                isNoInternetDialogShowing = false;
+                finish();
+            });
         }
     }
 
@@ -197,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
         if (noInternetView != null) {
             noInternetView.setVisibility(View.GONE);
         }
+        isNoInternetDialogShowing = false;
     }
 
     public void showSlowInternetLayout(double speed) {
@@ -207,6 +245,10 @@ public class MainActivity extends AppCompatActivity {
                 tvSpeed.setText(speedText);
             }
         }
+
+        if (!isFinishing() && !isDestroyed()) {
+            CustomDialogHelper.showInfoDialog(this, "Slow Network Detected", "Your network connection is slow." + "\n\nCurrent speed: " + String.format("%.2f Mbps", speed / 1000) + "\n\nSome features might load slowly" + " or be temporarily unavailable.");
+        }
     }
 
     public void hideSlowInternetLayout() {
@@ -214,6 +256,31 @@ public class MainActivity extends AppCompatActivity {
             slowInternetLayout.setVisibility(View.GONE);
         }
     }
+
+
+    private void showLogoutConfirmationDialog() {
+        CustomDialogHelper.showWarningDialog(this, "Logout", "Are you sure you want to logout?" + "\n\nYou will need to login again" + " to access the app.", "Yes, Logout", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+            @Override
+            public void onConfirm() {
+                handleLogout();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "Logout cancelled by user");
+            }
+        });
+    }
+
+    private void handleLogout() {
+        SecurePrefManager.getInstance(MainActivity.this).clearAll();
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.putExtra("isFallback", true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 
     private void toggleAttendanceVisibility(Menu menu) {
         boolean newVisibility = !isAttendanceSubmenuVisible;
@@ -225,9 +292,7 @@ public class MainActivity extends AppCompatActivity {
             menu.findItem(R.id.nav_regularizeAppliedFragment).setVisible(newVisibility);
         if (menu.findItem(R.id.nav_pendingApprovalFragment) != null)
             menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(newVisibility);
-
         isAttendanceSubmenuVisible = newVisibility;
-        navigationView.invalidate();
     }
 
     private void toggleLeavesVisibility(Menu menu) {
@@ -240,9 +305,7 @@ public class MainActivity extends AppCompatActivity {
             menu.findItem(R.id.nav_applied_leaves).setVisible(newVisibility);
         if (menu.findItem(R.id.nav_approve_leaves) != null)
             menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
-
         isLeavesSubmenuVisible = newVisibility;
-        navigationView.invalidate();
     }
 
     private void toggleTeamMemberVisibility(Menu menu) {
@@ -255,9 +318,7 @@ public class MainActivity extends AppCompatActivity {
             menu.findItem(R.id.nav_team_member_leave).setVisible(newVisibility);
         if (menu.findItem(R.id.nav_team_member_timesheet) != null)
             menu.findItem(R.id.nav_team_member_timesheet).setVisible(newVisibility);
-
         isTeamSubVisible = newVisibility;
-        navigationView.invalidate();
     }
 
     private void toggleDcrVisibility(Menu menu) {
@@ -266,23 +327,35 @@ public class MainActivity extends AppCompatActivity {
             menu.findItem(R.id.nav_dcr).setVisible(newVisibility);
         if (menu.findItem(R.id.nav_dcr_form) != null)
             menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
-
         isDcrSubmenuVisible = newVisibility;
-        navigationView.invalidate();
     }
 
-    private void handleLogout() {
-        SecurePrefManager.getInstance(MainActivity.this).clearAll();
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        intent.putExtra("isFallback", true);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
+
+        } else if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+            navigateToDashboard();
+
+        } else {
+            CustomDialogHelper.showWarningDialog(this, "Exit App", "Are you sure you want to exit the app?", "Yes, Exit", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                @Override
+                public void onConfirm() {
+                    finish();
+                }
+
+                @Override
+                public void onCancel() {
+                    // Stay in app
+                }
+            });
+        }
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 
@@ -296,10 +369,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_PUNCH_ACTIVITY) {
             if (resultCode == Activity.RESULT_OK) {
-                NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-                navController.navigate(R.id.nav_dashboard);
+                navigateToDashboard();
             } else {
-                Toast.makeText(this, "Attendance Punch failed", Toast.LENGTH_SHORT).show();
+                CustomDialogHelper.showErrorDialog(this, "Punch Failed", "Attendance punch could not be recorded." + "\nPlease try again.");
             }
         }
     }
@@ -308,13 +380,14 @@ public class MainActivity extends AppCompatActivity {
         if (NetworkUtils.isNetworkAvailable(this)) {
             hideNoInternetLayout();
         } else {
-            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
+            CustomDialogHelper.showInfoDialog(this, "Still Offline", "No internet connection detected." + "\nPlease enable Wi-Fi or mobile data" + " and try again.");
         }
     }
 
     public void onOpenSettingsButtonClicked(View view) {
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
+
 
     private void fetchUserProfileData() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(MainActivity.this);
@@ -331,18 +404,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfile(String userId, String authToken, ImageView profileImage, TextView profileName, TextView profileEmail) {
-        String authHeaderValue = "jwt " + authToken;
 
+        String authHeaderValue = "jwt " + authToken;
         profileCall = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
+
         profileCall.enqueue(new Callback<UserProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
+
                 if (!response.isSuccessful() || response.body() == null) {
-                    handleProfileFetchFailure("Profile fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()), profileImage, profileName, profileEmail, clientLogo);
+                    handleProfileFetchFailure("Profile fetch failed", profileImage, profileName, profileEmail, clientLogo);
                     return;
                 }
 
                 UserProfileResponse userProfileResponse = response.body();
+
                 if (!userProfileResponse.isSuccess() || userProfileResponse.getData() == null || userProfileResponse.getData().getEmployee() == null) {
                     handleProfileFetchFailure("Profile fetch failed: " + userProfileResponse.getMessage(), profileImage, profileName, profileEmail, clientLogo);
                     return;
@@ -354,6 +430,7 @@ public class MainActivity extends AppCompatActivity {
                 String email = userProfileResponse.getData().getEmployee().getEmail();
 
                 String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+
                 SpannableString spannableString = new SpannableString(fullName);
 
                 if (firstName != null && !firstName.isEmpty()) {
@@ -376,47 +453,44 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && profileImage != null) {
                     if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                        Glide.with(MainActivity.this)
-                                .load(profileImageUrl)
-                                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                                .placeholder(R.drawable.ic_profile_placeholder)
-                                .error(R.drawable.ic_profile_placeholder)
-                                .into(profileImage);
+                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).into(profileImage);
                     } else {
-                        Glide.with(MainActivity.this)
-                                .load(R.drawable.ic_profile_placeholder)
-                                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                                .into(profileImage);
+                        Glide.with(MainActivity.this).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
                     }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
+                Log.e(TAG, "Profile fetch failure: " + t.getMessage());
                 handleProfileFetchFailure("Profile fetch failed: " + t.getMessage(), profileImage, profileName, profileEmail, clientLogo);
             }
         });
     }
 
     private void fetchUserData(String userId, String authToken, ImageView clientLogo) {
-        String authHeaderValue = "jwt " + authToken;
 
+        String authHeaderValue = "jwt " + authToken;
         userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
+
         userCall.enqueue(new Callback<UserModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
+
                 if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "User data fetch failed: " + (response.isSuccessful() ? "empty response" : response.code()));
+                    Log.e(TAG, "User data fetch failed");
                     return;
                 }
 
                 UserModelResponse userDataResponse = response.body();
+
                 if (!userDataResponse.isSuccess() || userDataResponse.getData() == null || userDataResponse.getData().getCompany() == null) {
                     Log.e(TAG, "User data fetch failed: " + userDataResponse.getMessage());
                     return;
                 }
 
                 String clientLogoUrl = userDataResponse.getData().getCompany().getLogo();
+
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && clientLogo != null) {
                     if (clientLogoUrl != null && !clientLogoUrl.isEmpty()) {
                         Glide.with(MainActivity.this).load(clientLogoUrl).into(clientLogo);
@@ -434,9 +508,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleProfileFetchFailure(String message, ImageView profileImage, TextView profileName, TextView profileEmail, ImageView clientLogo) {
+
         if (isFinishing() || isDestroyed()) return;
 
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Log.e(TAG, "handleProfileFetchFailure: " + message);
 
         if (profileName != null) profileName.setText(getString(R.string.guest_name));
         if (profileEmail != null) profileEmail.setText(getString(R.string.guest_email));
@@ -444,10 +519,15 @@ public class MainActivity extends AppCompatActivity {
         if (profileImage != null) {
             Glide.with(getApplicationContext()).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
         }
+
         if (clientLogo != null) {
             Glide.with(getApplicationContext()).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(clientLogo);
         }
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // LIFECYCLE
+    // ══════════════════════════════════════════════════════════════════════
 
     @Override
     protected void onStart() {
@@ -464,9 +544,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (noInternetDialog != null && noInternetDialog.isShowing()) noInternetDialog.dismiss();
-        if (slowNetworkDialog != null && slowNetworkDialog.isShowing()) slowNetworkDialog.dismiss();
-
         if (profileCall != null) profileCall.cancel();
         if (userCall != null) userCall.cancel();
     }

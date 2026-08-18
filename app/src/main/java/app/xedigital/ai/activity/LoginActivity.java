@@ -38,23 +38,13 @@ public class LoginActivity extends AppCompatActivity {
     private View loadingOverlay;
     private boolean isRedirectInProgress = false;
     private boolean isCheckingPermissions = false;
-    private AlertDialog batteryDialog;
-    private AlertDialog infoDialog;
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 isCheckingPermissions = false;
                 proceedToAuthCheck();
             });
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!isCheckingPermissions) {
-            isRedirectInProgress = false;
-            evaluateSessionWorkflow();
-        }
-    }
-
+    private AlertDialog batteryDialog;
+    private AlertDialog infoDialog;
     // ─── Session Workflow ─────────────────────────────────────────────────────
     private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
@@ -75,6 +65,15 @@ public class LoginActivity extends AppCompatActivity {
                     showAlertDialog("Foreground location permission is required for shift tracking.");
                 }
             });
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isCheckingPermissions) {
+            isRedirectInProgress = false;
+            evaluateSessionWorkflow();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

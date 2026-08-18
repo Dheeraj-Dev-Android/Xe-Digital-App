@@ -390,14 +390,7 @@ public class DashboardFragment extends Fragment {
                                 binding.tvPunchOutTimeValue.setText(punchOut != null && !punchOut.isEmpty() ? punchOut : "--:--");
 
                                 // Thorough check to ensure user actually punched in today
-                                boolean isValidPunchIn = rawPunchIn != null
-                                        && !rawPunchIn.trim().isEmpty()
-                                        && !rawPunchIn.equalsIgnoreCase("null")
-                                        && !rawPunchIn.equals("-")
-                                        && !rawPunchIn.startsWith("00:00")
-                                        && punchIn != null
-                                        && !punchIn.trim().isEmpty()
-                                        && !punchIn.equals("-");
+                                boolean isValidPunchIn = rawPunchIn != null && !rawPunchIn.trim().isEmpty() && !rawPunchIn.equalsIgnoreCase("null") && !rawPunchIn.equals("-") && !rawPunchIn.startsWith("00:00") && punchIn != null && !punchIn.trim().isEmpty() && !punchIn.equals("-");
 
                                 if (isValidPunchIn) {
                                     binding.tvPunchStatusValue.setText("Punched In");

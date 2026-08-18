@@ -186,7 +186,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="@color/colorPrimary"
+                        app:cardBackgroundColor="#1059B2"
                         app:cardCornerRadius="37dp"
                         app:cardElevation="4dp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -203,10 +203,10 @@
 
                             <ImageView
                                 android:id="@+id/ivPunchButtonIcon"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
                                 android:contentDescription="@null"
-                                android:src="@drawable/ic_fingerprint"
+                                android:src="@drawable/face_scan"
                                 app:tint="@color/white" />
 
                             <TextView

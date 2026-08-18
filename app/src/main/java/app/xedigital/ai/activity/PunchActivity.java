@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +53,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
@@ -84,6 +82,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.utills.BioMetric;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.FaceOverlayView;
 import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
@@ -97,13 +96,14 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     private static final String TAG = "PunchActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;
-//    private static final String COLLECTION_NAME = "consultedgeglobalpvtltd_5e970n";
 
     private static final String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private volatile ActivityState currentState = ActivityState.IDLE;
+
     private PreviewView previewView;
     private FaceOverlayView faceOverlay;
     private MaterialCardView loadingPanel;
@@ -115,6 +115,8 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private boolean challengeSatisfied = false;
     private LivenessChallenge currentChallenge;
     private ObjectAnimator scannerAnimator;
+
+    // ── Permission launcher ────────────────────────────────────────────
     private final ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
         boolean isGranted = true;
         for (boolean granted : result.values()) {
@@ -129,9 +131,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             showPermissionDeniedAlert();
         }
     });
+
+    // ── Dialog references (kept for dismissing on destroy) ────────────
     private AlertDialog attendanceSuccessDialog;
-    private AlertDialog failedDialog;
-    private AlertDialog errorDialog;
     private AlertDialog securityDialog;
 
     private String authToken;
@@ -142,6 +144,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private String currentAddress = "";
     private BioMetric bioMetric;
     private String collectionName;
+
+    // ══════════════════════════════════════════════════════════════════════
+    // LIFECYCLE
+    // ══════════════════════════════════════════════════════════════════════
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,8 +164,9 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         userId = prefManager.getString("userId", null);
         collectionName = prefManager.getString("collection", null);
-        Log.e(TAG, "collectionName: " + collectionName);
         employeeFirstName = prefManager.getString("empFirstName", "");
+
+        Log.e(TAG, "collectionName: " + collectionName);
 
         if (authToken != null) {
             prefManager.putString("authToken", authToken);
@@ -184,20 +191,12 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
     }
 
-    private void initiateVerificationFlow() {
-        currentState = ActivityState.SCANNING;
-        setRandomChallenge();
-        startCamera();
-    }
-
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
 
-        dismissDialog(attendanceSuccessDialog);
-        dismissDialog(failedDialog);
-        dismissDialog(errorDialog);
-        dismissDialog(securityDialog);
+        dismissDialogSafely(attendanceSuccessDialog);
+        dismissDialogSafely(securityDialog);
 
         if (scannerAnimator != null) {
             scannerAnimator.cancel();
@@ -222,9 +221,24 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         safeUnbindCamera();
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // VERIFICATION FLOW
+    // ══════════════════════════════════════════════════════════════════════
+
+    private void initiateVerificationFlow() {
+        currentState = ActivityState.SCANNING;
+        setRandomChallenge();
+        startCamera();
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // LIVENESS INSTRUCTIONS
+    // ══════════════════════════════════════════════════════════════════════
+
     private void showLivenessInstructions() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_liveness_instructions, null);
 
+        // ✅ Keep custom view dialog for liveness — has special layout
         AlertDialog infoDialog = new AlertDialog.Builder(this).setView(dialogView).setPositiveButton("I'm Ready", (dialog, which) -> {
             SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
             prefManager.putBoolean("instructionsSeenAttendance", true);
@@ -239,22 +253,13 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         infoDialog.show();
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // PERMISSIONS
+    // ══════════════════════════════════════════════════════════════════════
+
     private void showPermissionDeniedAlert() {
-        new AlertDialog.Builder(this).setTitle("Camera Access Required").setMessage("To login to your account using face recognition, you must grant camera access. Please enable it in settings.").setPositiveButton("OK", (dialog, which) -> finish()).setCancelable(false).show();
-    }
-
-    private boolean isActivityAlive() {
-        return !isFinishing() && !isDestroyed();
-    }
-
-    private void dismissDialog(AlertDialog dialog) {
-        if (dialog != null && dialog.isShowing()) {
-            try {
-                dialog.dismiss();
-            } catch (Exception e) {
-                Log.w(TAG, "Dialog dismiss failed", e);
-            }
-        }
+        // ✅ Custom error dialog for permission denied
+        CustomDialogHelper.showErrorDialog(this, "Permissions Required", "Camera and location permissions are required" + " for attendance punch." + "\n\nPlease enable them in your" + " device settings to continue.", () -> finish());
     }
 
     private boolean allPermissionsGranted() {
@@ -274,12 +279,17 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // CAMERA
+    // ══════════════════════════════════════════════════════════════════════
+
     private void startCamera() {
         if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
 
         toggleScannerAnimation(true);
 
         ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(this);
+
         future.addListener(() -> {
             try {
                 if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
@@ -316,6 +326,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // LIVENESS CHALLENGE
+    // ══════════════════════════════════════════════════════════════════════
+
     private void setRandomChallenge() {
         LivenessChallenge[] challenges = LivenessChallenge.values();
         currentChallenge = challenges[new Random().nextInt(challenges.length)];
@@ -342,6 +356,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // FACE ANALYSIS
+    // ══════════════════════════════════════════════════════════════════════
+
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void analyzeFace(@NonNull ImageProxy imageProxy) {
         if (isAnalyzing.get() || currentState != ActivityState.SCANNING || currentChallenge == null) {
@@ -366,6 +384,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
 
         InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
+
         detector.process(image).addOnSuccessListener(faces -> {
             if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
 
@@ -375,7 +394,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 isBlinking = false;
             } else if (faces.size() > 1) {
                 faceOverlay.setFaceDetected(false);
-                updateStatus("Multiple faces detected! Ensure only you are in frame.");
+                updateStatus("Multiple faces detected!" + " Ensure only you are in frame.");
                 isBlinking = false;
             } else {
                 faceOverlay.setFaceDetected(true);
@@ -428,19 +447,21 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         ByteBuffer buffer = planes[0].getBuffer();
         byte[] data = new byte[buffer.remaining()];
         buffer.get(data);
-
         long sum = 0;
-        for (byte b : data) {
-            sum += (b & 0xFF);
-        }
+        for (byte b : data) sum += (b & 0xFF);
         return sum / (double) data.length;
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // IMAGE CAPTURE
+    // ══════════════════════════════════════════════════════════════════════
 
     private void captureImage() {
         File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + "_photo.jpg");
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
+
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults results) {
                 if (!isActivityAlive()) {
@@ -455,7 +476,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                         if (bitmap == null) {
                             deleteQuietly(photoFile);
-                            handleError("Failed to decode captured image.");
+                            handleError("Failed to decode" + " captured image.");
                             return;
                         }
 
@@ -490,6 +511,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         });
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // API CALLS
+    // ══════════════════════════════════════════════════════════════════════
 
     private void prepareJsonAndSend(@NonNull String base64Image) {
         try {
@@ -527,6 +552,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private void sendImageToApi(@NonNull RequestBody requestBody) {
         APIInterface service = APIClient.getInstance().getImage();
         service.FaceRecognitionApi(requestBody).enqueue(new Callback<ResponseBody>() {
+
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
@@ -537,7 +563,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         JSONObject json = new JSONObject(bodyStr);
 
                         if (!json.has("data") || json.isNull("data")) {
-                            handleError("Server response is missing required data.");
+                            handleError("Server response is" + " missing required data.");
                             return;
                         }
 
@@ -572,6 +598,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private void callFaceDetailApi(@NonNull String token, @NonNull RequestBody requestBody) {
         APIInterface service = APIClient.getInstance().getFace();
         service.FaceDetailApi(token, requestBody).enqueue(new Callback<ResponseBody>() {
+
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
@@ -582,13 +609,13 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         JSONObject json = new JSONObject(bodyStr);
 
                         if (!json.has("data") || json.isNull("data")) {
-                            showAttendanceFailedAlert("Attendance failed: Face not found or matched.");
+                            showAttendanceFailedAlert("Face not found or matched.");
                             return;
                         }
 
                         JSONObject dataObject = json.getJSONObject("data");
                         if (!dataObject.has("employee") || dataObject.isNull("employee")) {
-                            showAttendanceFailedAlert("Attendance failed: Employee record not found.");
+                            showAttendanceFailedAlert("Employee record not found.");
                             return;
                         }
 
@@ -599,22 +626,22 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         if (userId != null && userId.equals(id)) {
                             callAttendanceApi(id, firstName);
                         } else {
-                            showAttendanceFailedAlert("Attendance failed: Identity mismatch.");
+                            showAttendanceFailedAlert("Identity mismatch detected.");
                         }
 
                     } catch (IOException | JSONException e) {
                         Log.e(TAG, "Face detail parse error", e);
-                        showAttendanceFailedAlert("Attendance failed: An error occurred.");
+                        showAttendanceFailedAlert("An error occurred during" + " verification.");
                     }
                 } else {
-                    showAttendanceFailedAlert("Attendance failed: Server error.");
+                    showAttendanceFailedAlert("Server error during verification.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
-                showAttendanceFailedAlert("Attendance failed: Network or API error.");
+                showAttendanceFailedAlert("Network or API error: " + t.getMessage());
             }
         });
     }
@@ -622,14 +649,27 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private void callAttendanceApi(@NonNull String employeeId, @NonNull String employeeName) {
         if (!isActivityAlive()) return;
 
+        // ── Auto time check ────────────────────────────────────────────
         if (!isAutomaticTimeEnabled()) {
-            dismissDialog(securityDialog);
-            securityDialog = new AlertDialog.Builder(this).setTitle("Security Check").setMessage("Please enable 'Automatic Date and Time' in your device settings to continue.").setPositiveButton("Settings", (d, w) -> startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS))).setNegativeButton("Cancel", (d, w) -> finish()).setCancelable(false).show();
+            dismissDialogSafely(securityDialog);
+
+            // ✅ Custom warning dialog for auto time
+            CustomDialogHelper.showWarningDialog(this, "Security Check", "Please enable <b>'Automatic Date and Time'</b>" + " in your device settings to continue." + "\n\nThis ensures accurate" + " attendance recording.", "Open Settings", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                @Override
+                public void onConfirm() {
+                    startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
+                }
+
+                @Override
+                public void onCancel() {
+                    finish();
+                }
+            });
             return;
         }
 
         if (userId == null || !userId.equals(employeeId)) {
-            showAttendanceFailedAlert("Attendance failed: User ID mismatch.");
+            showAttendanceFailedAlert("User ID mismatch. Please re-login.");
             return;
         }
 
@@ -650,6 +690,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                 APIInterface service = APIClient.getInstance().getAttendance();
                 service.AttendanceApi(token, requestBody).enqueue(new Callback<ResponseBody>() {
+
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
@@ -660,11 +701,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                                 String responseBody = response.body().string();
                                 showAttendanceSuccessAlert(responseBody);
                             } catch (IOException | JSONException e) {
-                                Log.e(TAG, "Attendance response parse error", e);
+                                Log.e(TAG, "Attendance response" + " parse error", e);
                                 showAttendanceFailedAlert("Error getting Attendance.");
                             }
                         } else {
-                            showAttendanceFailedAlert("Attendance submission failed. Please retry.");
+                            showAttendanceFailedAlert("Attendance submission failed." + " Please retry.");
                         }
                     }
 
@@ -673,7 +714,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                         if (!isActivityAlive() || currentState != ActivityState.UPLOADING) return;
                         setLoadingVisible(false);
                         if (t instanceof java.net.SocketTimeoutException) {
-                            showAttendanceFailedAlert("Connection timed out. Please check your internet.");
+                            showAttendanceFailedAlert("Connection timed out." + " Please check" + " your internet.");
                         } else {
                             showAttendanceFailedAlert("Network error: " + t.getMessage());
                         }
@@ -692,7 +733,12 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return android.provider.Settings.Global.getInt(getContentResolver(), android.provider.Settings.Global.AUTO_TIME, 0) == 1;
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // ATTENDANCE RESULT DIALOGS
+    // ══════════════════════════════════════════════════════════════════════
+
     private void showAttendanceSuccessAlert(@NonNull String responseBody) throws JSONException, IOException {
+
         toggleScannerAnimation(false);
         setLoadingVisible(false);
 
@@ -710,45 +756,86 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         JSONObject data = responseJson.optJSONObject("data");
         String punchInTime = data != null ? data.optString("punchInTime", "") : "";
         String punchOutTime = data != null ? data.optString("punchOutTime", "") : "";
-
         String punchInAddress = data != null ? data.optString("punchInAddress", "") : "";
         String punchOutAddress = data != null ? data.optString("punchOutAddress", "") : "";
         String displayAddress = punchOutAddress.isEmpty() ? punchInAddress : punchOutAddress;
 
-        String htmlMsg = "<b>" + message + "</b><br><br>Address: " + displayAddress;
+        dismissDialogSafely(attendanceSuccessDialog);
 
-        dismissDialog(attendanceSuccessDialog);
+        // ✅ Custom success dialog with HTML formatting
+        String htmlMessage = "<b>" + message + "</b>" + "<br><br>" + "&#8226; <b>Location:</b> " + displayAddress;
 
-        attendanceSuccessDialog = new MaterialAlertDialogBuilder(this).setTitle("Attendance Success").setMessage(Html.fromHtml(htmlMsg, Html.FROM_HTML_MODE_LEGACY)).setCancelable(false).setPositiveButton("OK", (d, w) -> {
-            d.dismiss();
+        // ── Build success dialog with auto-dismiss ─────────────────────
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_success, null);
+        builder.setView(view);
+        builder.setCancelable(false);
 
-            if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
-                boolean hasBackgroundLoc = true;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    hasBackgroundLoc = androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED;
-                }
+        attendanceSuccessDialog = builder.create();
 
-                if (!hasBackgroundLoc) {
-                    Toast.makeText(this, "Enable 'Allow all the time' for Precise Location.", Toast.LENGTH_LONG).show();
-                    try {
-                        androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment_content_main).navigate(R.id.nav_permission);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Navigation failed: " + e.getMessage());
-                    }
-                    finish();
-                    return;
-                }
-            }
-            setResult(Activity.RESULT_OK);
-            finish();
-        }).show();
+        // Setup dialog window
+        if (attendanceSuccessDialog.getWindow() != null) {
+            attendanceSuccessDialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
 
+        attendanceSuccessDialog.show();
+
+        // Setup views after show
+        android.widget.TextView titleView = view.findViewById(R.id.dialogTitle);
+        android.widget.TextView messageView = view.findViewById(R.id.dialogMessage);
+        com.google.android.material.button.MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
+
+        if (titleView != null) titleView.setText("Attendance Recorded! ✅");
+        if (messageView != null) {
+            messageView.setText(android.text.Html.fromHtml(htmlMessage, android.text.Html.FROM_HTML_MODE_COMPACT));
+            messageView.setGravity(android.view.Gravity.START);
+        }
+
+        // ── Animate dialog ─────────────────────────────────────────────
+        android.view.animation.Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.dialog_scale_in);
+        view.startAnimation(anim);
+
+        // ── OK button action ───────────────────────────────────────────
+        final String finalPunchInTime = punchInTime;
+        final String finalPunchOutTime = punchOutTime;
+
+        if (btnOk != null) {
+            btnOk.setOnClickListener(v -> {
+                dismissDialogSafely(attendanceSuccessDialog);
+                handlePostAttendanceNavigation(finalPunchInTime, finalPunchOutTime);
+            });
+        }
+
+        // ── Auto-dismiss after 5 seconds ───────────────────────────────
         handler.postDelayed(() -> {
             if (!isActivityAlive()) return;
             if (attendanceSuccessDialog != null && attendanceSuccessDialog.isShowing()) {
-                attendanceSuccessDialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
+                dismissDialogSafely(attendanceSuccessDialog);
+                handlePostAttendanceNavigation(finalPunchInTime, finalPunchOutTime);
             }
         }, 5000);
+    }
+
+    private void handlePostAttendanceNavigation(String punchInTime, String punchOutTime) {
+        if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
+            boolean hasBackgroundLoc = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                hasBackgroundLoc = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            }
+
+            if (!hasBackgroundLoc) {
+                Toast.makeText(this, "Enable 'Allow all the time'" + " for Precise Location.", Toast.LENGTH_LONG).show();
+                try {
+                    androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment_content_main).navigate(R.id.nav_permission);
+                } catch (Exception e) {
+                    Log.e(TAG, "Navigation failed: " + e.getMessage());
+                }
+                finish();
+                return;
+            }
+        }
+        setResult(Activity.RESULT_OK);
+        finish();
     }
 
     private void showAttendanceFailedAlert(@NonNull String message) {
@@ -757,35 +844,32 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
         if (!isActivityAlive()) return;
 
-        dismissDialog(failedDialog);
+        boolean hasBiometric = bioMetric != null && bioMetric.isBiometricAvailable();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Attendance Failed");
-        builder.setMessage(message);
-        builder.setCancelable(false);
+        if (hasBiometric) {
+            // ✅ Custom warning dialog with biometric option
+            CustomDialogHelper.showWarningDialogHtml(this, "Attendance Failed", "<b>Reason:</b> " + message + "<br><br>" + "You can retry face scan or use" + " <b>biometric authentication</b>" + " as an alternative.", "Retry", "Use Biometric", new CustomDialogHelper.OnWarningActionListener() {
+                @Override
+                public void onConfirm() {
+                    // Retry face scan
+                    safeUnbindCamera();
+                    initiateVerificationFlow();
+                }
 
-        builder.setPositiveButton("Retry", (d, id) -> {
-            d.dismiss();
-            safeUnbindCamera();
-            initiateVerificationFlow();
-        });
-
-        builder.setNegativeButton("Cancel", (d, id) -> {
-            d.dismiss();
-            setResult(Activity.RESULT_CANCELED);
-            finish();
-        });
-
-        if (bioMetric != null && bioMetric.isBiometricAvailable()) {
-            builder.setNeutralButton("Use Biometric", (d, id) -> {
-                d.dismiss();
-                currentState = ActivityState.BIOMETRIC_FALLBACK;
-                bioMetric.authenticate(false);
+                @Override
+                public void onCancel() {
+                    // Use biometric
+                    currentState = ActivityState.BIOMETRIC_FALLBACK;
+                    bioMetric.authenticate(false);
+                }
+            });
+        } else {
+            // ✅ Custom error dialog without biometric option
+            CustomDialogHelper.showErrorDialog(this, "Attendance Failed", message + "\n\nPlease try again or" + " contact your administrator.", () -> {
+                safeUnbindCamera();
+                initiateVerificationFlow();
             });
         }
-
-        failedDialog = builder.create();
-        failedDialog.show();
     }
 
     private void handleError(@NonNull String errorMessage) {
@@ -795,13 +879,15 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
         if (!isActivityAlive()) return;
 
-        String userMessage = errorMessage.contains("There are no faces in the image") ? "No face detected. Please position your face clearly in the circle." : errorMessage;
+        String userMessage = errorMessage.contains("There are no faces in the image") ? "No face detected." + "\nPlease position your face clearly" + " in the circle and try again." : errorMessage;
 
-        dismissDialog(errorDialog);
-        errorDialog = new AlertDialog.Builder(this).setTitle("Error").setMessage(userMessage).setPositiveButton("Retry", (d, w) -> initiateVerificationFlow()).setNegativeButton("Cancel", (d, w) -> finish()).setCancelable(false).create();
-
-        errorDialog.show();
+        // ✅ Custom error dialog with retry
+        CustomDialogHelper.showErrorDialog(this, "Verification Error", userMessage, () -> initiateVerificationFlow());
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BIOMETRIC CALLBACKS
+    // ══════════════════════════════════════════════════════════════════════
 
     @Override
     public void onAuthenticationSucceeded() {
@@ -811,7 +897,7 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             setLoadingVisible(true);
             callAttendanceApi(userId, employeeFirstName);
         } else {
-            showAttendanceFailedAlert("Biometric authentication succeeded but no user found.");
+            showAttendanceFailedAlert("Biometric authentication succeeded" + " but no user found.");
         }
     }
 
@@ -819,24 +905,34 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     public void onAuthenticationError(int errorCode, CharSequence errString) {
         if (!isActivityAlive()) return;
         setLoadingVisible(false);
-        showAttendanceFailedAlert("Biometric Error: " + errString);
-        Toast.makeText(this, "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
+
+        // ✅ Custom error dialog for biometric error
+        CustomDialogHelper.showErrorDialog(this, "Biometric Error", "Authentication error: " + errString + "\n\nPlease try face scan again.", () -> {
+            safeUnbindCamera();
+            initiateVerificationFlow();
+        });
     }
 
     @Override
     public void onAuthenticationFailed() {
         if (!isActivityAlive()) return;
         setLoadingVisible(false);
-        showAttendanceFailedAlert("Biometric authentication failed. Please try again.");
-        Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
+        updateStatus("Biometric authentication failed." + " Please try again.");
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // LOCATION
+    // ══════════════════════════════════════════════════════════════════════
 
     private void getCurrentLocation(@NonNull AddressCallback callback) {
         if (!isActivityAlive()) return;
 
+        // ── VPN check ─────────────────────────────────────────────────
         if (isVpnActive()) {
-            dismissDialog(securityDialog);
-            securityDialog = new AlertDialog.Builder(this).setTitle("Security Alert").setMessage("VPN detected. Please disconnect to continue.").setPositiveButton("OK", (d, w) -> finish()).setCancelable(false).show();
+            dismissDialogSafely(securityDialog);
+
+            // ✅ Custom error dialog for VPN detected
+            CustomDialogHelper.showErrorDialog(this, "VPN Detected 🔒", "A VPN connection was detected on your device." + "\n\nPlease disconnect your VPN" + " to continue with attendance punch.", () -> finish());
             return;
         }
 
@@ -861,8 +957,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
                     if (isMockLocation(location)) {
                         fusedLocationClient.removeLocationUpdates(this);
-                        dismissDialog(securityDialog);
-                        securityDialog = new AlertDialog.Builder(PunchActivity.this).setTitle("Security Alert").setMessage("Fake location detected. Please disable mock location apps to proceed.").setPositiveButton("OK", (d, w) -> finish()).setCancelable(false).show();
+                        dismissDialogSafely(securityDialog);
+
+                        // ✅ Custom error dialog for mock location
+                        CustomDialogHelper.showErrorDialog(PunchActivity.this, "Fake Location Detected 📍", "A mock/fake location was detected" + " on your device." + "\n\nPlease disable all" + " mock location apps" + " and try again.", () -> finish());
                         return;
                     }
 
@@ -874,12 +972,22 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 
         } else if (!isLocationEnabled) {
-            dismissDialog(securityDialog);
-            securityDialog = new AlertDialog.Builder(this).setTitle("Location Services Disabled").setMessage("Please enable location services to record attendance.").setPositiveButton("OK", (d, w) -> {
-                d.dismiss();
-                setResult(Activity.RESULT_CANCELED);
-                finish();
-            }).setCancelable(false).show();
+            dismissDialogSafely(securityDialog);
+
+            // ✅ Custom warning dialog for location disabled
+            CustomDialogHelper.showWarningDialog(this, "Location Services Disabled", "GPS / Location services are turned off." + "\n\nPlease enable location services" + " to record your attendance.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                @Override
+                public void onConfirm() {
+                    setResult(Activity.RESULT_CANCELED);
+                    finish();
+                }
+
+                @Override
+                public void onCancel() {
+                    setResult(Activity.RESULT_CANCELED);
+                    finish();
+                }
+            });
         } else {
             callback.onAddressReceived("Location not found", null);
         }
@@ -939,41 +1047,16 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         });
     }
 
-    //    private void showLocationNotFoundAlert() {
-//        if (!isActivityAlive()) return;
-//        dismissDialog(securityDialog);
-//        securityDialog = new AlertDialog.Builder(this)
-//                .setTitle("Location Not Found")
-//                .setMessage("We couldn't determine your location. Please check your GPS settings.")
-//                .setPositiveButton("Retry", (d, w) -> {
-//                    d.dismiss();
-//                    initiateVerificationFlow();
-//                })
-//                .setNegativeButton("Exit", (d, w) -> finish())
-//                .setCancelable(false)
-//                .show();
-//    }
     private void showLocationNotFoundAlert() {
-
         if (!isActivityAlive()) {
-            Log.w(TAG, "Activity is not alive. Skipping Location NotFound Alert.");
+            Log.w(TAG, "Activity not alive. Skipping dialog.");
             return;
         }
 
-        dismissDialog(securityDialog);
+        dismissDialogSafely(securityDialog);
 
-        try {
-            securityDialog = new AlertDialog.Builder(this).setTitle("Location Not Found").setMessage("We couldn't determine your location. Please check your GPS settings.").setPositiveButton("Retry", (d, w) -> {
-                d.dismiss();
-                initiateVerificationFlow();
-            }).setNegativeButton("Exit", (d, w) -> finish()).setCancelable(false).create();
-
-            if (isActivityAlive()) {
-                securityDialog.show();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to show Location NotFound Dialog safely", e);
-        }
+        // ✅ Custom error dialog for location not found
+        CustomDialogHelper.showErrorDialog(this, "Location Not Found 📍", "We couldn't determine your current location." + "\n\nPlease check your GPS settings" + " and make sure location is enabled.", () -> initiateVerificationFlow());
     }
 
     private boolean isMockLocation(@NonNull Location location) {
@@ -995,6 +1078,24 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
         return location != null ? fmt.format(new Date(location.getTime())) : fmt.format(new Date());
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // UI HELPERS
+    // ══════════════════════════════════════════════════════════════════════
+
+    private boolean isActivityAlive() {
+        return !isFinishing() && !isDestroyed();
+    }
+
+    private void dismissDialogSafely(AlertDialog dialog) {
+        if (dialog != null && dialog.isShowing()) {
+            try {
+                dialog.dismiss();
+            } catch (Exception e) {
+                Log.w(TAG, "Dialog dismiss failed", e);
+            }
+        }
     }
 
     private void updateStatus(@NonNull String text) {
@@ -1039,6 +1140,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         });
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ENUMS & INTERFACES
+    // ══════════════════════════════════════════════════════════════════════
 
     private enum ActivityState {
         IDLE, SCANNING, PROCESSING_LIVENESS, UPLOADING, BIOMETRIC_FALLBACK
