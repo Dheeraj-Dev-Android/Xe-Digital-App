@@ -32,6 +32,7 @@ import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimResponse;
 import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
+import app.xedigital.ai.model.employeeOnboarding.EmployeeOnboardingResponse;
 import app.xedigital.ai.model.faceAdd.AddFaceRequest;
 import app.xedigital.ai.model.faceAdd.AddFaceResponse;
 import app.xedigital.ai.model.getDocuments.DocumentListResponse;
@@ -214,6 +215,10 @@ public interface APIInterface {
 
     @GET("employees/allEmp?active=true")
     Call<AllEmployeeResponse> getAllEmployees(@Header("Authorization") String authToken);
+
+    //    https://app.xedigital.ai/api/v1/employees/getOnBoardEmployeeById/63ec7ea3877d7f4417cc5a39
+    @GET("employees/getOnBoardEmployeeById/{userId}")
+    Call<EmployeeOnboardingResponse> getOnBoardEmployeeById(@Header("Authorization") String authToken, @Path("userId") String userId);
 
     //  POST APIs
     @POST("claims/food")

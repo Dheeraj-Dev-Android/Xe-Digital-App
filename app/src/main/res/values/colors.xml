@@ -186,4 +186,15 @@
 
     <!-- Policy inactive/archived state -->
     <color name="policy_inactive">#FFE53935</color>
+    <color name="onb_primary">#1565C0</color>
+    <color name="onb_bg_field">#F5F7FA</color>
+    <color name="onb_text_primary">#1A1D29</color>
+    <color name="onb_text_secondary">#6B7280</color>
+    <color name="onb_stroke">#E2E5EC</color>
+    <color name="onb_error">#D32F2F</color>
+
+    <color name="onb_primary_dark">#0D47A1</color>
+    <color name="onb_text_label">#98A2B3</color>
+    <color name="onb_error_bg">#FDECEA</color>
+    <color name="onb_screen_bg">#F3F5F9</color>
 </resources>

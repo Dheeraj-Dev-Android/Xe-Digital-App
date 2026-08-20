@@ -208,20 +208,28 @@
                                 android:contentDescription="@null"
                                 android:src="@drawable/face_scan"
                                 app:tint="@color/white" />
-
-                            <TextView
-                                android:id="@+id/tvPunchButtonLabel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="Punch-In"
-                                android:textColor="@color/white"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
                         </LinearLayout>
+
                     </com.google.android.material.card.MaterialCardView>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!--                <LinearLayout-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:gravity="end"-->
+                <!--                    android:padding="6dp">-->
+
+                <!--                    <TextView-->
+                <!--                        android:id="@+id/tvPunchButtonLabel"-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_marginTop="2dp"-->
+                <!--                        android:text="Punch-In"-->
+                <!--                        android:textColor="@color/white"-->
+                <!--                        android:textSize="10sp"-->
+                <!--                        android:textStyle="bold" />-->
+                <!--                </LinearLayout>-->
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Quick actions shimmer -->

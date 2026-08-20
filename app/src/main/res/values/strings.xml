@@ -165,4 +165,6 @@
     <string name="check_in_visitors">Check In Visitors</string>
     <string name="no_visitors_found">No Visitors Found</string>
     <string name="empty_visitors_subtitle">No visitors to display.\nPull down to refresh or add new visitors.</string>
+    <string name="onboarding">Onboarding</string>
+    <string name="onboarding_detail">Onboarding Detail</string>
 </resources>

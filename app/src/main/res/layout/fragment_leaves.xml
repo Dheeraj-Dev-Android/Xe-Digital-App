@@ -39,7 +39,6 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/gradient_attendance_card"
                     android:orientation="vertical"
-
                     android:padding="12dp">
 
                     <!-- Section Header -->
