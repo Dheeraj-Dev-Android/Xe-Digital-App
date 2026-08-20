@@ -167,4 +167,5 @@
     <string name="empty_visitors_subtitle">No visitors to display.\nPull down to refresh or add new visitors.</string>
     <string name="onboarding">Onboarding</string>
     <string name="onboarding_detail">Onboarding Detail</string>
+    <string name="onboarding_form">Onboarding Form</string>
 </resources>

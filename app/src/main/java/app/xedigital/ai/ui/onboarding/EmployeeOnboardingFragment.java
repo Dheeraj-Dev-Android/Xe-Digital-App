@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,24 +22,36 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.model.employeeOnboarding.DocumentsItem;
+import app.xedigital.ai.model.employeeOnboarding.EmployeeOnBoardDetails;
+import app.xedigital.ai.model.employeeOnboarding.FamilyDetailsItem;
 import app.xedigital.ai.ui.onboarding.adapter.FamilyMemberAdapter;
 import app.xedigital.ai.ui.onboarding.adapter.OtherDocumentAdapter;
 import app.xedigital.ai.ui.onboarding.model.FamilyMember;
 import app.xedigital.ai.ui.onboarding.model.OnboardingFormModel;
 import app.xedigital.ai.ui.onboarding.model.OtherDocument;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class EmployeeOnboardingFragment extends Fragment {
 
@@ -47,57 +61,60 @@ public class EmployeeOnboardingFragment extends Fragment {
     private static final int REQ_FAMILY_BASE = 2000;
     private static final int REQ_OTHER_BASE = 3000;
 
-    // File size limit: 500KB – matches web validateFile()
     private static final long MAX_FILE_SIZE = 500 * 1024;
     private static final String[] GENDERS = {"Male", "Female", "Other"};
     private static final String[] MARITAL_STATUSES = {"Single", "Married"};
     private static final String[] EMPLOYMENT_TYPES = {"Full Time", "Part Time", "Intern", "Contract"};
     private static final String[] MEDICAL_CONDITIONS = {"No", "Yes"};
+
     private EmployeeOnboardingViewModel mViewModel;
     private OnboardingFormModel formModel;
     private boolean submitted = false;
     private String existingAadhaarFrontURL = "";
     private String existingAadhaarBackURL = "";
     private String existingPanURL = "";
-    private TextInputLayout tilFullName, tilDob, tilGender, tilPersonalMobile;
+
+    private ScrollView scrollContent;
+    private ProgressBar progressBar;
+
+    private TextInputLayout tilFullName, tilDob, tilGender, tilPersonalMobileLayout, tilPersonalEmail;
     private TextInputEditText etFullName, etDob, etFatherOrHusbandName, etBloodGroup, etNationality;
     private AutoCompleteTextView spGender, spMaritalStatus;
-    private TextInputLayout tilPersonalMobileLayout, tilPersonalEmail;
     private TextInputEditText etPersonalMobile, etAlternateMobile, etPersonalEmail, etCurrentAddress, etPermanentAddress, etCity, etState, etPincode, etCountry;
     private TextInputEditText etEmergencyName, etEmergencyRelationship, etEmergencyNumber, etEmergencyAlternateNumber, etEmergencyAddress;
     private TextInputEditText etEmployeeId, etDateOfJoining, etDesignation, etDepartment, etGrade, etReportingManager, etWorkLocation;
     private AutoCompleteTextView spEmploymentType;
     private TextInputEditText etQualification, etInstitution, etYearOfPassing, etPercentageGrade;
     private TextInputEditText etPreviousEmployer, etPreviousDesignation, etPreviousDuration, etLastDrawnCtc, etRelievingDate, etReasonForLeaving;
+    private TextInputLayout tilAccountNumber, tilUanNumber, tilEsiNumber, tilPassportNumber;
     private TextInputEditText etBankName, etBranchName, etAccountNumber, etIfscCode, etAccountHolderName, etUpiId;
     private TextInputEditText etUanNumber, etEsiNumber, etPassportNumber, etPassportExpiryDate;
     private TextInputEditText etNomineeName, etNomineeRelationship, etNomineeDob, etSharePercentage;
     private AutoCompleteTextView spMedicalCondition;
     private TextInputLayout tilMedicalConditionDetails;
     private TextInputEditText etMedicalConditionDetails, etKnownAllergies;
+
     private RecyclerView rvFamilyDetails;
     private FamilyMemberAdapter familyAdapter;
     private List<FamilyMember> familyDetailsList;
     private Button btnAddFamilyMember;
+
     private TextInputLayout tilAadhaarNumber, tilPanNumber;
     private TextInputEditText etAadhaarNumber, etPanNumber;
-    // Aadhaar Front
     private Button btnAadhaarFront;
     private TextView tvAadhaarFrontFileName;
-    // Aadhaar Back
     private Button btnAadhaarBack;
     private TextView tvAadhaarBackFileName;
-    // PAN
     private Button btnPanFile;
     private TextView tvPanFileName;
-    // Validation error texts
     private TextView tvAadhaarFrontError, tvAadhaarBackError, tvPanError;
-    // Other documents
+
     private RecyclerView rvDocuments;
     private OtherDocumentAdapter otherDocAdapter;
     private List<OtherDocument> documentsList;
     private Button btnAddDocument;
     private Button btnSave, btnReset, btnSubmit;
+
     private ActivityResultLauncher<Intent> filePickerLauncher;
     private int currentFileRequest = -1;
 
@@ -121,10 +138,7 @@ public class EmployeeOnboardingFragment extends Fragment {
         familyDetailsList = new ArrayList<>();
         documentsList = new ArrayList<>();
 
-        // Web initialises with 1 family member
         familyDetailsList.add(new FamilyMember());
-
-        // Web initialises with 2 documents
         documentsList.add(new OtherDocument());
         documentsList.add(new OtherDocument());
 
@@ -136,9 +150,13 @@ public class EmployeeOnboardingFragment extends Fragment {
         setupClickListeners();
         setupMedicalConditionToggle();
         observeViewModel();
+
+        loadCurrentOnboardingDetails();
     }
 
     private void initViews(View v) {
+        scrollContent = v.findViewById(R.id.scroll_content);
+        progressBar = v.findViewById(R.id.progress_bar);
 
         // Section 1 – Personal Details
         tilFullName = v.findViewById(R.id.til_full_name);
@@ -177,7 +195,7 @@ public class EmployeeOnboardingFragment extends Fragment {
         spEmploymentType = v.findViewById(R.id.sp_employment_type);
         etDesignation = v.findViewById(R.id.et_designation);
         etDepartment = v.findViewById(R.id.et_department);
-        etGrade = v.findViewById(R.id.et_grade);   // NOTE: "grade"
+        etGrade = v.findViewById(R.id.et_grade);
         etReportingManager = v.findViewById(R.id.et_reporting_manager);
         etWorkLocation = v.findViewById(R.id.et_work_location);
 
@@ -190,7 +208,7 @@ public class EmployeeOnboardingFragment extends Fragment {
         // Section 6 – Previous Employment
         etPreviousEmployer = v.findViewById(R.id.et_previous_employer);
         etPreviousDesignation = v.findViewById(R.id.et_previous_designation);
-        etPreviousDuration = v.findViewById(R.id.et_previous_duration); // single field
+        etPreviousDuration = v.findViewById(R.id.et_previous_duration);
         etLastDrawnCtc = v.findViewById(R.id.et_last_drawn_ctc);
         etRelievingDate = v.findViewById(R.id.et_relieving_date);
         etReasonForLeaving = v.findViewById(R.id.et_reason_for_leaving);
@@ -243,7 +261,6 @@ public class EmployeeOnboardingFragment extends Fragment {
         rvDocuments = v.findViewById(R.id.rv_documents);
         btnAddDocument = v.findViewById(R.id.btn_add_document);
 
-        // Action buttons
         btnSave = v.findViewById(R.id.btn_save);
         btnReset = v.findViewById(R.id.btn_reset);
         btnSubmit = v.findViewById(R.id.btn_submit);
@@ -273,25 +290,276 @@ public class EmployeeOnboardingFragment extends Fragment {
         field.setClickable(true);
         field.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
-            DatePickerDialog dlg = new DatePickerDialog(requireContext(), (dp, y, m, d) ->
-                    // yyyy-MM-dd matches web formatDate()
-                    field.setText(String.format("%04d-%02d-%02d", y, m + 1, d)), c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+            DatePickerDialog dlg = new DatePickerDialog(requireContext(), (dp, y, m, d) -> field.setText(String.format(Locale.US, "%04d-%02d-%02d", y, m + 1, d)), c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
             if (pastOnly) dlg.getDatePicker().setMaxDate(System.currentTimeMillis());
             dlg.show();
         });
     }
 
+    private void loadCurrentOnboardingDetails() {
+        SecurePrefManager prefs = SecurePrefManager.getInstance(requireContext());
+        String token = prefs.getString("authToken", "");
+        String userId = prefs.getString("userId", "");
+        if (!token.isEmpty() && !userId.isEmpty()) {
+            mViewModel.fetchOnboardingDetails("jwt " + token, userId);
+        }
+    }
+
+    private void observeViewModel() {
+        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), loading -> {
+            if (loading != null) {
+                if (progressBar != null)
+                    progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+                if (scrollContent != null) scrollContent.setAlpha(loading ? 0.35f : 1.0f);
+            }
+        });
+
+        mViewModel.getFetchResponse().observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.isSuccess() && response.getData() != null) {
+                EmployeeOnBoardDetails details = response.getData().getEmployeeOnBoardDetails();
+                if (details != null) {
+                    if (details.isStatus()) {
+                        // "status": true -> Locked. Show styled non-dismissible alert to view details.
+                        showSubmittedAlert();
+                    } else {
+                        // "status": false -> Open for review/resubmission. Pre-fill form.
+                        patchForm(details);
+                    }
+                }
+            }
+        });
+
+        mViewModel.getSubmitSuccess().observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                Toast.makeText(requireContext(), "Onboarding submitted successfully!", Toast.LENGTH_LONG).show();
+                navigateToViewDetails();
+            }
+        });
+
+        mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null && !msg.isEmpty()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * Shows a beautifully designed, non-cancelable Material dialog
+     * informing the user that their onboarding form is locked.
+     */
+    private void showSubmittedAlert() {
+        if (getContext() == null || !isAdded()) return;
+
+        View customLayout = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_onboarding_submitted, null);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(customLayout)
+                .setCancelable(false) // Blocks dismissing by tapping outside or back button
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        // Bind button action
+        Button btnViewDetails = customLayout.findViewById(R.id.btn_dialog_view_details);
+        btnViewDetails.setOnClickListener(v -> {
+            dialog.dismiss();
+            navigateToViewDetails();
+        });
+
+        dialog.show();
+    }
+
+    private void lockFormInputs() {
+        btnSubmit.setEnabled(false);
+        btnSubmit.setText("Already Submitted (Read Only)");
+        btnSave.setEnabled(false);
+        btnReset.setEnabled(false);
+        btnAddFamilyMember.setEnabled(false);
+        btnAddDocument.setEnabled(false);
+        btnAadhaarFront.setEnabled(false);
+        btnAadhaarBack.setEnabled(false);
+        btnPanFile.setEnabled(false);
+    }
+
+    private void navigateToViewDetails() {
+        if (!isAdded()) return;
+
+        try {
+            NavController navController = NavHostFragment.findNavController(this);
+            // Uses your exact action ID
+            navController.navigate(R.id.action_nav_onboarding_to_nav_onboarding_details);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "Navigation failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void patchForm(EmployeeOnBoardDetails data) {
+        if (data == null) return;
+
+        etFullName.setText(safe(data.getFullName()));
+        etDob.setText(formatToFormDate(data.getDob()));
+        spGender.setText(safe(data.getGender()), false);
+        etFatherOrHusbandName.setText(safe(data.getFatherOrHusbandName()));
+        spMaritalStatus.setText(safe(data.getMaritalStatus()), false);
+        etBloodGroup.setText(safe(data.getBloodGroup()));
+        etNationality.setText(safe(data.getNationality()));
+
+        etPersonalMobile.setText(safe(data.getPersonalMobile()));
+        etAlternateMobile.setText(safe(data.getAlternateMobile()));
+        etPersonalEmail.setText(safe(data.getPersonalEmail()));
+        etCurrentAddress.setText(safe(data.getCurrentAddress()));
+        etPermanentAddress.setText(safe(data.getPermanentAddress()));
+        etCity.setText(safe(data.getCity()));
+        etState.setText(safe(data.getState()));
+        etPincode.setText(safe(data.getPincode()));
+        etCountry.setText(safe(data.getCountry()).isEmpty() ? "India" : data.getCountry());
+
+        etEmergencyName.setText(safe(data.getEmergencyName()));
+        etEmergencyRelationship.setText(safe(data.getEmergencyRelationship()));
+        etEmergencyNumber.setText(safe(data.getEmergencyNumber()));
+        etEmergencyAlternateNumber.setText(safe(data.getEmergencyAlternateNumber()));
+        etEmergencyAddress.setText(safe(data.getEmergencyAddress()));
+
+        etEmployeeId.setText(safe(data.getEmployeeId()));
+        etDateOfJoining.setText(formatToFormDate(data.getDateOfJoining()));
+        spEmploymentType.setText(safe(data.getEmploymentType()), false);
+        etDesignation.setText(safe(data.getDesignation()));
+        etDepartment.setText(safe(data.getDepartment()));
+        etGrade.setText(safe(data.getGrade()));
+        etReportingManager.setText(safe(data.getReportingManager()));
+        etWorkLocation.setText(safe(data.getWorkLocation()));
+
+        etQualification.setText(safe(data.getQualification()));
+        etInstitution.setText(safe(data.getInstitution()));
+        etYearOfPassing.setText(safe(data.getYearOfPassing()));
+        etPercentageGrade.setText(safe(data.getPercentageGrade()));
+
+        etPreviousEmployer.setText(safe(data.getPreviousEmployer()));
+        etPreviousDesignation.setText(safe(data.getPreviousDesignation()));
+        etPreviousDuration.setText(safe(data.getPreviousDuration()));
+        etLastDrawnCtc.setText(safe(data.getLastDrawnCtc()));
+        etRelievingDate.setText("");
+        etReasonForLeaving.setText(safe(data.getReasonForLeaving()));
+
+        etBankName.setText(safe(data.getBankName()));
+        etBranchName.setText(safe(data.getBranchName()));
+        etIfscCode.setText(safe(data.getIfscCode()));
+        etAccountHolderName.setText(safe(data.getAccountHolderName()));
+        etUpiId.setText(safe(data.getUpiId()));
+
+        if (data.getAccountNumberMasked() != null && !data.getAccountNumberMasked().isEmpty()) {
+            etAccountNumber.setHint("On file: " + data.getAccountNumberMasked());
+        }
+
+        if (data.getUanNumberMasked() != null && !data.getUanNumberMasked().isEmpty()) {
+            etUanNumber.setHint("On file: " + data.getUanNumberMasked());
+        }
+        if (data.getEsiNumberMasked() != null && !data.getEsiNumberMasked().isEmpty()) {
+            etEsiNumber.setHint("On file: " + data.getEsiNumberMasked());
+        }
+        if (data.getPassportNumberMasked() != null && !data.getPassportNumberMasked().isEmpty()) {
+            etPassportNumber.setHint("On file: " + data.getPassportNumberMasked());
+        }
+        etPassportExpiryDate.setText(formatToFormDate(data.getPassportExpiryDate()));
+
+        etNomineeName.setText(safe(data.getNomineeName()));
+        etNomineeRelationship.setText(safe(data.getNomineeRelationship()));
+        etNomineeDob.setText(formatToFormDate(data.getNomineeDob()));
+        etSharePercentage.setText(safe(data.getSharePercentage()));
+
+        String medCond = safe(data.getMedicalCondition());
+        spMedicalCondition.setText(medCond.isEmpty() ? "No" : medCond, false);
+        boolean isYes = "Yes".equalsIgnoreCase(medCond);
+        tilMedicalConditionDetails.setVisibility(isYes ? View.VISIBLE : View.GONE);
+        etMedicalConditionDetails.setText(safe(data.getMedicalConditionDetails()));
+        etKnownAllergies.setText(safe(data.getKnownAllergies()));
+
+        // Show masked Aadhaar / PAN info to let the user know they are already on file
+        if (data.getAadhaarNumberMasked() != null && !data.getAadhaarNumberMasked().isEmpty()) {
+            tilAadhaarNumber.setHelperText("Current: " + data.getAadhaarNumberMasked());
+        }
+        if (data.getPanNumberMasked() != null && !data.getPanNumberMasked().isEmpty()) {
+            tilPanNumber.setHelperText("Current: " + data.getPanNumberMasked());
+        }
+
+        existingAadhaarFrontURL = safe(data.getAadhaarFrontFileURL());
+        existingAadhaarBackURL = safe(data.getAadhaarBackFileURL());
+        existingPanURL = safe(data.getPanFileURL());
+
+        if (!existingAadhaarFrontURL.isEmpty()) tvAadhaarFrontFileName.setText("File on server ✓");
+        if (!existingAadhaarBackURL.isEmpty()) tvAadhaarBackFileName.setText("File on server ✓");
+        if (!existingPanURL.isEmpty()) tvPanFileName.setText("File on server ✓");
+
+        familyDetailsList.clear();
+        if (data.getFamilyDetails() != null && !data.getFamilyDetails().isEmpty()) {
+            for (FamilyDetailsItem item : data.getFamilyDetails()) {
+                FamilyMember m = new FamilyMember();
+                m.setFamilyMemberName(safe(item.getFamilyMemberName()));
+                m.setFamilyRelationship(safe(item.getFamilyRelationship()));
+                m.setFamilyDob(formatToFormDate(item.getFamilyDob()));
+                m.setFamilyMobile(safe(item.getFamilyMobile()));
+                m.setAddressProofFileURL(safe(item.getAddressProofFileURL()));
+                familyDetailsList.add(m);
+            }
+        } else {
+            familyDetailsList.add(new FamilyMember());
+        }
+        familyAdapter.notifyDataSetChanged();
+
+        documentsList.clear();
+        if (data.getDocuments() != null && !data.getDocuments().isEmpty()) {
+            for (DocumentsItem item : data.getDocuments()) {
+                OtherDocument doc = new OtherDocument();
+                doc.setDocumentName(safe(item.getDocumentName()));
+                doc.setDocumentFileURL(safe(item.getDocumentFileURL()));
+                documentsList.add(doc);
+            }
+        } else {
+            documentsList.add(new OtherDocument());
+            documentsList.add(new OtherDocument());
+        }
+        otherDocAdapter.notifyDataSetChanged();
+    }
+
+    private String formatToFormDate(Object dateObj) {
+        if (dateObj == null) return "";
+        String dateStr = dateObj.toString().trim();
+        if (dateStr.isEmpty() || "null".equalsIgnoreCase(dateStr)) return "";
+
+        // If it already matches yyyy-MM-dd
+        if (dateStr.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+            return dateStr;
+        }
+
+        String[] parseFormats = {"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "dd-MM-yyyy"};
+
+        for (String format : parseFormats) {
+            try {
+                SimpleDateFormat inFmt = new SimpleDateFormat(format, Locale.US);
+                inFmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date parsed = inFmt.parse(dateStr);
+                if (parsed != null) {
+                    SimpleDateFormat outFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    return outFmt.format(parsed);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (dateStr.contains("T")) {
+            return dateStr.split("T")[0];
+        }
+        return dateStr;
+    }
+
     private void registerFilePicker() {
         filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            requireActivity();
-            if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null)
-                return;
-
+            if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null) return;
             Uri uri = result.getData().getData();
-            if (uri == null) return;
-
-            // Validate file – matches web validateFile()
-            if (!validateFile(uri)) return;
+            if (uri == null || !validateFile(uri)) return;
 
             String name = resolveFileName(uri);
 
@@ -300,24 +568,20 @@ public class EmployeeOnboardingFragment extends Fragment {
                 formModel.setAadhaarFrontFileName(name);
                 tvAadhaarFrontFileName.setText(name);
                 tvAadhaarFrontError.setVisibility(View.GONE);
-
             } else if (currentFileRequest == REQ_AADHAAR_BACK) {
                 formModel.setAadhaarBackFile(uri);
                 formModel.setAadhaarBackFileName(name);
                 tvAadhaarBackFileName.setText(name);
                 tvAadhaarBackError.setVisibility(View.GONE);
-
             } else if (currentFileRequest == REQ_PAN) {
                 formModel.setPanFile(uri);
                 formModel.setPanFileName(name);
                 tvPanFileName.setText(name);
                 tvPanError.setVisibility(View.GONE);
-
             } else if (currentFileRequest >= REQ_FAMILY_BASE && currentFileRequest < REQ_OTHER_BASE) {
                 int pos = currentFileRequest - REQ_FAMILY_BASE;
                 familyDetailsList.get(pos).setAddressProofFile(uri);
                 familyAdapter.updateFile(pos, name);
-
             } else if (currentFileRequest >= REQ_OTHER_BASE) {
                 int pos = currentFileRequest - REQ_OTHER_BASE;
                 documentsList.get(pos).setDocumentFile(uri);
@@ -329,29 +593,24 @@ public class EmployeeOnboardingFragment extends Fragment {
     private boolean validateFile(Uri uri) {
         try {
             String mimeType = requireContext().getContentResolver().getType(uri);
-
             if (mimeType == null || (!mimeType.equals("image/jpeg") && !mimeType.equals("image/png"))) {
                 Toast.makeText(requireContext(), "Only JPEG/PNG files are allowed.", Toast.LENGTH_LONG).show();
                 return false;
             }
 
-            // Check file size
-            Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                if (sizeIndex >= 0) {
-                    long size = cursor.getLong(sizeIndex);
-                    cursor.close();
-                    if (size > MAX_FILE_SIZE) {
-                        Toast.makeText(requireContext(), "File size should be less than 500KB.", Toast.LENGTH_LONG).show();
-                        return false;
+            try (Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    if (sizeIndex >= 0) {
+                        long size = cursor.getLong(sizeIndex);
+                        if (size > MAX_FILE_SIZE) {
+                            Toast.makeText(requireContext(), "File size should be less than 500KB.", Toast.LENGTH_LONG).show();
+                            return false;
+                        }
                     }
-                } else {
-                    cursor.close();
                 }
             }
             return true;
-
         } catch (Exception e) {
             return false;
         }
@@ -362,7 +621,6 @@ public class EmployeeOnboardingFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        // Matches web accept="image/png,image/jpeg"
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/jpeg", "image/png"});
         filePickerLauncher.launch(Intent.createChooser(intent, "Select Image"));
     }
@@ -383,13 +641,11 @@ public class EmployeeOnboardingFragment extends Fragment {
     }
 
     private void setupRecyclerViews() {
-        // Family Details
         familyAdapter = new FamilyMemberAdapter(requireContext(), familyDetailsList, pos -> launchPicker(REQ_FAMILY_BASE + pos));
         rvFamilyDetails.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvFamilyDetails.setAdapter(familyAdapter);
         rvFamilyDetails.setNestedScrollingEnabled(false);
 
-        // Other Documents
         otherDocAdapter = new OtherDocumentAdapter(requireContext(), documentsList, pos -> launchPicker(REQ_OTHER_BASE + pos));
         rvDocuments.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvDocuments.setAdapter(otherDocAdapter);
@@ -397,39 +653,30 @@ public class EmployeeOnboardingFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-
         btnAadhaarFront.setOnClickListener(v -> launchPicker(REQ_AADHAAR_FRONT));
-
         btnAadhaarBack.setOnClickListener(v -> launchPicker(REQ_AADHAAR_BACK));
-
         btnPanFile.setOnClickListener(v -> launchPicker(REQ_PAN));
 
-        // addFamilyMember() – matches web addFamilyMember()
         btnAddFamilyMember.setOnClickListener(v -> {
             familyDetailsList.add(new FamilyMember());
             familyAdapter.notifyItemInserted(familyDetailsList.size() - 1);
-            // Refresh all to update Remove button visibility
             familyAdapter.notifyDataSetChanged();
         });
 
-        // addDocument() – matches web addDocument()
         btnAddDocument.setOnClickListener(v -> {
             documentsList.add(new OtherDocument());
             otherDocAdapter.notifyItemInserted(documentsList.size() - 1);
         });
 
-        // saveDraft() – matches web saveDraft()
         btnSave.setOnClickListener(v -> {
             submitted = false;
             collectFormData();
             mViewModel.saveDraft(formModel);
-            Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Saved Draft Successfully!", Toast.LENGTH_SHORT).show();
         });
 
-        // onReset() – matches web onReset()
         btnReset.setOnClickListener(v -> resetForm());
 
-        // submitForm() – matches web submitForm()
         btnSubmit.setOnClickListener(v -> {
             submitted = true;
             if (validateForm()) {
@@ -448,23 +695,7 @@ public class EmployeeOnboardingFragment extends Fragment {
         });
     }
 
-    private void observeViewModel() {
-        mViewModel.getSubmitSuccess().observe(getViewLifecycleOwner(), success -> {
-            if (Boolean.TRUE.equals(success)) {
-                Toast.makeText(requireContext(), "Onboarding submitted successfully!", Toast.LENGTH_LONG).show();
-                // TODO: hide form, show detail view
-            }
-        });
-
-        mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), msg -> {
-            if (msg != null && !msg.isEmpty()) {
-                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
     private void collectFormData() {
-        // Section 1
         formModel.setFullName(get(etFullName));
         formModel.setDob(get(etDob));
         formModel.setGender(spGender.getText().toString().trim());
@@ -473,7 +704,6 @@ public class EmployeeOnboardingFragment extends Fragment {
         formModel.setBloodGroup(get(etBloodGroup));
         formModel.setNationality(get(etNationality));
 
-        // Section 2
         formModel.setPersonalMobile(get(etPersonalMobile));
         formModel.setAlternateMobile(get(etAlternateMobile));
         formModel.setPersonalEmail(get(etPersonalEmail));
@@ -484,14 +714,12 @@ public class EmployeeOnboardingFragment extends Fragment {
         formModel.setPincode(get(etPincode));
         formModel.setCountry(get(etCountry));
 
-        // Section 3
         formModel.setEmergencyName(get(etEmergencyName));
         formModel.setEmergencyRelationship(get(etEmergencyRelationship));
         formModel.setEmergencyNumber(get(etEmergencyNumber));
         formModel.setEmergencyAlternateNumber(get(etEmergencyAlternateNumber));
         formModel.setEmergencyAddress(get(etEmergencyAddress));
 
-        // Section 4
         formModel.setEmployeeId(get(etEmployeeId));
         formModel.setDateOfJoining(get(etDateOfJoining));
         formModel.setEmploymentType(spEmploymentType.getText().toString().trim());
@@ -501,13 +729,11 @@ public class EmployeeOnboardingFragment extends Fragment {
         formModel.setReportingManager(get(etReportingManager));
         formModel.setWorkLocation(get(etWorkLocation));
 
-        // Section 5
         formModel.setQualification(get(etQualification));
         formModel.setInstitution(get(etInstitution));
         formModel.setYearOfPassing(get(etYearOfPassing));
         formModel.setPercentageGrade(get(etPercentageGrade));
 
-        // Section 6
         formModel.setPreviousEmployer(get(etPreviousEmployer));
         formModel.setPreviousDesignation(get(etPreviousDesignation));
         formModel.setPreviousDuration(get(etPreviousDuration));
@@ -515,7 +741,6 @@ public class EmployeeOnboardingFragment extends Fragment {
         formModel.setRelievingDate(get(etRelievingDate));
         formModel.setReasonForLeaving(get(etReasonForLeaving));
 
-        // Section 7
         formModel.setBankName(get(etBankName));
         formModel.setBranchName(get(etBranchName));
         formModel.setAccountNumber(get(etAccountNumber));
@@ -523,27 +748,21 @@ public class EmployeeOnboardingFragment extends Fragment {
         formModel.setAccountHolderName(get(etAccountHolderName));
         formModel.setUpiId(get(etUpiId));
 
-        // Section 8
         formModel.setUanNumber(get(etUanNumber));
         formModel.setEsiNumber(get(etEsiNumber));
         formModel.setPassportNumber(get(etPassportNumber));
         formModel.setPassportExpiryDate(get(etPassportExpiryDate));
 
-        // Section 9
         formModel.setNomineeName(get(etNomineeName));
         formModel.setNomineeRelationship(get(etNomineeRelationship));
         formModel.setNomineeDob(get(etNomineeDob));
         formModel.setSharePercentage(get(etSharePercentage));
 
-        // Section 10
         formModel.setMedicalCondition(spMedicalCondition.getText().toString().trim());
         formModel.setMedicalConditionDetails(get(etMedicalConditionDetails));
         formModel.setKnownAllergies(get(etKnownAllergies));
 
-        // Family Details
         formModel.setFamilyDetails(familyDetailsList);
-
-        // Section 11
         formModel.setAadhaarNumber(get(etAadhaarNumber));
         formModel.setPanNumber(get(etPanNumber).toUpperCase());
         formModel.setDocuments(documentsList);
@@ -551,30 +770,22 @@ public class EmployeeOnboardingFragment extends Fragment {
 
     private boolean validateForm() {
         boolean valid = true;
-
         clearAllErrors();
 
-        // fullName: Validators.required
         if (get(etFullName).isEmpty()) {
             tilFullName.setError("Full Name is required");
             if (valid) etFullName.requestFocus();
             valid = false;
         }
-
-        // dob: Validators.required
         if (get(etDob).isEmpty()) {
-            // Set error on parent layout
             etDob.setError("Date of Birth is required");
             valid = false;
         }
-
-        // gender: Validators.required
         if (spGender.getText().toString().trim().isEmpty()) {
             spGender.setError("Gender is required");
             valid = false;
         }
 
-        // personalMobile: required + pattern /^[6-9][0-9]{9}$/
         String mob = get(etPersonalMobile);
         if (mob.isEmpty()) {
             tilPersonalMobileLayout.setError("Personal Mobile is required");
@@ -584,7 +795,6 @@ public class EmployeeOnboardingFragment extends Fragment {
             valid = false;
         }
 
-        // personalEmail: required + email
         String email = get(etPersonalEmail);
         if (email.isEmpty()) {
             tilPersonalEmail.setError("Personal Email is required");
@@ -594,71 +804,58 @@ public class EmployeeOnboardingFragment extends Fragment {
             valid = false;
         }
 
-        // aadhaarNumber: required + pattern /^[0-9]{12}$/
         String aadhaar = get(etAadhaarNumber);
-        if (aadhaar.isEmpty()) {
+        if (aadhaar.isEmpty() && existingAadhaarFrontURL.isEmpty()) {
             tilAadhaarNumber.setError("Aadhaar Number is required");
             valid = false;
-        } else if (!aadhaar.matches("^[0-9]{12}$")) {
+        } else if (!aadhaar.isEmpty() && !aadhaar.matches("^[0-9]{12}$")) {
             tilAadhaarNumber.setError("Enter valid 12 digit Aadhaar Number");
             valid = false;
         }
 
-        // aadhaarFrontFile: required (unless existing URL)
         if (formModel.getAadhaarFrontFile() == null && existingAadhaarFrontURL.isEmpty()) {
             tvAadhaarFrontError.setVisibility(View.VISIBLE);
             tvAadhaarFrontError.setText("Aadhaar front file is required");
             valid = false;
         }
-
-        // aadhaarBackFile: required (unless existing URL)
         if (formModel.getAadhaarBackFile() == null && existingAadhaarBackURL.isEmpty()) {
             tvAadhaarBackError.setVisibility(View.VISIBLE);
             tvAadhaarBackError.setText("Aadhaar back file is required");
             valid = false;
         }
 
-        // panNumber: required + pattern /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/
         String pan = get(etPanNumber).toUpperCase();
-        if (pan.isEmpty()) {
+        if (pan.isEmpty() && existingPanURL.isEmpty()) {
             tilPanNumber.setError("PAN Number is required");
             valid = false;
-        } else if (!pan.matches("^[A-Z]{5}[0-9]{4}[A-Z]{1}$")) {
+        } else if (!pan.isEmpty() && !pan.matches("^[A-Z]{5}[0-9]{4}[A-Z]{1}$")) {
             tilPanNumber.setError("Enter valid PAN Number");
             valid = false;
         }
 
-        // panFile: required (unless existing URL)
         if (formModel.getPanFile() == null && existingPanURL.isEmpty()) {
             tvPanError.setVisibility(View.VISIBLE);
             tvPanError.setText("PAN document is required");
             valid = false;
         }
 
-        // validateOtherDocuments() – matches web validateOtherDocuments()
         valid = validateOtherDocuments() && valid;
-
         if (!valid) {
             Toast.makeText(requireContext(), "Please complete all mandatory fields.", Toast.LENGTH_LONG).show();
         }
-
-        // Update adapter with submitted state for doc validation UI
         otherDocAdapter.setSubmitted(submitted);
-
         return valid;
     }
-
 
     private boolean validateOtherDocuments() {
         boolean valid = true;
         for (OtherDocument doc : documentsList) {
             boolean rowHasValue = !doc.getDocumentName().isEmpty() || doc.getDocumentFile() != null || !doc.getDocumentFileURL().isEmpty();
-
             if (rowHasValue && doc.getDocumentName().isEmpty()) {
-                valid = false; // adapter will show error
+                valid = false;
             }
             if (rowHasValue && doc.getDocumentFile() == null && doc.getDocumentFileURL().isEmpty()) {
-                valid = false; // adapter will show error
+                valid = false;
             }
         }
         return valid;
@@ -679,8 +876,6 @@ public class EmployeeOnboardingFragment extends Fragment {
 
     private void resetForm() {
         submitted = false;
-
-        // Clear all fields
         etFullName.setText("");
         etDob.setText("");
         spGender.setText("", false);
@@ -696,7 +891,7 @@ public class EmployeeOnboardingFragment extends Fragment {
         etCity.setText("");
         etState.setText("");
         etPincode.setText("");
-        etCountry.setText("India");    // reset to default
+        etCountry.setText("India");
         etEmergencyName.setText("");
         etEmergencyRelationship.setText("");
         etEmergencyNumber.setText("");
@@ -740,7 +935,9 @@ public class EmployeeOnboardingFragment extends Fragment {
         etAadhaarNumber.setText("");
         etPanNumber.setText("");
 
-        // Reset file fields
+        tilAadhaarNumber.setHelperText(null);
+        tilPanNumber.setHelperText(null);
+
         tvAadhaarFrontFileName.setText("No file chosen");
         tvAadhaarBackFileName.setText("No file chosen");
         tvPanFileName.setText("No file chosen");
@@ -748,123 +945,25 @@ public class EmployeeOnboardingFragment extends Fragment {
         existingAadhaarBackURL = "";
         existingPanURL = "";
 
-        // Reset family – 1 empty member like web
         familyDetailsList.clear();
         familyDetailsList.add(new FamilyMember());
         familyAdapter.notifyDataSetChanged();
 
-        // Reset documents – 2 empty docs like web
         documentsList.clear();
         documentsList.add(new OtherDocument());
         documentsList.add(new OtherDocument());
         otherDocAdapter.notifyDataSetChanged();
 
-        // Reset form model
         formModel = new OnboardingFormModel();
-
-        // Clear errors
         clearAllErrors();
         tilMedicalConditionDetails.setVisibility(View.GONE);
     }
 
-    public void patchForm(OnboardingFormModel data) {
-        etFullName.setText(data.getFullName());
-        etDob.setText(data.getDob());
-        spGender.setText(data.getGender(), false);
-        etFatherOrHusbandName.setText(data.getFatherOrHusbandName());
-        spMaritalStatus.setText(data.getMaritalStatus(), false);
-        etBloodGroup.setText(data.getBloodGroup());
-        etNationality.setText(data.getNationality());
-        etPersonalMobile.setText(data.getPersonalMobile());
-        etAlternateMobile.setText(data.getAlternateMobile());
-        etPersonalEmail.setText(data.getPersonalEmail());
-        etCurrentAddress.setText(data.getCurrentAddress());
-        etPermanentAddress.setText(data.getPermanentAddress());
-        etCity.setText(data.getCity());
-        etState.setText(data.getState());
-        etPincode.setText(data.getPincode());
-        etCountry.setText(data.getCountry().isEmpty() ? "India" : data.getCountry());
-        etEmergencyName.setText(data.getEmergencyName());
-        etEmergencyRelationship.setText(data.getEmergencyRelationship());
-        etEmergencyNumber.setText(data.getEmergencyNumber());
-        etEmergencyAlternateNumber.setText(data.getEmergencyAlternateNumber());
-        etEmergencyAddress.setText(data.getEmergencyAddress());
-        etEmployeeId.setText(data.getEmployeeId());
-        etDateOfJoining.setText(data.getDateOfJoining());
-        spEmploymentType.setText(data.getEmploymentType(), false);
-        etDesignation.setText(data.getDesignation());
-        etDepartment.setText(data.getDepartment());
-        etGrade.setText(data.getGrade());
-        etReportingManager.setText(data.getReportingManager());
-        etWorkLocation.setText(data.getWorkLocation());
-        etQualification.setText(data.getQualification());
-        etInstitution.setText(data.getInstitution());
-        etYearOfPassing.setText(data.getYearOfPassing());
-        etPercentageGrade.setText(data.getPercentageGrade());
-        etPreviousEmployer.setText(data.getPreviousEmployer());
-        etPreviousDesignation.setText(data.getPreviousDesignation());
-        etPreviousDuration.setText(data.getPreviousDuration());
-        etLastDrawnCtc.setText(data.getLastDrawnCtc());
-        etRelievingDate.setText(data.getRelievingDate());
-        etReasonForLeaving.setText(data.getReasonForLeaving());
-        etBankName.setText(data.getBankName());
-        etBranchName.setText(data.getBranchName());
-
-        // IMPORTANT: Never pre-fill sensitive fields – matches web patchOnboardForm
-        // accountNumber, aadhaarNumber, panNumber, uan, esi, passport left blank
-        etAccountNumber.setText("");
-        etIfscCode.setText(data.getIfscCode());
-        etAccountHolderName.setText(data.getAccountHolderName());
-        etUpiId.setText(data.getUpiId());
-        etUanNumber.setText("");
-        etEsiNumber.setText("");
-        etPassportNumber.setText("");
-        etPassportExpiryDate.setText(data.getPassportExpiryDate());
-        etNomineeName.setText(data.getNomineeName());
-        etNomineeRelationship.setText(data.getNomineeRelationship());
-        etNomineeDob.setText(data.getNomineeDob());
-        etSharePercentage.setText(data.getSharePercentage());
-        spMedicalCondition.setText(data.getMedicalCondition(), false);
-
-        boolean isYes = "Yes".equals(data.getMedicalCondition());
-        tilMedicalConditionDetails.setVisibility(isYes ? View.VISIBLE : View.GONE);
-        etMedicalConditionDetails.setText(data.getMedicalConditionDetails());
-        etKnownAllergies.setText(data.getKnownAllergies());
-        etAadhaarNumber.setText(""); // never pre-fill
-        etPanNumber.setText("");     // never pre-fill
-
-        // Store existing URLs – matches web clearValidators if URL exists
-        existingAadhaarFrontURL = data.getAadhaarFrontFileURL();
-        existingAadhaarBackURL = data.getAadhaarBackFileURL();
-        existingPanURL = data.getPanFileURL();
-
-        if (!existingAadhaarFrontURL.isEmpty()) tvAadhaarFrontFileName.setText("File uploaded ✓");
-        if (!existingAadhaarBackURL.isEmpty()) tvAadhaarBackFileName.setText("File uploaded ✓");
-        if (!existingPanURL.isEmpty()) tvPanFileName.setText("File uploaded ✓");
-
-        // Patch family details
-        if (data.getFamilyDetails() != null && !data.getFamilyDetails().isEmpty()) {
-            familyDetailsList.clear();
-            familyDetailsList.addAll(data.getFamilyDetails());
-        } else {
-            familyDetailsList.clear();
-            familyDetailsList.add(new FamilyMember());
-        }
-        familyAdapter.notifyDataSetChanged();
-
-        // Patch documents
-        if (data.getDocuments() != null && !data.getDocuments().isEmpty()) {
-            documentsList.clear();
-            documentsList.addAll(data.getDocuments());
-        } else {
-            documentsList.clear();
-            documentsList.add(new OtherDocument());
-        }
-        otherDocAdapter.notifyDataSetChanged();
-    }
-
-    // ── Helper ────────────────────────────────────────────────────────────────
     private String get(TextInputEditText et) {
         return et.getText() != null ? et.getText().toString().trim() : "";
+    }
+
+    private String safe(String value) {
+        return value != null ? value.trim() : "";
     }
 }

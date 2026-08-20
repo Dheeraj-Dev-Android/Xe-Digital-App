@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isLeavesSubmenuVisible = false;
     private boolean isTeamSubVisible = false;
     private boolean isDcrSubmenuVisible = false;
+    private boolean isOnboardingVisible = false;
     private boolean isNetworkChangeReceiverRegistered = false;
 
     private NavigationView navigationView;
@@ -144,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_dcr_menu) {
                 toggleDcrVisibility(navigationView.getMenu());
                 return true;
+            } else if (id == R.id.nav_onboarding_menu) {
+                toggleOnboardingVisibility(navigationView.getMenu());
+                return true;
 
             } else if (id == R.id.nav_team_member) {
                 toggleTeamMemberVisibility(navigationView.getMenu());
@@ -184,8 +188,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToDashboard() {
-        NavOptions navOptions = new NavOptions.Builder()
-                .setPopUpTo(R.id.nav_dashboard, true).setLaunchSingleTop(true).build();
+        NavOptions navOptions = new NavOptions.Builder().setPopUpTo(R.id.nav_dashboard, true).setLaunchSingleTop(true).build();
         try {
             navController.navigate(R.id.nav_dashboard, null, navOptions);
         } catch (Exception e) {
@@ -211,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         if (isLeavesSubmenuVisible) toggleLeavesVisibility(menu);
         if (isTeamSubVisible) toggleTeamMemberVisibility(menu);
         if (isDcrSubmenuVisible) toggleDcrVisibility(menu);
+        if (isOnboardingVisible) toggleOnboardingVisibility(menu);
     }
 
 
@@ -328,6 +332,15 @@ public class MainActivity extends AppCompatActivity {
         if (menu.findItem(R.id.nav_dcr_form) != null)
             menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
         isDcrSubmenuVisible = newVisibility;
+    }
+
+    private void toggleOnboardingVisibility(Menu menu) {
+        boolean newVisibility = !isOnboardingVisible;
+        if (menu.findItem(R.id.nav_onboarding) != null)
+            menu.findItem(R.id.nav_onboarding).setVisible(newVisibility);
+        if (menu.findItem(R.id.nav_onboarding_details) != null)
+            menu.findItem(R.id.nav_onboarding_details).setVisible(newVisibility);
+        isOnboardingVisible = newVisibility;
     }
 
     @Override

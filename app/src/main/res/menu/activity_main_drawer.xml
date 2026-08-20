@@ -66,14 +66,21 @@
 
     </group>
 
-
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_onboarding_menu"
+            android:icon="@drawable/onboarding"
+            android:title="@string/onboarding" />
+    </group>
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_onboarding"
-            android:title="@string/onboarding" />
+            android:title="@string/onboarding_form"
+            android:visible="false" />
         <item
             android:id="@+id/nav_onboarding_details"
-            android:title="@string/onboarding_detail" />
+            android:title="@string/onboarding_detail"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">

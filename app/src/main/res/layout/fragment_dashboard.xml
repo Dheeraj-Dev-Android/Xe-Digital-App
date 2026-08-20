@@ -167,7 +167,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="4dp"
                         android:text="20 Feb 2024"
                         android:textColor="@color/colorPrimary"
                         android:textSize="13sp"
@@ -177,21 +176,21 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvPunchStatusValue" />
 
-                    <!-- Circular Punch Button moved to the Right Side -->
+                    <!-- Circular Punch Button -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/punchButton"
-                        android:layout_width="74dp"
-                        android:layout_height="74dp"
-                        android:layout_marginRight="20dp"
+                        android:layout_width="66dp"
+                        android:layout_height="66dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
                         app:cardBackgroundColor="#1059B2"
-                        app:cardCornerRadius="37dp"
+                        app:cardCornerRadius="33dp"
                         app:cardElevation="4dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/tvPunchButtonLabel"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
                         app:strokeWidth="0dp">
 
                         <LinearLayout
@@ -203,33 +202,31 @@
 
                             <ImageView
                                 android:id="@+id/ivPunchButtonIcon"
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
                                 android:contentDescription="@null"
                                 android:src="@drawable/face_scan"
                                 app:tint="@color/white" />
                         </LinearLayout>
-
                     </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Punch Button Label below Punch Button -->
+                    <TextView
+                        android:id="@+id/tvPunchButtonLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Punch-In"
+                        android:textColor="@color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@id/punchButton"
+                        app:layout_constraintStart_toStartOf="@id/punchButton"
+                        app:layout_constraintTop_toBottomOf="@id/punchButton" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!--                <LinearLayout-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="match_parent"-->
-                <!--                    android:gravity="end"-->
-                <!--                    android:padding="6dp">-->
-
-                <!--                    <TextView-->
-                <!--                        android:id="@+id/tvPunchButtonLabel"-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_marginTop="2dp"-->
-                <!--                        android:text="Punch-In"-->
-                <!--                        android:textColor="@color/white"-->
-                <!--                        android:textSize="10sp"-->
-                <!--                        android:textStyle="bold" />-->
-                <!--                </LinearLayout>-->
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Quick actions shimmer -->
@@ -786,9 +783,6 @@
                         app:layout_constraintTop_toBottomOf="@id/tvEmployeeShift" />
 
                     <!-- Punch in / punch out stat tiles -->
-
-                    <!-- Punch in / punch out stat tiles -->
-
                     <LinearLayout
                         android:id="@+id/punchInContainer"
                         android:layout_width="0dp"

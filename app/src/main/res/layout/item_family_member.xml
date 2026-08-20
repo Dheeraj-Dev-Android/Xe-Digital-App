@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="@color/onb_bg_field"
+    app:cardBackgroundColor="@color/avatar_bg"
     app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/onb_stroke"
@@ -13,7 +13,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_attendance_card"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -47,7 +46,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="Family Member"
-                android:textColor="@color/white"
+                android:textColor="@color/avatar_text"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -94,58 +93,50 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- familyRelationship + familyDob row -->
-        <LinearLayout
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:orientation="horizontal">
+            android:layout_marginBottom="14dp"
+            android:hint="Relationship"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/onb_primary">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_family_relationship"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:hint="Relationship"
-                app:boxBackgroundColor="@color/white"
-                app:boxCornerRadiusBottomEnd="10dp"
-                app:boxCornerRadiusBottomStart="10dp"
-                app:boxCornerRadiusTopEnd="10dp"
-                app:boxCornerRadiusTopStart="10dp"
-                app:boxStrokeColor="@color/onb_primary">
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_family_relationship"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:hint="Date of Birth"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/onb_primary"
+            app:endIconDrawable="@drawable/ic_calendar"
+            app:endIconMode="custom"
+            app:endIconTint="@color/onb_primary">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_family_dob"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:hint="Date of Birth"
-                app:boxBackgroundColor="@color/white"
-                app:boxCornerRadiusBottomEnd="10dp"
-                app:boxCornerRadiusBottomStart="10dp"
-                app:boxCornerRadiusTopEnd="10dp"
-                app:boxCornerRadiusTopStart="10dp"
-                app:boxStrokeColor="@color/onb_primary"
-                app:endIconDrawable="@drawable/ic_calendar"
-                app:endIconMode="custom"
-                app:endIconTint="@color/onb_primary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_family_dob"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="false" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                android:clickable="true"
+                android:focusable="false" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- familyMobile -->
         <com.google.android.material.textfield.TextInputLayout
@@ -176,7 +167,7 @@
             android:fontFamily="sans-serif-medium"
             android:paddingBottom="8dp"
             android:text="Address Proof"
-            android:textColor="@color/white"
+            android:textColor="@color/avatar_text"
             android:textSize="13sp" />
 
         <com.google.android.material.card.MaterialCardView

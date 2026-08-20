@@ -26,6 +26,7 @@ public class FamilyMemberAdapter extends
     private final Context context;
     private final List<FamilyMember> list;
     private final OnFilePickListener listener;
+
     public FamilyMemberAdapter(Context context,
                                List<FamilyMember> list,
                                OnFilePickListener listener) {

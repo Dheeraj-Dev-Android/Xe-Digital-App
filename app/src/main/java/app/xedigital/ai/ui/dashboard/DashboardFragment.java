@@ -396,7 +396,7 @@ public class DashboardFragment extends Fragment {
                                     binding.tvPunchStatusValue.setText("Punched In");
                                     binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
-//                                    binding.tvPunchButtonLabel.setText("Punch Out");
+                                    binding.tvPunchButtonLabel.setText("Punch Out");
                                     binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color.rejected_color, requireContext().getTheme()));
                                 } else {
                                     resetPunchUI();
@@ -479,8 +479,8 @@ public class DashboardFragment extends Fragment {
         binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
         // Reset Button Label & Text Color
-//        binding.tvPunchButtonLabel.setText("Punch In");
-//        binding.tvPunchButtonLabel.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
+        binding.tvPunchButtonLabel.setText("Punch In");
+        binding.tvPunchButtonLabel.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
         // Reset Card Background
         binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color._0000, requireContext().getTheme()));

@@ -354,7 +354,7 @@ public class ViewOnboardingDetailsFragment extends Fragment {
 
         // ── Profile Header ────────────────────────────────────────────────────────
         String name = safe(d.getFullName());
-        safeSetText(tvAvatarChar, name.isEmpty() ? "E" : String.valueOf(name.charAt(0)).toUpperCase());
+        safeSetText(tvAvatarChar, name.isEmpty() ? "XE" : String.valueOf(name.charAt(0)).toUpperCase());
         safeSetText(tvFullName, name.isEmpty() ? "N/A" : name);
         safeSetText(tvEmailHeader, safe(d.getPersonalEmail()));
         safeSetText(tvMobileHeader, orNA(d.getPersonalMobile()));

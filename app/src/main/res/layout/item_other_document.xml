@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/avatar_bg"
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/onb_stroke"
@@ -12,7 +13,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_attendance_card"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -28,7 +28,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="34dp"
                 android:layout_height="34dp"
-                app:cardBackgroundColor="#E3EDFB"
+                app:cardBackgroundColor="#03A9F4"
                 app:cardCornerRadius="17dp"
                 app:cardElevation="0dp">
 
@@ -46,7 +46,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="Other Document"
-                android:textColor="@color/white"
+                android:textColor="@color/avatar_text"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -99,7 +99,7 @@
             android:fontFamily="sans-serif-medium"
             android:paddingBottom="8dp"
             android:text="Upload Document"
-            android:textColor="@color/white"
+            android:textColor="@color/avatar_text"
             android:textSize="13sp" />
 
         <com.google.android.material.card.MaterialCardView
