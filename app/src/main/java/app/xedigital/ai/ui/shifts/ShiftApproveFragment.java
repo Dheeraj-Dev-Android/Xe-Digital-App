@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.List;
 
@@ -31,71 +33,126 @@ import retrofit2.Response;
 
 public class ShiftApproveFragment extends Fragment {
 
-    private RecyclerView ShiftApproveRecyclerView;
-    private ProgressBar loadingProgress;
+    private static final String TAG = "ShiftApproveFragment";
+
+    // Views
+    private RecyclerView shiftApproveRecyclerView;
+    private CircularProgressIndicator loadingProgress;  // ✅ Correct type
+    private LinearLayout emptyStateContainer;           // ✅ Correct type
     private TextView emptyStateText;
-    private View emptyStateContainer;
+
+    // ViewModel & Prefs
     private ProfileViewModel profileViewModel;
     private SecurePrefManager prefManager;
 
     public ShiftApproveFragment() {
-        // Required empty public constructor
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState
+    ) {
         return inflater.inflate(R.layout.fragment_shift_approve, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // ---- Init ViewModel ----
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
-        ShiftApproveRecyclerView = view.findViewById(R.id.ShiftApproveRecyclerView);
+        // ---- Bind Views ----
+        shiftApproveRecyclerView = view.findViewById(R.id.ShiftApproveRecyclerView);
         loadingProgress = view.findViewById(R.id.loadingProgress);
-        emptyStateText = view.findViewById(R.id.emptyStateText);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
-        ShiftApproveRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        emptyStateText = view.findViewById(R.id.emptyStateText);
 
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        // ---- RecyclerView Setup ----
+        shiftApproveRecyclerView.setLayoutManager(
+                new LinearLayoutManager(getContext())
+        );
+
+        // ---- Auth Token ----
         prefManager = SecurePrefManager.getInstance(requireContext());
-        String token = prefManager.getString("authToken", "");
+        String authToken = "jwt " + prefManager.getString("authToken", "");
 
-        APIInterface shiftApprovalList = APIClient.getInstance().getShiftTypes();
-        String authToken = "jwt " + token;
+        // ---- Fetch Data ----
+        fetchShiftApprovalList(authToken);
+    }
 
-        Call<ShiftApproveListResponse> call = shiftApprovalList.getShiftApprovalList(authToken);
-        call.enqueue(new Callback<ShiftApproveListResponse>() {
+    private void fetchShiftApprovalList(String authToken) {
+        showLoading();
+
+        APIInterface api = APIClient.getInstance().getShiftTypes();
+        api.getShiftApprovalList(authToken).enqueue(new Callback<ShiftApproveListResponse>() {
+
             @Override
-            public void onResponse(@NonNull Call<ShiftApproveListResponse> call, @NonNull Response<ShiftApproveListResponse> response) {
-                loadingProgress.setVisibility(View.GONE);
-                if (response.isSuccessful()) {
-                    ShiftApproveListResponse shiftList = response.body();
-                    if (shiftList != null && shiftList.getData() != null && shiftList.getData().getEmployeeShiftdata() != null && !shiftList.getData().getEmployeeShiftdata().isEmpty()) {
-                        List<EmployeeApproveShiftdataItem> shiftApprovalDataList = shiftList.getData().getEmployeeShiftdata();
-                        ShiftApprovalListAdapter adapter = new ShiftApprovalListAdapter(getContext(), shiftApprovalDataList, getViewLifecycleOwner(), profileViewModel);
-                        ShiftApproveRecyclerView.setAdapter(adapter);
-                    } else {
-                        emptyStateContainer.setVisibility(View.VISIBLE);
-                    }
+            public void onResponse(
+                    @NonNull Call<ShiftApproveListResponse> call,
+                    @NonNull Response<ShiftApproveListResponse> response
+            ) {
+                hideLoading();
+
+                if (response.isSuccessful()
+                        && response.body() != null
+                        && response.body().getData() != null
+                        && response.body().getData().getEmployeeShiftdata() != null
+                        && !response.body().getData().getEmployeeShiftdata().isEmpty()
+                ) {
+                    List<EmployeeApproveShiftdataItem> list =
+                            response.body().getData().getEmployeeShiftdata();
+                    showList(list);
                 } else {
-                    emptyStateContainer.setVisibility(View.VISIBLE);
-                    Log.e("ShiftApproveFragment", "API Error: " + response.code() + " - " + response.message());
+                    Log.e(TAG, "Empty or error response: "
+                            + response.code() + " - " + response.message());
+                    showEmptyState();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<ShiftApproveListResponse> call, @NonNull Throwable t) {
-                loadingProgress.setVisibility(View.GONE);
-                emptyStateContainer.setVisibility(View.VISIBLE);
-                Log.e("ShiftApproveFragment", "Network Error: " + t.getMessage());
+            public void onFailure(
+                    @NonNull Call<ShiftApproveListResponse> call,
+                    @NonNull Throwable t
+            ) {
+                hideLoading();
+                Log.e(TAG, "Network error: " + t.getMessage());
+                showEmptyState();
             }
         });
+    }
+
+    // ----------------------------------------------------------------
+    // UI State helpers — single place to control visibility
+    // ----------------------------------------------------------------
+
+    private void showLoading() {
+        loadingProgress.setVisibility(View.VISIBLE);
+        shiftApproveRecyclerView.setVisibility(View.GONE);
+        emptyStateContainer.setVisibility(View.GONE);
+    }
+
+    private void hideLoading() {
+        loadingProgress.setVisibility(View.GONE);
+    }
+
+    private void showList(List<EmployeeApproveShiftdataItem> list) {
+        shiftApproveRecyclerView.setVisibility(View.VISIBLE);
+        emptyStateContainer.setVisibility(View.GONE);
+
+        ShiftApprovalListAdapter adapter = new ShiftApprovalListAdapter(
+                getContext(),
+                list,
+                getViewLifecycleOwner(),
+                profileViewModel
+        );
+        shiftApproveRecyclerView.setAdapter(adapter);
+    }
+
+    private void showEmptyState() {
+        shiftApproveRecyclerView.setVisibility(View.GONE);
+        emptyStateContainer.setVisibility(View.VISIBLE);
     }
 }

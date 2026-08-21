@@ -4,29 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.shifts.ShiftApproveFragment">
 
+    <!-- ================= LIST ================= -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ShiftApproveRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="12dp" />
+        android:overScrollMode="never"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp"
+        android:scrollbars="none"
+        tools:listitem="@layout/item_shift_approval" />
 
+    <!-- ================= LOADING STATE ================= -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/loadingProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:background="@drawable/bg_loading_indicator"
         android:indeterminate="true"
+        android:padding="16dp"
         android:visibility="gone"
-        app:indicatorColor="@color/purple_700"
-        app:indicatorSize="48dp"
-        app:trackColor="@color/purple_200"
-        app:trackCornerRadius="4dp"
-        app:trackThickness="4dp" />
+        app:indicatorColor="@color/accent_employee"
+        app:indicatorSize="52dp"
+        app:trackColor="@color/loading_track"
+        app:trackCornerRadius="6dp"
+        app:trackThickness="4dp"
+        tools:visibility="gone" />
 
+    <!-- ================= EMPTY STATE ================= -->
     <LinearLayout
         android:id="@+id/emptyStateContainer"
         android:layout_width="match_parent"
@@ -34,24 +45,51 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:paddingHorizontal="40dp"
+        android:visibility="gone"
+        tools:ignore="UseCompoundDrawables"
+        tools:visibility="gone">
 
-        <ImageView
+        <!-- Icon Badge -->
+        <FrameLayout
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:contentDescription="No Shift Change found"
-            android:src="@drawable/ic_empty_state" />
+            android:background="@drawable/bg_empty_state_circle">
 
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/no_shift_change_found"
+                android:src="@drawable/ic_empty_state"
+                app:tint="@color/accent_employee" />
+        </FrameLayout>
+
+        <!-- Title -->
         <TextView
             android:id="@+id/emptyStateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
-            android:text="No Shift Change found"
-            android:textColor="@color/_000000"
-            android:textSize="16sp" />
+            android:text="@string/no_shift_change_found"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/emptyStateSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/quicksand_font_family"
+            android:gravity="center"
+            android:text="@string/no_shift_approval_subtitle"
+            android:textColor="@color/white_60"
+            android:textSize="13sp" />
+
     </LinearLayout>
 
 </FrameLayout>

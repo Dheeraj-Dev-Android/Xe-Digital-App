@@ -33,7 +33,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#1755C1"
+        android:background="@drawable/gradient_attendance_card"
         android:textAlignment="center"
         app:popupTheme="@style/Theme.XEDigital.PopupOverlay"
         app:title="@string/app_name" />

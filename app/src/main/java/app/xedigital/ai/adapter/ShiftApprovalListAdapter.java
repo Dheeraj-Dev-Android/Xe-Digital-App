@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -43,221 +44,258 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApprovalListAdapter.ViewHolder> {
+
+    private static final String TAG = "ShiftApprovalAdapter";
 
     private final Context context;
     private final List<EmployeeApproveShiftdataItem> shiftApprovalDataList;
     private final ProfileViewModel profileViewModel;
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final LifecycleOwner lifecycleOwner;
-    private String fName;
-    private String lName;
-    private String empId;
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    private String fName = "";
+    private String lName = "";
+    private String empId = "";
 
     public ShiftApprovalListAdapter(Context context, List<EmployeeApproveShiftdataItem> shiftApprovalDataList, LifecycleOwner lifecycleOwner, ProfileViewModel profileViewModel) {
         this.context = context;
         this.shiftApprovalDataList = shiftApprovalDataList;
         this.lifecycleOwner = lifecycleOwner;
         this.profileViewModel = profileViewModel;
+
+        // ✅ Observe profile once in the constructor to avoid memory leaks
+        SecurePrefManager prefs = SecurePrefManager.getInstance(context);
+        profileViewModel.storeLoginData(prefs.getString("userId", ""), prefs.getString("authToken", ""));
+        profileViewModel.fetchUserProfile();
+        profileViewModel.userProfile.observe(lifecycleOwner, profile -> {
+            if (profile != null && profile.getData() != null) {
+                fName = profile.getData().getEmployee().getFirstname();
+                lName = profile.getData().getEmployee().getLastname();
+                empId = profile.getData().getEmployee().getId();
+            }
+        });
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_shift_approval, parent, false);
-        SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
-        String authToken = prefManager.getString("authToken", "");
-        String userId = prefManager.getString("userId", "");
-        profileViewModel.fetchUserProfile();
-        profileViewModel.storeLoginData(userId, authToken);
-        profileViewModel.userProfile.observe(lifecycleOwner, userProfile -> {
-            if (userProfile != null) {
-                fName = userProfile.getData().getEmployee().getFirstname();
-                lName = userProfile.getData().getEmployee().getLastname();
-                empId = userProfile.getData().getEmployee().getId();
-            }
-        });
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        EmployeeApproveShiftdataItem shiftApprovalData = shiftApprovalDataList.get(position);
+        EmployeeApproveShiftdataItem data = shiftApprovalDataList.get(position);
 
-        holder.tvName.setText(shiftApprovalData.getEmployee().getFirstname() + " " + shiftApprovalData.getEmployee().getLastname());
+        // ---- Profile ----
+        holder.tvName.setText(data.getEmployee().getFirstname() + " " + data.getEmployee().getLastname());
+        holder.tvEmail.setText(data.getEmployee().getEmail());
+        holder.tvContactNumber.setText(data.getEmployee().getContact());
 
-        Object profileImageUrl = shiftApprovalData.getEmployee().getProfileImageUrl();
-        ImageView profileImage = holder.ivProfile;
+        Object profileImageUrl = data.getEmployee().getProfileImageUrl();
         if (profileImageUrl != null) {
-            Glide.with(holder.itemView.getContext()).load(profileImageUrl).apply(RequestOptions.circleCropTransform()).placeholder(R.mipmap.ic_default_profile).error(R.mipmap.ic_default_profile).into(profileImage);
+            Glide.with(context).load(profileImageUrl).apply(RequestOptions.circleCropTransform().placeholder(R.mipmap.ic_default_profile).error(R.mipmap.ic_default_profile)).into(holder.ivProfile);
         } else {
-            profileImage.setImageResource(R.mipmap.ic_default_profile);
-        }
-        holder.tvEmail.setText(shiftApprovalData.getEmployee().getEmail());
-        holder.tvContactNumber.setText(shiftApprovalData.getEmployee().getContact());
-
-        holder.shiftTimeCurrent.setText("Shift : " + shiftApprovalData.getShift().getName() + " (" + shiftApprovalData.getShift().getStartTime() + " - " + shiftApprovalData.getShift().getEndTime() + ")");
-        holder.tvShiftType.setText("Shift Type : " + shiftApprovalData.getShiftType().getShifttypeName());
-        holder.tvRequestedDate.setText("Requested Date : " + formatDate(shiftApprovalData.getAppliedDate()));
-        holder.tvApprovedDate.setText("Approved Date : " + formatDate(shiftApprovalData.getApprovedDate()));
-        holder.tvShiftUpdate.setText("Shift Updated : " + shiftApprovalData.getShiftUpdate().getName() + " (" + shiftApprovalData.getShiftUpdate().getStartTime() + " - " + shiftApprovalData.getShiftUpdate().getEndTime() + ")");
-        holder.tvApprovedBy.setText("Approved by: " + shiftApprovalData.getApprovedByName());
-
-        if (shiftApprovalData.getStatus().equals("unapproved")) {
-            holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.pending_status_color)));
-        } else if (shiftApprovalData.getStatus().equals("approved")) {
-            holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved)));
-        } else if (shiftApprovalData.getStatus().equals("cancel")) {
-            holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected)));
-        }
-        holder.chipStatus.setText(shiftApprovalData.getStatus());
-        if (shiftApprovalData.getStatus().equals("unapproved")) {
-            holder.btnApprove.setVisibility(View.VISIBLE);
-            holder.btnCancel.setVisibility(View.VISIBLE);
-        } else {
-            holder.btnApprove.setVisibility(View.GONE);
-            holder.btnCancel.setVisibility(View.GONE);
+            holder.ivProfile.setImageResource(R.mipmap.ic_default_profile);
         }
 
-        holder.btnApprove.setOnClickListener(v -> {
-            String shiftID = shiftApprovalData.getId();
-            updateShiftStatus(shiftID, "approved", "", shiftApprovalData);
+        // ---- Current Shift ----
+        holder.shiftTimeCurrent.setText(data.getShift().getName() + " (" + data.getShift().getStartTime() + " - " + data.getShift().getEndTime() + ")");
+        holder.tvShiftType.setText(data.getShiftType().getShifttypeName());
 
-        });
+        // ---- Requested Update ----
+        holder.tvShiftUpdate.setText(data.getShiftUpdate().getName() + " (" + data.getShiftUpdate().getStartTime() + " - " + data.getShiftUpdate().getEndTime() + ")");
+        holder.tvRequestedDate.setText(formatDate(data.getAppliedDate()));
 
-        holder.btnCancel.setOnClickListener(v -> {
-            showRejectDialog(holder, shiftApprovalData.getId(), shiftApprovalData);
-        });
+        // ---- Approval info ----
+        holder.tvApprovedBy.setText(data.getApprovedByName() != null ? data.getApprovedByName() : "N/A");
+        holder.tvApprovedDate.setText(formatDate(data.getApprovedDate()));
+
+        // ---- Status UI Bind ----
+        bindStatus(holder, data.getStatus());
+
+        // ---- Action Listeners ----
+        holder.btnApprove.setOnClickListener(v -> confirmAndUpdate(data, "approved", ""));
+        holder.btnCancel.setOnClickListener(v -> showRejectDialog(data));
     }
 
-    private void showRejectDialog(ViewHolder holder, final String shiftID, EmployeeApproveShiftdataItem shiftApprovalData) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View dialogView = inflater.inflate(R.layout.dialog_shift_action, null);
-        builder.setView(dialogView);
+    private void bindStatus(@NonNull ViewHolder holder, String rawStatus) {
+        if (rawStatus == null) rawStatus = "";
 
+        String label;
+        int chipBg;
+        int chipText = ContextCompat.getColor(context, R.color.white);
+        boolean showStrip = false;
+        boolean showActions = false;
+
+        // Reset colors to guard against RecyclerView view recycling
+        int green = ContextCompat.getColor(context, R.color.status_approved);
+        holder.tvApprovedBy.setTextColor(green);
+        holder.tvApprovedDate.setTextColor(green);
+
+        switch (rawStatus.toLowerCase(Locale.getDefault())) {
+            case "approved":
+                label = "Approved";
+                chipBg = ContextCompat.getColor(context, R.color.status_approved);
+                showStrip = true;
+                break;
+
+            case "cancel":
+                label = "Cancelled";
+                chipBg = ContextCompat.getColor(context, R.color.status_rejected);
+                showStrip = true;
+                int red = ContextCompat.getColor(context, R.color.status_rejected);
+                holder.tvApprovedBy.setTextColor(red);
+                holder.tvApprovedDate.setTextColor(red);
+                break;
+
+            case "unapproved":
+            default:
+                label = "Pending";
+                chipBg = ContextCompat.getColor(context, R.color.pending_status_color);
+                showActions = true;
+                break;
+        }
+
+        holder.chipStatus.setText(label);
+        holder.chipStatus.setChipBackgroundColor(ColorStateList.valueOf(chipBg));
+        holder.chipStatus.setTextColor(chipText);
+        holder.approvalStripContainer.setVisibility(showStrip ? View.VISIBLE : View.GONE);
+        holder.actionsContainer.setVisibility(showActions ? View.VISIBLE : View.GONE);
+    }
+
+    private void confirmAndUpdate(EmployeeApproveShiftdataItem data, String status, String comment) {
+        new AlertDialog.Builder(context).setTitle("Confirm Approval").setMessage("Are you sure you want to approve this shift change request?").setPositiveButton("Approve", (d, w) -> {
+            updateShiftStatus(data, status, comment);
+            d.dismiss();
+        }).setNegativeButton("Cancel", (d, w) -> d.dismiss()).show();
+    }
+
+    private void showRejectDialog(EmployeeApproveShiftdataItem data) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_shift_action, null);
         EditText etComment = dialogView.findViewById(R.id.etComment);
-        MaterialButton btnRejectDialog = dialogView.findViewById(R.id.btnRejectDialog);
+        MaterialButton btnReject = dialogView.findViewById(R.id.btnRejectDialog);
 
-        AlertDialog dialog = builder.create();
+        AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
         dialog.show();
 
-        btnRejectDialog.setOnClickListener(v -> {
-            String comment = etComment.getText().toString();
-            updateShiftStatus(shiftID, "cancel", comment, shiftApprovalData);
+        btnReject.setOnClickListener(v -> {
+            String comment = etComment.getText().toString().trim();
+            if (comment.isEmpty()) {
+                etComment.setError("Please provide a cancellation reason");
+                return;
+            }
+            updateShiftStatus(data, "cancel", comment);
             dialog.dismiss();
         });
     }
 
-    private void updateShiftStatus(String shiftId, String status, String comment, EmployeeApproveShiftdataItem originalPayload) {
-        Log.d("ShiftStatus", "Shift ID: " + shiftId + ", Status: " + status + ", Comment: " + comment);
+    private void updateShiftStatus(EmployeeApproveShiftdataItem originalPayload, String status, String comment) {
+        Log.d(TAG, "Updating status of " + originalPayload.getId() + " to " + status);
+
         SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
-        String authToken = prefManager.getString("authToken", "");
-        String token = "jwt " + authToken;
-        ShiftApproveRequest requestBody = new ShiftApproveRequest();
+        String token = "jwt " + prefManager.getString("authToken", "");
 
-        requestBody.setStatus(status);
-        requestBody.setComment(comment);
-        requestBody.setReportingManager(empId);
+        String formattedNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(new Date());
 
-        // Get current date and time
-        Date currentDate = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        String formattedDate = dateFormat.format(currentDate);
+        // ---- Create Request Payload ----
+        ShiftApproveRequest request = new ShiftApproveRequest();
 
-        requestBody.setId(originalPayload.getId());
-        requestBody.setAppliedDate(originalPayload.getAppliedDate());
-        requestBody.setApprovedDate(formattedDate);
-        requestBody.setStatus(status);
-        requestBody.setReportingManager(originalPayload.getReportingManager());
-        requestBody.setApprovedByName(fName + " " + lName);
-        requestBody.setComment(comment);
+        request.setId(originalPayload.getId());
+        request.setStatus(status);
+        request.setApprovedDate(formattedNow);
+        request.setApprovedByName(fName + " " + lName);
+        request.setComment(comment != null ? comment : "");
+        request.setAppliedDate(originalPayload.getAppliedDate());
+        request.setReportingManager(originalPayload.getReportingManager());
 
+        // ✅ Bulletproof Conversion: Maps nested JSON models across packages perfectly
+        request.setShiftType(convertModel(originalPayload.getShiftType(), app.xedigital.ai.model.shiftApprove.ShiftType.class));
+        request.setShift(convertModel(originalPayload.getShift(), app.xedigital.ai.model.shiftApprove.Shift.class));
+        request.setShiftUpdate(convertModel(originalPayload.getShiftUpdate(), app.xedigital.ai.model.shiftApprove.ShiftUpdate.class));
+        request.setEmployee(convertModel(originalPayload.getEmployee(), app.xedigital.ai.model.shiftApprove.Employee.class));
 
-        APIInterface apiInterface = APIClient.getInstance().getShiftTypes();
-        Call<ResponseBody> call = apiInterface.UpdateShiftStatus(token, shiftId, requestBody);
-        call.enqueue(new Callback<ResponseBody>() {
+        APIInterface api = APIClient.getInstance().getShiftTypes();
+        api.UpdateShiftStatus(token, originalPayload.getId(), request).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                try {
-                    ResponseBody responseBody = response.body();
-                    if (response.isSuccessful() && responseBody != null) {
-                        String responseJson = gson.toJson(response.body());
-                        String successMsg = "Shift status updated successfully!";
-                        showAlertDialog("Success", successMsg);
-                    } else {
-                        // Log error response
-                        assert response.errorBody() != null;
-                        String errorBody = response.errorBody().string();
-                        showAlertDialog("Error", "Failed to update shift: " + errorBody);
-                        Log.d("ShiftStatus", "Error Response: " + errorBody);
+                if (response.isSuccessful() && response.body() != null) {
+
+                    // ✅ Dynamic UI Updates (no list re-fetch required)
+                    originalPayload.setStatus(status);
+                    originalPayload.setApprovedByName(fName + " " + lName);
+                    originalPayload.setApprovedDate(formattedNow);
+
+                    int index = shiftApprovalDataList.indexOf(originalPayload);
+                    if (index != -1) {
+                        notifyItemChanged(index);
                     }
-                } catch (IOException e) {
-                    Log.e("ShiftStatus", "Error reading response body", e);
-                    showAlertDialog("Error", "Something went wrong while processing the response.");
+
+                    String msg = "approved".equals(status) ? "Shift approved successfully!" : "Shift cancelled successfully!";
+                    showAlertDialog("Success", msg);
+                } else {
+                    try {
+                        String error = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
+                        Log.e(TAG, "Response Error: " + error);
+                        showAlertDialog("Error", "Action failed:\n" + error);
+                    } catch (IOException e) {
+                        showAlertDialog("Error", "Failed to parse API error details.");
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                String failMsg = "Failed to update shift status: " + t.getMessage();
-                Log.d("ShiftStatus", failMsg);
-                showAlertDialog("Failure", failMsg);
+                Log.e(TAG, "Network failure: " + t.getMessage());
+                showAlertDialog("Network Error", "Could not connect to server.");
             }
         });
-
     }
 
+    /**
+     * Helper strategy to convert matching nested JSON schemas between packages type-safely.
+     */
+    private <T> T convertModel(Object source, Class<T> targetClass) {
+        if (source == null) return null;
+        String json = gson.toJson(source);
+        return gson.fromJson(json, targetClass);
+    }
 
     private void showAlertDialog(String title, String message) {
         if (context instanceof Activity) {
-            ((Activity) context).runOnUiThread(() -> {
-                new AlertDialog.Builder(context)
-                        .setTitle(title)
-                        .setMessage(message)
-                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                        .show();
-            });
+            ((Activity) context).runOnUiThread(() -> new AlertDialog.Builder(context).setTitle(title).setMessage(message).setPositiveButton("OK", (d, w) -> d.dismiss()).show());
         }
     }
 
-    private String formatDate(String dateString) {
-        if (dateString == null || dateString.isEmpty()) {
-            return "";
-        }
-
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
+    private String formatDate(String input) {
+        if (input == null || input.isEmpty()) return "N/A";
         try {
-            Date date = inputFormat.parse(dateString);
-            return outputFormat.format(date);
+            SimpleDateFormat in = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+            SimpleDateFormat out = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            Date date = in.parse(input);
+            return date != null ? out.format(date) : "N/A";
         } catch (ParseException e) {
-            Log.e("ShiftApprovalListAdapter", "Error parsing date", e);
-            return "";
+            Log.e(TAG, "Date parsing issue: " + e.getMessage());
+            return input;
         }
     }
 
     @Override
     public int getItemCount() {
-        return shiftApprovalDataList.size();
+        return shiftApprovalDataList != null ? shiftApprovalDataList.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName;
-        TextView tvEmail;
-        TextView tvContactNumber;
-        TextView shiftTimeCurrent;
-        TextView tvShiftType;
-        TextView tvRequestedDate;
-        TextView tvApprovedDate;
-        TextView tvShiftUpdate;
-        TextView tvApprovedBy;
+        TextView tvName, tvEmail, tvContactNumber;
+        TextView shiftTimeCurrent, tvShiftType;
+        TextView tvShiftUpdate, tvRequestedDate;
+        TextView tvApprovedBy, tvApprovedDate;
         Chip chipStatus;
         ImageView ivProfile;
-        MaterialButton btnApprove;
-        MaterialButton btnCancel;
+        MaterialButton btnApprove, btnCancel;
+        LinearLayout approvalStripContainer;
+        LinearLayout actionsContainer;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -266,14 +304,16 @@ public class ShiftApprovalListAdapter extends RecyclerView.Adapter<ShiftApproval
             tvContactNumber = itemView.findViewById(R.id.tvContactNumber);
             shiftTimeCurrent = itemView.findViewById(R.id.shiftTimeCurrent);
             tvShiftType = itemView.findViewById(R.id.tvShiftType);
-            tvRequestedDate = itemView.findViewById(R.id.tvRequestedDate);
-            tvApprovedDate = itemView.findViewById(R.id.tvApprovedDate);
             tvShiftUpdate = itemView.findViewById(R.id.tvShiftUpdate);
+            tvRequestedDate = itemView.findViewById(R.id.tvRequestedDate);
             tvApprovedBy = itemView.findViewById(R.id.tvApprovedBy);
+            tvApprovedDate = itemView.findViewById(R.id.tvApprovedDate);
             chipStatus = itemView.findViewById(R.id.chipStatus);
             ivProfile = itemView.findViewById(R.id.ivProfile);
             btnApprove = itemView.findViewById(R.id.btnApprove);
             btnCancel = itemView.findViewById(R.id.btnCancel);
+            approvalStripContainer = itemView.findViewById(R.id.approvalStripContainer);
+            actionsContainer = itemView.findViewById(R.id.actionsContainer);
         }
     }
 }

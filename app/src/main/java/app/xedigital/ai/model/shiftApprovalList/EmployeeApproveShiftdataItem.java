@@ -34,8 +34,14 @@ public class EmployeeApproveShiftdataItem {
     @SerializedName("status")
     private String status;
 
+    // ---- Getters ----
+
     public String getApprovedDate() {
         return approvedDate;
+    }
+
+    public void setApprovedDate(String approvedDate) {
+        this.approvedDate = approvedDate;
     }
 
     public ShiftType getShiftType() {
@@ -62,9 +68,15 @@ public class EmployeeApproveShiftdataItem {
         return approvedByName;
     }
 
+    public void setApprovedByName(String approvedByName) {
+        this.approvedByName = approvedByName;
+    }
+
     public String getId() {
         return id;
     }
+
+    // ---- Setters (Added for local optimistic UI updates) ----
 
     public Employee getEmployee() {
         return employee;
@@ -72,5 +84,9 @@ public class EmployeeApproveShiftdataItem {
 
     public String getStatus() {
         return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

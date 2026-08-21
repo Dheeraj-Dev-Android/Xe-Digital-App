@@ -168,4 +168,8 @@
     <string name="onboarding">Onboarding</string>
     <string name="onboarding_detail">Onboarding Detail</string>
     <string name="onboarding_form">Onboarding Form</string>
+    <string name="no_shift_change_applied">No Shift Change Applied</string>
+    <string name="no_shift_change_applied_subtitle">Your submitted shift change requests will appear here</string>
+    <string name="no_shift_change_found">No Pending Approvals</string>
+    <string name="no_shift_approval_subtitle">Shift change requests awaiting your approval will appear here</string>
 </resources>

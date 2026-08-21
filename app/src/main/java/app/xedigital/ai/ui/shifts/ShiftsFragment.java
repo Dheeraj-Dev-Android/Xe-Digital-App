@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
@@ -78,9 +79,6 @@ public class ShiftsFragment extends Fragment {
         return root;
     }
 
-    // ==============================================
-    // INIT VIEWMODELS & DATA LOADING
-    // ==============================================
     private void initViewModels() {
         ShiftsViewModel shiftsViewModel = new ViewModelProvider(this).get(ShiftsViewModel.class);
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
@@ -99,18 +97,12 @@ public class ShiftsFragment extends Fragment {
         this.profileViewModel = profileViewModel;
     }
 
-    // ==============================================
-    // SPINNERS SETUP (True Native Behaviour)
-    // ==============================================
     private void setupSpinners() {
         // Force dropdown behavior — dismiss soft keyboard, show list on click
         binding.shiftTypeSpinner.setOnClickListener(v -> binding.shiftTypeSpinner.showDropDown());
         binding.shiftTimeSpinner.setOnClickListener(v -> binding.shiftTimeSpinner.showDropDown());
     }
 
-    // ==============================================
-    // OBSERVERS
-    // ==============================================
     private void setupObservers() {
 
         // Shift Types Observer
@@ -186,9 +178,6 @@ public class ShiftsFragment extends Fragment {
         });
     }
 
-    // ==============================================
-    // POPULATE EMPLOYEE DATA
-    // ==============================================
     private void populateEmployeeData(Employee employee) {
         fName = employee.getFirstname();
         lName = employee.getLastname();
@@ -242,27 +231,22 @@ public class ShiftsFragment extends Fragment {
         try {
             String imageUrl = null;
 
-            // 👇 Try to get image URL from employee — adjust based on your model
-            // Common getter names: getImage(), getProfilePic(), getAvatar(), getPhoto()
             if (employee.getProfileImageUrl() != null && !employee.getProfileImageUrl().isEmpty()) {
                 imageUrl = employee.getProfileImageUrl();
             }
 
             if (imageUrl != null && !imageUrl.isEmpty()) {
-                Glide.with(requireContext()).load(imageUrl).placeholder(R.drawable.ic_person).error(R.drawable.ic_person).diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop().into(binding.avatarImageView);
+                Glide.with(requireContext()).load(imageUrl).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop().into(binding.avatarImageView);
             } else {
                 // No image URL — show placeholder
-                binding.avatarImageView.setImageResource(R.drawable.ic_person);
+                binding.avatarImageView.setImageResource(R.drawable.ic_profile_placeholder);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error loading profile image: " + e.getMessage());
-            binding.avatarImageView.setImageResource(R.drawable.ic_person);
+            binding.avatarImageView.setImageResource(R.drawable.ic_profile_placeholder);
         }
     }
 
-    // ==============================================
-    // DISABLE READ-ONLY FIELDS
-    // ==============================================
     private void disableReadOnlyFields() {
         binding.firstNameEditText.setEnabled(false);
         binding.lastNameEditText.setEnabled(false);
@@ -271,9 +255,6 @@ public class ShiftsFragment extends Fragment {
         binding.hrEmailEditText.setEnabled(false);
     }
 
-    // ==============================================
-    // CLICK LISTENERS
-    // ==============================================
     private void setupClickListeners() {
 
         // Applied Shifts Chip
@@ -301,9 +282,6 @@ public class ShiftsFragment extends Fragment {
         binding.submitButton.setOnClickListener(view -> handleSubmit());
     }
 
-    // ==============================================
-    // TEXT WATCHERS
-    // ==============================================
     private void setupTextWatchers() {
 
         binding.shiftTypeSpinner.addTextChangedListener(new TextWatcher() {
@@ -341,22 +319,19 @@ public class ShiftsFragment extends Fragment {
         });
     }
 
-    // ==============================================
-    // FORM SUBMISSION
-    // ==============================================
     private void handleSubmit() {
         if (!validateForm()) {
             Toast.makeText(requireContext(), "Please select both shift type and timing", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String firstName = binding.firstNameEditText.getText().toString();
-        String lastName = binding.lastNameEditText.getText().toString();
-        String userEmail = binding.emailEditText.getText().toString();
-        String userContact = binding.contactEditText.getText().toString();
+        String firstName = Objects.requireNonNull(binding.firstNameEditText.getText()).toString();
+        String lastName = Objects.requireNonNull(binding.lastNameEditText.getText()).toString();
+        String userEmail = Objects.requireNonNull(binding.emailEditText.getText()).toString();
+        String userContact = Objects.requireNonNull(binding.contactEditText.getText()).toString();
         String shiftType = binding.shiftTypeSpinner.getText().toString();
         String shiftTime = binding.shiftTimeSpinner.getText().toString();
-        String hrEmail = binding.hrEmailEditText.getText().toString();
+        String hrEmail = Objects.requireNonNull(binding.hrEmailEditText.getText()).toString();
 
         // Find selected shift type
         ShiftsItem selectedShiftItem = null;
@@ -422,9 +397,6 @@ public class ShiftsFragment extends Fragment {
         submitShiftChange(requestBody);
     }
 
-    // ==============================================
-    // API SUBMISSION
-    // ==============================================
     private void submitShiftChange(ShiftUpdateRequest requestBody) {
         APIInterface shiftChangeApi = APIClient.getInstance().getShiftTypes();
         Call<ResponseBody> call = shiftChangeApi.ShiftChange("jwt " + authToken, requestBody);
@@ -454,9 +426,6 @@ public class ShiftsFragment extends Fragment {
         });
     }
 
-    // ==============================================
-    // FORM VALIDATION
-    // ==============================================
     private boolean validateForm() {
         boolean isValid = true;
 

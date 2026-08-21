@@ -109,7 +109,7 @@
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".activity.SplashActivity"
+            android:name="app.xedigital.ai.activity.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.XEDigital.NoActionBar.Starting">
             <intent-filter>
