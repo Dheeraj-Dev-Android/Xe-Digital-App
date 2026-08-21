@@ -1,6 +1,7 @@
 package app.xedigital.ai.ui.dashboard;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.ImageViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -88,6 +90,7 @@ public class DashboardFragment extends Fragment {
     private ShimmerFrameLayout punchCardShimmer;
     private ShimmerFrameLayout employeeCardShimmer;
     private ShimmerFrameLayout leavePieChartShimmer;
+    private ShimmerFrameLayout birthdayCarouselShimmer;
 
     // Real layouts
     private MaterialCardView punchCardView;
@@ -444,6 +447,13 @@ public class DashboardFragment extends Fragment {
         viewModal.getEmployeeBirthdayData().observe(getViewLifecycleOwner(), response -> {
             if (response != null && response.getData() != null && response.getData().getEmployees() != null) {
                 filterAndProcessBirthdays(response.getData().getEmployees());
+            } else {
+                if (birthdayCardView != null) birthdayCardView.setVisibility(View.GONE);
+            }
+
+            if (birthdayCarouselShimmer != null) {
+                birthdayCarouselShimmer.stopShimmer();
+                birthdayCarouselShimmer.setVisibility(View.GONE);
             }
         });
     }
@@ -453,18 +463,30 @@ public class DashboardFragment extends Fragment {
 
         int hour = LocalTime.now().getHour();
         String greeting;
+        int iconRes;
+        int tintColor;
 
         if (hour >= 4 && hour < 12) {
-            greeting = "Good Morning ! ";
+            greeting = "Good Morning!";
+            iconRes = R.drawable.ic_greeting_morning;
+            tintColor = Color.parseColor("#FFB74D"); // warm amber sunrise
         } else if (hour >= 12 && hour < 17) {
-            greeting = "Good Afternoon ! ";
+            greeting = "Good Afternoon!";
+            iconRes = R.drawable.ic_greeting_afternoon;
+            tintColor = Color.parseColor("#FFD54F"); // bright sun yellow
         } else if (hour >= 17 && hour < 22) {
-            greeting = "Good Evening ! ";
+            greeting = "Good Evening!";
+            iconRes = R.drawable.ic_greeting_evening;
+            tintColor = Color.parseColor("#FF8A65"); // sunset orange
         } else {
-            greeting = "Good Night ! ";
+            greeting = "Good Night!";
+            iconRes = R.drawable.ic_greeting_night;
+            tintColor = Color.parseColor("#9FA8DA"); // soft indigo moonlight
         }
 
         binding.tvGreeting.setText(greeting);
+        binding.ivHeaderAvatar.setImageResource(iconRes);
+        ImageViewCompat.setImageTintList(binding.ivHeaderAvatar, ColorStateList.valueOf(tintColor));
     }
 
     private void resetPunchUI() {
@@ -510,6 +532,14 @@ public class DashboardFragment extends Fragment {
         leavePieChartShimmer.setVisibility(View.VISIBLE);
         leavePieChartShimmer.startShimmer();
 
+        if (birthdayCarouselShimmer != null) {
+            birthdayCarouselShimmer.setVisibility(View.VISIBLE);
+            birthdayCarouselShimmer.startShimmer();
+        }
+        if (birthdayCardView != null) {
+            birthdayCardView.setVisibility(View.GONE);
+        }
+
         punchCardView.setVisibility(View.GONE);
         employeeCard.setVisibility(View.GONE);
         leavePieChartContainer.setVisibility(View.GONE);
@@ -540,6 +570,7 @@ public class DashboardFragment extends Fragment {
         punchCardShimmer = root.findViewById(R.id.punchCardShimmer);
         employeeCardShimmer = root.findViewById(R.id.employeeCardShimmer);
         leavePieChartShimmer = root.findViewById(R.id.leavePieChartShimmer);
+        birthdayCarouselShimmer = root.findViewById(R.id.birthdayCarouselShimmer);
 
         punchCardView = root.findViewById(R.id.punchCardView);
         employeeCard = root.findViewById(R.id.employeeCard);

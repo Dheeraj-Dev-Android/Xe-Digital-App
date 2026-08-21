@@ -11,56 +11,16 @@
         android:layout_height="match_parent"
         android:background="@drawable/fragment_dashboard_bg"
         android:fillViewport="true"
+        android:scrollbars="none"
         tools:context=".ui.dashboard.DashboardFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:paddingBottom="16dp">
+            android:layout_marginTop="24dp"
+            android:paddingBottom="24dp">
 
-
-            <ImageView
-                android:id="@+id/ivHeaderAvatar"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="16dp"
-                android:background="@drawable/bg_circle_tint"
-                android:contentDescription="@string/user_profile_picture"
-                android:padding="10dp"
-                android:src="@mipmap/ic_default_profile"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvGreeting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="@string/greeting_default"
-                android:textColor="@color/avatar_bg"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/ivHeaderAvatar"
-                app:layout_constraintEnd_toStartOf="@id/tvHeaderEmployeeName"
-                app:layout_constraintStart_toEndOf="@id/ivHeaderAvatar"
-                app:layout_constraintTop_toTopOf="@id/ivHeaderAvatar" />
-
-            <TextView
-                android:id="@+id/tvHeaderEmployeeName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="16dp"
-                android:text="Employee Name"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/tvGreeting"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/tvGreeting" />
-
-            <!-- Shimmer for punch card -->
+            <!-- ============== PUNCH CARD SHIMMER (now includes header placeholder) ============== -->
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/punchCardShimmer"
                 android:layout_width="0dp"
@@ -70,7 +30,7 @@
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ivHeaderAvatar">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -80,27 +40,84 @@
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:padding="16dp">
 
+                        <!-- header row placeholder -->
                         <View
-                            android:layout_width="120dp"
-                            android:layout_height="20dp"
-                            android:background="@color/primary_text_color" />
+                            android:id="@+id/s_avatar"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <View
-                            android:layout_width="match_parent"
-                            android:layout_height="46dp"
+                            android:layout_width="110dp"
+                            android:layout_height="10dp"
+                            android:layout_marginStart="12dp"
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color"
+                            app:layout_constraintStart_toEndOf="@id/s_avatar"
+                            app:layout_constraintTop_toTopOf="@id/s_avatar" />
+
+                        <View
+                            android:layout_width="150dp"
+                            android:layout_height="14dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color"
+                            app:layout_constraintBottom_toBottomOf="@id/s_avatar"
+                            app:layout_constraintStart_toEndOf="@id/s_avatar" />
+
+                        <!-- divider placeholder -->
+                        <View
+                            android:id="@+id/s_divider"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="18dp"
+                            android:background="#1AFFFFFF"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/s_avatar" />
+
+                        <!-- status block placeholder -->
+                        <View
+                            android:id="@+id/s_bar1"
+                            android:layout_width="70dp"
+                            android:layout_height="10dp"
                             android:layout_marginTop="16dp"
-                            android:background="@color/primary_text_color" />
-                    </LinearLayout>
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/s_divider" />
+
+                        <View
+                            android:layout_width="140dp"
+                            android:layout_height="20dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color"
+                            app:layout_constraintStart_toStartOf="@id/s_bar1"
+                            app:layout_constraintTop_toBottomOf="@id/s_bar1" />
+
+                        <View
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/s_divider" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <!-- Punch card (Updated Layout) -->
+            <!-- ============== PUNCH CARD (HERO) — now hosts header content too ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/punchCardView"
                 android:layout_width="0dp"
@@ -113,13 +130,13 @@
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ivHeaderAvatar"
+                app:layout_constraintTop_toTopOf="parent"
                 app:strokeWidth="0dp">
 
                 <ImageView
                     android:id="@+id/ivPunchCardBackground"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="200dp"
                     android:alpha="0.3"
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
@@ -130,66 +147,129 @@
                     android:layout_height="wrap_content"
                     android:padding="16dp">
 
-                    <!-- Left Text Layout Column -->
+                    <!-- ===== HEADER ROW (moved from fragment top) ===== -->
+
+                    <ImageView
+                        android:id="@+id/ivHeaderAvatar"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_circle_translucent_white"
+                        android:contentDescription="@null"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_greeting_afternoon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvGreeting"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:text="@string/greeting_default"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toTopOf="@id/tvHeaderEmployeeName"
+                        app:layout_constraintEnd_toStartOf="@id/punchButton"
+                        app:layout_constraintStart_toEndOf="@id/ivHeaderAvatar"
+                        app:layout_constraintTop_toTopOf="@id/ivHeaderAvatar"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <TextView
+                        android:id="@+id/tvHeaderEmployeeName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="26dp"
+                        android:layout_marginEnd="12dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Employee Name"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/ivHeaderAvatar"
+                        app:layout_constraintEnd_toStartOf="@id/punchButton"
+                        app:layout_constraintStart_toEndOf="@id/ivHeaderAvatar"
+                        app:layout_constraintTop_toBottomOf="@id/tvGreeting" />
+
+                    <!-- ===== DIVIDER ===== -->
+                    <View
+                        android:id="@+id/dividerHeaderPunch"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:background="#1AFFFFFF"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/ivHeaderAvatar" />
+
+                    <!-- ===== STATUS + PUNCH BUTTON ROW ===== -->
+
                     <TextView
                         android:id="@+id/tvPunchStatusLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:letterSpacing="0.03"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:letterSpacing="0.06"
                         android:text="@string/current_status"
                         android:textAllCaps="true"
-                        android:textColor="@color/avatar_bg"
+                        android:textColor="#B3FFFFFF"
                         android:textSize="11sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toStartOf="@id/punchButton"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toBottomOf="@id/dividerHeaderPunch" />
 
                     <TextView
                         android:id="@+id/tvPunchStatusValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="12dp"
                         android:text="@string/not_punched_in"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toStartOf="@id/punchButton"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvPunchStatusLabel" />
 
-                    <!-- Date & Time moved below the Punch Status -->
                     <TextView
                         android:id="@+id/todayDate"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="12dp"
+                        android:drawablePadding="6dp"
+                        android:gravity="center_vertical"
                         android:text="20 Feb 2024"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="13sp"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"
                         android:textStyle="bold"
+                        app:drawableStartCompat="@drawable/ic_event"
+                        app:drawableTint="#2196F3"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/punchButton"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvPunchStatusValue" />
 
-                    <!-- Circular Punch Button -->
+                    <!-- Punch button — vertically centered against the whole card content -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/punchButton"
-                        android:layout_width="66dp"
-                        android:layout_height="66dp"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#1059B2"
-                        app:cardCornerRadius="33dp"
-                        app:cardElevation="4dp"
+                        android:labelFor="@+id/tvPunchButtonLabel"
+                        app:cardBackgroundColor="@color/accent_employee"
+                        app:cardCornerRadius="36dp"
+                        app:cardElevation="6dp"
                         app:layout_constraintBottom_toTopOf="@id/tvPunchButtonLabel"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/dividerHeaderPunch"
                         app:layout_constraintVertical_chainStyle="packed"
                         app:strokeWidth="0dp">
 
@@ -198,7 +278,7 @@
                             android:layout_height="match_parent"
                             android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="6dp">
+                            android:padding="8dp">
 
                             <ImageView
                                 android:id="@+id/ivPunchButtonIcon"
@@ -210,12 +290,11 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Punch Button Label below Punch Button -->
                     <TextView
                         android:id="@+id/tvPunchButtonLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="8dp"
                         android:text="Punch-In"
                         android:textColor="@color/white"
                         android:textSize="13sp"
@@ -228,14 +307,13 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Quick actions shimmer -->
+            <!-- ============== QUICK ACTIONS SHIMMER ============== -->
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/quickActionsShimmer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -245,7 +323,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="@color/text_primary"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -253,69 +331,81 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:padding="16dp"
+                        android:padding="18dp"
                         android:weightSum="4">
 
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="46dp"
+                            android:layout_height="48dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color" />
 
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_marginStart="10dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color" />
 
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_marginStart="10dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color" />
 
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_marginStart="10dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <!-- Quick actions card -->
+            <!-- ============== QUICK ACTIONS CARD ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/quickActionsCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
                 app:cardBackgroundColor="@color/text_primary"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/punchCardView"
-                app:strokeWidth="0dp">
+                app:strokeColor="#14FFFFFF"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="18dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="14dp"
-                        android:text="@string/quick_actions"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/quick_actions"
+                            android:textColor="@color/white"
+                            android:textSize="14.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -337,14 +427,14 @@
                             android:orientation="vertical">
 
                             <FrameLayout
-                                android:layout_width="46dp"
-                                android:layout_height="46dp"
-                                android:background="@drawable/bg_rounded_icon_12"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:background="@drawable/bg_circle_tint"
                                 android:backgroundTint="@color/icon_background">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/attendance_detail"
                                     android:src="@drawable/ic_event"
@@ -354,7 +444,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="8dp"
                                 android:gravity="center"
                                 android:text="@string/attendance_detail"
                                 android:textColor="@color/avatar_bg"
@@ -377,14 +467,14 @@
                             android:orientation="vertical">
 
                             <FrameLayout
-                                android:layout_width="46dp"
-                                android:layout_height="46dp"
-                                android:background="@drawable/bg_rounded_icon_12"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:background="@drawable/bg_circle_tint"
                                 android:backgroundTint="@color/bg_tint_green">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/apply_leave"
                                     android:src="@drawable/ic_event_add"
@@ -394,7 +484,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="8dp"
                                 android:gravity="center"
                                 android:text="@string/apply_leave"
                                 android:textColor="@color/avatar_bg"
@@ -417,14 +507,14 @@
                             android:orientation="vertical">
 
                             <FrameLayout
-                                android:layout_width="46dp"
-                                android:layout_height="46dp"
-                                android:background="@drawable/bg_rounded_icon_12"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:background="@drawable/bg_circle_tint"
                                 android:backgroundTint="@color/warning_bg">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/add_timesheet"
                                     android:src="@drawable/ic_access_time"
@@ -434,7 +524,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="8dp"
                                 android:gravity="center"
                                 android:text="@string/add_timesheet"
                                 android:textColor="@color/avatar_bg"
@@ -443,7 +533,7 @@
                                 tools:ignore="SmallSp" />
                         </LinearLayout>
 
-                        <!-- Book meeting -->
+                        <!-- View profile -->
                         <LinearLayout
                             android:id="@+id/btnQuickProfile"
                             android:layout_width="0dp"
@@ -457,14 +547,14 @@
                             android:orientation="vertical">
 
                             <FrameLayout
-                                android:layout_width="46dp"
-                                android:layout_height="46dp"
-                                android:background="@drawable/bg_rounded_icon_12"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:background="@drawable/bg_circle_tint"
                                 android:backgroundTint="@color/bg_tint_cyan">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/view_profile"
                                     android:src="@drawable/ic_profile_placeholder"
@@ -474,7 +564,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="8dp"
                                 android:gravity="center"
                                 android:text="@string/view_profile"
                                 android:textColor="@color/avatar_bg"
@@ -487,13 +577,13 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Shimmer for employee card -->
+            <!-- ============== EMPLOYEE CARD SHIMMER ============== -->
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/employeeCardShimmer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -503,7 +593,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="@color/text_primary"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -511,7 +601,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="18dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -520,77 +610,85 @@
 
                             <View
                                 android:id="@+id/shimmerProfile"
-                                android:layout_width="58dp"
-                                android:layout_height="58dp"
-                                android:background="@color/primary_text_color" />
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:background="@drawable/bg_circle_tint"
+                                android:backgroundTint="@color/primary_text_color" />
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="14dp"
                                 android:layout_weight="1"
                                 android:orientation="vertical">
 
                                 <View
                                     android:layout_width="140dp"
                                     android:layout_height="16dp"
-                                    android:background="@color/primary_text_color" />
+                                    android:background="@drawable/bg_rounded_icon_12"
+                                    android:backgroundTint="@color/primary_text_color" />
 
                                 <View
                                     android:layout_width="100dp"
                                     android:layout_height="14dp"
                                     android:layout_marginTop="8dp"
-                                    android:background="@color/primary_text_color" />
+                                    android:background="@drawable/bg_rounded_icon_12"
+                                    android:backgroundTint="@color/primary_text_color" />
                             </LinearLayout>
                         </LinearLayout>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="16dp"
                             android:background="@color/gray_hint" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="16dp"
-                            android:layout_marginTop="12dp"
-                            android:background="@color/primary_text_color" />
+                            android:layout_marginTop="14dp"
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="16dp"
                             android:layout_marginTop="10dp"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="16dp"
                             android:layout_marginTop="10dp"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <!-- Employee card -->
+            <!-- ============== EMPLOYEE CARD ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/employeeCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
                 app:cardBackgroundColor="@color/text_primary"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/quickActionsCard"
-                app:strokeWidth="0dp">
+                app:strokeColor="#14FFFFFF"
+                app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="18dp">
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline_start"
@@ -608,15 +706,15 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/profileBorderContainer"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
                         app:cardBackgroundColor="@android:color/transparent"
-                        app:cardCornerRadius="29dp"
+                        app:cardCornerRadius="36dp"
                         app:cardElevation="0dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:strokeColor="@color/gray_hint"
-                        app:strokeWidth="1dp">
+                        app:strokeColor="#1059B2"
+                        app:strokeWidth="2dp">
 
                         <ImageView
                             android:id="@+id/ivEmployeeProfile"
@@ -627,12 +725,11 @@
                             android:src="@mipmap/ic_default_profile" />
                     </com.google.android.material.card.MaterialCardView>
 
-
                     <TextView
                         android:id="@+id/tvEmployeeNameValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="14dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:gravity="center_vertical"
@@ -648,8 +745,8 @@
                         android:id="@+id/tvEmployeeDesignationValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="4dp"
                         android:gravity="center_vertical"
                         android:text="Software Engineer"
                         android:textColor="@color/avatar_bg"
@@ -662,13 +759,19 @@
                         android:id="@+id/tvEmployeeCodeValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_rounded_icon_12"
+                        android:backgroundTint="#1A1059B2"
                         android:gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="2dp"
                         android:text="CEG 01"
-                        android:textColor="@color/avatar_bg"
-                        android:textSize="13sp"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:textColor="#4FA3FF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@id/profileBorderContainer"
                         app:layout_constraintTop_toBottomOf="@id/tvEmployeeDesignationValue" />
 
@@ -676,97 +779,136 @@
                         android:id="@+id/dividerAfterProfile"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="16dp"
                         android:background="@color/gray_hint"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/profileBorderContainer" />
 
-                    <!-- Email row -->
+                    <!-- Email row with leading icon -->
+                    <ImageView
+                        android:id="@+id/ivEmailIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="16dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_mail"
+                        app:layout_constraintBottom_toBottomOf="@id/tvEmployeeEmail"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/dividerAfterProfile"
+                        app:tint="@color/avatar_bg" />
+
                     <TextView
                         android:id="@+id/tvEmployeeEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="16dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="Email : "
-                        android:textColor="@color/white"
+                        android:textColor="@color/avatar_bg"
                         android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivEmailIcon"
                         app:layout_constraintTop_toBottomOf="@id/dividerAfterProfile" />
-
 
                     <TextView
                         android:id="@+id/tvEmployeeEmailValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="4dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="employee.t@xyz"
                         android:textColor="@color/white"
                         android:textSize="13sp"
+                        android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="@id/tvEmployeeEmail"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tvEmployeeEmail"
                         app:layout_constraintTop_toTopOf="@id/tvEmployeeEmail" />
 
-                    <!-- Contact row -->
+                    <!-- Contact row with leading icon -->
+                    <ImageView
+                        android:id="@+id/ivContactIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="14dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_call"
+                        app:layout_constraintBottom_toBottomOf="@id/tvEmployeeContact"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvEmployeeEmail"
+                        app:tint="@color/avatar_bg" />
+
                     <TextView
                         android:id="@+id/tvEmployeeContact"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="14dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="Contact : "
-                        android:textColor="@color/white"
+                        android:textColor="@color/avatar_bg"
                         android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivContactIcon"
                         app:layout_constraintTop_toBottomOf="@id/tvEmployeeEmail" />
-
 
                     <TextView
                         android:id="@+id/tvEmployeeContactValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="4dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="123-456-7890"
                         android:textColor="@color/white"
                         android:textSize="13sp"
+                        android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="@id/tvEmployeeContact"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tvEmployeeContact"
                         app:layout_constraintTop_toTopOf="@id/tvEmployeeContact" />
 
-                    <!-- Shift row -->
+                    <!-- Shift row with leading icon -->
+                    <ImageView
+                        android:id="@+id/ivShiftIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="14dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_access_time"
+                        app:layout_constraintBottom_toBottomOf="@id/tvEmployeeShift"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvEmployeeContact"
+                        app:tint="@color/avatar_bg" />
+
                     <TextView
                         android:id="@+id/tvEmployeeShift"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="14dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="Shift : "
-                        android:textColor="@color/white"
+                        android:textColor="@color/avatar_bg"
                         android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tvEmployeeContact"
-                        tools:ignore="MissingConstraints" />
+                        app:layout_constraintStart_toEndOf="@id/ivShiftIcon"
+                        app:layout_constraintTop_toBottomOf="@id/tvEmployeeContact" />
 
                     <TextView
                         android:id="@+id/tvEmployeeShiftValue"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="4dp"
                         android:autoSizePresetSizes="@array/autoSize_text_sizes"
                         android:autoSizeTextType="uniform"
                         android:text="9:00 AM - 5:00 PM"
                         android:textColor="@color/white"
                         android:textSize="13sp"
+                        android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="@id/tvEmployeeShift"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tvEmployeeShift"
@@ -776,95 +918,122 @@
                         android:id="@+id/dividerAfterRows"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="16dp"
                         android:background="@color/gray_hint"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvEmployeeShift" />
 
-                    <!-- Punch in / punch out stat tiles -->
+                    <!-- Punch In tile -->
                     <LinearLayout
                         android:id="@+id/punchInContainer"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="14dp"
                         android:background="@drawable/bg_stat_tile"
-                        android:backgroundTint="@color/primary_text_color"
-                        android:orientation="vertical"
-                        android:padding="10dp"
+                        android:backgroundTint="#1A4CAF50"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
                         app:layout_constraintEnd_toStartOf="@id/punchOutContainer"
                         app:layout_constraintHorizontal_chainStyle="spread"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/dividerAfterRows">
 
-                        <TextView
-                            android:id="@+id/tvPunchInLabel"
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_access_time"
+                            app:tint="@color/PrivilegeLeave" />
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Punch In"
-                            android:textColor="@color/gray_hint"
-                            android:textSize="12sp" />
+                            android:layout_marginStart="8dp"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvPunchInTimeValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                            android:autoSizeTextType="uniform"
-                            android:text="09:00 AM"
-                            android:textColor="@color/progress_fill"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+                            <TextView
+                                android:id="@+id/tvPunchInLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Punch In"
+                                android:textColor="@color/gray_hint"
+                                android:textSize="11sp" />
 
+                            <TextView
+                                android:id="@+id/tvPunchInTimeValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                                android:autoSizeTextType="uniform"
+                                android:text="09:00 AM"
+                                android:textColor="@color/progress_fill"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
                     </LinearLayout>
 
+                    <!-- Punch Out tile -->
                     <LinearLayout
                         android:id="@+id/punchOutContainer"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:background="@drawable/bg_stat_tile"
-                        android:backgroundTint="@color/primary_text_color"
-                        android:orientation="vertical"
-                        android:padding="10dp"
+                        android:backgroundTint="#1AFF5252"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/punchInContainer"
                         app:layout_constraintTop_toTopOf="@id/punchInContainer">
 
-                        <TextView
-                            android:id="@+id/tvPunchOutLabel"
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_access_time"
+                            app:tint="@color/SickLeave" />
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Punch Out"
-                            android:textColor="@color/gray_hint"
-                            android:textSize="12sp" />
+                            android:layout_marginStart="8dp"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvPunchOutTimeValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:autoSizePresetSizes="@array/autoSize_text_sizes"
-                            android:autoSizeTextType="uniform"
-                            android:text="05:00 PM"
-                            android:textColor="@color/SickLeave"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+                            <TextView
+                                android:id="@+id/tvPunchOutLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Punch Out"
+                                android:textColor="@color/gray_hint"
+                                android:textSize="11sp" />
 
+                            <TextView
+                                android:id="@+id/tvPunchOutTimeValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:autoSizePresetSizes="@array/autoSize_text_sizes"
+                                android:autoSizeTextType="uniform"
+                                android:text="05:00 PM"
+                                android:textColor="@color/SickLeave"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
                     </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Shimmer for leave chart -->
+            <!-- ============== LEAVE CHART SHIMMER ============== -->
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/leavePieChartShimmer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -874,7 +1043,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="@color/text_primary"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -882,51 +1051,55 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="18dp">
 
                         <View
                             android:layout_width="160dp"
                             android:layout_height="18dp"
-                            android:background="@color/primary_text_color" />
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color" />
 
                         <View
-                            android:layout_width="match_parent"
-                            android:layout_height="220dp"
-                            android:layout_marginTop="16dp"
-                            android:background="@color/primary_text_color" />
+                            android:layout_width="200dp"
+                            android:layout_height="200dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="20dp"
+                            android:background="@drawable/bg_circle_tint"
+                            android:backgroundTint="@color/primary_text_color" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <!-- Leave statistics card -->
+            <!-- ============== LEAVE STATISTICS CARD ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/leavePieChartContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
                 app:cardBackgroundColor="@color/text_primary"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/employeeCard"
-                app:strokeWidth="0dp">
+                app:strokeColor="#14FFFFFF"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="18dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="14dp"
+                        android:layout_marginBottom="16dp"
                         android:text="Leave Statistics"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
+                        android:textSize="14.5sp"
                         android:textStyle="bold" />
 
                     <com.github.mikephil.charting.charts.PieChart
@@ -936,15 +1109,124 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ============== BIRTHDAY CAROUSEL SHIMMER ============== -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/birthdayCarouselShimmer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="14dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/leavePieChartShimmer">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/text_primary"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <View
+                            android:layout_width="140dp"
+                            android:layout_height="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/bg_rounded_icon_12"
+                            android:backgroundTint="@color/primary_text_color" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <View
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    android:background="@drawable/bg_circle_tint"
+                                    android:backgroundTint="@color/primary_text_color" />
+
+                                <View
+                                    android:layout_width="60dp"
+                                    android:layout_height="10dp"
+                                    android:layout_marginTop="8dp"
+                                    android:background="@drawable/bg_rounded_icon_12"
+                                    android:backgroundTint="@color/primary_text_color" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <View
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    android:background="@drawable/bg_circle_tint"
+                                    android:backgroundTint="@color/primary_text_color" />
+
+                                <View
+                                    android:layout_width="60dp"
+                                    android:layout_height="10dp"
+                                    android:layout_marginTop="8dp"
+                                    android:background="@drawable/bg_rounded_icon_12"
+                                    android:backgroundTint="@color/primary_text_color" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <View
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    android:background="@drawable/bg_circle_tint"
+                                    android:backgroundTint="@color/primary_text_color" />
+
+                                <View
+                                    android:layout_width="60dp"
+                                    android:layout_height="10dp"
+                                    android:layout_marginTop="8dp"
+                                    android:background="@drawable/bg_rounded_icon_12"
+                                    android:backgroundTint="@color/primary_text_color" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <include
                 android:id="@+id/includedBirthdayCarousel"
                 layout="@layout/layout_dashboard_birthday_carousel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="14dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/leavePieChartContainer" />
@@ -953,7 +1235,7 @@
                 android:id="@+id/blurOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#80000000"
+                android:background="#99000000"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -964,6 +1246,7 @@
                 android:id="@+id/loader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:indeterminateTint="#1059B2"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
