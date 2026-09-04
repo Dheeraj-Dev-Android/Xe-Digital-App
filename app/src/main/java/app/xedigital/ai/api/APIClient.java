@@ -9,11 +9,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-    private static final String BASE_URL = "https://app.xedigital.ai/";
+    //    private static final String BASE_URL = "http://10.172.6.31:4000/";
+//    private static final String BASE_URL_2 = "http://10.172.6.31:4000/api/v1/";
+//
+//    private static final String BASE_URL_3 = "http://10.172.6.31:4000/api/v1/";
+    private static final String BASE_URL = "https://app.xedigital.ai/api";
     private static final String BASE_URL_2 = "https://app.xedigital.ai/api/v1/";
+
     private static APIClient instance;
     private final Retrofit retrofit1;
     private final Retrofit retrofit2;
+//    private final Retrofit retrofit3;
+
 
     private APIClient() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
@@ -29,6 +36,7 @@ public class APIClient {
         retrofit1 = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
 
         retrofit2 = new Retrofit.Builder().baseUrl(BASE_URL_2).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
+//        retrofit3 = new Retrofit.Builder().baseUrl(BASE_URL_3).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
     }
 
     public static synchronized APIClient getInstance() {
@@ -42,6 +50,10 @@ public class APIClient {
     public APIInterface getApi() {
         return retrofit2.create(APIInterface.class);
     }
+
+//    public APIInterface getDevice() {
+//        return retrofit3.create(APIInterface.class);
+//    }
 
     public APIInterface getRecognize() {
         return retrofit1.create(APIInterface.class);

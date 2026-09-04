@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
@@ -42,6 +43,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityMainBinding;
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
+import app.xedigital.ai.ui.deviceRegister.DeviceRegistrationViewModel;
 import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.NetworkUtils;
 import app.xedigital.ai.utills.SecurePrefManager;
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private Call<UserModelResponse> userCall;
 
     private boolean isNoInternetDialogShowing = false;
+    private DeviceRegistrationViewModel deviceRegistrationViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,22 +108,11 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-
-                // ── Main items ─────────────────────────────────────────
                 R.id.nav_dashboard, R.id.nav_profile, R.id.nav_vms, R.id.nav_holidays, R.id.nav_policy, R.id.nav_settings, R.id.nav_payroll, R.id.nav_documents, R.id.nav_claim_management, R.id.nav_meeting_room, R.id.nav_shifts,
-
-                // ── Attendance submenu ─────────────────────────────────
                 R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_pendingApprovalFragment,
-
-                // ── Leaves submenu ─────────────────────────────────────
                 R.id.nav_leaves, R.id.nav_leaves_data, R.id.nav_applied_leaves, R.id.nav_approve_leaves,
-
-                // ── Team submenu ───────────────────────────────────────
                 R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member_leave, R.id.nav_team_member_timesheet,
-
-                // ── DCR submenu ────────────────────────────────────────
                 R.id.nav_dcr, R.id.nav_dcr_form
-
         ).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -133,30 +125,24 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.nav_dashboard) {
                 navigateToDashboard();
                 handled = true;
-
             } else if (id == R.id.nav_attendance_menu) {
                 toggleAttendanceVisibility(navigationView.getMenu());
                 return true;
-
             } else if (id == R.id.nav_leaves_menu) {
                 toggleLeavesVisibility(navigationView.getMenu());
                 return true;
-
             } else if (id == R.id.nav_dcr_menu) {
                 toggleDcrVisibility(navigationView.getMenu());
                 return true;
             } else if (id == R.id.nav_onboarding_menu) {
                 toggleOnboardingVisibility(navigationView.getMenu());
                 return true;
-
             } else if (id == R.id.nav_team_member) {
                 toggleTeamMemberVisibility(navigationView.getMenu());
                 return true;
-
             } else if (id == R.id.nav_logout) {
                 showLogoutConfirmationDialog();
                 return true;
-
             } else {
                 handled = navigateToDestination(id);
             }
@@ -185,6 +171,56 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fetchUserProfileData();
+
+        // ── Security Device Binding and Lockout Verification ──
+        Log.d(TAG, "🔌 [MainActivity] Initializing Device Binding Protection Gate...");
+        deviceRegistrationViewModel = new ViewModelProvider(this).get(DeviceRegistrationViewModel.class);
+
+        deviceRegistrationViewModel.getIsLoading().observe(this, loading -> {
+            Log.d(TAG, "🔌 [MainActivity] Validation checking in progress: " + loading);
+        });
+
+        deviceRegistrationViewModel.getIsDeviceBlocked().observe(this, isBlocked -> {
+            if (Boolean.TRUE.equals(isBlocked)) {
+                String reasonMessage = deviceRegistrationViewModel.getBlockedReason().getValue();
+
+                Log.e(TAG, "🚨 [MainActivity] DEVICE LOCKOUT TRIGGERED: " + reasonMessage);
+
+                CustomDialogHelper.showWarningDialog(
+                        this,
+                        "Device Access Denied",
+                        reasonMessage != null ? reasonMessage : "Access denied due to device binding policy.",
+                        "Logout",
+                        "Exit App",
+                        new CustomDialogHelper.OnWarningActionListener() {
+                            @Override
+                            public void onConfirm() {
+                                handleLogout();
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                finishAffinity();
+                                System.exit(0);
+                            }
+                        }
+                );
+            }
+        });
+
+        deviceRegistrationViewModel.getSuccessMessage().observe(this, message -> {
+            if (message != null) {
+                Log.i(TAG, "🔌 [MainActivity] Binding Gate cleared: " + message);
+            }
+        });
+
+        deviceRegistrationViewModel.getErrorMessage().observe(this, message -> {
+            if (message != null) {
+                Log.e(TAG, "🔌 [MainActivity] Binding Gate Connection Error: " + message);
+            }
+        });
+
+        deviceRegistrationViewModel.validateAndRegisterDevice();
     }
 
     private void navigateToDashboard() {
@@ -199,7 +235,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean navigateToDestination(int destinationId) {
         try {
             NavOptions navOptions = new NavOptions.Builder().setLaunchSingleTop(true).build();
-
             navController.navigate(destinationId, null, navOptions);
             return true;
         } catch (Exception e) {
@@ -217,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
         if (isOnboardingVisible) toggleOnboardingVisibility(menu);
     }
 
-
     public void showNoInternetLayout() {
         View noInternetView = findViewById(R.id.noInternetLayout);
         if (noInternetView != null) {
@@ -226,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!isNoInternetDialogShowing && !isFinishing() && !isDestroyed()) {
             isNoInternetDialogShowing = true;
-            CustomDialogHelper.showErrorDialog(this, "No Internet Connection", "Please check your internet connection" + " and try again." + "\n\nMake sure Wi-Fi or mobile data" + " is turned on.", () -> {
+            CustomDialogHelper.showErrorDialog(this, "No Internet Connection", "Please check your internet connection and try again.\n\nMake sure Wi-Fi or mobile data is turned on.", () -> {
                 isNoInternetDialogShowing = false;
                 finish();
             });
@@ -251,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!isFinishing() && !isDestroyed()) {
-            CustomDialogHelper.showInfoDialog(this, "Slow Network Detected", "Your network connection is slow." + "\n\nCurrent speed: " + String.format("%.2f Mbps", speed / 1000) + "\n\nSome features might load slowly" + " or be temporarily unavailable.");
+            CustomDialogHelper.showInfoDialog(this, "Slow Network Detected", "Your network connection is slow.\n\nCurrent speed: " + String.format("%.2f Mbps", speed / 1000) + "\n\nSome features might load slowly or be temporarily unavailable.");
         }
     }
 
@@ -261,9 +295,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void showLogoutConfirmationDialog() {
-        CustomDialogHelper.showWarningDialog(this, "Logout", "Are you sure you want to logout?" + "\n\nYou will need to login again" + " to access the app.", "Yes, Logout", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+        CustomDialogHelper.showWarningDialog(this, "Logout", "Are you sure you want to logout?\n\nYou will need to login again to access the app.", "Yes, Logout", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
             @Override
             public void onConfirm() {
                 handleLogout();
@@ -277,14 +310,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        SecurePrefManager.getInstance(MainActivity.this).clearAll();
+        // 🔒 Use clearSession() so hardware binding is preserved on logout
+        SecurePrefManager.getInstance(MainActivity.this).clearSession();
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         intent.putExtra("isFallback", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
-
 
     private void toggleAttendanceVisibility(Menu menu) {
         boolean newVisibility = !isAttendanceSubmenuVisible;
@@ -348,10 +381,8 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
-
         } else if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
             navigateToDashboard();
-
         } else {
             CustomDialogHelper.showWarningDialog(this, "Exit App", "Are you sure you want to exit the app?", "Yes, Exit", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                 @Override
@@ -384,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 navigateToDashboard();
             } else {
-                CustomDialogHelper.showErrorDialog(this, "Punch Failed", "Attendance punch could not be recorded." + "\nPlease try again.");
+                CustomDialogHelper.showErrorDialog(this, "Punch Failed", "Attendance punch could not be recorded.\nPlease try again.");
             }
         }
     }
@@ -393,14 +424,13 @@ public class MainActivity extends AppCompatActivity {
         if (NetworkUtils.isNetworkAvailable(this)) {
             hideNoInternetLayout();
         } else {
-            CustomDialogHelper.showInfoDialog(this, "Still Offline", "No internet connection detected." + "\nPlease enable Wi-Fi or mobile data" + " and try again.");
+            CustomDialogHelper.showInfoDialog(this, "Still Offline", "No internet connection detected.\nPlease enable Wi-Fi or mobile data and try again.");
         }
     }
 
     public void onOpenSettingsButtonClicked(View view) {
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
-
 
     private void fetchUserProfileData() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(MainActivity.this);
@@ -417,21 +447,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfile(String userId, String authToken, ImageView profileImage, TextView profileName, TextView profileEmail) {
-
         String authHeaderValue = "jwt " + authToken;
         profileCall = APIClient.getInstance().getUser().getUserProfile(userId, authHeaderValue);
 
         profileCall.enqueue(new Callback<UserProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
-
                 if (!response.isSuccessful() || response.body() == null) {
                     handleProfileFetchFailure("Profile fetch failed", profileImage, profileName, profileEmail, clientLogo);
                     return;
                 }
 
                 UserProfileResponse userProfileResponse = response.body();
-
                 if (!userProfileResponse.isSuccess() || userProfileResponse.getData() == null || userProfileResponse.getData().getEmployee() == null) {
                     handleProfileFetchFailure("Profile fetch failed: " + userProfileResponse.getMessage(), profileImage, profileName, profileEmail, clientLogo);
                     return;
@@ -443,7 +470,6 @@ public class MainActivity extends AppCompatActivity {
                 String email = userProfileResponse.getData().getEmployee().getEmail();
 
                 String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-
                 SpannableString spannableString = new SpannableString(fullName);
 
                 if (firstName != null && !firstName.isEmpty()) {
@@ -482,28 +508,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchUserData(String userId, String authToken, ImageView clientLogo) {
-
         String authHeaderValue = "jwt " + authToken;
         userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
 
         userCall.enqueue(new Callback<UserModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
-
                 if (!response.isSuccessful() || response.body() == null) {
                     Log.e(TAG, "User data fetch failed");
                     return;
                 }
 
                 UserModelResponse userDataResponse = response.body();
-
                 if (!userDataResponse.isSuccess() || userDataResponse.getData() == null || userDataResponse.getData().getCompany() == null) {
                     Log.e(TAG, "User data fetch failed: " + userDataResponse.getMessage());
                     return;
                 }
 
                 String clientLogoUrl = userDataResponse.getData().getCompany().getLogo();
-
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && clientLogo != null) {
                     if (clientLogoUrl != null && !clientLogoUrl.isEmpty()) {
                         Glide.with(MainActivity.this).load(clientLogoUrl).into(clientLogo);
@@ -521,7 +543,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleProfileFetchFailure(String message, ImageView profileImage, TextView profileName, TextView profileEmail, ImageView clientLogo) {
-
         if (isFinishing() || isDestroyed()) return;
 
         Log.e(TAG, "handleProfileFetchFailure: " + message);
@@ -537,10 +558,6 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(getApplicationContext()).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(clientLogo);
         }
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // LIFECYCLE
-    // ══════════════════════════════════════════════════════════════════════
 
     @Override
     protected void onStart() {

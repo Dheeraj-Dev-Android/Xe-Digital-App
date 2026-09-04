@@ -59,4 +59,17 @@ public class SecurePrefManager {
     public void clearAll() {
         sharedPreferences.edit().clear().apply();
     }
+
+    public void clearSession() {
+        String installId = getString("installation_id", null);
+        String boundUserId = getString("bound_user_id", null);
+        String boundEmail = getString("bound_user_email", null);
+
+        sharedPreferences.edit().clear().apply();
+
+        // Restore hardware & device-binding identity
+        if (installId != null) putString("installation_id", installId);
+        if (boundUserId != null) putString("bound_user_id", boundUserId);
+        if (boundEmail != null) putString("bound_user_email", boundEmail);
+    }
 }

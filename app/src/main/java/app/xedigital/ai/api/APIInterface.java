@@ -30,6 +30,8 @@ import app.xedigital.ai.model.cmLeaveApprovalPending.CMLeavePendingResponse;
 import app.xedigital.ai.model.dcrData.DcrDataResponse;
 import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
+import app.xedigital.ai.model.deviceRegistration.DeviceDetailsResponse;
+import app.xedigital.ai.model.deviceRegistration.DeviceRegistrationRequest;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimResponse;
 import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
 import app.xedigital.ai.model.employeeOnboarding.EmployeeOnboardingResponse;
@@ -347,4 +349,11 @@ public interface APIInterface {
     @GET("employees/attendance/regularize/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     retrofit2.Call<CfRegularizeApprovalResponse> getCFMRegularize(@Header("Authorization") String authToken, @Path("userId") String id);
+
+
+    @POST("authentication/device/registration")
+    Call<ResponseBody> registerDevice(@Header("Authorization") String token, @Body DeviceRegistrationRequest request);
+
+    @GET("authentication/device/getDeviceDetails")
+    Call<DeviceDetailsResponse> getDeviceDetails(@Header("Authorization") String token);
 }
