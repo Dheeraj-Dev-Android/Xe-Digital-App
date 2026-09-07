@@ -23,10 +23,10 @@ import app.xedigital.ai.R;
 public class CustomDialogHelper {
 
     // ══════════════════════════════════════════════════════════════════════
-    // CALLBACK INTERFACES
+    // SUCCESS DIALOGS
     // ══════════════════════════════════════════════════════════════════════
 
-    public static void showSuccessDialog(Context context, String title, String message, OnDialogDismissListener listener) {
+    public static void showSuccessDialog(Context context, String title, String message, String buttonText, OnDialogDismissListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_success, null);
         builder.setView(view);
@@ -41,6 +41,9 @@ public class CustomDialogHelper {
 
         titleView.setText(title != null ? title : "Success!");
         messageView.setText(message);
+        if (buttonText != null && !buttonText.isEmpty()) {
+            btnOk.setText(buttonText);
+        }
 
         btnOk.setOnClickListener(v -> {
             dialog.dismiss();
@@ -51,15 +54,15 @@ public class CustomDialogHelper {
         animateDialog(context, view);
     }
 
-    public static void showSuccessDialog(Context context, String title, String message) {
-        showSuccessDialog(context, title, message, null);
+    public static void showSuccessDialog(Context context, String title, String message, OnDialogDismissListener listener) {
+        showSuccessDialog(context, title, message, "Okay", listener);
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // SUCCESS DIALOG — Plain text
-    // ══════════════════════════════════════════════════════════════════════
+    public static void showSuccessDialog(Context context, String title, String message) {
+        showSuccessDialog(context, title, message, "Okay", null);
+    }
 
-    public static void showSuccessDialogHtml(Context context, String title, String htmlMessage, OnDialogDismissListener listener) {
+    public static void showSuccessDialogHtml(Context context, String title, String htmlMessage, String buttonText, OnDialogDismissListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_success, null);
         builder.setView(view);
@@ -74,6 +77,51 @@ public class CustomDialogHelper {
 
         titleView.setText(title != null ? title : "Success!");
         applyHtml(messageView, htmlMessage);
+        if (buttonText != null && !buttonText.isEmpty()) {
+            btnOk.setText(buttonText);
+        }
+
+        btnOk.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (listener != null) listener.onDismiss();
+        });
+
+        dialog.show();
+        animateDialog(context, view);
+    }
+
+    public static void showSuccessDialogHtml(Context context, String title, String htmlMessage, OnDialogDismissListener listener) {
+        showSuccessDialogHtml(context, title, htmlMessage, "Okay", listener);
+    }
+
+    public static void showSuccessDialogHtml(Context context, String title, String htmlMessage) {
+        showSuccessDialogHtml(context, title, htmlMessage, "Okay", null);
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ERROR DIALOGS
+    // ══════════════════════════════════════════════════════════════════════
+
+    public static void showErrorDialog(Context context, String title, String message, String buttonText, OnDialogDismissListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_error, null);
+        builder.setView(view);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        setupDialogWindow(dialog);
+
+        TextView titleView = view.findViewById(R.id.dialogTitle);
+        TextView messageView = view.findViewById(R.id.dialogMessage);
+        MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
+
+        titleView.setText(title != null ? title : "Oops!");
+        messageView.setText(message);
+        if (buttonText != null && !buttonText.isEmpty()) {
+            btnOk.setText(buttonText);
+        } else {
+            btnOk.setText("Close");
+        }
 
         btnOk.setOnClickListener(v -> {
             dialog.dismiss();
@@ -85,47 +133,18 @@ public class CustomDialogHelper {
     }
 
     public static void showErrorDialog(Context context, String title, String message, OnDialogDismissListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_error, null);
-        builder.setView(view);
-        builder.setCancelable(false);
-
-        AlertDialog dialog = builder.create();
-        setupDialogWindow(dialog);
-
-        TextView titleView = view.findViewById(R.id.dialogTitle);
-        TextView messageView = view.findViewById(R.id.dialogMessage);
-        MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
-
-        titleView.setText(title != null ? title : "Oops!");
-        messageView.setText(message);
-
-        btnOk.setOnClickListener(v -> {
-            dialog.dismiss();
-            if (listener != null) listener.onDismiss();
-        });
-
-        dialog.show();
-        animateDialog(context, view);
+        showErrorDialog(context, title, message, "Close", listener);
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // SUCCESS DIALOG — HTML formatted
-    // ══════════════════════════════════════════════════════════════════════
 
     public static void showErrorDialog(Context context, String title, String message) {
-        showErrorDialog(context, title, message, null);
+        showErrorDialog(context, title, message, "Close", null);
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // ERROR DIALOG — Plain text
-    // ══════════════════════════════════════════════════════════════════════
 
     public static void showErrorDialog(Context context, String message) {
-        showErrorDialog(context, null, message, null);
+        showErrorDialog(context, null, message, "Close", null);
     }
 
-    public static void showErrorDialogHtml(Context context, String title, String htmlMessage, OnDialogDismissListener listener) {
+    public static void showErrorDialogHtml(Context context, String title, String htmlMessage, String buttonText, OnDialogDismissListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_error, null);
         builder.setView(view);
@@ -140,6 +159,11 @@ public class CustomDialogHelper {
 
         titleView.setText(title != null ? title : "Oops!");
         applyHtml(messageView, htmlMessage);
+        if (buttonText != null && !buttonText.isEmpty()) {
+            btnOk.setText(buttonText);
+        } else {
+            btnOk.setText("Close");
+        }
 
         btnOk.setOnClickListener(v -> {
             dialog.dismiss();
@@ -150,12 +174,100 @@ public class CustomDialogHelper {
         animateDialog(context, view);
     }
 
+    public static void showErrorDialogHtml(Context context, String title, String htmlMessage, OnDialogDismissListener listener) {
+        showErrorDialogHtml(context, title, htmlMessage, "Close", listener);
+    }
+
+    public static void showErrorDialogHtml(Context context, String title, String htmlMessage, String buttonText) {
+        showErrorDialogHtml(context, title, htmlMessage, buttonText, null);
+    }
+
     public static void showErrorDialogHtml(Context context, String title, String htmlMessage) {
-        showErrorDialogHtml(context, title, htmlMessage, null);
+        showErrorDialogHtml(context, title, htmlMessage, "Close", null);
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // ERROR DIALOG — HTML formatted
+    // INFO DIALOGS
+    // ══════════════════════════════════════════════════════════════════════
+
+    public static void showInfoDialog(Context context, String title, String message, String buttonText, OnDialogDismissListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_info, null);
+        builder.setView(view);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        setupDialogWindow(dialog);
+
+        TextView titleView = view.findViewById(R.id.dialogTitle);
+        TextView messageView = view.findViewById(R.id.dialogMessage);
+        MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
+
+        titleView.setText(title != null ? title : "Information");
+        messageView.setText(message);
+        if (buttonText != null && !buttonText.isEmpty()) {
+            btnOk.setText(buttonText);
+        } else {
+            btnOk.setText("Okay");
+        }
+
+        btnOk.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (listener != null) listener.onDismiss();
+        });
+
+        dialog.show();
+        animateDialog(context, view);
+    }
+
+    public static void showInfoDialog(Context context, String title, String message, OnDialogDismissListener listener) {
+        showInfoDialog(context, title, message, "Okay", listener);
+    }
+
+    public static void showInfoDialog(Context context, String title, String message) {
+        showInfoDialog(context, title, message, "Okay", null);
+    }
+
+    public static void showInfoDialogHtml(Context context, String title, String htmlMessage, String buttonText, OnDialogDismissListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_info, null);
+        builder.setView(view);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        setupDialogWindow(dialog);
+
+        TextView titleView = view.findViewById(R.id.dialogTitle);
+        TextView messageView = view.findViewById(R.id.dialogMessage);
+        MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
+
+        titleView.setText(title != null ? title : "Information");
+        applyHtml(messageView, htmlMessage);
+        if (buttonText != null && !buttonText.isEmpty()) {
+            btnOk.setText(buttonText);
+        } else {
+            btnOk.setText("Okay");
+        }
+
+        btnOk.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (listener != null) listener.onDismiss();
+        });
+
+        dialog.show();
+        animateDialog(context, view);
+    }
+
+    public static void showInfoDialogHtml(Context context, String title, String htmlMessage, OnDialogDismissListener listener) {
+        showInfoDialogHtml(context, title, htmlMessage, "Okay", listener);
+    }
+
+    public static void showInfoDialogHtml(Context context, String title, String htmlMessage) {
+        showInfoDialogHtml(context, title, htmlMessage, "Okay", null);
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // WARNING DIALOGS
     // ══════════════════════════════════════════════════════════════════════
 
     public static void showWarningDialog(Context context, String title, String message, String confirmText, String cancelText, OnWarningActionListener listener) {
@@ -174,8 +286,8 @@ public class CustomDialogHelper {
 
         titleView.setText(title != null ? title : "Warning");
         messageView.setText(message);
-        if (confirmText != null) btnConfirm.setText(confirmText);
-        if (cancelText != null) btnCancel.setText(cancelText);
+        btnConfirm.setText(confirmText != null ? confirmText : "Okay");
+        btnCancel.setText(cancelText != null ? cancelText : "Close");
 
         btnConfirm.setOnClickListener(v -> {
             dialog.dismiss();
@@ -207,8 +319,8 @@ public class CustomDialogHelper {
 
         titleView.setText(title != null ? title : "Warning");
         applyHtml(messageView, htmlMessage);
-        if (confirmText != null) btnConfirm.setText(confirmText);
-        if (cancelText != null) btnCancel.setText(cancelText);
+        btnConfirm.setText(confirmText != null ? confirmText : "Okay");
+        btnCancel.setText(cancelText != null ? cancelText : "Close");
 
         btnConfirm.setOnClickListener(v -> {
             dialog.dismiss();
@@ -225,77 +337,7 @@ public class CustomDialogHelper {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // WARNING DIALOG — Plain text
-    // ══════════════════════════════════════════════════════════════════════
-
-    public static void showInfoDialog(Context context, String title, String message, OnDialogDismissListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_info, null);
-        builder.setView(view);
-        builder.setCancelable(false);
-
-        AlertDialog dialog = builder.create();
-        setupDialogWindow(dialog);
-
-        TextView titleView = view.findViewById(R.id.dialogTitle);
-        TextView messageView = view.findViewById(R.id.dialogMessage);
-        MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
-
-        titleView.setText(title != null ? title : "Information");
-        messageView.setText(message);
-
-        btnOk.setOnClickListener(v -> {
-            dialog.dismiss();
-            if (listener != null) listener.onDismiss();
-        });
-
-        dialog.show();
-        animateDialog(context, view);
-    }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // WARNING DIALOG — HTML formatted
-    // ══════════════════════════════════════════════════════════════════════
-
-    public static void showInfoDialog(Context context, String title, String message) {
-        showInfoDialog(context, title, message, null);
-    }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // INFO DIALOG — Plain text
-    // ══════════════════════════════════════════════════════════════════════
-
-    public static void showInfoDialogHtml(Context context, String title, String htmlMessage, OnDialogDismissListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_info, null);
-        builder.setView(view);
-        builder.setCancelable(false);
-
-        AlertDialog dialog = builder.create();
-        setupDialogWindow(dialog);
-
-        TextView titleView = view.findViewById(R.id.dialogTitle);
-        TextView messageView = view.findViewById(R.id.dialogMessage);
-        MaterialButton btnOk = view.findViewById(R.id.btnDialogOk);
-
-        titleView.setText(title != null ? title : "Information");
-        applyHtml(messageView, htmlMessage);
-
-        btnOk.setOnClickListener(v -> {
-            dialog.dismiss();
-            if (listener != null) listener.onDismiss();
-        });
-
-        dialog.show();
-        animateDialog(context, view);
-    }
-
-    public static void showInfoDialogHtml(Context context, String title, String htmlMessage) {
-        showInfoDialogHtml(context, title, htmlMessage, null);
-    }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // INFO DIALOG — HTML formatted
+    // LOADING DIALOG
     // ══════════════════════════════════════════════════════════════════════
 
     public static AlertDialog showLoadingDialog(Context context) {
@@ -328,7 +370,7 @@ public class CustomDialogHelper {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // LOADING DIALOG
+    // PRIVATE HELPERS
     // ══════════════════════════════════════════════════════════════════════
 
     private static void setupDialogWindow(AlertDialog dialog) {
@@ -343,15 +385,6 @@ public class CustomDialogHelper {
         view.startAnimation(anim);
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // PRIVATE HELPERS
-    // ══════════════════════════════════════════════════════════════════════
-
-    /**
-     * Applies HTML formatting to a TextView.
-     * Sets left-alignment for proper bullet point display.
-     * Enables link clicking if any links are present.
-     */
     private static void applyHtml(TextView textView, String htmlContent) {
         Spanned formatted = Html.fromHtml(htmlContent, Html.FROM_HTML_MODE_COMPACT);
         textView.setText(formatted);

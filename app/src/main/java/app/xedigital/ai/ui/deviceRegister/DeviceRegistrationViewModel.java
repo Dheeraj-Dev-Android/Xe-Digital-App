@@ -109,7 +109,7 @@ public class DeviceRegistrationViewModel extends AndroidViewModel {
         // =========================================================================
         // 🔒 CHECK 2 (Server-Side): Is this user account bound to a DIFFERENT device?
         // =========================================================================
-        checkCall = APIClient.getInstance().getDevice().getDeviceDetails(authHeader);
+//        checkCall = APIClient.getInstance().getDevice().getDeviceDetails(authHeader);
         checkCall.enqueue(new Callback<DeviceDetailsResponse>() {
             @Override
             public void onResponse(@NonNull Call<DeviceDetailsResponse> call, @NonNull Response<DeviceDetailsResponse> response) {
@@ -195,7 +195,7 @@ public class DeviceRegistrationViewModel extends AndroidViewModel {
         Log.d(TAG, "│ Device Details: " + request.getDeviceName());
         Log.d(TAG, "└─────────────────────────────────────────────────────────");
 
-        registrationCall = APIClient.getInstance().getDevice().registerDevice(authHeader, request);
+//        registrationCall = APIClient.getInstance().getDevice().registerDevice(authHeader, request);
         registrationCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {

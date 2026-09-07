@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
@@ -173,54 +172,54 @@ public class MainActivity extends AppCompatActivity {
         fetchUserProfileData();
 
         // ── Security Device Binding and Lockout Verification ──
-        Log.d(TAG, "🔌 [MainActivity] Initializing Device Binding Protection Gate...");
-        deviceRegistrationViewModel = new ViewModelProvider(this).get(DeviceRegistrationViewModel.class);
-
-        deviceRegistrationViewModel.getIsLoading().observe(this, loading -> {
-            Log.d(TAG, "🔌 [MainActivity] Validation checking in progress: " + loading);
-        });
-
-        deviceRegistrationViewModel.getIsDeviceBlocked().observe(this, isBlocked -> {
-            if (Boolean.TRUE.equals(isBlocked)) {
-                String reasonMessage = deviceRegistrationViewModel.getBlockedReason().getValue();
-
-                Log.e(TAG, "🚨 [MainActivity] DEVICE LOCKOUT TRIGGERED: " + reasonMessage);
-
-                CustomDialogHelper.showWarningDialog(
-                        this,
-                        "Device Access Denied",
-                        reasonMessage != null ? reasonMessage : "Access denied due to device binding policy.",
-                        "Logout",
-                        "Exit App",
-                        new CustomDialogHelper.OnWarningActionListener() {
-                            @Override
-                            public void onConfirm() {
-                                handleLogout();
-                            }
-
-                            @Override
-                            public void onCancel() {
-                                finishAffinity();
-                                System.exit(0);
-                            }
-                        }
-                );
-            }
-        });
-
-        deviceRegistrationViewModel.getSuccessMessage().observe(this, message -> {
-            if (message != null) {
-                Log.i(TAG, "🔌 [MainActivity] Binding Gate cleared: " + message);
-            }
-        });
-
-        deviceRegistrationViewModel.getErrorMessage().observe(this, message -> {
-            if (message != null) {
-                Log.e(TAG, "🔌 [MainActivity] Binding Gate Connection Error: " + message);
-            }
-        });
-
-        deviceRegistrationViewModel.validateAndRegisterDevice();
+//        Log.d(TAG, "🔌 [MainActivity] Initializing Device Binding Protection Gate...");
+//        deviceRegistrationViewModel = new ViewModelProvider(this).get(DeviceRegistrationViewModel.class);
+//
+//        deviceRegistrationViewModel.getIsLoading().observe(this, loading -> {
+//            Log.d(TAG, "🔌 [MainActivity] Validation checking in progress: " + loading);
+//        });
+//
+//        deviceRegistrationViewModel.getIsDeviceBlocked().observe(this, isBlocked -> {
+//            if (Boolean.TRUE.equals(isBlocked)) {
+//                String reasonMessage = deviceRegistrationViewModel.getBlockedReason().getValue();
+//
+//                Log.e(TAG, "🚨 [MainActivity] DEVICE LOCKOUT TRIGGERED: " + reasonMessage);
+//
+//                CustomDialogHelper.showWarningDialog(
+//                        this,
+//                        "Device Access Denied",
+//                        reasonMessage != null ? reasonMessage : "Access denied due to device binding policy.",
+//                        "Logout",
+//                        "Exit App",
+//                        new CustomDialogHelper.OnWarningActionListener() {
+//                            @Override
+//                            public void onConfirm() {
+//                                handleLogout();
+//                            }
+//
+//                            @Override
+//                            public void onCancel() {
+//                                finishAffinity();
+//                                System.exit(0);
+//                            }
+//                        }
+//                );
+//            }
+//        });
+//
+//        deviceRegistrationViewModel.getSuccessMessage().observe(this, message -> {
+//            if (message != null) {
+//                Log.i(TAG, "🔌 [MainActivity] Binding Gate cleared: " + message);
+//            }
+//        });
+//
+//        deviceRegistrationViewModel.getErrorMessage().observe(this, message -> {
+//            if (message != null) {
+//                Log.e(TAG, "🔌 [MainActivity] Binding Gate Connection Error: " + message);
+//            }
+//        });
+//
+//        deviceRegistrationViewModel.validateAndRegisterDevice();
     }
 
     private void navigateToDashboard() {

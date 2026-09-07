@@ -13,7 +13,7 @@ public class APIClient {
 //    private static final String BASE_URL_2 = "http://10.172.6.31:4000/api/v1/";
 //
 //    private static final String BASE_URL_3 = "http://10.172.6.31:4000/api/v1/";
-    private static final String BASE_URL = "https://app.xedigital.ai/api";
+    private static final String BASE_URL = "https://app.xedigital.ai/api/";
     private static final String BASE_URL_2 = "https://app.xedigital.ai/api/v1/";
 
     private static APIClient instance;

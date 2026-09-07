@@ -2,14 +2,12 @@ package app.xedigital.ai.adapter;
 
 import static app.xedigital.ai.ui.regularize_attendance.RegularizeFragment.ARG_ATTENDANCE_ITEM;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
@@ -19,14 +17,17 @@ import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.attendance.EmployeePunchDataItem;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.AttendanceViewHolder> {
 
     private final List<EmployeePunchDataItem> attendanceList;
+    private final OnAttendanceActionListener listener;
 
-    public AttendanceAdapter(List<EmployeePunchDataItem> attendanceList) {
+    public AttendanceAdapter(List<EmployeePunchDataItem> attendanceList, OnAttendanceActionListener listener) {
         this.attendanceList = attendanceList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -45,7 +46,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         String punchOut = attendanceItem.getPunchOut();
         holder.leaveTypeName.setVisibility(View.GONE);
 
-        if ((dayOfWeek.equals("Sat") || dayOfWeek.equals("Sun")) && (punchIn == null || punchOut == null)) {
+        if ((dayOfWeek != null && (dayOfWeek.equals("Sat") || dayOfWeek.equals("Sun"))) && (punchIn == null || punchOut == null)) {
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
 
             holder.punchInTextView.setVisibility(View.GONE);
@@ -58,7 +59,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.leaveTypeName.setVisibility(View.GONE);
 
         } else if (attendanceItem.getLeaveName() != null && !attendanceItem.getLeaveName().isEmpty()) {
-            // Leave data
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.leaveTypeName.setVisibility(View.VISIBLE);
             holder.leaveTypeName.setText("Leave Name: " + attendanceItem.getLeaveName());
@@ -72,7 +72,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.btnRegularize.setVisibility(View.GONE);
 
         } else if (attendanceItem.getHolidayName() != null && !attendanceItem.getHolidayName().isEmpty()) {
-            // Holiday data
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.leaveTypeName.setVisibility(View.VISIBLE);
             holder.leaveTypeName.setText("Holiday Name: " + attendanceItem.getHolidayName());
@@ -86,7 +85,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.btnRegularize.setVisibility(View.GONE);
 
         } else if (punchIn != null && !punchIn.isEmpty() && punchOut != null && !punchOut.isEmpty()) {
-            // Attendance data
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.punchInTextView.setVisibility(View.VISIBLE);
             holder.punchOutTextView.setVisibility(View.VISIBLE);
@@ -100,9 +98,8 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.punchInTextView.setText(DateTimeUtils.formatTime(punchIn));
             holder.punchOutTextView.setText(DateTimeUtils.formatTime(punchOut));
 
-            // Extract employee's dynamic shift details safely
-            String shiftStart = "09:00"; // Default fallback start time
-            String shiftEnd = "18:00";   // Default fallback end time
+            String shiftStart = "09:00";
+            String shiftEnd = "18:00";
 
             if (attendanceItem.getShift() != null) {
                 if (attendanceItem.getShift().getStartTime() != null && !attendanceItem.getShift().getStartTime().isEmpty()) {
@@ -113,21 +110,18 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
                 }
             }
 
-            // 1. Total Time Evaluation
             String totalTime = attendanceItem.getTotalTime();
             if (isInvalidValue(totalTime)) {
                 totalTime = DateTimeUtils.calculateTotalTime(punchIn, punchOut);
             }
             holder.totalTimeTextView.setText(totalTime);
 
-            // 2. Late Time Evaluation
             String lateTime = attendanceItem.getLateTime();
             if (isInvalidValue(lateTime)) {
                 lateTime = DateTimeUtils.calculateLateTime(punchIn, shiftStart);
             }
             holder.lateTimeTextView.setText(lateTime);
 
-            // 3. Overtime Evaluation
             String overTime = attendanceItem.getOvertime();
             if (isInvalidValue(overTime)) {
                 overTime = DateTimeUtils.calculateOvertime(totalTime, shiftStart, shiftEnd);
@@ -135,7 +129,6 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
             holder.overTimeTextView.setText(overTime);
 
         } else {
-            // No leave, holiday, or punch data - show LOP/LWP
             holder.dateTextView.setText("Date: " + attendanceItem.getPunchDateFormat() + "  (" + dayOfWeek + ")");
             holder.leaveTypeName.setVisibility(View.VISIBLE);
             holder.leaveTypeName.setText("Leave Name : Loss of Pay (LOP) / Leave Without Pay (LWP)");
@@ -153,28 +146,21 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
     private boolean isInvalidValue(String val) {
         if (val == null) return true;
         String trimmed = val.trim();
-        return trimmed.isEmpty()
-                || trimmed.equalsIgnoreCase("0")
-                || trimmed.equalsIgnoreCase("00:00 Hrs")
-                || trimmed.equalsIgnoreCase("0 Min's")
-                || trimmed.equalsIgnoreCase("N/A");
+        return trimmed.isEmpty() || trimmed.equalsIgnoreCase("0") || trimmed.equalsIgnoreCase("00:00 Hrs") || trimmed.equalsIgnoreCase("0 Min's") || trimmed.equalsIgnoreCase("N/A");
     }
 
     @Override
     public int getItemCount() {
-        return attendanceList.size();
+        return attendanceList != null ? attendanceList.size() : 0;
+    }
+
+    public interface OnAttendanceActionListener {
+        void onRegularizeClick(EmployeePunchDataItem attendanceItem);
     }
 
     public class AttendanceViewHolder extends RecyclerView.ViewHolder {
-        public TextView dateTextView;
-        public TextView punchInTextView;
-        public TextView punchOutTextView;
-        public TextView totalTimeTextView;
-        public TextView lateTimeTextView;
-        public TextView overTimeTextView;
-        public TextView leaveTypeName;
-        public ImageButton btnViewAttendance;
-        public ImageButton btnRegularize;
+        public TextView dateTextView, punchInTextView, punchOutTextView, totalTimeTextView, lateTimeTextView, overTimeTextView, leaveTypeName;
+        public ImageButton btnViewAttendance, btnRegularize;
 
         public AttendanceViewHolder(View itemView) {
             super(itemView);
@@ -197,26 +183,22 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
                         bundle.putSerializable(ARG_ATTENDANCE_ITEM, attendanceItem);
                         Navigation.findNavController(v).navigate(R.id.action_nav_attendance_to_nav_viewAttendanceFragment, bundle);
                     } else {
-                        new AlertDialog.Builder(v.getContext()).setTitle("Attendance Data").setMessage("Attendance data not available.").setPositiveButton(android.R.string.ok, null).show();
+                        CustomDialogHelper.showInfoDialog(v.getContext(), "Attendance Data", "Attendance data not available.");
                     }
                 }
             });
 
             btnRegularize.setOnClickListener(v -> {
-                try {
-                    int position = getBindingAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        EmployeePunchDataItem attendanceItem = attendanceList.get(position);
-                        if (attendanceItem != null && attendanceItem.getId() != null) {
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable(ARG_ATTENDANCE_ITEM, attendanceItem);
-                            Navigation.findNavController(v).navigate(R.id.action_nav_attendance_to_regularizeFragment, bundle);
-                        } else {
-                            new AlertDialog.Builder(v.getContext()).setTitle("Attendance Data").setMessage("Attendance data not available.").setPositiveButton(android.R.string.ok, null).show();
+                int position = getBindingAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    EmployeePunchDataItem attendanceItem = attendanceList.get(position);
+                    if (attendanceItem != null) {
+                        if (listener != null) {
+                            listener.onRegularizeClick(attendanceItem);
                         }
+                    } else {
+                        CustomDialogHelper.showInfoDialog(v.getContext(), "Attendance Data", "Attendance data not available.");
                     }
-                } catch (Exception e) {
-                    Toast.makeText(v.getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
                 }
             });
         }

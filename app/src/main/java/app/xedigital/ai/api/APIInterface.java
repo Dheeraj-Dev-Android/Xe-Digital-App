@@ -50,6 +50,7 @@ import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorReques
 import app.xedigital.ai.model.profile.UserProfileResponse;
 import app.xedigital.ai.model.regularize.RegularizeAttendanceRequest;
 import app.xedigital.ai.model.regularizeApplied.RegularizeAppliedResponse;
+import app.xedigital.ai.model.regularizeLimit.RegularizeLimitResponse;
 import app.xedigital.ai.model.regularizeList.RegularizeApprovalResponse;
 import app.xedigital.ai.model.regularizeUpdateStatus.RegularizeUpdateRequest;
 import app.xedigital.ai.model.shiftApplied.ShiftAppliedResponse;
@@ -221,6 +222,10 @@ public interface APIInterface {
     //    https://app.xedigital.ai/api/v1/employees/getOnBoardEmployeeById/63ec7ea3877d7f4417cc5a39
     @GET("employees/getOnBoardEmployeeById/{userId}")
     Call<EmployeeOnboardingResponse> getOnBoardEmployeeById(@Header("Authorization") String authToken, @Path("userId") String userId);
+
+    //    https://app.xedigital.ai/api/v1/employees/getAttendenceRegularizationLimit
+    @GET("employees/getAttendenceRegularizationLimit")
+    Call<RegularizeLimitResponse> getAttendenceRegularizationLimit(@Header("Authorization") String authToken);
 
     //  POST APIs
     @POST("claims/food")
