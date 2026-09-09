@@ -1,7 +1,8 @@
 package app.xedigital.ai.adapter;
 
-
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,12 @@ import app.xedigital.ai.utills.DateTimeUtils;
 
 public class CFregularizeAdapter extends RecyclerView.Adapter<CFregularizeAdapter.ViewHolder> {
     public static final String ARG_ATTENDANCE_REG_ITEM = "attendanceRegItem";
+    private static final String[] AVATAR_COLORS = {
+            "#F44336", "#E91E63", "#9C27B0", "#673AB7",
+            "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4",
+            "#009688", "#4CAF50", "#8BC34A", "#FF9800",
+            "#FF5722", "#795548", "#607D8B"
+    };
     private final String authToken;
     private final String userId;
     private final Context context;
@@ -47,9 +54,18 @@ public class CFregularizeAdapter extends RecyclerView.Adapter<CFregularizeAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AttendanceRegItem item = attendanceRegItem.get(position);
-        holder.empName.setText(item.getEmployee().getFullname());
-        holder.appliedDate.setText("Applied Date : " + DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate()));
-        holder.empPunchDate.setText("Punch Date : " + DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate()));
+        String fullName = item.getEmployee().getFullname();
+
+        holder.empName.setText(fullName);
+
+        // Set avatar initials + dynamic background color
+        holder.empAvatar.setText(getInitials(fullName));
+        setAvatarBackground(holder.empAvatar, fullName);
+
+        // Date values only (labels are now static in XML)
+        holder.appliedDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getAppliedDate()));
+        holder.empPunchDate.setText(DateTimeUtils.getDayOfWeekAndDate(item.getPunchDate()));
+
         holder.statusChip.setText(item.getStatus());
         setStatusChipColor(holder.statusChip, item.getStatus());
 
@@ -58,7 +74,7 @@ public class CFregularizeAdapter extends RecyclerView.Adapter<CFregularizeAdapte
                 AttendanceRegItem selectedItem = attendanceRegItem.get(position);
                 String attendanceRegId = selectedItem.getId();
 
-                if (attendanceRegId != null && attendanceRegItem != null) {
+                if (attendanceRegId != null) {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(ARG_ATTENDANCE_REG_ITEM, selectedItem);
                     Navigation.findNavController(v).navigate(R.id.action_nav_cross_approval_attendance_to_nav_pendingCFMAttendanceApprovalFragment, bundle);
@@ -99,8 +115,38 @@ public class CFregularizeAdapter extends RecyclerView.Adapter<CFregularizeAdapte
         }
     }
 
+    /**
+     * Generates initials from full name, e.g. "Xedigital Employee" -> "XE"
+     */
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "??";
+        String[] parts = name.trim().split("\\s+");
+        StringBuilder initials = new StringBuilder();
+        for (int i = 0; i < Math.min(2, parts.length); i++) {
+            if (!parts[i].isEmpty()) {
+                initials.append(Character.toUpperCase(parts[i].charAt(0)));
+            }
+        }
+        return initials.length() > 0 ? initials.toString() : "??";
+    }
+
+    /**
+     * Assigns a consistent color per employee name (based on hashcode)
+     * so the same employee always gets the same avatar color.
+     */
+    private void setAvatarBackground(TextView avatarView, String name) {
+        int colorIndex = Math.abs((name == null ? "?" : name).hashCode()) % AVATAR_COLORS.length;
+        int color = Color.parseColor(AVATAR_COLORS[colorIndex]);
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.OVAL);
+        drawable.setColor(color);
+        avatarView.setBackground(drawable);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView empName;
+        public TextView empAvatar;
         public TextView appliedDate;
         public TextView empPunchDate;
         public Chip statusChip;
@@ -110,6 +156,7 @@ public class CFregularizeAdapter extends RecyclerView.Adapter<CFregularizeAdapte
         public ViewHolder(View itemView) {
             super(itemView);
             empName = itemView.findViewById(R.id.empName);
+            empAvatar = itemView.findViewById(R.id.empAvatar);
             appliedDate = itemView.findViewById(R.id.appliedDate);
             empPunchDate = itemView.findViewById(R.id.empPunchDate);
             statusChip = itemView.findViewById(R.id.statusChip);

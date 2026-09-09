@@ -81,26 +81,18 @@ public class PendingApprovalViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Deserialize item from arguments
         if (getArguments() != null) {
             item = (AttendanceRegularizeAppliedItem) getArguments().getSerializable(ARG_ATTENDANCE_ID);
         }
 
         // Init SecurePrefManager
         prefManager = SecurePrefManager.getInstance(requireContext());
-
-        // ✅ Single ViewModel initialization using requireActivity()
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
-        Log.d(TAG, "onCreate: ViewModel initialized with Activity scope");
-
         // Init API
         apiInterface = APIClient.getInstance().UpdateRegularizeListApproval();
-
         // Fetch profile to resolve approver name
         String userId = prefManager.getString("userId", "");
         String authToken = prefManager.getString("authToken", "");
-        Log.d(TAG, "onCreate: Fetching profile for userId=" + userId);
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
     }
@@ -122,11 +114,9 @@ public class PendingApprovalViewFragment extends Fragment {
 
                 String firstName = userProfile.getData().getEmployee().getFirstname();
                 String lastName = userProfile.getData().getEmployee().getLastname();
-                Log.d(TAG, "userProfile Observer: firstname=" + firstName + ", lastname=" + lastName);
 
                 if (firstName != null && lastName != null) {
                     approverName = firstName.trim() + " " + lastName.trim();
-                    Log.d(TAG, "userProfile Observer: approverName set to: " + approverName);
                 }
             } else {
                 Log.w(TAG, "userProfile Observer: null or incomplete profile data");
@@ -139,12 +129,8 @@ public class PendingApprovalViewFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // ✅ Avoid memory leaks
+        binding = null;
     }
-
-    // ─────────────────────────────────────────────────────────────────
-    // UI Population
-    // ─────────────────────────────────────────────────────────────────
 
     private void populateUI() {
 
@@ -188,13 +174,14 @@ public class PendingApprovalViewFragment extends Fragment {
         binding.appliedPunchOut.setText(formatOrFallbackTime(item.getPunchOutUpdated()));
         binding.appliedPunchInAddress.setText(safeText(item.getPunchInAddressUpdated()));
         binding.appliedPunchOutAddress.setText(safeText(item.getPunchOutAddressUpdated()));
+        binding.appliedAttendanceRemarks.setText(safeText(item.getAttendenceRegularizationRemark()));
 
         // Applied Date
         binding.appliedDate.setText(formatOrFallbackDate(item.getAppliedDate()));
 
         // Status Update Metadata
         binding.appliedStatusUpdateBy.setText(safeText(item.getApprovedByName()));
-        binding.appliedStatusUpdateDate.setText(formatOrFallbackDate(item.getApprovedDate()));
+        binding.appliedStatusUpdateDate.setText(safeText(DateTimeUtils.getDayOfWeekAndDate(item.getApprovedDate())));
 
         // Status Chip
         String status = item.getStatus();
@@ -207,12 +194,12 @@ public class PendingApprovalViewFragment extends Fragment {
 
             binding.approveButton.setOnClickListener(v -> {
                 String attendanceId = item.getId();
-                handleApprove(attendanceId); // ✅ listener called inside on success only
+                handleApprove(attendanceId);
             });
 
             binding.rejectButton.setOnClickListener(v -> {
                 String attendanceId = item.getId();
-                handleReject(attendanceId); // ✅ listener called inside on success only
+                handleReject(attendanceId);
             });
 
         } else {
@@ -362,7 +349,7 @@ public class PendingApprovalViewFragment extends Fragment {
         }
 
         // ✅ Only these two fields differ between approve and reject
-        requestBody.setStatus(status);                  // "approved" or "rejected"
+        requestBody.setStatus(status);
         requestBody.setApprovedByName(approverName);
         requestBody.setApprovedDate(getCurrentDateTimeInUTC());
 
@@ -377,29 +364,25 @@ public class PendingApprovalViewFragment extends Fragment {
         String finalApprover = resolveApproverIdentity();
 
         if (finalApprover == null || finalApprover.trim().isEmpty()) {
-            Log.e(TAG, "handleApprove: Approver identity is blank. Aborting.");
             Toast.makeText(requireContext(), "Error: Approver Identity missing. Request aborted.", Toast.LENGTH_LONG).show();
             return;
         }
 
         RegularizeUpdateRequest requestBody = buildRequestBody("approved", finalApprover);
         String authToken = prefManager.getString("authToken", "");
-        Log.i(TAG, "handleApprove: Payload -> " + gson.toJson(requestBody));
 
         Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (binding == null) return; // Fragment view already destroyed
+                if (binding == null) return;
 
                 if (response.isSuccessful()) {
-                    Log.i(TAG, "handleApprove: Success - " + response.code());
                     Toast.makeText(requireContext(), "Attendance Approved", Toast.LENGTH_SHORT).show();
                     if (listener != null) listener.onApprove(item);
                     requireActivity().getSupportFragmentManager().popBackStack();
                 } else {
-                    Log.e(TAG, "handleApprove: Failed - " + response.code());
                     Toast.makeText(requireContext(), "Failed to approve: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -407,7 +390,6 @@ public class PendingApprovalViewFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 if (binding == null) return;
-                Log.e(TAG, "handleApprove: Network error", throwable);
                 Toast.makeText(requireContext(), "Network error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -421,29 +403,24 @@ public class PendingApprovalViewFragment extends Fragment {
         String finalApprover = resolveApproverIdentity();
 
         if (finalApprover == null || finalApprover.trim().isEmpty()) {
-            Log.e(TAG, "handleReject: Approver identity is blank. Aborting.");
             Toast.makeText(requireContext(), "Error: Approver Identity missing. Request aborted.", Toast.LENGTH_LONG).show();
             return;
         }
 
         RegularizeUpdateRequest requestBody = buildRequestBody("rejected", finalApprover);
         String authToken = prefManager.getString("authToken", "");
-        Log.i(TAG, "handleReject: Payload -> " + gson.toJson(requestBody));
-
         Call<ResponseBody> call = apiInterface.RegularizeAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (binding == null) return; // Fragment view already destroyed
+                if (binding == null) return;
 
                 if (response.isSuccessful()) {
-                    Log.i(TAG, "handleReject: Success - " + response.code());
                     Toast.makeText(requireContext(), "Attendance Rejected", Toast.LENGTH_SHORT).show();
-                    if (listener != null) listener.onReject(item); // ✅ Fixed: was onApprove
+                    if (listener != null) listener.onReject(item);
                     requireActivity().getSupportFragmentManager().popBackStack();
                 } else {
-                    Log.e(TAG, "handleReject: Failed - " + response.code());
                     Toast.makeText(requireContext(), "Failed to reject: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -451,33 +428,26 @@ public class PendingApprovalViewFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 if (binding == null) return;
-                Log.e(TAG, "handleReject: Network error", throwable);
                 Toast.makeText(requireContext(), "Network error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    // Helper Methods
-    // ─────────────────────────────────────────────────────────────────
 
     private String resolveApproverIdentity() {
         if (approverName != null && !approverName.trim().isEmpty()) {
-            Log.d(TAG, "resolveApproverIdentity: Using runtime approverName -> " + approverName);
             return approverName;
         } else if (item != null && item.getApprovedByName() != null && !item.getApprovedByName().trim().isEmpty()) {
-            Log.d(TAG, "resolveApproverIdentity: Using item metadata -> " + item.getApprovedByName());
             return item.getApprovedByName();
         } else {
             String savedName = prefManager.getString("username", "");
-            Log.d(TAG, "resolveApproverIdentity: Using SharedPrefs fallback -> " + savedName);
             return savedName;
         }
     }
 
     private String extractDateOnly(String isoDateTime) {
         if (isoDateTime == null || isoDateTime.length() < 10) return null;
-        return isoDateTime.substring(0, 10); // "2026-08-05T15:37:00.000Z" → "2026-08-05"
+        return isoDateTime.substring(0, 10);
     }
 
     private String safeText(String input) {
@@ -499,10 +469,6 @@ public class PendingApprovalViewFragment extends Fragment {
         }
         return "N/A";
     }
-
-    // ─────────────────────────────────────────────────────────────────
-    // Interface
-    // ─────────────────────────────────────────────────────────────────
 
     public interface OnRegularizeApprovalActionListener {
         void onApprove(AttendanceRegularizeAppliedItem item);

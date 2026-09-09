@@ -1,513 +1,823 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
-    android:fillViewport="true"
+    android:background="@drawable/fragment_dashboard_bg"
+    android:clipToPadding="false"
+    android:fadeScrollbars="false"
+    android:padding="16dp"
+    android:scrollbars="none"
     tools:context=".ui.regularize_attendance.PendingCMFAttendanceApproveFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/headerCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:strokeColor="#E0E0E0"
-            app:strokeWidth="1dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/empName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="#1A1A1A"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/empPunchDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textColor="#4A4A4A"
-                    android:textSize="15sp"
-                    app:layout_constraintTop_toBottomOf="@id/empName" />
-
-                <TextView
-                    android:id="@+id/appliedDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="#4A4A4A"
-                    android:textSize="15sp"
-                    app:layout_constraintTop_toBottomOf="@id/empPunchDate" />
-
-                <View
-                    android:id="@+id/dividerHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:background="#EAEAEA"
-                    app:layout_constraintTop_toBottomOf="@id/appliedDate" />
-
-                <TextView
-                    android:id="@+id/empEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="sans-serif-light"
-                    android:textColor="#0379A6"
-                    android:textSize="14sp"
-                    app:layout_constraintTop_toBottomOf="@id/dividerHeader" />
-
-                <TextView
-                    android:id="@+id/empContact"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="sans-serif-light"
-                    android:textColor="#0379A6"
-                    android:textSize="14sp"
-                    app:layout_constraintTop_toBottomOf="@id/empEmail" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/punchDetailsCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/headerCard"
-            app:strokeColor="#E0E0E0"
-            app:strokeWidth="1dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/titlePunchDetails"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Punch Details"
-                    android:textColor="#1A1A1A"
-                    android:textSize="16sp"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/shiftLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Shift"
-                    android:textColor="#757575"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/titlePunchDetails" />
-
-                <TextView
-                    android:id="@+id/empShift"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="#1A1A1A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/barrier"
-                    app:layout_constraintTop_toTopOf="@id/shiftLabel" />
-
-                <TextView
-                    android:id="@+id/punchInLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch In"
-                    android:textColor="#757575"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/empShift" />
-
-                <TextView
-                    android:id="@+id/empPunchIn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#1A1A1A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/barrier"
-                    app:layout_constraintTop_toTopOf="@id/punchInLabel" />
-
-                <TextView
-                    android:id="@+id/punchOutLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch Out"
-                    android:textColor="#757575"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/empPunchIn" />
-
-                <TextView
-                    android:id="@+id/empPunchOut"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#1A1A1A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/barrier"
-                    app:layout_constraintTop_toTopOf="@id/punchOutLabel" />
-
-                <TextView
-                    android:id="@+id/empPunchInAddressLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch In Address"
-                    android:textColor="#757575"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/empPunchOut" />
-
-                <TextView
-                    android:id="@+id/empPunchInAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#4A4A4A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/barrier"
-                    app:layout_constraintTop_toTopOf="@id/empPunchInAddressLabel" />
-
-                <TextView
-                    android:id="@+id/empPunchOutAddressLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch Out Address"
-                    android:textColor="#757575"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/empPunchInAddress" />
-
-                <TextView
-                    android:id="@+id/empPunchOutAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#4A4A4A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/barrier"
-                    app:layout_constraintTop_toTopOf="@id/empPunchOutAddressLabel" />
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/barrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="end"
-                    app:constraint_referenced_ids="shiftLabel,punchInLabel,punchOutLabel,empPunchInAddressLabel,empPunchOutAddressLabel" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/updatedInfoCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#F0F7FA"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/punchDetailsCard"
-            app:strokeColor="#D1E4ED"
-            app:strokeWidth="1dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/titleUpdatedInfo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Updated Information"
-                    android:textColor="#026287"
-                    android:textSize="16sp"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/updatedPunchInLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Punch In"
-                    android:textColor="#5B7E91"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/titleUpdatedInfo" />
-
-                <TextView
-                    android:id="@+id/appliedPunchIn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="#026287"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                    app:layout_constraintTop_toTopOf="@id/updatedPunchInLabel" />
-
-                <TextView
-                    android:id="@+id/updatedPunchOutLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch Out"
-                    android:textColor="#5B7E91"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/appliedPunchIn" />
-
-                <TextView
-                    android:id="@+id/appliedPunchOut"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="#026287"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                    app:layout_constraintTop_toTopOf="@id/updatedPunchOutLabel" />
-
-                <TextView
-                    android:id="@+id/punchInAddressLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch In Address"
-                    android:textColor="#5B7E91"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/appliedPunchOut" />
-
-                <TextView
-                    android:id="@+id/appliedPunchInAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#026287"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                    app:layout_constraintTop_toTopOf="@id/punchInAddressLabel" />
-
-                <TextView
-                    android:id="@+id/punchOutAddressLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Punch Out Address"
-                    android:textColor="#5B7E91"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/appliedPunchInAddress" />
-
-                <TextView
-                    android:id="@+id/appliedPunchOutAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#026287"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/addressBarrier"
-                    app:layout_constraintTop_toTopOf="@id/punchOutAddressLabel" />
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/addressBarrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="end"
-                    app:constraint_referenced_ids="updatedPunchInLabel,updatedPunchOutLabel,punchInAddressLabel,punchOutAddressLabel" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/statusCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#FDF2F2"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/updatedInfoCard"
-            app:strokeColor="#FAD2D2"
-            app:strokeWidth="1dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/titleStatusInfo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Status Information"
-                    android:textColor="#C53030"
-                    android:textSize="16sp"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/statusLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Status"
-                    android:textColor="#9B6A6A"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/titleStatusInfo" />
-
-                <TextView
-                    android:id="@+id/appliedStatus"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="#C53030"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/statusBarrier"
-                    app:layout_constraintTop_toTopOf="@id/statusLabel" />
-
-                <TextView
-                    android:id="@+id/updatedByLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Updated By"
-                    android:textColor="#9B6A6A"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/appliedStatus" />
-
-                <TextView
-                    android:id="@+id/appliedStatusUpdateBy"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#1A1A1A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/statusBarrier"
-                    app:layout_constraintTop_toTopOf="@id/updatedByLabel" />
-
-                <TextView
-                    android:id="@+id/updatedDateLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Updated Date"
-                    android:textColor="#9B6A6A"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/appliedStatusUpdateBy" />
-
-                <TextView
-                    android:id="@+id/appliedStatusUpdateDate"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:textColor="#1A1A1A"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/statusBarrier"
-                    app:layout_constraintTop_toTopOf="@id/updatedDateLabel" />
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/statusBarrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="end"
-                    app:constraint_referenced_ids="statusLabel,updatedByLabel,updatedDateLabel" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/actionButtonsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statusCard">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/approve_button"
-                android:layout_width="0dp"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/headerCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:text="Approve"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/approved_color"
-                app:cornerRadius="12dp"
-                app:elevation="0dp" />
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="0dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/reject_button"
-                android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/gradient_attendance_card"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/empName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/quicksand_medium"
+                        android:text="Employee Name"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <!-- Divider Line -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp"
+                        android:alpha="0.3"
+                        android:background="@color/white" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:orientation="horizontal">
+
+                        <!-- Punch Date Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.05"
+                                android:text="PUNCH DATE"
+                                android:textColor="@color/attendance_card_subtext"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empPunchDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="April 16, 2023"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Applied Date Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.05"
+                                android:text="APPLIED DATE"
+                                android:textColor="@color/attendance_card_subtext"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/appliedDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="April 20, 2023"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Contact Info Section -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="6dp"
+                        android:alpha="0.2"
+                        android:background="@color/white" />
+
+
+                    <!-- Email and Contact in Two Rows -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Email Row -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.05"
+                                android:text="EMAIL"
+                                android:textColor="@color/attendance_card_subtext"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:text="email@example.com"
+                                android:textColor="@color/white"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Contact Row -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.05"
+                                android:text="CONTACT"
+                                android:textColor="@color/attendance_card_subtext"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empContact"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:text="+1 234 567 8900"
+                                android:textColor="@color/white"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- =============================================== -->
+            <!-- CARD 2: PUNCH DETAILS                           -->
+            <!-- =============================================== -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/punchDetailsCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:text="Reject"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:backgroundTint="#C62828"
-                app:cornerRadius="12dp"
-                app:elevation="0dp" />
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_color"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Section Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@color/colorSecondaryVariant" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_medium"
+                            android:text="Punch Details"
+                            android:textColor="@color/primary_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- Shift Info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/shiftLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="SHIFT"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/empShift"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/quicksand_medium"
+                            android:text="09:00 AM - 06:00 PM"
+                            android:textColor="@color/primary_text"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Punch In and Punch Out in Same Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:orientation="horizontal">
+
+                        <!-- Punch In Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/punchInLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.08"
+                                android:text="PUNCH IN"
+                                android:textColor="@color/avatar_text"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empPunchIn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="09:15 AM"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Punch Out Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/punchOutLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.08"
+                                android:text="PUNCH OUT"
+                                android:textColor="@color/avatar_text"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empPunchOut"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="05:45 PM"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="6dp"
+                        android:background="@color/divider_color" />
+
+                    <!-- Punch In Address -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/empPunchInAddressLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="PUNCH IN ADDRESS"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/empPunchInAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="123 Main Street, Office Building A, Floor 5"
+                            android:textColor="@color/primary_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- Punch Out Address -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/empPunchOutAddressLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="PUNCH OUT ADDRESS"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/empPunchOutAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="123 Main Street, Office Building A, Floor 5"
+                            android:textColor="@color/primary_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/updatedInfoCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_color"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Section Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@color/colorPrimary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_medium"
+                            android:text="Updated Information"
+                            android:textColor="@color/primary_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/updatedPunchInLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.08"
+                                android:text="PUNCH IN"
+                                android:textColor="@color/avatar_text"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/appliedPunchIn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="09:00 AM"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Updated Punch Out Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/updatedPunchOutLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.08"
+                                android:text="PUNCH OUT"
+                                android:textColor="@color/avatar_text"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/appliedPunchOut"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="06:00 PM"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="6dp"
+                        android:background="@color/divider_color" />
+
+                    <!-- Updated Punch In Address -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/punchInAddressLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="PUNCH IN ADDRESS"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/appliedPunchInAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="123 Main Street, Office Building A, Floor 5"
+                            android:textColor="@color/primary_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- Updated Punch Out Address -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/punchOutAddressLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="PUNCH OUT ADDRESS"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/appliedPunchOutAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="123 Main Street, Office Building A, Floor 5"
+                            android:textColor="@color/primary_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="6dp"
+                        android:background="@color/divider_color" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/attendanceRemarks"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="REGULARIZE REMARKS"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/appliedAttendanceRemarks"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="This is a sample remark for regularizing attendance."
+                            android:textColor="@color/primary_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/statusCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_color"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Section Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@color/PrivilegeLeave" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_medium"
+                            android:text="Status Information"
+                            android:textColor="@color/primary_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- Status Field -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/statusLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/quicksand_regular"
+                            android:letterSpacing="0.08"
+                            android:text="STATUS"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/appliedStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pending"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:chipIcon="@drawable/ic_clock"
+                                app:chipIconTint="@color/white" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/updatedByLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.08"
+                                android:text="UPDATED BY"
+                                android:textColor="@color/avatar_text"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/appliedStatusUpdateBy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="Admin User"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Updated Date Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/updatedDateLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_regular"
+                                android:letterSpacing="0.08"
+                                android:text="UPDATED DATE"
+                                android:textColor="@color/avatar_text"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/appliedStatusUpdateDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_medium"
+                                android:text="April 20, 2023"
+                                android:textColor="@color/primary_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/actionButtonsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/approve_button"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:text="Approve"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/approved_color"
+                    app:cornerRadius="10dp"
+                    app:elevation="4dp"
+                    app:icon="@drawable/ic_check_circle"
+                    app:iconTint="@color/white" />
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/reject_button"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:text="Reject"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/rejected_color"
+                    app:cornerRadius="10dp"
+                    app:elevation="4dp"
+                    app:icon="@drawable/ic_close_circle_x"
+                    app:iconTint="@color/white" />
+
+            </LinearLayout>
+
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</ScrollView>

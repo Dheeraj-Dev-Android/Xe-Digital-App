@@ -65,7 +65,6 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cross_f_m_attendance_approval, container, false);
 
         recyclerView = view.findViewById(R.id.cross_approval_recycler_view);
@@ -74,7 +73,6 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         loadingProgress.setVisibility(View.VISIBLE);
         apiInterface = APIClient.getInstance().getAttendance();
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         authToken = prefManager.getString("authToken", "");
         userId = prefManager.getString("userId", "");
@@ -111,7 +109,6 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
     }
 
     public void onChipClicked(View view) {
-        // Get the ChipGroup and the clicked chip
         ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
         Chip clickedChip = (Chip) view;
 
@@ -119,26 +116,8 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
         chipGroup.check(clickedChip.getId());
     }
 
-    //    private void filterRequests(String status) {
-//        if (regularizeApprovalResponse != null && regularizeApprovalResponse.getData() != null) {
-//            List<AttendanceRegItem> originalList = (List<AttendanceRegItem>) regularizeApprovalResponse.getData();
-//            List<AttendanceRegItem> filteredList = new ArrayList<>();
-//
-//            if (status.equals("All")) {
-//                filteredList.addAll(originalList);
-//            } else {
-//                for (AttendanceRegItem item : originalList) {
-//                    if (item.getStatus().equalsIgnoreCase(status)) {
-//                        filteredList.add(item);
-//                    }
-//                }
-//            }
-//            adapter.updateList(filteredList);
-//        }
-//    }
     private void filterRequests(String status) {
         if (regularizeApprovalResponse != null && regularizeApprovalResponse.getData() != null) {
-            // Get the list from the Data object, not by casting the Data object itself
             List<AttendanceRegItem> originalList = regularizeApprovalResponse.getData().getAttendanceReg();
             List<AttendanceRegItem> filteredList = new ArrayList<>();
 
@@ -148,7 +127,6 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
                 filteredList.addAll(originalList);
             } else {
                 for (AttendanceRegItem item : originalList) {
-                    // Check for null status to avoid NullPointerException
                     if (item.getStatus() != null && item.getStatus().equalsIgnoreCase(status)) {
                         filteredList.add(item);
                     }
@@ -162,7 +140,6 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
     }
 
     private void getRegularizeApproval() {
-//        loadingProgress.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
         // Make API call
         Call<CfRegularizeApprovalResponse> call = apiInterface.getCFMRegularize("jwt " + authToken, userId);
@@ -173,7 +150,7 @@ public class CrossFMAttendanceApprovalFragment extends Fragment {
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful()) {
                     regularizeApprovalResponse = response.body();
-                    if (regularizeApprovalResponse != null) { // CHECK IF BODY IS NULL
+                    if (regularizeApprovalResponse != null) {
                         // Access the Data object correctly
                         Data data = regularizeApprovalResponse.getData();
 

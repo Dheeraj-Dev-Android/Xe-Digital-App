@@ -23,6 +23,7 @@
     <dimen name="buttons_top_margin">32dp</dimen>
 
     <dimen name="screen_margin">16dp</dimen>
+    <dimen name="dialog_outer_margin">24dp</dimen>
 
     <array name="autoSize_text_sizes">
         <item>12sp</item>

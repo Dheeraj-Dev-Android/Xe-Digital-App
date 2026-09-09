@@ -11,9 +11,9 @@
         android:id="@+id/horizontalScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#F5F5F5"
-        android:paddingTop="8dp"
+        android:paddingTop="12dp"
         android:paddingBottom="8dp"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -31,8 +31,11 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
+                android:checked="true"
                 android:text="All"
                 android:textColor="@android:color/white"
+                app:checkedIconVisible="true"
                 app:chipBackgroundColor="#9E9E9E" />
 
             <com.google.android.material.chip.Chip
@@ -40,8 +43,10 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="Approved"
                 android:textColor="@android:color/white"
+                app:checkedIconVisible="true"
                 app:chipBackgroundColor="#4CAF50" />
 
             <com.google.android.material.chip.Chip
@@ -49,8 +54,10 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="Unapproved"
                 android:textColor="@android:color/white"
+                app:checkedIconVisible="true"
                 app:chipBackgroundColor="#FF9800" />
 
             <com.google.android.material.chip.Chip
@@ -58,8 +65,10 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="Rejected"
                 android:textColor="@android:color/white"
+                app:checkedIconVisible="true"
                 app:chipBackgroundColor="#F44336" />
 
             <com.google.android.material.chip.Chip
@@ -67,9 +76,11 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="Cancelled"
                 android:textColor="@android:color/white"
-                app:chipBackgroundColor="#F44336" />
+                app:checkedIconVisible="true"
+                app:chipBackgroundColor="#607D8B" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
@@ -101,13 +112,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView"
         tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/emptyStateView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
@@ -115,7 +126,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView"
         tools:visibility="visible">
 
         <ImageView

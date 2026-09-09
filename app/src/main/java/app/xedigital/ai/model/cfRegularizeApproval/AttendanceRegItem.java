@@ -152,4 +152,13 @@ public class AttendanceRegItem implements Serializable {
     public String getStatus() {
         return status;
     }
+
+    public void setStatus(String status) {
+    }
+
+    public void setApprovedByName(String finalApprover) {
+    }
+
+    public void setApprovedDate(String approvalTimestamp) {
+    }
 }

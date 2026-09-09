@@ -8,7 +8,7 @@ public class Attendance {
     private String id;
 
     @SerializedName("employee")
-    private String employee;  // String ID in payload, not object
+    private String employee;
 
     @SerializedName("punchDate")
     private String punchDate;
