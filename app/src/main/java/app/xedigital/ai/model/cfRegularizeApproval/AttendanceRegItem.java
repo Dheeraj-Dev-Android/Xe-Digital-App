@@ -109,6 +109,9 @@ public class AttendanceRegItem implements Serializable {
         return approvedDate;
     }
 
+    public void setApprovedDate(String approvalTimestamp) {
+    }
+
     public String getPunchOutAddressUpdated() {
         return punchOutAddressUpdated;
     }
@@ -133,6 +136,9 @@ public class AttendanceRegItem implements Serializable {
         return approvedByName;
     }
 
+    public void setApprovedByName(String finalApprover) {
+    }
+
     public String getPunchOutDate() {
         return punchOutDate;
     }
@@ -154,11 +160,5 @@ public class AttendanceRegItem implements Serializable {
     }
 
     public void setStatus(String status) {
-    }
-
-    public void setApprovedByName(String finalApprover) {
-    }
-
-    public void setApprovedDate(String approvalTimestamp) {
     }
 }

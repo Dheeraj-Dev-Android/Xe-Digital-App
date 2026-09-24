@@ -70,13 +70,11 @@ import retrofit2.Response;
 public class FaceLoginActivity extends AppCompatActivity implements BioMetric.BiometricAuthListener {
 
     private static final String TAG = "FaceLoginActivity";
-
     // ── Demo Account For Google Play Review ───────────────────────────
     private static final String REVIEWER_EMAIL = "emp@xyzdemo.ai";
-
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
-
+    private boolean hasStartedFlow = false;
     private String authToken;
     private String storedUserId;
     private PreviewView previewView;
@@ -137,7 +135,16 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         FaceDetectorOptions options = new FaceDetectorOptions.Builder().setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST).setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL).setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL).build();
         detector = FaceDetection.getClient(options);
 
-        loadCollectionAndProceed();
+//        loadCollectionAndProceed();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && !hasStartedFlow) {
+            hasStartedFlow = true;
+            loadCollectionAndProceed();
+        }
     }
 
     @Override

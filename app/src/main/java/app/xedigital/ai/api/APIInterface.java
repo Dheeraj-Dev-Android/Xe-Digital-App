@@ -3,6 +3,7 @@ package app.xedigital.ai.api;
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
 import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
+import app.xedigital.ai.model.ShortLeaveDetails.GetShortLeaveDetails;
 import app.xedigital.ai.model.TeamLeave.TeamLeaveResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
 import app.xedigital.ai.model.TeamTimesheetResponse.TeamTimesheetResponse;
@@ -227,6 +228,10 @@ public interface APIInterface {
     @GET("employees/getAttendenceRegularizationLimit")
     Call<RegularizeLimitResponse> getAttendenceRegularizationLimit(@Header("Authorization") String authToken);
 
+    //    Short Leave
+//    https://app.xedigital.ai/api/v1/employees/getShortLeaveDetails
+    @GET("employees/getShortLeaveDetails")
+    Call<GetShortLeaveDetails> getShortLeaveDetails(@Header("Authorization") String authToken);
     //  POST APIs
     @POST("claims/food")
     retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body ExpenseRequest foodRequest);

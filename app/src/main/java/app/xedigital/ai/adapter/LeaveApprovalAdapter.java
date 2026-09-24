@@ -69,16 +69,22 @@ public class LeaveApprovalAdapter extends RecyclerView.Adapter<LeaveApprovalAdap
 
         int statusColor;
         String status = item.getStatus().toLowerCase();
-        if (status.equals("approved")) {
-            statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved);
-        } else if (status.equals("unapproved")) {
-            statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
-        } else if (status.equals("rejected")) {
-            statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
-        } else if (status.equals("cancelled")) {
-            statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
-        } else {
-            statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
+        switch (status) {
+            case "approved":
+                statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_approved);
+                break;
+            case "unapproved":
+                statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
+                break;
+            case "rejected":
+                statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
+                break;
+            case "cancelled":
+                statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_rejected);
+                break;
+            default:
+                statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending);
+                break;
         }
         statusChip.setChipBackgroundColor(ColorStateList.valueOf(statusColor));
 

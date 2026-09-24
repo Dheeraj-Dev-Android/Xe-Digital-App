@@ -14,7 +14,7 @@ android {
         minSdk = 28
         targetSdk = 36
         versionCode = 4
-        versionName = "0.0"
+        versionName = "0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -102,7 +102,7 @@ dependencies {
     implementation(libs.camera.extensions)
     implementation(libs.play.services.location)
     implementation(platform(libs.firebase.bom))
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
@@ -116,5 +116,5 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.security:security-crypto:1.1.0")
 }
