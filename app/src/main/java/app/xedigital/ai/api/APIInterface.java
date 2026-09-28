@@ -13,6 +13,7 @@ import app.xedigital.ai.model.addAttendance.AddAttendanceRequest;
 import app.xedigital.ai.model.addAttendanceRequest.AddedAttendanceCancelRequest;
 import app.xedigital.ai.model.addedAttendanceList.AddedAttendanceListResponse;
 import app.xedigital.ai.model.allEmployee.AllEmployeeResponse;
+import app.xedigital.ai.model.appliedLeaveDetails.AppliedLeaveDetailResponse;
 import app.xedigital.ai.model.appliedLeaves.AppliedLeavesResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.approveClaim.ApproveClaimResponse;
@@ -141,6 +142,10 @@ public interface APIInterface {
     @GET("leaves/applied/report/manager/{employeeId}")
     retrofit2.Call<LeavePendingApprovalResponse> getPendingApprovalLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
+    //    https://app.xedigital.ai/api/v1/leaves/appliedLeaves?start=2026-08-31&end=2026-09-29&sorting=&employee=685bbf7b528dc12b11868484&page=&limit=&branch=&prefix=
+    @GET("leaves/appliedLeaves")
+    retrofit2.Call<AppliedLeaveDetailResponse> getAppliedLeavesWithFilters(@Header("Authorization") String authToken, @Query("start") String startDate, @Query("end") String endDate, @Query("sorting") String sorting, @Query("employee") String employee, @Query("page") String page, @Query("limit") String limit, @Query("branch") String branch, @Query("prefix") String prefix);
+
     //    Team Leave
     @GET("leaves/employees/leaves/{employeeId}")
     retrofit2.Call<TeamLeaveResponse> getTeamLeaves(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
@@ -232,6 +237,7 @@ public interface APIInterface {
 //    https://app.xedigital.ai/api/v1/employees/getShortLeaveDetails
     @GET("employees/getShortLeaveDetails")
     Call<GetShortLeaveDetails> getShortLeaveDetails(@Header("Authorization") String authToken);
+
     //  POST APIs
     @POST("claims/food")
     retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body ExpenseRequest foodRequest);

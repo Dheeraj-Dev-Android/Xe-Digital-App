@@ -4,32 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class ApplyLeaveRequest {
 
-    @SerializedName("leaveName")
-    private String leaveName;
-
     @SerializedName("crossManagerEmail")
     private String crossManagerEmail;
 
     @SerializedName("reason")
     private String reason;
 
-    @SerializedName("leavingStation")
-    private String leavingStation;
-
-    @SerializedName("leavetype")
-    private String leavetype;
-
-    @SerializedName("reportingManager")
-    private String reportingManager;
-
-    @SerializedName("empLastName")
-    private String empLastName;
-
     @SerializedName("crossManager")
     private String crossManager;
-
-    @SerializedName("toDate")
-    private String toDate;
 
     @SerializedName("empFirstName")
     private String empFirstName;
@@ -37,26 +19,11 @@ public class ApplyLeaveRequest {
     @SerializedName("empEmail")
     private String empEmail;
 
-    @SerializedName("appliedDate")
-    private String appliedDate;
-
-    @SerializedName("reportingManagerName")
-    private String reportingManagerName;
-
     @SerializedName("selectTypeFrom")
-    private String selectTypeFrom;
+    private Object selectTypeFrom;
 
     @SerializedName("employee")
     private String employee;
-
-    @SerializedName("selectTypeTo")
-    private String selectTypeTo;
-
-    @SerializedName("fromDate")
-    private String fromDate;
-
-    @SerializedName("vacationAddress")
-    private String vacationAddress;
 
     @SerializedName("reportingManagerLastName")
     private String reportingManagerLastName;
@@ -70,30 +37,56 @@ public class ApplyLeaveRequest {
     @SerializedName("department")
     private String department;
 
+    @SerializedName("shortLeaveEndTime")
+    private String shortLeaveEndTime;
+
+    @SerializedName("leaveName")
+    private String leaveName;
+
+    @SerializedName("leavingStation")
+    private String leavingStation;
+
+    @SerializedName("leavetype")
+    private String leavetype;
+
+    @SerializedName("reportingManager")
+    private String reportingManager;
+
+    @SerializedName("empLastName")
+    private String empLastName;
+
+    @SerializedName("toDate")
+    private String toDate;
+
+    @SerializedName("leavePlanned")
+    private String leavePlanned;
+
+    @SerializedName("appliedDate")
+    private String appliedDate;
+
+    @SerializedName("reportingManagerName")
+    private String reportingManagerName;
+
+    @SerializedName("selectTypeTo")
+    private Object selectTypeTo;
+
+    @SerializedName("shortLeaveStartTime")
+    private String shortLeaveStartTime;
+
+    @SerializedName("fromDate")
+    private String fromDate;
+
+    @SerializedName("vacationAddress")
+    private String vacationAddress;
+
+    @SerializedName("shortLeaveTimingSlot")
+    private String shortLeaveTimingSlot;
+
     @SerializedName("hrEmail")
     private String hrEmail;
 
     @SerializedName("status")
     private String status;
-
-    @SerializedName("leavePlanned")
-    private String leavePlanned;
-
-    public String getLeaveName() {
-        return leaveName;
-    }
-
-    public void setLeaveName(String leaveName) {
-        this.leaveName = leaveName;
-    }
-
-    public String getLeavePlanned() {
-        return leavePlanned;
-    }
-
-    public void setLeavePlanned(String leavePlanned) {
-        this.leavePlanned = leavePlanned;
-    }
 
     public String getCrossManagerEmail() {
         return crossManagerEmail;
@@ -109,6 +102,94 @@ public class ApplyLeaveRequest {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public String getCrossManager() {
+        return crossManager;
+    }
+
+    public void setCrossManager(String crossManager) {
+        this.crossManager = crossManager;
+    }
+
+    public String getEmpFirstName() {
+        return empFirstName;
+    }
+
+    public void setEmpFirstName(String empFirstName) {
+        this.empFirstName = empFirstName;
+    }
+
+    public String getEmpEmail() {
+        return empEmail;
+    }
+
+    public void setEmpEmail(String empEmail) {
+        this.empEmail = empEmail;
+    }
+
+    public Object getSelectTypeFrom() {
+        return selectTypeFrom;
+    }
+
+    public void setSelectTypeFrom(Object selectTypeFrom) {
+        this.selectTypeFrom = selectTypeFrom;
+    }
+
+    public String getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(String employee) {
+        this.employee = employee;
+    }
+
+    public String getReportingManagerLastName() {
+        return reportingManagerLastName;
+    }
+
+    public void setReportingManagerLastName(String reportingManagerLastName) {
+        this.reportingManagerLastName = reportingManagerLastName;
+    }
+
+    public String getCrossManagerName() {
+        return crossManagerName;
+    }
+
+    public void setCrossManagerName(String crossManagerName) {
+        this.crossManagerName = crossManagerName;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getShortLeaveEndTime() {
+        return shortLeaveEndTime;
+    }
+
+    public void setShortLeaveEndTime(String shortLeaveEndTime) {
+        this.shortLeaveEndTime = shortLeaveEndTime;
+    }
+
+    public String getLeaveName() {
+        return leaveName;
+    }
+
+    public void setLeaveName(String leaveName) {
+        this.leaveName = leaveName;
     }
 
     public String getLeavingStation() {
@@ -143,14 +224,6 @@ public class ApplyLeaveRequest {
         this.empLastName = empLastName;
     }
 
-    public String getCrossManager() {
-        return crossManager;
-    }
-
-    public void setCrossManager(String crossManager) {
-        this.crossManager = crossManager;
-    }
-
     public String getToDate() {
         return toDate;
     }
@@ -159,20 +232,12 @@ public class ApplyLeaveRequest {
         this.toDate = toDate;
     }
 
-    public String getEmpFirstName() {
-        return empFirstName;
+    public String getLeavePlanned() {
+        return leavePlanned;
     }
 
-    public void setEmpFirstName(String empFirstName) {
-        this.empFirstName = empFirstName;
-    }
-
-    public String getEmpEmail() {
-        return empEmail;
-    }
-
-    public void setEmpEmail(String empEmail) {
-        this.empEmail = empEmail;
+    public void setLeavePlanned(String leavePlanned) {
+        this.leavePlanned = leavePlanned;
     }
 
     public String getAppliedDate() {
@@ -191,28 +256,20 @@ public class ApplyLeaveRequest {
         this.reportingManagerName = reportingManagerName;
     }
 
-    public String getSelectTypeFrom() {
-        return selectTypeFrom;
-    }
-
-    public void setSelectTypeFrom(String selectTypeFrom) {
-        this.selectTypeFrom = selectTypeFrom;
-    }
-
-    public String getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(String employee) {
-        this.employee = employee;
-    }
-
-    public String getSelectTypeTo() {
+    public Object getSelectTypeTo() {
         return selectTypeTo;
     }
 
-    public void setSelectTypeTo(String selectTypeTo) {
+    public void setSelectTypeTo(Object selectTypeTo) {
         this.selectTypeTo = selectTypeTo;
+    }
+
+    public String getShortLeaveStartTime() {
+        return shortLeaveStartTime;
+    }
+
+    public void setShortLeaveStartTime(String shortLeaveStartTime) {
+        this.shortLeaveStartTime = shortLeaveStartTime;
     }
 
     public String getFromDate() {
@@ -231,36 +288,12 @@ public class ApplyLeaveRequest {
         this.vacationAddress = vacationAddress;
     }
 
-    public String getReportingManagerLastName() {
-        return reportingManagerLastName;
+    public String getShortLeaveTimingSlot() {
+        return shortLeaveTimingSlot;
     }
 
-    public void setReportingManagerLastName(String reportingManagerLastName) {
-        this.reportingManagerLastName = reportingManagerLastName;
-    }
-
-    public String getCrossManagerName() {
-        return crossManagerName;
-    }
-
-    public void setCrossManagerName(String crossManagerName) {
-        this.crossManagerName = crossManagerName;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setShortLeaveTimingSlot(String shortLeaveTimingSlot) {
+        this.shortLeaveTimingSlot = shortLeaveTimingSlot;
     }
 
     public String getHrEmail() {

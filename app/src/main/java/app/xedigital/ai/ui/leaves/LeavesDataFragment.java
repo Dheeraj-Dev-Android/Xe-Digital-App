@@ -2,7 +2,6 @@ package app.xedigital.ai.ui.leaves;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,11 +86,15 @@ public class LeavesDataFragment extends Fragment {
 
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
             loadingProgress.setVisibility(View.GONE);
+
+            // ✅ FIX: Added (leaves == null || leaves.isEmpty()) null-safety check
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
-                if (leaves.isEmpty()) {
+                if (leaves == null || leaves.isEmpty()) {
                     emptyStateContainer.setVisibility(View.VISIBLE);
+                    emptyStateText.setText("No leaves data available");
                     recyclerViewLeaves.setVisibility(View.GONE);
+                    leavePieChart.setVisibility(View.GONE);
                 } else {
                     emptyStateContainer.setVisibility(View.GONE);
                     recyclerViewLeaves.setVisibility(View.VISIBLE);
@@ -103,10 +106,10 @@ public class LeavesDataFragment extends Fragment {
                     updatePieChartData(leaves);
                 }
             } else {
-
                 emptyStateContainer.setVisibility(View.VISIBLE);
                 emptyStateText.setText("Error loading data");
                 recyclerViewLeaves.setVisibility(View.GONE);
+                leavePieChart.setVisibility(View.GONE);
             }
         });
 
@@ -114,23 +117,27 @@ public class LeavesDataFragment extends Fragment {
     }
 
     public void updatePieChartData(List<LeavesItem> leaves) {
+        if (leaves == null || leaves.isEmpty()) return;
+
         Map<String, Float> leaveData = new HashMap<>();
         float totalBalanceLeaves = 0;
         float totalLeaves = 0;
 
         for (LeavesItem leave : leaves) {
-            String leaveType = leave.getLeavetype();
-            if (leaveType != null) {
-                float creditedLeaves = leave.getCreditLeave();
-                float usedLeaves = leave.getUsedLeave();
-                float debitedLeaves = leave.getDebitLeave();
+            if (leave != null) {
+                String leaveType = leave.getLeavetype();
+                if (leaveType != null) {
+                    float creditedLeaves = leave.getCreditLeave();
+                    float usedLeaves = leave.getUsedLeave();
+                    float debitedLeaves = leave.getDebitLeave();
 
-                // Calculate balance leaves
-                float balanceLeaves = creditedLeaves - usedLeaves - debitedLeaves;
+                    // Calculate balance leaves
+                    float balanceLeaves = creditedLeaves - usedLeaves - debitedLeaves;
 
-                leaveData.put(leaveType, balanceLeaves);
-                totalBalanceLeaves += balanceLeaves;
-                totalLeaves += creditedLeaves;
+                    leaveData.put(leaveType, balanceLeaves);
+                    totalBalanceLeaves += balanceLeaves;
+                    totalLeaves += creditedLeaves;
+                }
             }
         }
 
@@ -140,6 +147,16 @@ public class LeavesDataFragment extends Fragment {
                 entries.add(new PieEntry(entry.getValue(), entry.getKey()));
             }
         }
+
+        if (entries.isEmpty()) {
+            if (emptyStateText != null) {
+                emptyStateContainer.setVisibility(View.VISIBLE);
+                emptyStateText.setText("No balance leaves data available");
+            }
+            leavePieChart.setVisibility(View.GONE);
+            return;
+        }
+
         PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
         if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
             entries.clear();
@@ -153,16 +170,6 @@ public class LeavesDataFragment extends Fragment {
             });
         } else {
             dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
-        }
-        if (entries.isEmpty()) {
-            if (emptyStateText != null) {
-                emptyStateContainer.setVisibility(View.VISIBLE);
-                emptyStateText.setText("No balance leaves data available");
-            } else {
-                // Handle the case where emptyStateText is still null, maybe log an error
-                Log.e("LeavesDataFragment", "emptyStateText is null!");
-            }
-            return;
         }
 
         // Create a color map for leave types

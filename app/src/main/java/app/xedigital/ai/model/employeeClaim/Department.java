@@ -2,7 +2,9 @@ package app.xedigital.ai.model.employeeClaim;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Department {
+import java.io.Serializable;
+
+public class Department implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

@@ -86,7 +86,7 @@ public class LeavesViewModel extends ViewModel {
                             if ("Restricted Holidays".equals(leaveType.getLeavetypeName())) {
                                 restrictedHolidayId = leaveType.getId();
 //                                Log.e("fetchLeavesType", "Restricted holiday ID: " + restrictedHolidayId);
-                                break; // Exit loop once found
+                                break;
                             }
                         }
 //                        Log.d("fetchLeavesType", "Leave Response: " + responseJson);

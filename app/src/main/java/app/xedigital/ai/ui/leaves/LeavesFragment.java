@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,9 +24,12 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -49,6 +54,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.FragmentLeavesBinding;
+import app.xedigital.ai.model.ShortLeaveDetails.GetShortLeaveDetails;
+import app.xedigital.ai.model.appliedLeaveDetails.AppliedLeaveDetailResponse;
 import app.xedigital.ai.model.applyLeaves.ApplyLeaveRequest;
 import app.xedigital.ai.model.branch.UserBranchResponse;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
@@ -71,19 +78,27 @@ public class LeavesFragment extends Fragment {
 
     private static final String TAG = "LeavesFragment";
 
-    // ── Valid Leave Category Combinations ──────────────────────────────
+    // ── Leave Category Constants ───────────────────────────────────────
     private static final String FULL_DAY = "Full Day";
     private static final String FIRST_HALF_DAY = "First Half Day";
     private static final String SECOND_HALF_DAY = "Second Half Day";
+    private static final String SHORT_LEAVE = "Short Leave";
 
-    // ── Active loader counter ──────────────────────────────────────────
+    // ── Loader ─────────────────────────────────────────────────────────
     private final AtomicInteger activeLoaderCount = new AtomicInteger(0);
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    // ── Views ──────────────────────────────────────────────────────────
     private FragmentLeavesBinding binding;
     private EditText etFromDate, etToDate;
+    private EditText etStartTime, etEndTime;
+    private LinearLayout llShortTimeContainer, llToDateContainer, llTimeSlotContainer;
+    private TextInputLayout tilLeaveCategoryFrom, tilLeaveCategoryTo;
+    private AutoCompleteTextView spinnerTimeSlot;
     private AlertDialog loadingDialog;
     private SimpleDateFormat dateFormat;
+
+    // ── Leave Data ─────────────────────────────────────────────────────
     private double balanceLeave;
     private double totalDays;
     private double finalUsedDays;
@@ -93,12 +108,27 @@ public class LeavesFragment extends Fragment {
     private DebitLeaveRequest debitLeaveRequest;
     private String selectedLeaveTypeName;
     private List<LeavetypesItem> leaveTypesList = new ArrayList<>();
+    private String selectedLeaveTypeId;
+
+    // ── Employee Data ──────────────────────────────────────────────────
     private String empId, empName, empLastname, empEmail;
     private String hrMail, empDepartment, department, empBirthday;
-    private String selectedLeaveTypeId;
     private String reportingManagerName, reportingManagerLastname, reportingManagerEmail;
     private String crossFunctionalManagerName, crossFunctionalManagerEmail, crossFunctionalManagerId;
     private String authToken, restrictedHolidayId, lossOfPayId;
+
+    // ── Short Leave Config (Dynamic from API) ──────────────────────────
+    private boolean shortLeaveConfigLoaded = false;
+    private boolean shortLeaveEnabled = false;
+    private boolean shortLeaveTimingEnabled = false;
+    private int maxShortLeavesPerMonth = 0;
+    private double fixedShortLeaveHours = 0;
+    private int usedShortLeavesThisMonth = 0;
+
+    // ── Shift Data (from UserProfile) ──────────────────────────────────
+    private boolean shiftDataLoaded = false;
+    private String shiftStartTime = "";
+    private String shiftEndTime = "";
 
     // ══════════════════════════════════════════════════════════════════════
     // LOADER
@@ -141,18 +171,36 @@ public class LeavesFragment extends Fragment {
 
         holidaysViewModel = new ViewModelProvider(requireActivity()).get(HolidaysViewModel.class);
 
+        // ── Standard Views ─────────────────────────────────────────────
         etFromDate = binding.etFromDate;
         etToDate = binding.etToDate;
-        binding.balanceLeaveTextView.setText("");
 
+        // ── Short Leave Views ──────────────────────────────────────────
+        etStartTime = binding.etStartTime;
+        etEndTime = binding.etEndTime;
+        llShortTimeContainer = binding.llShortTimeContainer;
+        llToDateContainer = binding.llToDateContainer;
+        llTimeSlotContainer = binding.llTimeSlotContainer;
+        tilLeaveCategoryFrom = binding.tilLeaveCategoryFrom;
+        tilLeaveCategoryTo = binding.tilLeaveCategoryTo;
+        spinnerTimeSlot = binding.spinnerTimeSlot;
+
+        binding.balanceLeaveTextView.setText("");
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         // ── Date Pickers ───────────────────────────────────────────────
         etFromDate.setOnClickListener(view -> showDatePicker(etFromDate));
         etToDate.setOnClickListener(view -> showDatePicker(etToDate));
 
+        // ── Time Pickers (Manual mode only) ────────────────────────────
+        etStartTime.setOnClickListener(view -> {
+            if (etStartTime.isFocusable()) showTimePicker(etStartTime);
+        });
+        etEndTime.setOnClickListener(view -> {
+            if (etEndTime.isFocusable()) showTimePicker(etEndTime);
+        });
+
         // ── Spinners ───────────────────────────────────────────────────
-        AutoCompleteTextView leaveTypeSpinner = binding.spinnerLeaveType;
         AutoCompleteTextView leaveCategorySpinnerFrom = binding.spinnerLeaveCategoryFrom;
         AutoCompleteTextView leaveCategorySpinnerTo = binding.spinnerLeaveCategoryTo;
         AutoCompleteTextView leavingStationSpinner = binding.spinnerLeavingStation;
@@ -184,6 +232,17 @@ public class LeavesFragment extends Fragment {
         ArrayAdapter<String> leavePlannedAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, getResources().getStringArray(R.array.leave_planned));
         leavePlannedSpinner.setAdapter(leavePlannedAdapter);
 
+        // ── Time Slot Adapter (Morning / Evening) ──────────────────────
+        String[] timeSlots = {"Morning", "Evening"};
+        ArrayAdapter<String> timeSlotAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, timeSlots);
+        spinnerTimeSlot.setAdapter(timeSlotAdapter);
+
+        // ── Time Slot Selection Handler ────────────────────────────────
+        spinnerTimeSlot.setOnItemClickListener((parent, view, position, id) -> {
+            String slot = (String) parent.getItemAtPosition(position);
+            handleTimeSlotSelection(slot);
+        });
+
         // ── Auth & User Setup ──────────────────────────────────────────
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         authToken = prefManager.getString("authToken", "");
@@ -193,14 +252,15 @@ public class LeavesFragment extends Fragment {
         leavesViewModel.fetchLeavesType();
         holidaysViewModel.loadHolidays(authToken);
 
+        // ── Fetch Short Leave Config ───────────────────────────────────
+        fetchShortLeaveDetails(authToken);
+
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.storeLoginData(userId, authToken);
         profileViewModel.fetchUserProfile();
 
-        // ── Disable Submit until all data is ready ─────────────────────
         binding.btnSubmit.setEnabled(false);
 
-        // ── Initial page loaders ───────────────────────────────────────
         showLoader(); // profile
         showLoader(); // user → branch chain
         showLoader(); // leave types
@@ -247,6 +307,9 @@ public class LeavesFragment extends Fragment {
                     crossFunctionalManagerId = null;
                 }
 
+                // ── Extract Shift Data from UserProfile ────────────────
+                extractShiftDataFromProfile(employee);
+
                 binding.btnSubmit.setEnabled(true);
             }
             hideLoader();
@@ -284,11 +347,15 @@ public class LeavesFragment extends Fragment {
         // ── Clear Button ───────────────────────────────────────────────
         binding.btnClear.setOnClickListener(view -> clearForm());
 
-        // ── Leave Type Guard (dates must be selected first) ────────────
-        leaveTypeSpinner.setOnClickListener(view -> {
-            if (etToDate.getText().toString().isEmpty()) {
-                CustomDialogHelper.showInfoDialog(requireContext(), "Select Dates", "Please select From and To dates first.");
+        // ── ✅ Intercept Click/Touch on Leave Type Spinner ───────
+        binding.spinnerLeaveType.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                if (etFromDate.getText().toString().isEmpty()) {
+                    CustomDialogHelper.showInfoDialog(requireContext(), "Select Date", "Please select From Date first.");
+                    return true;
+                }
             }
+            return false;
         });
 
         // ── Leave Type Spinner ─────────────────────────────────────────
@@ -298,51 +365,98 @@ public class LeavesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 LeavetypesItem selectedLeaveType = leaveTypesList.get(position);
+                String tempLeaveTypeName = selectedLeaveType.getLeavetypeName();
+
+                if (!SHORT_LEAVE.equalsIgnoreCase(tempLeaveTypeName) && etToDate.getText().toString().isEmpty()) {
+                    CustomDialogHelper.showInfoDialog(requireContext(), "Select To Date", "Please select To Date first for this leave type.");
+                    clearLeaveTypeOnly();
+                    return;
+                }
+
                 selectedLeaveTypeId = selectedLeaveType.getId();
-                selectedLeaveTypeName = selectedLeaveType.getLeavetypeName();
+                selectedLeaveTypeName = tempLeaveTypeName;
 
-                // ✅ Removed duplicate checkRestrictedHoliday call
-                // from here — it is handled ONLY inside
-                // fetchEmployeeLeave response to prevent
-                // double alert trigger.
+                // Reset time inputs
+                etStartTime.setText("");
+                etEndTime.setText("");
+                spinnerTimeSlot.setText("", false);
 
-                SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
-                String authTokenN = prefManager.getString("authToken", "");
-                String employeeId = prefManager.getString("userId", "");
+                // ── SHORT LEAVE UI TOGGLE ──────────────────────────
+                if (SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName)) {
+
+                    if (!shortLeaveConfigLoaded) {
+                        CustomDialogHelper.showErrorDialog(requireContext(), "Please Wait", "Short Leave settings are still loading.\nPlease try again in a moment.", () -> clearLeaveTypeOnly());
+                        return;
+                    }
+
+                    if (!shortLeaveEnabled) {
+                        CustomDialogHelper.showErrorDialog(requireContext(), "Short Leave Disabled", "Short Leave is not enabled for your account.\n\nPlease contact HR.", () -> clearLeaveTypeOnly());
+                        return;
+                    }
+
+                    String fromDateVal = etFromDate.getText().toString();
+                    if (!fromDateVal.isEmpty()) {
+                        etToDate.setText(fromDateVal);
+                    }
+
+                    llToDateContainer.setVisibility(View.GONE);
+                    tilLeaveCategoryFrom.setVisibility(View.GONE);
+                    tilLeaveCategoryTo.setVisibility(View.GONE);
+                    binding.spinnerLeaveCategoryFrom.setText("", false);
+                    binding.spinnerLeaveCategoryTo.setText("", false);
+
+                    llShortTimeContainer.setVisibility(View.VISIBLE);
+
+                    if (shortLeaveTimingEnabled) {
+                        llTimeSlotContainer.setVisibility(View.VISIBLE);
+
+                        etStartTime.setFocusable(false);
+                        etStartTime.setClickable(false);
+                        etEndTime.setFocusable(false);
+                        etEndTime.setClickable(false);
+
+                        if (!shiftDataLoaded) {
+                            CustomDialogHelper.showWarningDialog(requireContext(), "No Shift Assigned", "No shift timing found for your profile.\n\n" + "You can select start and end times manually.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                                @Override
+                                public void onConfirm() {
+                                    enableManualTimeSelection();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    enableManualTimeSelection();
+                                }
+                            });
+                        }
+                    } else {
+                        llTimeSlotContainer.setVisibility(View.GONE);
+                        enableManualTimeSelection();
+                    }
+
+                    // Fetch monthly short leave usage from appliedLeaves API
+                    SecurePrefManager pm = SecurePrefManager.getInstance(requireContext());
+                    String authTokenN = pm.getString("authToken", "");
+                    String employeeId = pm.getString("userId", "");
+                    fetchMonthlyShortLeaveUsage(authTokenN, employeeId);
+
+                } else {
+                    llToDateContainer.setVisibility(View.VISIBLE);
+                    tilLeaveCategoryFrom.setVisibility(View.VISIBLE);
+                    tilLeaveCategoryTo.setVisibility(View.VISIBLE);
+                    llShortTimeContainer.setVisibility(View.GONE);
+                    llTimeSlotContainer.setVisibility(View.GONE);
+                }
+
+                SecurePrefManager pm = SecurePrefManager.getInstance(requireContext());
+                String authTokenN = pm.getString("authToken", "");
+                String employeeId = pm.getString("userId", "");
                 String authHeader = "jwt " + authTokenN;
 
-                showLoader(); // fetchEmployeeLeave
-                showLoader(); // fetchLeaveTypeDetails
-                showLoader(); // fetchUnapprovedLeaves
+                showLoader();
+                showLoader();
 
                 fetchEmployeeLeave(selectedLeaveTypeId, employeeId, authHeader, selectedLeaveTypeName);
                 fetchLeaveTypeDetails(selectedLeaveTypeId, authHeader);
-                fetchUnapprovedLeaves(selectedLeaveTypeId, employeeId, authHeader);
-            }
-
-            // ── Fetch Unapproved Leaves ────────────────────────
-            private void fetchUnapprovedLeaves(String leaveTypeId, String employeeId, String authHeader) {
-                Call<ResponseBody> call = APIClient.getInstance().getUnapprovedLeaves().getUnapprovedLeaves(authHeader, leaveTypeId, employeeId);
-
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                response.body().string();
-                            } catch (IOException e) {
-                                Log.e(TAG, "Unapproved leaves error: " + e.getMessage());
-                            }
-                        }
-                        hideLoader();
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                        Log.e(TAG, "Unapproved leaves failure: " + throwable.getMessage());
-                        hideLoader();
-                    }
-                });
             }
 
             // ── Fetch Leave Type Details ───────────────────────
@@ -356,7 +470,7 @@ public class LeavesFragment extends Fragment {
                             try {
                                 response.body().string();
                             } catch (IOException e) {
-                                Log.e(TAG, "Leave type details error: " + e.getMessage());
+                                Log.e(TAG, e.getMessage());
                             }
                         }
                         hideLoader();
@@ -377,9 +491,7 @@ public class LeavesFragment extends Fragment {
                 call.enqueue(new Callback<EmployeeLeaveTypeResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<EmployeeLeaveTypeResponse> call, @NonNull Response<EmployeeLeaveTypeResponse> response) {
-
                         if (response.isSuccessful() && response.body() != null) {
-
                             EmployeeLeaveTypeResponse res = response.body();
                             balanceLeave = res.getData().getCreditLeave() - (res.getData().getUsedLeave() + res.getData().getDebitLeave());
 
@@ -390,10 +502,6 @@ public class LeavesFragment extends Fragment {
                                 calculateTotalDaysAndCheckLeaveLimit(leaveTypeName);
                             }
 
-                            // ✅ ONLY place where
-                            // checkRestrictedHoliday
-                            // is called — prevents
-                            // double alert
                             if (leaveTypeId != null && leaveTypeId.equals(restrictedHolidayId) && !fromDate.isEmpty() && !toDate.isEmpty()) {
                                 checkRestrictedHoliday(fromDate, toDate);
                             }
@@ -401,9 +509,11 @@ public class LeavesFragment extends Fragment {
                             requireActivity().runOnUiThread(() -> {
                                 if (leaveTypeName.equals("Loss of Pay (LOP) / Leave Without Pay (LWP)")) {
                                     binding.balanceLeaveTextView.setText("");
+                                } else if (SHORT_LEAVE.equalsIgnoreCase(leaveTypeName)) {
+                                    // Handled by fetchMonthlyShortLeaveUsage
                                 } else {
                                     if (balanceLeave == 0.0) {
-                                        binding.balanceLeaveTextView.setText("Apply with LOP/LWP" + "  Balance: " + balanceLeave);
+                                        binding.balanceLeaveTextView.setText("Apply with LOP/LWP  Balance: " + balanceLeave);
                                         Toast.makeText(requireContext(), "LOP/LWP", Toast.LENGTH_SHORT).show();
                                     } else {
                                         binding.balanceLeaveTextView.setText("Balance Leave: " + balanceLeave);
@@ -423,29 +533,23 @@ public class LeavesFragment extends Fragment {
             }
 
             // ── Restricted Holiday Check ───────────────────────
-            // Called ONCE only from fetchEmployeeLeave response.
-            // This prevents the double-alert bug.
             private void checkRestrictedHoliday(String fromDate, String toDate) {
                 if (fromDate.isEmpty() || toDate.isEmpty()) return;
 
-                // ── Step 1: Birthday check ─────────────────────
                 String todayMD = LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd"));
                 String empDOBMD = DateTimeUtils.getMonthDayFromISO(empBirthday);
 
                 if (todayMD.equals(empDOBMD)) {
-                    binding.balanceLeaveTextView.setText("Today is your birthday." + " Restricted leave allowed!");
+                    binding.balanceLeaveTextView.setText("Today is your birthday. Restricted leave allowed!");
                     return;
                 }
 
-                // ── Step 2: Get holidays directly ──────────────
                 List<HolidaysItem> holidaysItems = holidaysViewModel.getHolidaysList().getValue();
-
                 if (holidaysItems == null || holidaysItems.isEmpty()) {
-                    CustomDialogHelper.showErrorDialog(requireContext(), "Data Unavailable", "Holiday data is not available." + " Please try again later.", () -> clearLeaveTypeOnly()); // ✅ Only clear leave type
+                    CustomDialogHelper.showErrorDialog(requireContext(), "Data Unavailable", "Holiday data is not available.", () -> clearLeaveTypeOnly());
                     return;
                 }
 
-                // ── Step 3: Check each date in range ──────────
                 List<String> dateRange = getDatesBetween(fromDate, toDate);
                 boolean isValidDateRange = true;
 
@@ -458,23 +562,20 @@ public class LeavesFragment extends Fragment {
                             break;
                         }
                     }
-
                     if (!isRestrictedHoliday) {
-                        binding.balanceLeaveTextView.setText("Selected date is not a" + " Restricted Holiday." + " Balance: " + balanceLeave);
+                        binding.balanceLeaveTextView.setText("Selected date is not a Restricted Holiday. Balance: " + balanceLeave);
                         isValidDateRange = false;
                         break;
                     }
                 }
 
-                // ── Step 4: Show result ────────────────────────
                 if (!isValidDateRange) {
-                    CustomDialogHelper.showErrorDialog(requireContext(), "Not a Restricted Holiday", "The selected date range contains" + " dates that are not" + " restricted holidays." + "\n\nPlease select a" + " different leave type" + " or change your dates.", () -> clearLeaveTypeOnly()); // ✅ Only clear leave type
+                    CustomDialogHelper.showErrorDialog(requireContext(), "Not a Restricted Holiday", "The selected date range contains dates that are not restricted holidays.", () -> clearLeaveTypeOnly());
                 } else {
                     binding.balanceLeaveTextView.setText("Balance Leave: " + balanceLeave);
                 }
             }
 
-            // ── Normalize API date to yyyy-MM-dd ──────────────
             private String normalizeDate(String rawDate) {
                 if (rawDate == null || rawDate.isEmpty()) return "";
                 try {
@@ -483,12 +584,10 @@ public class LeavesFragment extends Fragment {
                     }
                     return rawDate;
                 } catch (Exception e) {
-                    Log.e(TAG, "normalizeDate error: " + e.getMessage());
                     return rawDate;
                 }
             }
 
-            // ── Get dates between two date strings ────────────
             private List<String> getDatesBetween(String startDate, String endDate) {
                 List<String> dates = new ArrayList<>();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -497,7 +596,6 @@ public class LeavesFragment extends Fragment {
                     startCal.setTime(Objects.requireNonNull(sdf.parse(startDate)));
                     Calendar endCal = Calendar.getInstance();
                     endCal.setTime(Objects.requireNonNull(sdf.parse(endDate)));
-
                     while (startCal.before(endCal) || startCal.equals(endCal)) {
                         dates.add(sdf.format(startCal.getTime()));
                         startCal.add(Calendar.DAY_OF_MONTH, 1);
@@ -524,11 +622,365 @@ public class LeavesFragment extends Fragment {
                 String reason = Objects.requireNonNull(binding.etReason.getText()).toString();
                 String leavePlanned = Objects.requireNonNull(binding.spinnerLeavePlanned.getText()).toString();
 
+                if (SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName)) {
+                    toDate = fromDate;
+                    leaveCategoryFrom = "";
+                    leaveCategoryTo = "";
+                }
+
                 applyLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason, leavePlanned);
             }
         });
 
         return root;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ✅ FETCH APPLIED LEAVES & COUNT MONTHLY SHORT LEAVES
+    // ══════════════════════════════════════════════════════════════════════
+
+    private void fetchMonthlyShortLeaveUsage(String authToken, String employeeId) {
+        LocalDate targetDate = LocalDate.now();
+        String fromDateText = etFromDate.getText().toString();
+        if (!fromDateText.isEmpty()) {
+            try {
+                targetDate = LocalDate.parse(fromDateText, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            } catch (Exception e) {
+                Log.e(TAG, "Error parsing selected date: " + e.getMessage());
+            }
+        }
+
+        String startOfMonth = targetDate.withDayOfMonth(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String endOfMonth = targetDate.withDayOfMonth(targetDate.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String authHeader = "jwt " + authToken;
+
+        Log.d(TAG, "🔎 [SHORT-LEAVE] Fetching range: " + startOfMonth + " to " + endOfMonth);
+
+        showLoader();
+
+        String sorting = "-createdAt";
+        String page = "1";
+        String limit = "100";
+        String branch = "";
+        String prefix = "";
+
+        Call<AppliedLeaveDetailResponse> call = APIClient.getInstance().getApi().getAppliedLeavesWithFilters(authHeader, startOfMonth, endOfMonth, sorting, employeeId, page, limit, branch, prefix);
+
+        call.enqueue(new Callback<AppliedLeaveDetailResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<AppliedLeaveDetailResponse> call, @NonNull Response<AppliedLeaveDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        String jsonResponse = gson.toJson(response.body());
+                        JSONArray leavesArray = null;
+
+                        if (jsonResponse.trim().startsWith("[")) {
+                            leavesArray = new JSONArray(jsonResponse);
+                        } else {
+                            JSONObject root = new JSONObject(jsonResponse);
+                            if (root.has("data")) {
+                                Object dataObj = root.get("data");
+                                if (dataObj instanceof JSONArray) {
+                                    leavesArray = (JSONArray) dataObj;
+                                } else if (dataObj instanceof JSONObject) {
+                                    JSONObject dataJson = (JSONObject) dataObj;
+                                    if (dataJson.has("employeesAppliedLeaves")) {
+                                        leavesArray = dataJson.optJSONArray("employeesAppliedLeaves");
+                                    }
+                                }
+                            }
+                        }
+
+                        usedShortLeavesThisMonth = calculateShortLeavesCount(leavesArray);
+                        Log.d(TAG, "✅ [SHORT-LEAVE] Monthly Usage: " + usedShortLeavesThisMonth + "/" + maxShortLeavesPerMonth);
+
+                        requireActivity().runOnUiThread(() -> updateShortLeaveBalanceUI());
+
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error parsing applied leaves array: " + e.getMessage());
+                    }
+                } else {
+                    Log.e(TAG, "Applied leaves endpoint failed: " + response.message());
+                }
+                hideLoader();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<AppliedLeaveDetailResponse> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "Applied leaves call failed: " + throwable.getMessage());
+                hideLoader();
+            }
+        });
+    }
+
+    private int calculateShortLeavesCount(JSONArray leavesArray) {
+        int count = 0;
+        if (leavesArray == null) return 0;
+        try {
+            for (int i = 0; i < leavesArray.length(); i++) {
+                JSONObject leave = leavesArray.getJSONObject(i);
+                String leaveName = leave.optString("leaveName", "");
+                String status = leave.optString("status", "");
+
+                if (SHORT_LEAVE.equalsIgnoreCase(leaveName)) {
+                    if (!"Rejected".equalsIgnoreCase(status) && !"Cancelled".equalsIgnoreCase(status)) {
+                        count++;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "calculateShortLeavesCount parsing error: " + e.getMessage());
+        }
+        return count;
+    }
+
+    private void updateShortLeaveBalanceUI() {
+        if (!SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName)) return;
+
+        int remaining = maxShortLeavesPerMonth - usedShortLeavesThisMonth;
+        if (remaining <= 0) {
+            binding.balanceLeaveTextView.setText("⚠ Monthly limit reached (" + usedShortLeavesThisMonth + "/" + maxShortLeavesPerMonth + " used)");
+        } else {
+            String hourText = fixedShortLeaveHours > 0 ? formatHours(fixedShortLeaveHours) + " hrs fixed" : "Flexible hours";
+            binding.balanceLeaveTextView.setText("Short Leave: " + remaining + "/" + maxShortLeavesPerMonth + " remaining this month • " + hourText);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ✅ EXTRACT SHIFT DATA FROM USER PROFILE
+    // ══════════════════════════════════════════════════════════════════════
+
+    private void extractShiftDataFromProfile(Employee employee) {
+        try {
+            if (employee.getShift() != null) {
+                shiftStartTime = employee.getShift().getStartTime();
+                shiftEndTime = employee.getShift().getEndTime();
+                shiftDataLoaded = true;
+            }
+
+            if (shiftDataLoaded) {
+                Log.d(TAG, "✅ Shift from profile: " + shiftStartTime + " → " + shiftEndTime);
+            } else {
+                Log.w(TAG, "No shift data found in user profile");
+            }
+        } catch (Exception e) {
+            shiftDataLoaded = false;
+            Log.e(TAG, "extractShiftDataFromProfile error: " + e.getMessage());
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // TIME SLOT HANDLER (Morning / Evening)
+    // ══════════════════════════════════════════════════════════════════════
+
+    private void handleTimeSlotSelection(String slot) {
+        if (!shiftDataLoaded) {
+            CustomDialogHelper.showWarningDialog(requireContext(), "No Shift Assigned", "No shift timing found. Please select times manually.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                @Override
+                public void onConfirm() {
+                    enableManualTimeSelection();
+                }
+
+                @Override
+                public void onCancel() {
+                    enableManualTimeSelection();
+                }
+            });
+            return;
+        }
+
+        if (fixedShortLeaveHours <= 0) {
+            etStartTime.setText(formatTimeTo12Hour(shiftStartTime));
+            etEndTime.setText(formatTimeTo12Hour(shiftEndTime));
+            return;
+        }
+
+        if ("Morning".equalsIgnoreCase(slot)) {
+            String start = formatTimeTo12Hour(shiftStartTime);
+            String end = addHoursToTime(shiftStartTime, fixedShortLeaveHours);
+            etStartTime.setText(start);
+            etEndTime.setText(end);
+        } else if ("Evening".equalsIgnoreCase(slot)) {
+            String start = subtractHoursFromTime(shiftEndTime, fixedShortLeaveHours);
+            String end = formatTimeTo12Hour(shiftEndTime);
+            etStartTime.setText(start);
+            etEndTime.setText(end);
+        }
+    }
+
+    private void enableManualTimeSelection() {
+        llTimeSlotContainer.setVisibility(View.GONE);
+        etStartTime.setFocusable(true);
+        etStartTime.setClickable(true);
+        etEndTime.setFocusable(true);
+        etEndTime.setClickable(true);
+        etStartTime.setOnClickListener(v -> showTimePicker(etStartTime));
+        etEndTime.setOnClickListener(v -> showTimePicker(etEndTime));
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SHORT LEAVE CONFIG FETCH
+    // ══════════════════════════════════════════════════════════════════════
+
+    private void fetchShortLeaveDetails(String authToken) {
+        String authHeader = "jwt " + authToken;
+        showLoader();
+
+        Call<GetShortLeaveDetails> call = APIClient.getInstance().getApi().getShortLeaveDetails(authHeader);
+
+        call.enqueue(new Callback<GetShortLeaveDetails>() {
+            @Override
+            public void onResponse(@NonNull Call<GetShortLeaveDetails> call, @NonNull Response<GetShortLeaveDetails> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    app.xedigital.ai.model.ShortLeaveDetails.Data data = response.body().getData();
+                    if (data != null) {
+                        shortLeaveEnabled = data.isShortLeave();
+                        shortLeaveTimingEnabled = data.isShortLeaveTiming();
+                        maxShortLeavesPerMonth = data.getShortLeaveCount();
+                        fixedShortLeaveHours = data.getShortLeaveExemption();
+
+                        if (maxShortLeavesPerMonth < 0) maxShortLeavesPerMonth = 0;
+                        if (fixedShortLeaveHours < 0) fixedShortLeaveHours = 0;
+
+                        shortLeaveConfigLoaded = true;
+
+                        Log.d(TAG, "✅ Short Leave Config → enabled=" + shortLeaveEnabled + ", monthlyLimit=" + maxShortLeavesPerMonth + ", fixedHours=" + fixedShortLeaveHours + ", timingDropdown=" + shortLeaveTimingEnabled);
+                    }
+                } else {
+                    shortLeaveConfigLoaded = false;
+                    Log.e(TAG, "Short leave config failed: " + response.message());
+                }
+                hideLoader();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GetShortLeaveDetails> call, @NonNull Throwable throwable) {
+                shortLeaveConfigLoaded = false;
+                Log.e(TAG, "Short leave config failure: " + throwable.getMessage());
+                hideLoader();
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // TIME HELPERS
+    // ══════════════════════════════════════════════════════════════════════
+
+    private Date parseTimeString(String timeStr) {
+        if (timeStr == null || timeStr.isEmpty()) return null;
+        String[] formats = {"HH:mm", "hh:mm a", "HH:mm:ss", "hh:mm:ss a", "h:mm a"};
+        for (String fmt : formats) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(fmt, Locale.getDefault());
+                sdf.setLenient(false);
+                return sdf.parse(timeStr.trim());
+            } catch (ParseException ignored) {
+            }
+        }
+        Log.e(TAG, "Could not parse time: " + timeStr);
+        return null;
+    }
+
+    private String formatTimeTo12Hour(String timeStr) {
+        Date time = parseTimeString(timeStr);
+        if (time == null) return timeStr;
+        return new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(time);
+    }
+
+    private String addHoursToTime(String timeStr, double hours) {
+        Date time = parseTimeString(timeStr);
+        if (time == null) return timeStr;
+        long millis = time.getTime() + (long) (hours * 60 * 60 * 1000);
+        return new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date(millis));
+    }
+
+    private String subtractHoursFromTime(String timeStr, double hours) {
+        Date time = parseTimeString(timeStr);
+        if (time == null) return timeStr;
+        long millis = time.getTime() - (long) (hours * 60 * 60 * 1000);
+        return new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date(millis));
+    }
+
+    private double calculateHoursBetween(String startStr, String endStr) {
+        try {
+            Date start = parseTimeString(startStr);
+            Date end = parseTimeString(endStr);
+            if (start == null || end == null) return 0;
+            long diffMillis = end.getTime() - start.getTime();
+            return diffMillis / (1000.0 * 60 * 60);
+        } catch (Exception e) {
+            Log.e(TAG, "calculateHoursBetween error: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    private String formatHours(double hours) {
+        if (hours == Math.floor(hours)) return String.valueOf((int) hours);
+        return String.valueOf(hours);
+    }
+
+    /**
+     * ✅ NEW: Converts a 12-hour formatted time string (e.g. "09:00 AM") into a 24-hour format (e.g. "09:00").
+     */
+    private String convertTo24HourFormat(String time12) {
+        if (time12 == null || time12.isEmpty()) return "";
+        try {
+            Date date = parseTimeString(time12);
+            if (date != null) {
+                return new SimpleDateFormat("HH:mm", Locale.getDefault()).format(date);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error converting to 24-hour: " + e.getMessage());
+        }
+        return time12;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // TIME PICKER (Manual mode)
+    // ══════════════════════════════════════════════════════════════════════
+
+    private void showTimePicker(final EditText editText) {
+        Calendar now = Calendar.getInstance();
+
+        MaterialTimePicker picker = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_12H).setHour(now.get(Calendar.HOUR_OF_DAY)).setMinute(now.get(Calendar.MINUTE)).setTitleText("Select Time").build();
+
+        picker.addOnPositiveButtonClickListener(v -> {
+            int hour = picker.getHour();
+            int minute = picker.getMinute();
+            String amPm = (hour >= 12) ? "PM" : "AM";
+            int formattedHour = (hour == 0 || hour == 12) ? 12 : hour % 12;
+            String timeString = String.format(Locale.getDefault(), "%02d:%02d %s", formattedHour, minute, amPm);
+            editText.setText(timeString);
+
+            if (editText == etEndTime) {
+                validateShortLeaveTimeRange();
+            }
+        });
+
+        picker.show(requireActivity().getSupportFragmentManager(), "timePicker");
+    }
+
+    private void validateShortLeaveTimeRange() {
+        String startStr = etStartTime.getText().toString();
+        String endStr = etEndTime.getText().toString();
+        if (startStr.isEmpty() || endStr.isEmpty()) return;
+
+        Date startTime = parseTimeString(startStr);
+        Date endTime = parseTimeString(endStr);
+
+        if (startTime != null && endTime != null && !endTime.after(startTime)) {
+            CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Time Range", "End time must be after start time.");
+            etEndTime.setText("");
+            return;
+        }
+
+        if (fixedShortLeaveHours > 0) {
+            double hours = calculateHoursBetween(startStr, endStr);
+            if (Math.abs(hours - fixedShortLeaveHours) > 0.01) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Duration", "Short Leave must be exactly " + formatHours(fixedShortLeaveHours) + " hours.\n\n" + "You selected " + String.format(Locale.getDefault(), "%.2f", hours) + " hours.");
+                etEndTime.setText("");
+            }
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -544,34 +996,72 @@ public class LeavesFragment extends Fragment {
         String leavingStation = binding.spinnerLeavingStation.getText().toString();
         String leaveStationAddress = Objects.requireNonNull(binding.etLeaveStationAddress.getText()).toString();
 
-        // ── Step 1: Required fields ────────────────────────────────────
-        if (fromDateText.isEmpty() || toDateText.isEmpty() || leaveType.isEmpty() || leaveCategoryFrom.isEmpty() || leaveCategoryTo.isEmpty() || leavingStation.isEmpty()) {
-            CustomDialogHelper.showWarningDialog(requireContext(), "Missing Fields", "Please fill in all required fields before submitting.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
-                @Override
-                public void onConfirm() {
-                }
+        boolean isShortLeave = SHORT_LEAVE.equalsIgnoreCase(leaveType);
 
-                @Override
-                public void onCancel() {
-                }
-            });
+        if (fromDateText.isEmpty() || leaveType.isEmpty() || leavingStation.isEmpty()) {
+            showMissingFieldsWarning();
             return false;
         }
 
-        // ── Step 2: Leaving station address ───────────────────────────
+        if (isShortLeave) {
+            if (!shortLeaveEnabled) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Short Leave Disabled", "Short Leave is not enabled for your account.");
+                return false;
+            }
+
+            if (maxShortLeavesPerMonth > 0 && usedShortLeavesThisMonth >= maxShortLeavesPerMonth) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Monthly Limit Reached", "You have used all " + maxShortLeavesPerMonth + " short leaves this month.");
+                return false;
+            }
+
+            if (shortLeaveTimingEnabled && llTimeSlotContainer.getVisibility() == View.VISIBLE) {
+                if (spinnerTimeSlot.getText().toString().isEmpty()) {
+                    CustomDialogHelper.showErrorDialog(requireContext(), "Time Slot Required", "Please select Morning or Evening time slot.");
+                    return false;
+                }
+            }
+
+            String startTimeText = etStartTime.getText().toString();
+            String endTimeText = etEndTime.getText().toString();
+
+            if (startTimeText.isEmpty() || endTimeText.isEmpty()) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Missing Time Slot", "Please enter both Start and End times.");
+                return false;
+            }
+
+            Date startTime = parseTimeString(startTimeText);
+            Date endTime = parseTimeString(endTimeText);
+
+            if (startTime != null && endTime != null && !endTime.after(startTime)) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Time Range", "End time must be after start time.");
+                return false;
+            }
+
+            if (fixedShortLeaveHours > 0) {
+                double hours = calculateHoursBetween(startTimeText, endTimeText);
+                if (Math.abs(hours - fixedShortLeaveHours) > 0.01) {
+                    CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Duration", "Short Leave must be exactly " + formatHours(fixedShortLeaveHours) + " hours.\n\n" + "You selected " + String.format(Locale.getDefault(), "%.2f", hours) + " hours.");
+                    return false;
+                }
+            }
+        } else {
+            if (toDateText.isEmpty() || leaveCategoryFrom.isEmpty() || leaveCategoryTo.isEmpty()) {
+                showMissingFieldsWarning();
+                return false;
+            }
+        }
+
         if (leavingStation.equalsIgnoreCase("Yes") && leaveStationAddress.isEmpty()) {
-            CustomDialogHelper.showErrorDialog(requireContext(), "Address Required", "You selected 'Yes' for leaving station." + "\nPlease enter your leave station address.");
+            CustomDialogHelper.showErrorDialog(requireContext(), "Address Required", "You selected 'Yes' for leaving station.\nPlease enter your leave station address.");
             return false;
         }
 
-        // ── Step 3: Contact number ─────────────────────────────────────
         String contactNumber = Objects.requireNonNull(binding.etContactNumber.getText()).toString().trim();
         if (contactNumber.isEmpty()) {
-            CustomDialogHelper.showErrorDialog(requireContext(), "Contact Required", "Please enter a contact number where" + " you can be reached during leave.");
+            CustomDialogHelper.showErrorDialog(requireContext(), "Contact Required", "Please enter a contact number.");
             return false;
         }
 
-        // ── Step 4: Leave planned ──────────────────────────────────────
         if (binding.spinnerLeavePlanned.getText().toString().isEmpty()) {
             binding.spinnerLeavePlanned.setError("This field is required");
             return false;
@@ -579,52 +1069,63 @@ public class LeavesFragment extends Fragment {
             binding.spinnerLeavePlanned.setError(null);
         }
 
-        // ── Step 5: Date range ─────────────────────────────────────────
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date fromDate = sdf.parse(fromDateText);
-            Date toDate = sdf.parse(toDateText);
+            Date toDate = isShortLeave ? fromDate : sdf.parse(toDateText);
             Date today = sdf.parse(sdf.format(new Date()));
 
             if (!leaveType.equals("Sick Leave") && fromDate != null && fromDate.before(today)) {
-                CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Date", "Past dates are not allowed for this leave type." + "\nPlease select today or a future date.");
+                CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Date", "Past dates are not allowed for this leave type.");
                 return false;
             }
 
-            if (fromDate != null && fromDate.after(toDate)) {
-                CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Date Range", "The 'From' date cannot be after the 'To' date." + "\nPlease correct your date selection.");
+            if (fromDate != null && toDate != null && fromDate.after(toDate)) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Date Range", "The 'From' date cannot be after the 'To' date.");
                 return false;
             }
 
         } catch (ParseException e) {
             Log.e(TAG, "Date parse error: " + e.getMessage());
-            CustomDialogHelper.showErrorDialog(requireContext(), "Date Error", "Invalid date format. Please re-select your dates.");
+            CustomDialogHelper.showErrorDialog(requireContext(), "Date Error", "Invalid date format.");
             return false;
         }
 
-        // ── Step 6: Leave category combination ────────────────────────
-        if (!isValidLeaveCategoryCombination(leaveCategoryFrom, leaveCategoryTo)) {
-            showLeaveCombinationWarningDialog(leaveCategoryFrom, leaveCategoryTo);
-            return false;
-        }
+        if (!isShortLeave) {
+            if (!isValidLeaveCategoryCombination(leaveCategoryFrom, leaveCategoryTo)) {
+                showLeaveCombinationWarningDialog(leaveCategoryFrom, leaveCategoryTo);
+                return false;
+            }
 
-        // ── Step 7: Single day half-day consistency ───────────────────
-        if (!isValidSingleDayHalfDaySelection(fromDateText, toDateText, leaveCategoryFrom, leaveCategoryTo)) {
-            CustomDialogHelper.showWarningDialog(requireContext(), "Invalid Half-Day Selection", "Selecting \"First Half\" → \"Second Half\"" + " on the same day equals a full day.\n\n" + "Please use \"Full Day → Full Day\" instead.", "Fix It", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
-                @Override
-                public void onConfirm() {
-                    binding.spinnerLeaveCategoryFrom.setText("", false);
-                    binding.spinnerLeaveCategoryTo.setText("", false);
-                }
+            if (!isValidSingleDayHalfDaySelection(fromDateText, toDateText, leaveCategoryFrom, leaveCategoryTo)) {
+                CustomDialogHelper.showWarningDialog(requireContext(), "Invalid Half-Day Selection", "Selecting \"First Half\" → \"Second Half\" on the same day equals a full day.\n\n" + "Please use \"Full Day → Full Day\" instead.", "Fix It", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                    @Override
+                    public void onConfirm() {
+                        binding.spinnerLeaveCategoryFrom.setText("", false);
+                        binding.spinnerLeaveCategoryTo.setText("", false);
+                    }
 
-                @Override
-                public void onCancel() {
-                }
-            });
-            return false;
+                    @Override
+                    public void onCancel() {
+                    }
+                });
+                return false;
+            }
         }
 
         return true;
+    }
+
+    private void showMissingFieldsWarning() {
+        CustomDialogHelper.showWarningDialog(requireContext(), "Missing Fields", "Please fill in all required fields before submitting.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+            @Override
+            public void onConfirm() {
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        });
     }
 
     private boolean isValidLeaveCategoryCombination(String from, String to) {
@@ -656,21 +1157,21 @@ public class LeavesFragment extends Fragment {
 
     private String buildCombinationErrorMessage(String from, String to) {
         if (SECOND_HALF_DAY.equals(from) && FIRST_HALF_DAY.equals(to)) {
-            return "\"Second Half\" → \"First Half\" is not allowed.\n\n" + "Try:\n• First Half → First Half (0.5 day)\n" + "• First Half → Second Half (full)\n" + "• Second Half → Second Half (0.5 day)";
+            return "\"Second Half\" → \"First Half\" is not allowed.\n\nTry:\n• First Half → First Half (0.5 day)\n• First Half → Second Half (full)\n• Second Half → Second Half (0.5 day)";
         }
         if (SECOND_HALF_DAY.equals(from) && FULL_DAY.equals(to)) {
-            return "\"Second Half\" → \"Full Day\" is not allowed.\n\n" + "Valid: Second Half → Second Half (0.5 day)";
+            return "\"Second Half\" → \"Full Day\" is not allowed.\n\nValid: Second Half → Second Half (0.5 day)";
         }
         if (FULL_DAY.equals(from) && FIRST_HALF_DAY.equals(to)) {
-            return "\"Full Day\" → \"First Half\" is not allowed.\n\n" + "Valid: Full Day → Full Day";
+            return "\"Full Day\" → \"First Half\" is not allowed.\n\nValid: Full Day → Full Day";
         }
         if (FULL_DAY.equals(from) && SECOND_HALF_DAY.equals(to)) {
-            return "\"Full Day\" → \"Second Half\" is not allowed.\n\n" + "Valid: Full Day → Full Day";
+            return "\"Full Day\" → \"Second Half\" is not allowed.\n\nValid: Full Day → Full Day";
         }
         if (FIRST_HALF_DAY.equals(from) && FULL_DAY.equals(to)) {
-            return "\"First Half\" → \"Full Day\" is not allowed.\n\n" + "Valid:\n• First Half → First Half\n" + "• First Half → Second Half";
+            return "\"First Half\" → \"Full Day\" is not allowed.\n\nValid:\n• First Half → First Half\n• First Half → Second Half";
         }
-        return "\"" + from + "\" → \"" + to + "\" is invalid.\n\n" + "Valid:\n• Full Day → Full Day\n" + "• First Half → First Half (0.5)\n" + "• First Half → Second Half (full)\n" + "• Second Half → Second Half (0.5)";
+        return "\"" + from + "\" → \"" + to + "\" is invalid.\n\nValid:\n• Full Day → Full Day\n• First Half → First Half (0.5)\n• First Half → Second Half (full)\n• Second Half → Second Half (0.5)";
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -690,6 +1191,12 @@ public class LeavesFragment extends Fragment {
     }
 
     private void calculateTotalDaysAndCheckLeaveLimit(String leaveTypeName) {
+        if (SHORT_LEAVE.equalsIgnoreCase(leaveTypeName)) {
+            totalDays = 1.0; // Set to 1 for short leave payload requirement
+            finalUsedDays = 1.0;
+            return;
+        }
+
         String fromDate = Objects.requireNonNull(binding.etFromDate.getText()).toString();
         String toDate = Objects.requireNonNull(binding.etToDate.getText()).toString();
         String catFrom = binding.spinnerLeaveCategoryFrom.getText().toString();
@@ -702,7 +1209,7 @@ public class LeavesFragment extends Fragment {
         finalUsedDays = computeFinalUsedDays(tDays, catFrom, catTo);
 
         if (finalUsedDays > balanceLeave && leaveTypeName != null && !leaveTypeName.equals("Loss of Pay (LOP) / Leave Without Pay (LWP)")) {
-            CustomDialogHelper.showWarningDialog(requireContext(), "Insufficient Balance", "You need " + finalUsedDays + " days but only have " + balanceLeave + " days available.\n\n" + "Please reduce days or apply for LOP.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+            CustomDialogHelper.showWarningDialog(requireContext(), "Insufficient Balance", "You need " + finalUsedDays + " days but only have " + balanceLeave + " days available.\n\nPlease reduce days or apply for LOP.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                 @Override
                 public void onConfirm() {
                     binding.spinnerLeaveType.setText("");
@@ -717,16 +1224,13 @@ public class LeavesFragment extends Fragment {
 
     private double computeFinalUsedDays(long tDays, String from, String to) {
         double fUsedDays = tDays;
-        if (FIRST_HALF_DAY.equals(from) && FIRST_HALF_DAY.equals(to)) {
-            fUsedDays -= 0.5;
-        } else if (SECOND_HALF_DAY.equals(from) && SECOND_HALF_DAY.equals(to)) {
-            fUsedDays -= 0.5;
-        }
+        if (FIRST_HALF_DAY.equals(from) && FIRST_HALF_DAY.equals(to)) fUsedDays -= 0.5;
+        else if (SECOND_HALF_DAY.equals(from) && SECOND_HALF_DAY.equals(to)) fUsedDays -= 0.5;
         return fUsedDays;
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // APPLY LEAVE
+    // ✅ APPLY LEAVE — Payload Updated as per Backend Spec
     // ══════════════════════════════════════════════════════════════════════
 
     private void applyLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason, String leavePlanned) {
@@ -736,17 +1240,16 @@ public class LeavesFragment extends Fragment {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
         String appliedDate = formatter.format(Instant.now());
 
+        boolean isShortLeave = SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName);
+
+        // ── Common fields ──────────────────────────────────────────────
         applyLeaveRequest.setFromDate(fromDate);
-        applyLeaveRequest.setSelectTypeFrom(leaveCategoryFrom);
         applyLeaveRequest.setToDate(toDate);
-        applyLeaveRequest.setSelectTypeTo(leaveCategoryTo);
         applyLeaveRequest.setLeaveName(selectedLeaveTypeName);
-        applyLeaveRequest.setLeavingStation(leavingStation);
-        applyLeaveRequest.setVacationAddress(leaveStationAdd);
         applyLeaveRequest.setLeavetype(selectedLeaveTypeId);
         applyLeaveRequest.setContactNumber(contactNumber);
         applyLeaveRequest.setReason(reason);
-        applyLeaveRequest.setLeavePlanned(leavePlanned);
+        applyLeaveRequest.setVacationAddress(leaveStationAdd);
         applyLeaveRequest.setAppliedDate(appliedDate);
         applyLeaveRequest.setDepartment(department);
         applyLeaveRequest.setEmployee(empId);
@@ -759,9 +1262,46 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setReportingManagerName(reportingManagerName);
         applyLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
 
-        // ── Cross-functional manager guard ─────────────────────────────
+        // ── ✅ Convert Yes/No → true/false string ──────────────────────
+        String leavingStationPayload = "Yes".equalsIgnoreCase(leavingStation) ? "true" : "false";
+        applyLeaveRequest.setLeavingStation(leavingStationPayload);
+
+        // ── ✅ Lowercase leave planned (planned / unplanned) ──────────
+        applyLeaveRequest.setLeavePlanned(leavePlanned.toLowerCase(Locale.getDefault()));
+
+        // ── ✅ Short Leave vs Standard Leave payload handling ─────────
+        if (isShortLeave) {
+            // Short Leave: selectTypeFrom/To must be null
+            applyLeaveRequest.setSelectTypeFrom(null);
+            applyLeaveRequest.setSelectTypeTo(null);
+
+            // Convert 12-hour → 24-hour format for backend
+            String rawStart = etStartTime.getText().toString();
+            String rawEnd = etEndTime.getText().toString();
+            applyLeaveRequest.setShortLeaveStartTime(convertTo24HourFormat(rawStart));
+            applyLeaveRequest.setShortLeaveEndTime(convertTo24HourFormat(rawEnd));
+
+            // Time slot (morning / evening) — lowercase — only if timing enabled
+            if (shortLeaveTimingEnabled) {
+                String slot = spinnerTimeSlot.getText().toString().toLowerCase(Locale.getDefault());
+                applyLeaveRequest.setShortLeaveTimingSlot(slot);
+            } else {
+                applyLeaveRequest.setShortLeaveTimingSlot(null);
+            }
+
+            Log.d(TAG, "Short Leave Payload — Start: " + convertTo24HourFormat(rawStart) + " | End: " + convertTo24HourFormat(rawEnd));
+        } else {
+            // Standard leave
+            applyLeaveRequest.setSelectTypeFrom(leaveCategoryFrom);
+            applyLeaveRequest.setSelectTypeTo(leaveCategoryTo);
+            applyLeaveRequest.setShortLeaveStartTime("");
+            applyLeaveRequest.setShortLeaveEndTime("");
+            applyLeaveRequest.setShortLeaveTimingSlot(null);
+        }
+
+        // ── Cross Functional Manager Guard ────────────────────────────
         if (crossFunctionalManagerName == null || crossFunctionalManagerName.isEmpty() || crossFunctionalManagerEmail == null || crossFunctionalManagerEmail.isEmpty()) {
-            CustomDialogHelper.showWarningDialog(requireContext(), "Manager Not Assigned", "No cross-functional manager is assigned" + " to your profile." + "\n\nPlease contact your Admin or HR" + " to get this resolved.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+            CustomDialogHelper.showWarningDialog(requireContext(), "Manager Not Assigned", "No cross-functional manager is assigned to your profile.\n\nPlease contact your Admin or HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                 @Override
                 public void onConfirm() {
                     clearForm();
@@ -779,6 +1319,8 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
         applyLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
 
+        Log.d(TAG, "📤 Apply Leave Payload:\n" + gson.toJson(applyLeaveRequest));
+
         showLoader();
 
         Call<ResponseBody> applyLeave = APIClient.getInstance().LeavesApply().LeavesApply("jwt " + authToken, applyLeaveRequest);
@@ -795,18 +1337,22 @@ public class LeavesFragment extends Fragment {
                         String databaseId = (data != null) ? data.optString("_id") : null;
 
                         if (isSuccess && databaseId != null && !databaseId.isEmpty()) {
-                            if (!Objects.equals(selectedLeaveTypeId, lossOfPayId)) {
+                            // ✅ For Short Leave, ALWAYS debit (as backend requires tDays=1, fUsedDays=1)
+                            // Only skip debit for LOP
+                            boolean skipDebit = Objects.equals(selectedLeaveTypeId, lossOfPayId);
+
+                            if (!skipDebit) {
                                 hideLoader();
                                 showLoader();
                                 debitLeave(fromDate, toDate, leaveCategoryFrom, leaveCategoryTo, leavingStation, leaveStationAdd, contactNumber, reason);
                             } else {
                                 hideLoader();
-                                CustomDialogHelper.showSuccessDialog(requireContext(), "Leave Applied! 🎉", "Your leave request has been" + " submitted successfully." + "\n\nYour manager will be" + " notified for approval.", () -> clearForm());
+                                CustomDialogHelper.showSuccessDialog(requireContext(), "Leave Applied! 🎉", "Your leave request has been submitted successfully.\n\nYour manager will be notified.", () -> clearForm());
                             }
                         } else {
                             hideLoader();
                             binding.btnSubmit.setEnabled(true);
-                            CustomDialogHelper.showErrorDialog(requireContext(), "Application Failed", "Server did not return a valid record." + "\nPlease try again.");
+                            CustomDialogHelper.showErrorDialog(requireContext(), "Application Failed", "Server did not return a valid record.\nPlease try again.");
                         }
                     } else {
                         hideLoader();
@@ -816,7 +1362,7 @@ public class LeavesFragment extends Fragment {
                 } catch (Exception e) {
                     hideLoader();
                     binding.btnSubmit.setEnabled(true);
-                    CustomDialogHelper.showErrorDialog(requireContext(), "Parsing Error", "Could not process server response." + "\n\n" + e.getMessage());
+                    CustomDialogHelper.showErrorDialog(requireContext(), "Parsing Error", "Could not process server response.\n\n" + e.getMessage());
                 }
             }
 
@@ -824,13 +1370,13 @@ public class LeavesFragment extends Fragment {
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 hideLoader();
                 binding.btnSubmit.setEnabled(true);
-                CustomDialogHelper.showErrorDialog(requireContext(), "Network Error", "Could not connect to the server." + "\nPlease check your internet" + " connection and try again.");
+                CustomDialogHelper.showErrorDialog(requireContext(), "Network Error", "Could not connect to the server.\nPlease check your internet connection.");
             }
         });
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // DEBIT LEAVE
+    // ✅ DEBIT LEAVE — Payload Updated as per Backend Spec
     // ══════════════════════════════════════════════════════════════════════
 
     private void debitLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason) {
@@ -840,16 +1386,16 @@ public class LeavesFragment extends Fragment {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
         String appliedDate = formatter.format(Instant.now());
 
+        boolean isShortLeave = SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName);
+
+        // ── Common fields ──────────────────────────────────────────────
         debitLeaveRequest.setFromDate(fromDate);
-        debitLeaveRequest.setSelectTypeFrom(leaveCategoryFrom);
         debitLeaveRequest.setToDate(toDate);
-        debitLeaveRequest.setSelectTypeTo(leaveCategoryTo);
         debitLeaveRequest.setLeaveName(selectedLeaveTypeName);
-        debitLeaveRequest.setLeavingStation(leavingStation);
-        debitLeaveRequest.setVacationAddress(leaveStationAdd);
         debitLeaveRequest.setLeavetype(selectedLeaveTypeId);
         debitLeaveRequest.setContactNumber(contactNumber);
         debitLeaveRequest.setReason(reason);
+        debitLeaveRequest.setVacationAddress(leaveStationAdd);
         debitLeaveRequest.setAppliedDate(appliedDate);
         debitLeaveRequest.setEmployee(empId);
         debitLeaveRequest.setEmpFirstName(empName);
@@ -860,8 +1406,54 @@ public class LeavesFragment extends Fragment {
         debitLeaveRequest.setReportingManager(reportingManagerEmail);
         debitLeaveRequest.setReportingManagerName(reportingManagerName);
         debitLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
-        debitLeaveRequest.setTDays(totalDays);
-        debitLeaveRequest.setFUsedDays(finalUsedDays);
+
+        // ── ✅ Convert Yes/No → true/false string ─────────────────────
+        String leavingStationPayload = "Yes".equalsIgnoreCase(leavingStation) ? "true" : "false";
+        debitLeaveRequest.setLeavingStation(leavingStationPayload);
+
+        // ── ✅ Lowercase leave planned ────────────────────────────────
+        debitLeaveRequest.setLeavePlanned(binding.spinnerLeavePlanned.getText().toString().toLowerCase(Locale.getDefault()));
+
+        // ── ✅ Cross Manager Fields (missing in old debit — now added) ──
+        debitLeaveRequest.setCrossManager(crossFunctionalManagerId);
+        debitLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
+        debitLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
+
+        // ── ✅ Add department (missing in old debit — now added) ──────
+        debitLeaveRequest.setDepartment(department);
+
+        // ── ✅ Short Leave vs Standard Leave payload handling ─────────
+        if (isShortLeave) {
+            debitLeaveRequest.setSelectTypeFrom(null);
+            debitLeaveRequest.setSelectTypeTo(null);
+
+            String rawStart = etStartTime.getText().toString();
+            String rawEnd = etEndTime.getText().toString();
+            debitLeaveRequest.setShortLeaveStartTime(convertTo24HourFormat(rawStart));
+            debitLeaveRequest.setShortLeaveEndTime(convertTo24HourFormat(rawEnd));
+
+            if (shortLeaveTimingEnabled) {
+                String slot = spinnerTimeSlot.getText().toString().toLowerCase(Locale.getDefault());
+                debitLeaveRequest.setShortLeaveTimingSlot(slot);
+            } else {
+                debitLeaveRequest.setShortLeaveTimingSlot(null);
+            }
+
+            // ✅ Short leave: tDays = 1, fUsedDays = 1 (as per payload)
+            debitLeaveRequest.setTDays(1);
+            debitLeaveRequest.setFUsedDays(1);
+        } else {
+            debitLeaveRequest.setSelectTypeFrom(leaveCategoryFrom);
+            debitLeaveRequest.setSelectTypeTo(leaveCategoryTo);
+            debitLeaveRequest.setShortLeaveStartTime("");
+            debitLeaveRequest.setShortLeaveEndTime("");
+            debitLeaveRequest.setShortLeaveTimingSlot(null);
+
+            debitLeaveRequest.setTDays((int) totalDays);
+            debitLeaveRequest.setFUsedDays((int) finalUsedDays);
+        }
+
+        Log.d(TAG, "📤 Debit Leave Payload:\n" + gson.toJson(debitLeaveRequest));
 
         Call<ResponseBody> debitLeave = APIClient.getInstance().debitLeave().LeavesUsedDebit("jwt " + authToken, debitLeaveRequest);
 
@@ -873,9 +1465,9 @@ public class LeavesFragment extends Fragment {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         response.body().string();
-                        CustomDialogHelper.showSuccessDialog(requireContext(), "Leave Applied! 🎉", "Your leave request has been submitted" + " and balance has been updated." + "\n\nYour manager will review" + " and approve your request.", () -> clearForm());
+                        CustomDialogHelper.showSuccessDialog(requireContext(), "Leave Applied! 🎉", "Your leave request has been submitted and balance updated.", () -> clearForm());
                     } else {
-                        CustomDialogHelper.showWarningDialog(requireContext(), "Partial Success", "Your leave was recorded successfully" + " but balance update failed." + "\n\nPlease contact HR to verify.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                        CustomDialogHelper.showWarningDialog(requireContext(), "Partial Success", "Leave recorded but balance update failed.\nPlease contact HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                             @Override
                             public void onConfirm() {
                                 clearForm();
@@ -888,7 +1480,7 @@ public class LeavesFragment extends Fragment {
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "debitLeave parse error: " + e.getMessage());
-                    CustomDialogHelper.showWarningDialog(requireContext(), "Partial Success", "Leave recorded but could not verify" + " balance update." + "\nPlease contact HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                    CustomDialogHelper.showWarningDialog(requireContext(), "Partial Success", "Leave recorded but could not verify balance.\nPlease contact HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                         @Override
                         public void onConfirm() {
                             clearForm();
@@ -905,7 +1497,7 @@ public class LeavesFragment extends Fragment {
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 hideLoader();
                 binding.btnSubmit.setEnabled(true);
-                CustomDialogHelper.showWarningDialog(requireContext(), "Partial Success", "Leave recorded but network error occurred" + " during balance update." + "\nPlease contact HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                CustomDialogHelper.showWarningDialog(requireContext(), "Partial Success", "Leave recorded but network error during balance update.\nPlease contact HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                     @Override
                     public void onConfirm() {
                         clearForm();
@@ -1004,6 +1596,16 @@ public class LeavesFragment extends Fragment {
             String selectedDate = dateFormat.format(calendar.getTime());
             editText.setText(selectedDate);
 
+            if (SHORT_LEAVE.equalsIgnoreCase(selectedLeaveType) && editText == etFromDate) {
+                etToDate.setText(selectedDate);
+
+                // Fetch dynamic Month usage on Date selection inside Short Leave Mode
+                SecurePrefManager pm = SecurePrefManager.getInstance(requireContext());
+                String authTokenN = pm.getString("authToken", "");
+                String employeeId = pm.getString("userId", "");
+                fetchMonthlyShortLeaveUsage(authTokenN, employeeId);
+            }
+
             if (editText == etToDate) {
                 validateDateRange();
                 calculateTotalDaysAndCheckLeaveLimit(selectedLeaveTypeName);
@@ -1031,7 +1633,7 @@ public class LeavesFragment extends Fragment {
                     }
                 } else {
                     if (fromDate != null && (fromDate.after(toDate) || fromDate.before(today))) {
-                        CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Date Range", "'From' date cannot be after 'To' date" + " or before today.");
+                        CustomDialogHelper.showErrorDialog(requireContext(), "Invalid Date Range", "'From' date cannot be after 'To' date or before today.");
                     }
                 }
             } catch (ParseException e) {
@@ -1097,22 +1699,21 @@ public class LeavesFragment extends Fragment {
     // UI HELPERS
     // ══════════════════════════════════════════════════════════════════════
 
-    /**
-     * Clears ONLY the leave type spinner and balance text.
-     * ✅ Keeps all other fields (dates, category, etc.) intact.
-     * Used when restricted holiday validation fails.
-     */
     public void clearLeaveTypeOnly() {
         binding.spinnerLeaveType.setText("", false);
         binding.balanceLeaveTextView.setText("");
+        etStartTime.setText("");
+        etEndTime.setText("");
+        spinnerTimeSlot.setText("", false);
+        llShortTimeContainer.setVisibility(View.GONE);
+        llTimeSlotContainer.setVisibility(View.GONE);
+        llToDateContainer.setVisibility(View.VISIBLE);
+        tilLeaveCategoryFrom.setVisibility(View.VISIBLE);
+        tilLeaveCategoryTo.setVisibility(View.VISIBLE);
         selectedLeaveTypeId = null;
         selectedLeaveTypeName = null;
     }
 
-    /**
-     * Clears ALL form fields completely.
-     * Used after successful leave submission or full reset.
-     */
     public void clearForm() {
         binding.etFromDate.setText("");
         binding.etToDate.setText("");
@@ -1126,6 +1727,16 @@ public class LeavesFragment extends Fragment {
         binding.balanceLeaveTextView.setText("");
         binding.tilLeaveStationAddress.setVisibility(View.GONE);
         binding.spinnerLeavePlanned.setText("");
+
+        etStartTime.setText("");
+        etEndTime.setText("");
+        spinnerTimeSlot.setText("", false);
+        llShortTimeContainer.setVisibility(View.GONE);
+        llTimeSlotContainer.setVisibility(View.GONE);
+        llToDateContainer.setVisibility(View.VISIBLE);
+        tilLeaveCategoryFrom.setVisibility(View.VISIBLE);
+        tilLeaveCategoryTo.setVisibility(View.VISIBLE);
+
         binding.btnSubmit.setEnabled(true);
         selectedLeaveTypeId = null;
         selectedLeaveTypeName = null;

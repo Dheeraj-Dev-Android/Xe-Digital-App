@@ -24,6 +24,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- CARD 1: LEAVE DURATION -->
+            <!-- ═══════════════════════════════════════════════════ -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,7 +65,6 @@
                             android:textColor="@color/white"
                             android:textSize="17sp"
                             android:textStyle="bold" />
-
                     </LinearLayout>
 
                     <!-- From Date + Category Row -->
@@ -119,18 +121,17 @@
                                 android:id="@+id/spinnerLeaveCategoryFrom"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:contentDescription="Select leave category for from date"
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:hint="Type"
                                 android:inputType="none"
                                 android:textColor="@color/primary_text"
                                 android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
-
                     </LinearLayout>
 
-                    <!-- To Date + Category Row -->
+                    <!-- To Date + Category Row (Wrapped for hiding) -->
                     <LinearLayout
+                        android:id="@+id/llToDateContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:baselineAligned="false"
@@ -182,19 +183,118 @@
                                 android:id="@+id/spinnerLeaveCategoryTo"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:contentDescription="Select leave category for to date"
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:hint="Type"
                                 android:inputType="none"
                                 android:textColor="@color/primary_text"
                                 android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
+                    <!-- ✅ NEW: Time Slot Dropdown (Morning / Evening) -->
+                    <LinearLayout
+                        android:id="@+id/llTimeSlotContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilTimeSlot"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:boxBackgroundColor="@color/surface_color"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxStrokeColor="@color/colorPrimaryVariant">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerTimeSlot"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:hint="Time Slot"
+                                android:inputType="none"
+                                android:textColor="@color/primary_text"
+                                android:textSize="13sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Short Leave Time Container (Start / End) -->
+                    <LinearLayout
+                        android:id="@+id/llShortTimeContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilStartTime"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="1"
+                            app:boxBackgroundColor="@color/surface_color"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxStrokeColor="@color/colorPrimaryVariant">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etStartTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:hint="Start Time"
+                                android:textColor="@color/primary_text"
+                                android:textColorHint="@color/secondary_text"
+                                android:textSize="13sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEndTime"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="1"
+                            app:boxBackgroundColor="@color/surface_color"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxStrokeColor="@color/colorPrimaryVariant">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etEndTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:hint="End Time"
+                                android:textColor="@color/primary_text"
+                                android:textColorHint="@color/secondary_text"
+                                android:textSize="13sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- CARD 2: LEAVE TYPE & REASON -->
+            <!-- ═══════════════════════════════════════════════════ -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -210,7 +310,6 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
-                    <!-- Section Header -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -231,10 +330,8 @@
                             android:textColor="@color/primary_text"
                             android:textSize="17sp"
                             android:textStyle="bold" />
-
                     </LinearLayout>
 
-                    <!-- Leave Type Dropdown -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
@@ -249,14 +346,12 @@
                             android:id="@+id/spinnerLeaveType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:contentDescription="Select type of leave"
                             android:fontFamily="@font/quicksand_font_family"
                             android:hint="Type of Leave"
                             android:inputType="none"
                             android:textColor="@color/primary_text" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Balance Leave Info -->
                     <TextView
                         android:id="@+id/balanceLeaveTextView"
                         android:layout_width="match_parent"
@@ -269,7 +364,6 @@
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
-                    <!-- Reason for Leave -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
@@ -296,10 +390,12 @@
                             android:textColor="@color/primary_text"
                             android:textColorHint="@color/secondary_text" />
                     </com.google.android.material.textfield.TextInputLayout>
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- CARD 3: STATION INFORMATION -->
+            <!-- ═══════════════════════════════════════════════════ -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -315,7 +411,6 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
-                    <!-- Section Header -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -336,10 +431,8 @@
                             android:textColor="@color/primary_text"
                             android:textSize="17sp"
                             android:textStyle="bold" />
-
                     </LinearLayout>
 
-                    <!-- Leaving Station Dropdown -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
@@ -355,14 +448,12 @@
                             android:id="@+id/spinnerLeavingStation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:contentDescription="Select leaving station"
                             android:fontFamily="@font/quicksand_font_family"
                             android:hint="Leaving Station"
                             android:inputType="none"
                             android:textColor="@color/primary_text" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Leave Station Address -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilLeaveStationAddress"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -389,10 +480,12 @@
                             android:textColor="@color/primary_text"
                             android:textColorHint="@color/secondary_text" />
                     </com.google.android.material.textfield.TextInputLayout>
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- CARD 4: CONTACT & PLANNING -->
+            <!-- ═══════════════════════════════════════════════════ -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -408,7 +501,6 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
-                    <!-- Section Header -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -429,10 +521,8 @@
                             android:textColor="@color/primary_text"
                             android:textSize="17sp"
                             android:textStyle="bold" />
-
                     </LinearLayout>
 
-                    <!-- Contact Number -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
@@ -459,7 +549,6 @@
                             android:textColorHint="@color/secondary_text" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Leave Planned Dropdown -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
@@ -474,16 +563,17 @@
                             android:id="@+id/spinnerLeavePlanned"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:contentDescription="Select if leave is planned"
                             android:fontFamily="@font/quicksand_font_family"
                             android:hint="Leave Planned"
                             android:inputType="none"
                             android:textColor="@color/primary_text" />
                     </com.google.android.material.textfield.TextInputLayout>
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- BUTTONS -->
+            <!-- ═══════════════════════════════════════════════════ -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

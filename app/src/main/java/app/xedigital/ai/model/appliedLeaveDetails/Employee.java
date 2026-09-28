@@ -1,4 +1,4 @@
-package app.xedigital.ai.model.profile;
+package app.xedigital.ai.model.appliedLeaveDetails;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -12,23 +12,23 @@ public class Employee {
     @SerializedName("fatherName")
     private Object fatherName;
 
-    @SerializedName("components")
-    private List<ComponentsItem> components;
-
     @SerializedName("firstname")
     private String firstname;
 
+    @SerializedName("components")
+    private List<ComponentsItem> components;
+
     @SerializedName("isVerified")
     private boolean isVerified;
+
+    @SerializedName("shift")
+    private String shift;
 
     @SerializedName("addpayroll")
     private boolean addpayroll;
 
     @SerializedName("totalMonthlySalary")
-    private double totalMonthlySalary;
-
-    @SerializedName("shift")
-    private Shift shift;
+    private int totalMonthlySalary;
 
     @SerializedName("joiningDate")
     private String joiningDate;
@@ -40,7 +40,7 @@ public class Employee {
     private String createdAt;
 
     @SerializedName("ctc")
-    private double ctc;
+    private int ctc;
 
     @SerializedName("bu")
     private String bu;
@@ -54,17 +54,17 @@ public class Employee {
     @SerializedName("isHROrAdmin")
     private boolean isHROrAdmin;
 
-    @SerializedName("epf")
-    private boolean epf;
-
     @SerializedName("company")
     private String company;
+
+    @SerializedName("epf")
+    private boolean epf;
 
     @SerializedName("state")
     private Object state;
 
     @SerializedName("department")
-    private Department department;
+    private String department;
 
     @SerializedName("profileImageUrl")
     private String profileImageUrl;
@@ -79,13 +79,13 @@ public class Employee {
     private Object pincode;
 
     @SerializedName("reportingManager")
-    private ReportingManager reportingManager;
-
-    @SerializedName("totalYearlySalary")
-    private Object totalYearlySalary;
+    private String reportingManager;
 
     @SerializedName("address")
     private Object address;
+
+    @SerializedName("totalYearlySalary")
+    private Object totalYearlySalary;
 
     @SerializedName("level")
     private String level;
@@ -112,7 +112,7 @@ public class Employee {
     private String employeeType;
 
     @SerializedName("partner")
-    private Object partner;
+    private String partner;
 
     @SerializedName("grade")
     private String grade;
@@ -120,14 +120,17 @@ public class Employee {
     @SerializedName("esi")
     private boolean esi;
 
-    @SerializedName("designation")
-    private String designation;
-
     @SerializedName("_id")
     private String id;
 
+    @SerializedName("designation")
+    private String designation;
+
+    @SerializedName("fullname")
+    private String fullname;
+
     @SerializedName("crossmanager")
-    private Crossmanager crossmanager;
+    private String crossmanager;
 
     @SerializedName("uanno")
     private Object uanno;
@@ -143,28 +146,28 @@ public class Employee {
         return fatherName;
     }
 
-    public List<ComponentsItem> getComponents() {
-        return components;
-    }
-
     public String getFirstname() {
         return firstname;
+    }
+
+    public List<ComponentsItem> getComponents() {
+        return components;
     }
 
     public boolean isIsVerified() {
         return isVerified;
     }
 
+    public String getShift() {
+        return shift;
+    }
+
     public boolean isAddpayroll() {
         return addpayroll;
     }
 
-    public double getTotalMonthlySalary() {
+    public int getTotalMonthlySalary() {
         return totalMonthlySalary;
-    }
-
-    public Shift getShift() {
-        return shift;
     }
 
     public String getJoiningDate() {
@@ -179,7 +182,7 @@ public class Employee {
         return createdAt;
     }
 
-    public double getCtc() {
+    public int getCtc() {
         return ctc;
     }
 
@@ -199,19 +202,19 @@ public class Employee {
         return isHROrAdmin;
     }
 
-    public boolean isEpf() {
-        return epf;
-    }
-
     public String getCompany() {
         return company;
+    }
+
+    public boolean isEpf() {
+        return epf;
     }
 
     public Object getState() {
         return state;
     }
 
-    public Department getDepartment() {
+    public String getDepartment() {
         return department;
     }
 
@@ -231,16 +234,16 @@ public class Employee {
         return pincode;
     }
 
-    public ReportingManager getReportingManager() {
+    public String getReportingManager() {
         return reportingManager;
-    }
-
-    public Object getTotalYearlySalary() {
-        return totalYearlySalary;
     }
 
     public Object getAddress() {
         return address;
+    }
+
+    public Object getTotalYearlySalary() {
+        return totalYearlySalary;
     }
 
     public String getLevel() {
@@ -275,7 +278,7 @@ public class Employee {
         return employeeType;
     }
 
-    public Object getPartner() {
+    public String getPartner() {
         return partner;
     }
 
@@ -287,15 +290,19 @@ public class Employee {
         return esi;
     }
 
-    public String getDesignation() {
-        return designation;
-    }
-
     public String getId() {
         return id;
     }
 
-    public Crossmanager getCrossmanager() {
+    public String getDesignation() {
+        return designation;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public String getCrossmanager() {
         return crossmanager;
     }
 

@@ -37,6 +37,7 @@ googleFirebaseFirebasePerf = "2.0.2"
 roomCompiler = "2.8.4"
 legacySupportV4Version = "1.0.0"
 firebaseInappmessagingDisplay = "22.0.3"
+scenecore = "1.0.0-rc01"
 
 [libraries]
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
@@ -88,6 +89,7 @@ engage-core = { group = "com.google.android.engage", name = "engage-core", versi
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4Version" }
 firebase-inappmessaging-display = { group = "com.google.firebase", name = "firebase-inappmessaging-display", version.ref = "firebaseInappmessagingDisplay" }
+scenecore = { group = "androidx.xr.scenecore", name = "scenecore", version.ref = "scenecore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
