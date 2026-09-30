@@ -12,6 +12,32 @@
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_person"
         android:title="@string/menu_profile" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_attendance_menu"
+            android:icon="@drawable/ic_collections_bookmark"
+            android:title="@string/menu_attendance" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_attendance"
+            android:title="@string/view_attendance"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_addAttendanceFragment"
+            android:title="@string/menu_add_attendance"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_regularizeAppliedFragment"
+            android:title="@string/regularize_applied"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_pendingApprovalFragment"
+            android:title="@string/regularize_pending_approval"
+            android:visible="false" />
+
+    </group>
 
     <group android:checkableBehavior="single">
         <item
@@ -36,34 +62,6 @@
             android:id="@+id/nav_team_member_timesheet"
             android:title="@string/team_dcr"
             android:visible="false" />
-    </group>
-
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_attendance_menu"
-            android:icon="@drawable/ic_collections_bookmark"
-            android:title="@string/menu_attendance" />
-    </group>
-
-
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_attendance"
-            android:title="@string/view_attendance"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_addAttendanceFragment"
-            android:title="@string/menu_add_attendance"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_regularizeAppliedFragment"
-            android:title="@string/regularize_applied"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_pendingApprovalFragment"
-            android:title="@string/regularize_pending_approval"
-            android:visible="false" />
-
     </group>
 
     <group android:checkableBehavior="single">

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -37,6 +38,8 @@ import app.xedigital.ai.utills.SecurePrefManager;
 public class MeetingRoomBookedSlotsFragment extends Fragment {
 
     private static final String TAG = "BookedSlotsFragment";
+
+    // Aligns with argument definitions in navigation graph
     private static final String ARG_ROOM_ID = "arg_room_id";
     private static final String ARG_ROOM_NAME = "arg_room_name";
 
@@ -133,23 +136,19 @@ public class MeetingRoomBookedSlotsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh list when user returns from booking form
         if (authToken != null && roomId != null) {
             mViewModel.fetchBookedSlots(authToken, roomId);
         }
     }
 
     private void setupClickListeners() {
-        // Navigate to the Book Meeting Room Fragment
         btnBookMeetingRoom.setOnClickListener(v -> navigateToBookingForm());
-
         btnFilter.setOnClickListener(v -> showFilterBottomSheet());
-
         chipActiveFilter.setOnCloseIconClickListener(v -> clearFilter());
     }
 
     // ─────────────────────────────────────────────
-    // Navigate to Booking Form
+    // Navigate to Booking Form (Refactored)
     // ─────────────────────────────────────────────
     private void navigateToBookingForm() {
         if (roomId == null || roomId.trim().isEmpty()) {
@@ -157,11 +156,14 @@ public class MeetingRoomBookedSlotsFragment extends Fragment {
             return;
         }
 
-        BookMeetingRoomFragment fragment = BookMeetingRoomFragment.newInstance(roomId, roomName);
+        // Map arguments to pass into the form fragment
+        Bundle args = new Bundle();
+        args.putString("arg_room_id", roomId);
+        args.putString("arg_room_name", roomName);
 
-        // Replace with the container ID used in your Activity
-        // Common: R.id.nav_host_fragment_content_main OR R.id.fragment_container
-        getParentFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right, android.R.anim.slide_in_left, android.R.anim.slide_out_right).replace(((ViewGroup) requireView().getParent()).getId(), fragment).addToBackStack("BookMeetingRoom").commit();
+        // Execute Jetpack navigation cleanly
+        Navigation.findNavController(requireView())
+                .navigate(R.id.action_booked_slots_to_book_meeting_room, args);
     }
 
     private void setupObservers() {
@@ -192,9 +194,6 @@ public class MeetingRoomBookedSlotsFragment extends Fragment {
         });
     }
 
-    // ─────────────────────────────────────────────
-    // Filter BottomSheet
-    // ─────────────────────────────────────────────
     private void showFilterBottomSheet() {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View sheet = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_filter_meeting, null);
@@ -317,9 +316,6 @@ public class MeetingRoomBookedSlotsFragment extends Fragment {
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Filtering Logic
-    // ─────────────────────────────────────────────
     private void applyFilterAndRender() {
         if (allSlots == null || allSlots.isEmpty()) {
             showEmptyState("No booked slots found.");

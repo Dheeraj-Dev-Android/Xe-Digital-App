@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@+id/nav_dashboard">
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/nav_dashboard">
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  DASHBOARD                                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_dashboard"
         android:name="app.xedigital.ai.ui.dashboard.DashboardFragment"
@@ -13,9 +16,11 @@
         <action
             android:id="@+id/action_nav_dashboard_to_nav_profile"
             app:destination="@id/nav_profile" />
-
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  ATTENDANCE                                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_attendance"
         android:name="app.xedigital.ai.ui.attendance.AttendanceFragment"
@@ -33,7 +38,6 @@
         <action
             android:id="@+id/action_nav_attendance_to_nav_add_attendance_fragment"
             app:destination="@id/nav_addAttendanceFragment" />
-
     </fragment>
 
     <fragment
@@ -44,7 +48,6 @@
         <action
             android:id="@+id/action_nav_viewAttendanceFragment_to_nav_attendance"
             app:destination="@id/nav_attendance" />
-
     </fragment>
 
     <fragment
@@ -56,6 +59,7 @@
             android:id="@+id/action_nav_add_attendance_to_nav_View_add_attendance_fragment"
             app:destination="@id/nav_View_add_attendance_fragment" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_View_add_attendance_fragment"
         android:name="app.xedigital.ai.ui.attendance.ViewAddedAttendanceFragment"
@@ -67,8 +71,8 @@
         <action
             android:id="@+id/action_nav_View_add_attendance_fragment_to_nav_detail_view_added_attendanceFragment"
             app:destination="@id/nav_detail_view_added_attendanceFragment" />
-
     </fragment>
+
     <fragment
         android:id="@+id/nav_detail_view_added_attendanceFragment"
         android:name="app.xedigital.ai.ui.attendance.DetailViewAddAttendanceFragment"
@@ -77,9 +81,11 @@
         <action
             android:id="@+id/action_nav_detail_view_added_attendanceFragment_to_nav_View_add_attendance_fragment"
             app:destination="@id/nav_View_add_attendance_fragment" />
-
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  REGULARIZE ATTENDANCE                                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/regularizeFragment"
         android:name="app.xedigital.ai.ui.regularize_attendance.RegularizeFragment"
@@ -87,7 +93,7 @@
         tools:layout="@layout/fragment_regularize">
         <action
             android:id="@+id/action_regularizeFragment_to_nav_attendance"
-            app:destination="@id/regularizeFragment" />
+            app:destination="@id/nav_attendance" />
         <action
             android:id="@+id/action_regularizeFragment_to_nav_regularizeAppliedFragment"
             app:destination="@id/nav_regularizeAppliedFragment" />
@@ -104,12 +110,15 @@
             android:id="@+id/action_nav_regularizeAppliedFragment_to_nav_regularizeViewFragment"
             app:destination="@id/nav_regularizeViewFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_regularizeViewFragment"
         android:name="app.xedigital.ai.ui.regularize_attendance.RegularizeViewFragment"
-        android:label="Regularize View">
+        android:label="Regularize View" />
 
-    </fragment>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  ATTENDANCE APPROVALS                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_cross_approval_attendance"
         android:name="app.xedigital.ai.ui.regularize_attendance.CrossFMAttendanceApprovalFragment"
@@ -121,6 +130,7 @@
             android:id="@+id/action_nav_cross_approval_attendance_to_nav_pendingCFMAttendanceApprovalFragment"
             app:destination="@id/nav_pendingCFMAttendanceApprovalFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_pendingCFMAttendanceApprovalFragment"
         android:name="app.xedigital.ai.ui.regularize_attendance.PendingCMFAttendanceApproveFragment"
@@ -128,7 +138,6 @@
         <action
             android:id="@+id/action_nav_pendingCFMAttendanceApprovalFragment_to_nav_cross_approval_attendance"
             app:destination="@id/nav_cross_approval_attendance" />
-
     </fragment>
 
     <fragment
@@ -143,17 +152,20 @@
             android:id="@+id/action_nav_pendingApprovalFragment_to_nav_cross_approval_attendance"
             app:destination="@id/nav_cross_approval_attendance" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_pendingApprovalViewFragment"
         android:name="app.xedigital.ai.ui.regularize_attendance.PendingApprovalViewFragment"
         android:label="Pending Approval View"
         tools:layout="@layout/fragment_pending_approval_view">
-
         <action
             android:id="@+id/action_nav_pendingApprovalViewFragment_to_nav_pendingApprovalFragment"
-            app:destination="@id/nav_attendance" />
+            app:destination="@id/nav_pendingApprovalFragment" />
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PROFILE                                                        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_profile"
         android:name="app.xedigital.ai.ui.profile.ProfileFragment"
@@ -177,6 +189,9 @@
             app:destination="@id/nav_profile" />
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  LEAVES                                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_leaves"
         android:name="app.xedigital.ai.ui.leaves.LeavesFragment"
@@ -196,6 +211,7 @@
             android:id="@+id/action_nav_leaves_to_nav_attendance"
             app:destination="@id/nav_attendance" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_applied_leaves"
         android:name="app.xedigital.ai.ui.leaves.AppliedLeaveFragment"
@@ -205,6 +221,7 @@
             android:id="@+id/action_nav_applied_leaves_to_nav_view_applied_leaves"
             app:destination="@id/nav_view_applied_leaves" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_view_applied_leaves"
         android:name="app.xedigital.ai.ui.leaves.AppliedViewFragment"
@@ -217,6 +234,10 @@
             android:id="@+id/action_nav_view_applied_leaves_to_nav_cross_approval_leave"
             app:destination="@id/nav_cross_approval_leave" />
     </fragment>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  LEAVES APPROVALS                                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_approve_leaves"
         android:name="app.xedigital.ai.ui.leaves.ApproveLeaveFragment"
@@ -229,6 +250,7 @@
             android:id="@+id/action_nav_approve_leaves_to_nav_cross_approval_leave"
             app:destination="@id/nav_cross_approval_leave" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_approve_leave_data"
         android:name="app.xedigital.ai.ui.leaves.PendingLeaveApproveFragment"
@@ -265,6 +287,9 @@
             app:destination="@id/nav_cross_approval_leave" />
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  HOLIDAYS                                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_holidays"
         android:name="app.xedigital.ai.ui.holidays.HolidaysFragment"
@@ -275,6 +300,9 @@
             app:destination="@id/nav_leaves" />
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  TIMESHEET / DCR                                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_dcr"
         android:name="app.xedigital.ai.ui.timesheet.DcrFragment"
@@ -307,6 +335,10 @@
             android:id="@+id/action_nav_selected_Timesheet_to_nav_dcr"
             app:destination="@id/nav_dcr" />
     </fragment>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  POLICY                                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_policy"
         android:name="app.xedigital.ai.ui.policy.PolicyFragment"
@@ -317,15 +349,14 @@
             app:destination="@id/nav_dcr" />
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  SHIFTS                                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_shifts"
         android:name="app.xedigital.ai.ui.shifts.ShiftsFragment"
         android:label="@string/menu_shifts"
         tools:layout="@layout/fragment_shifts">
-
-        <!--        <action-->
-        <!--            android:id="@+id/action_nav_shifts_to_nav_policy"-->
-        <!--            app:destination="@id/nav_policy" />-->
         <action
             android:id="@+id/action_nav_shifts_to_nav_shift_applied"
             app:destination="@id/nav_shift_applied" />
@@ -342,8 +373,8 @@
         <action
             android:id="@+id/action_nav_shift_applied_to_nav_shifts"
             app:destination="@id/nav_shifts" />
-
     </fragment>
+
     <fragment
         android:id="@+id/nav_shift_approve"
         android:name="app.xedigital.ai.ui.shifts.ShiftApproveFragment"
@@ -352,8 +383,11 @@
         <action
             android:id="@+id/action_nav_shift_approve_to_nav_shifts"
             app:destination="@id/nav_shifts" />
-
     </fragment>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  CLAIM MANAGEMENT                                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_claim_management"
         android:name="app.xedigital.ai.ui.claim_management.ClaimManagementFragment"
@@ -369,6 +403,7 @@
             android:id="@+id/action_nav_claim_management_to_nav_approve_claim"
             app:destination="@id/nav_approve_claim" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_view_claim"
         android:name="app.xedigital.ai.ui.claim_management.ViewClaimFragment"
@@ -377,13 +412,14 @@
         <action
             android:id="@+id/action_nav_view_claim_to_nav_claim_details"
             app:destination="@id/nav_claim_details" />
-
     </fragment>
+
     <fragment
         android:id="@+id/nav_claim_details"
         android:name="app.xedigital.ai.ui.claim_management.ClaimDetailsFragment"
         android:label="Claim Details"
         tools:layout="@layout/fragment_claim_details" />
+
     <fragment
         android:id="@+id/nav_approve_claim"
         android:name="app.xedigital.ai.ui.claim_management.ApproveClaimFragment"
@@ -393,33 +429,29 @@
             android:id="@+id/action_nav_approve_claim_to_nav_approve_claim_details"
             app:destination="@id/nav_approve_claim_details" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_approve_claim_details"
         android:name="app.xedigital.ai.ui.claim_management.ApproveClaimDetailsFragment"
         android:label="Approve Claim Details"
         tools:layout="@layout/fragment_approve_claim_details" />
 
-    <fragment
-        android:id="@+id/nav_meeting_room"
-        android:name="app.xedigital.ai.ui.mrm.MeetingRoomFragment"
-        android:label="@string/menu_meeting_room"
-        tools:layout="@layout/fragment_meeting_room">
-        <action
-            android:id="@+id/action_nav_meeting_room_to_nav_dashboard"
-            app:destination="@id/nav_dashboard" />
-    </fragment>
-
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PAYROLL                                                        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_payroll"
         android:name="app.xedigital.ai.ui.payroll.PayrollFragment"
         android:label="@string/menu_payroll"
         tools:layout="@layout/fragment_payroll">
-
         <action
             android:id="@+id/action_nav_payroll_to_nav_claim_management"
             app:destination="@id/nav_claim_management" />
     </fragment>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  DOCUMENTS                                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_documents"
         android:name="app.xedigital.ai.ui.document_upload.ViewDocumentFragment"
@@ -429,6 +461,7 @@
             android:id="@+id/action_nav_documents_to_nav_document_upload"
             app:destination="@id/nav_document_upload" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_document_upload"
         android:name="app.xedigital.ai.ui.document_upload.DocumentUploadFragment"
@@ -437,8 +470,11 @@
         <action
             android:id="@+id/action_nav_document_upload_to_nav_documents"
             app:destination="@id/nav_documents" />
-
     </fragment>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  VISITOR MANAGEMENT (VMS)                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_vms"
         android:name="app.xedigital.ai.ui.vms.VmsFragment"
@@ -446,11 +482,10 @@
         tools:layout="@layout/fragment_v_m_s">
         <action
             android:id="@+id/action_nav_vms_to_nav_preApproved_visitors"
-            app:destination="@+id/nav_preApproved_visitors" />
+            app:destination="@id/nav_preApproved_visitors" />
         <action
             android:id="@+id/action_nav_vms_to_nav_visitor_details"
-            app:destination="@+id/nav_visitor_details" />
-
+            app:destination="@id/nav_visitor_details" />
     </fragment>
 
     <fragment
@@ -460,9 +495,9 @@
         tools:layout="@layout/fragment_visitor_pre_approved">
         <action
             android:id="@+id/action_nav_preApproved_visitors_to_nav_vms"
-            app:destination="@+id/nav_vms" />
-
+            app:destination="@id/nav_vms" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_visitor_details"
         android:name="app.xedigital.ai.ui.vms.VisitorsDetailFragment"
@@ -470,28 +505,12 @@
         tools:layout="@layout/fragment_visitors_detail">
         <action
             android:id="@+id/action_nav_visitor_details_to_nav_vms"
-            app:destination="@+id/nav_vms" />
+            app:destination="@id/nav_vms" />
     </fragment>
 
-    <fragment
-        android:id="@+id/nav_about_us"
-        android:name="app.xedigital.ai.ui.about_application.AboutApplicationFragment"
-        android:label="About XeDigital.ai"
-        tools:layout="@layout/fragment_about_application">
-        <action
-            android:id="@+id/action_nav_about_us_to_nav_settings"
-            app:destination="@id/nav_settings" />
-    </fragment>
-    <fragment
-        android:id="@+id/nav_permission"
-        android:name="app.xedigital.ai.ui.permission.PermissionFragment"
-        android:label="Permissions"
-        tools:layout="@layout/fragment_permission">
-        <action
-            android:id="@+id/action_nav_permission_to_nav_settings"
-            app:destination="@id/nav_settings" />
-    </fragment>
-
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  MANAGER & TEAM Menu Mappings                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/navManager_attendance_menu"
         android:name="app.xedigital.ai.ui.AttendanceByManager.AttendanceByManagerFragment"
@@ -499,14 +518,15 @@
         tools:layout="@layout/fragment_attendance_by_manager">
         <action
             android:id="@+id/action_navManager_attendance_menu_to_nav_pendingApprovalFragment"
-            app:destination="@+id/nav_pendingApprovalFragment" />
-
+            app:destination="@id/nav_pendingApprovalFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/navTeam_member"
         android:name="app.xedigital.ai.ui.TeamMember.TeamMemberFragment"
         android:label="Team Members"
         tools:layout="@layout/fragment_team_member" />
+
     <fragment
         android:id="@+id/nav_team_member_timesheet"
         android:name="app.xedigital.ai.ui.teamTimesheet.TeamTimesheetFragment"
@@ -518,6 +538,10 @@
         android:name="app.xedigital.ai.ui.TeamLeaves.TeamLeavesFragment"
         android:label="Team Leaves"
         tools:layout="@layout/fragment_team_leaves" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  ONBOARDING                                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_onboarding"
         android:name="app.xedigital.ai.ui.onboarding.EmployeeOnboardingFragment"
@@ -539,6 +563,10 @@
             android:id="@+id/action_nav_onboarding_details_to_nav_onboarding"
             app:destination="@id/nav_onboarding" />
     </fragment>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  SETTINGS                                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <fragment
         android:id="@+id/nav_settings"
         android:name="app.xedigital.ai.ui.settings.SettingsFragment"
@@ -551,4 +579,71 @@
             android:id="@+id/action_nav_settings_to_nav_about_us"
             app:destination="@id/nav_about_us" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_about_us"
+        android:name="app.xedigital.ai.ui.about_application.AboutApplicationFragment"
+        android:label="About XeDigital.ai"
+        tools:layout="@layout/fragment_about_application">
+        <action
+            android:id="@+id/action_nav_about_us_to_nav_settings"
+            app:destination="@id/nav_settings" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_permission"
+        android:name="app.xedigital.ai.ui.permission.PermissionFragment"
+        android:label="Permissions"
+        tools:layout="@layout/fragment_permission">
+        <action
+            android:id="@+id/action_nav_permission_to_nav_settings"
+            app:destination="@id/nav_settings" />
+    </fragment>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  MEETING ROOM MANAGEMENT (MRM) - New Integrated Flow            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <fragment
+        android:id="@+id/nav_meeting_room"
+        android:name="app.xedigital.ai.ui.mrm.MeetingRoomFragment"
+        android:label="@string/menu_meeting_room"
+        tools:layout="@layout/fragment_meeting_room">
+        <action
+            android:id="@+id/action_meeting_room_to_booked_slots"
+            app:destination="@id/nav_booked_slots" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_booked_slots"
+        android:name="app.xedigital.ai.ui.mrm.MeetingRoomBookedSlotsFragment"
+        android:label="Booked Slots"
+        tools:layout="@layout/fragment_meeting_room_booked_slots">
+        <action
+            android:id="@+id/action_booked_slots_to_book_meeting_room"
+            app:destination="@id/nav_book_meeting_room" />
+
+        <argument
+            android:name="arg_room_id"
+            app:argType="string" />
+        <argument
+            android:name="arg_room_name"
+            android:defaultValue="Meeting Room"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_book_meeting_room"
+        android:name="app.xedigital.ai.ui.mrm.BookMeetingRoomFragment"
+        android:label="Book Meeting Room"
+        tools:layout="@layout/fragment_book_meeting_room">
+
+        <argument
+            android:name="arg_room_id"
+            app:argType="string" />
+        <argument
+            android:name="arg_room_name"
+            android:defaultValue="Meeting Room"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

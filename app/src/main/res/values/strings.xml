@@ -115,7 +115,7 @@
     <string name="team_attendance">Team Attendance</string>
     <string name="team_member_details">Team Member Details</string>
     <string name="team_member">Team Members</string>
-    <string name="menu_meeting_room">Meeting Room</string>
+    <string name="menu_meeting_room">Book Meeting Room</string>
     <string name="team_dcr">Team Member Timesheet</string>
 
     <string name="greeting_default">Welcome </string>

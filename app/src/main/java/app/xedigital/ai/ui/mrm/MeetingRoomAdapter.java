@@ -1,5 +1,6 @@
 package app.xedigital.ai.ui.mrm;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,8 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -83,9 +83,9 @@ public class MeetingRoomAdapter extends RecyclerView.Adapter<MeetingRoomAdapter.
             if (imageUrl != null && !imageUrl.trim().isEmpty()) {
                 Glide.with(itemView.getContext())
                         .load(imageUrl)
-                        .format(DecodeFormat.PREFER_RGB_565) // Uses 50% less RAM than default ARGB_8888
-                        .override(600, 300)                  // Downscales big API images to exact card size
-                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE) // Cache the downscaled version only
+                        .format(DecodeFormat.PREFER_RGB_565)
+                        .override(600, 300)
+                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                         .placeholder(R.drawable.ic_meeting_room)
                         .error(R.drawable.ic_meeting_room)
                         .into(imageRoom);
@@ -97,15 +97,14 @@ public class MeetingRoomAdapter extends RecyclerView.Adapter<MeetingRoomAdapter.
                 String roomId = item.getId() != null ? item.getId() : "";
                 String roomName = item.getRoomName() != null ? item.getRoomName() : "Room";
 
-                Fragment fragment = MeetingRoomBookedSlotsFragment.newInstance(roomId, roomName);
+                // Create navigation argument bundle mapping the graph parameters
+                Bundle args = new Bundle();
+                args.putString("arg_room_id", roomId);
+                args.putString("arg_room_name", roomName);
 
-                // If you're using Fragment navigation:
-                ((FragmentActivity) itemView.getContext())
-                        .getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.nav_host_fragment_content_main, fragment)  // ← your container ID
-                        .addToBackStack(null)
-                        .commit();
+                // Safe, clean Jetpack navigation execution
+                Navigation.findNavController(v)
+                        .navigate(R.id.action_meeting_room_to_booked_slots, args);
             });
         }
     }
