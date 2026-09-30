@@ -12,8 +12,4 @@ public class Data {
     public List<EmployeePunchDataItem> getEmployeePunchData() {
         return employeePunchData;
     }
-
-    public void setEmployeePunchData(List<EmployeePunchDataItem> employeePunchData) {
-        this.employeePunchData = employeePunchData;
-    }
 }

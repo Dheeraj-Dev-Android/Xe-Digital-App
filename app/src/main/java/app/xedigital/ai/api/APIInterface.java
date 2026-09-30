@@ -3,6 +3,7 @@ package app.xedigital.ai.api;
 import app.xedigital.ai.model.AttandanceByManager.AttandanceByManagerResponse;
 import app.xedigital.ai.model.AttendanceLog.AttendanceLogResponse;
 import app.xedigital.ai.model.EmployeeByBusinessUnit.EmployeeByBusinessUnitResponse;
+import app.xedigital.ai.model.MeetingRoomBookedSlotsResponse.MeetingRoomBookedSlotsResponse;
 import app.xedigital.ai.model.ShortLeaveDetails.GetShortLeaveDetails;
 import app.xedigital.ai.model.TeamLeave.TeamLeaveResponse;
 import app.xedigital.ai.model.TeamMember.TeamMemberResponse;
@@ -46,6 +47,7 @@ import app.xedigital.ai.model.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.model.leaveUpdateStatus.LeaveUpdateRequest;
 import app.xedigital.ai.model.leaves.LeavesResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
+import app.xedigital.ai.model.meetingRoom.MeetingRoomBookingRequest;
 import app.xedigital.ai.model.meetingRoom.MeetingRoomResponse;
 import app.xedigital.ai.model.policy.PolicyResponse;
 import app.xedigital.ai.model.preApprovedVisitorRequest.PreApprovedVisitorRequest;
@@ -238,6 +240,10 @@ public interface APIInterface {
     @GET("employees/getShortLeaveDetails")
     Call<GetShortLeaveDetails> getShortLeaveDetails(@Header("Authorization") String authToken);
 
+    //    https://app.xedigital.ai/api/v1/meetings/meetingRoomBookedSlots/6a4c8bbb3bfce43a90de5748
+    @GET("meetings/meetingRoomBookedSlots/{roomId}")
+    Call<MeetingRoomBookedSlotsResponse> getMeetingRoomBookedSlots(@Header("Authorization") String authToken, @Path("roomId") String roomId);
+
     //  POST APIs
     @POST("claims/food")
     retrofit2.Call<ResponseBody> FoodClaimApi(@Header("Authorization") String token, @Body ExpenseRequest foodRequest);
@@ -283,6 +289,10 @@ public interface APIInterface {
 
     @POST("shifts/shiftChange")
     retrofit2.Call<ResponseBody> ShiftChange(@Header("Authorization") String token, @Body ShiftUpdateRequest requestBody);
+
+    //    https://app.xedigital.ai/api/v1/meetings/meetingroomBooking
+    @POST("meetings/meetingroomBooking")
+    retrofit2.Call<ResponseBody> MeetingRoomBooking(@Header("Authorization") String token, @Body MeetingRoomBookingRequest requestBody);
 
     //    PUT API
     @PUT("employees/profile/image/{userId}")

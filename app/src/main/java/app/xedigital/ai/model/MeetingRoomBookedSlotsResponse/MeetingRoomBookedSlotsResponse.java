@@ -1,8 +1,8 @@
-package app.xedigital.ai.model.attendance;
+package app.xedigital.ai.model.MeetingRoomBookedSlotsResponse;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeeAttendanceResponse {
+public class MeetingRoomBookedSlotsResponse {
 
     @SerializedName("data")
     private Data data;

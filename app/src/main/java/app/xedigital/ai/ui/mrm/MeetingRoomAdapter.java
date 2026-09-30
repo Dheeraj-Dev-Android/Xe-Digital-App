@@ -5,9 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -80,14 +81,31 @@ public class MeetingRoomAdapter extends RecyclerView.Adapter<MeetingRoomAdapter.
 
             String imageUrl = item.getDocFileURL();
             if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                Glide.with(itemView.getContext()).load(imageUrl).format(DecodeFormat.PREFER_RGB_565).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.ic_meeting_room).error(R.drawable.ic_meeting_room).into(imageRoom);
+                Glide.with(itemView.getContext())
+                        .load(imageUrl)
+                        .format(DecodeFormat.PREFER_RGB_565) // Uses 50% less RAM than default ARGB_8888
+                        .override(600, 300)                  // Downscales big API images to exact card size
+                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE) // Cache the downscaled version only
+                        .placeholder(R.drawable.ic_meeting_room)
+                        .error(R.drawable.ic_meeting_room)
+                        .into(imageRoom);
             } else {
                 imageRoom.setImageResource(R.drawable.ic_meeting_room);
             }
 
             btnReserve.setOnClickListener(v -> {
-                String selectedRoom = item.getRoomName() != null ? item.getRoomName() : "Room";
-                Toast.makeText(itemView.getContext(), "Initiating booking for: " + selectedRoom, Toast.LENGTH_SHORT).show();
+                String roomId = item.getId() != null ? item.getId() : "";
+                String roomName = item.getRoomName() != null ? item.getRoomName() : "Room";
+
+                Fragment fragment = MeetingRoomBookedSlotsFragment.newInstance(roomId, roomName);
+
+                // If you're using Fragment navigation:
+                ((FragmentActivity) itemView.getContext())
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.nav_host_fragment_content_main, fragment)  // ← your container ID
+                        .addToBackStack(null)
+                        .commit();
             });
         }
     }
