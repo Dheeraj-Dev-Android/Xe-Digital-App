@@ -2,7 +2,9 @@ package app.xedigital.ai.model.TeamTimesheetResponse;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeesDcrDataItem {
+import java.io.Serializable;
+
+public class EmployeesDcrDataItem implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

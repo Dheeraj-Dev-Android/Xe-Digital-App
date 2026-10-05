@@ -6,17 +6,19 @@ public class PermissionItem {
     private final String manifestPermission;
     private final boolean isMandatory;
     private final String tag;
+    private final String category;   // NEW: "CORE", "BACKGROUND", "SECURITY", "SYSTEM"
     private boolean isGranted;
 
-    public PermissionItem(String title, String description, String manifestPermission, boolean isMandatory, String tag) {
+    public PermissionItem(String title, String description, String manifestPermission,
+                          boolean isMandatory, String tag, String category) {
         this.title = title;
         this.description = description;
         this.manifestPermission = manifestPermission;
         this.isMandatory = isMandatory;
         this.tag = tag;
+        this.category = category;
     }
 
-    // Getters
     public String getTitle() {
         return title;
     }
@@ -44,4 +46,8 @@ public class PermissionItem {
     public String getTag() {
         return tag;
     }
+
+    public String getCategory() {
+        return category;
+    }  // NEW
 }

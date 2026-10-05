@@ -2,7 +2,6 @@ package app.xedigital.ai.activity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 
@@ -26,6 +23,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
+import app.xedigital.ai.utills.PermissionManager;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,25 +36,32 @@ public class LoginActivity extends AppCompatActivity {
     private View loadingOverlay;
     private boolean isRedirectInProgress = false;
     private boolean isCheckingPermissions = false;
+    private PermissionManager permissionManager;
+
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // ── CHANGED: Sync with central manager ──
+                permissionManager.syncAllPermissions();
                 isCheckingPermissions = false;
                 proceedToAuthCheck();
             });
+
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
+
     // ─── Session Workflow ─────────────────────────────────────────────────────
     private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean fineGranted = Boolean.TRUE.equals(
-                        result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
-                boolean coarseGranted = Boolean.TRUE.equals(
-                        result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false));
+                // ── CHANGED: Sync with central manager ──
+                permissionManager.syncAllPermissions();
+
+                // ── CHANGED: Read from PermissionManager instead of raw result ──
+                boolean locationGranted = permissionManager.isGranted(PermissionManager.TAG_LOCATION);
 
                 SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
                 String cachedToken = prefManager.getString("cachedTokenPermission", null);
 
-                if (fineGranted || coarseGranted) {
+                if (locationGranted) {
                     if (cachedToken != null) {
                         navigateToFaceLogin(cachedToken);
                     }
@@ -83,6 +88,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
 
+        // ── CHANGED: Initialize central permission manager ──
+        permissionManager = PermissionManager.getInstance(this);
+
         hideLoginScreen();
         Glide.with(this).load(R.mipmap.ic_launcher).into(binding.logoImage);
 
@@ -101,11 +109,14 @@ public class LoginActivity extends AppCompatActivity {
     // ─── Silent Token Refresh ─────────────────────────────────────────────────
 
     private void evaluateSessionWorkflow() {
+        // ── CHANGED: Use PermissionManager instead of ContextCompat ──
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
+            if (!permissionManager.isGranted(PermissionManager.TAG_NOTIFICATION)) {
                 isCheckingPermissions = true;
-                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                String notifPerm = permissionManager.getManifestPermission(PermissionManager.TAG_NOTIFICATION);
+                if (notifPerm != null) {
+                    notificationPermissionLauncher.launch(notifPerm);
+                }
                 return;
             }
         }
@@ -120,8 +131,6 @@ public class LoginActivity extends AppCompatActivity {
         boolean isFallback = getIntent().getBooleanExtra("isFallback", false);
 
         if (isFallback) {
-            // User was redirected from FaceLoginActivity
-            // Clear tokens but keep credentials for future silent refresh
             prefManager.remove("authToken");
             prefManager.remove("cachedTokenPermission");
             showLoginScreen();
@@ -129,7 +138,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (authToken != null) {
-            // Token exists → silently refresh it
             silentlyRefreshToken();
         } else {
             showLoginScreen();
@@ -175,11 +183,9 @@ public class LoginActivity extends AppCompatActivity {
                         String token = loginResponse.getData().getToken();
                         String emailId = loginResponse.getData().getUser().getEmail();
 
-                        // Save all credentials + new token
                         storeInSharedPreferences(userId, emailId, password, token);
 
                         if (isManualLogin) {
-                            // Manual login → fetch user data first then navigate
                             fetchAndSaveUserData(userId, token);
                         } else {
                             checkPermissionsAndNavigate(token);
@@ -250,14 +256,11 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "Collection name saved: " + collectionName);
 
                 } else {
-                    // Collection fetch failed but still proceed
-                    // FaceLoginActivity will handle fallback
                     Log.e(TAG, "User data fetch failed: "
                             + (response.body() != null ? response.body().getMessage()
                             : response.code()));
                 }
 
-                // Always proceed to face login regardless
                 checkPermissionsAndNavigate(authToken);
             }
 
@@ -296,7 +299,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkPermissionsAndNavigate(String token) {
         SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
-        if (!hasForegroundLocationPermission()) {
+
+        // ── CHANGED: Use PermissionManager instead of direct check ──
+        if (!permissionManager.isGranted(PermissionManager.TAG_LOCATION)) {
             foregroundPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
@@ -306,12 +311,8 @@ public class LoginActivity extends AppCompatActivity {
         navigateToFaceLogin(token);
     }
 
-    private boolean hasForegroundLocationPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
-    }
+    // ── REMOVED: hasForegroundLocationPermission() ──
+    // Now handled by PermissionManager.isGranted(TAG_LOCATION)
 
     // ─── Navigation ───────────────────────────────────────────────────────────
 

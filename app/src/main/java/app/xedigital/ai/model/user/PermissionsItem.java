@@ -2,7 +2,9 @@ package app.xedigital.ai.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PermissionsItem {
+import java.io.Serializable;
+
+public class PermissionsItem implements Serializable {
     private String createdAt;
     private boolean jsonMemberDefault;
     private String displayName;

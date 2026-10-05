@@ -2,7 +2,9 @@ package app.xedigital.ai.model.getDocuments;
 
 import com.google.gson.annotations.SerializedName;
 
-public class DocumentsItem {
+import java.io.Serializable;
+
+public class DocumentsItem implements Serializable {
 
     @SerializedName("docFileURLKey")
     private String docFileURLKey;

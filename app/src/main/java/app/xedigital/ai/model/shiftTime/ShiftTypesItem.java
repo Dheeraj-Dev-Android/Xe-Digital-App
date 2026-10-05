@@ -2,7 +2,9 @@ package app.xedigital.ai.model.shiftTime;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ShiftTypesItem {
+import java.io.Serializable;
+
+public class ShiftTypesItem implements Serializable {
 
     @SerializedName("shiftType")
     private String shiftType;

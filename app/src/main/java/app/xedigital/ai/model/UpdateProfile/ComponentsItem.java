@@ -2,7 +2,9 @@ package app.xedigital.ai.model.UpdateProfile;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ComponentsItem {
+import java.io.Serializable;
+
+public class ComponentsItem implements Serializable {
 
     @SerializedName("calculationType")
     private String calculationType;
@@ -26,7 +28,7 @@ public class ComponentsItem {
     private Object monthlyAmount;
 
     @SerializedName("yearlyAmount")
-    private int yearlyAmount;
+    private double yearlyAmount;
 
     @SerializedName("earningname")
     private String earningname;
@@ -87,7 +89,7 @@ public class ComponentsItem {
         this.monthlyAmount = monthlyAmount;
     }
 
-    public int getYearlyAmount() {
+    public double getYearlyAmount() {
         return yearlyAmount;
     }
 

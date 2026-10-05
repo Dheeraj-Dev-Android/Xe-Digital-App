@@ -2,7 +2,9 @@ package app.xedigital.ai.model.MeetingRoomBookedSlotsResponse;
 
 import com.google.gson.annotations.SerializedName;
 
-public class DataByIdItem {
+import java.io.Serializable;
+
+public class DataByIdItem implements Serializable {
 
     @SerializedName("hostName")
     private String hostName;

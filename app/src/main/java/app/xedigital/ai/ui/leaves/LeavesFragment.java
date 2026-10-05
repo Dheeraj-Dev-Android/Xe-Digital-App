@@ -125,6 +125,13 @@ public class LeavesFragment extends Fragment {
     private double fixedShortLeaveHours = 0;
     private int usedShortLeavesThisMonth = 0;
 
+    // ── ✅ Probation & Slot Configurations ─────────────────────────────
+    private boolean confirmEmpShortLeave = false;
+    private boolean probationEmpShortLeave = false;
+    private boolean morningShortLeave = false;
+    private boolean eveningShortLeave = false;
+    private String empJoiningType = "";  // "probation" or "confirm"
+
     // ── Shift Data (from UserProfile) ──────────────────────────────────
     private boolean shiftDataLoaded = false;
     private String shiftStartTime = "";
@@ -233,8 +240,13 @@ public class LeavesFragment extends Fragment {
         leavePlannedSpinner.setAdapter(leavePlannedAdapter);
 
         // ── Time Slot Adapter (Morning / Evening) ──────────────────────
-        String[] timeSlots = {"Morning", "Evening"};
-        ArrayAdapter<String> timeSlotAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, timeSlots);
+//        String[] timeSlots = {"Morning", "Evening"};
+//        ArrayAdapter<String> timeSlotAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, timeSlots);
+//        spinnerTimeSlot.setAdapter(timeSlotAdapter);
+        // ── Time Slot Adapter (Morning / Evening) ──────────────────────
+        // Initialize with empty adapter — will be dynamically populated based on API config
+        ArrayAdapter<String> timeSlotAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, new ArrayList<>());
+        spinnerTimeSlot.setAdapter(timeSlotAdapter);
         spinnerTimeSlot.setAdapter(timeSlotAdapter);
 
         // ── Time Slot Selection Handler ────────────────────────────────
@@ -278,6 +290,10 @@ public class LeavesFragment extends Fragment {
                 empLastname = employee.getLastname();
                 empEmail = employee.getEmail();
                 empBirthday = employee.getDateOfBirth();
+
+                // ── ✅ Extract Joining Type ────────────────────────────
+                empJoiningType = employee.getJoiningType() != null ? employee.getJoiningType().toLowerCase(Locale.getDefault()) : "";
+                Log.d(TAG, "✅ Joining Type: " + empJoiningType);
 
                 if (employee.getDepartment() != null) {
                     empDepartment = employee.getDepartment().getName();
@@ -352,7 +368,7 @@ public class LeavesFragment extends Fragment {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 if (etFromDate.getText().toString().isEmpty()) {
                     CustomDialogHelper.showInfoDialog(requireContext(), "Select Date", "Please select From Date first.");
-                    return true;
+                    return true; // Consumes event, blocks dropdown
                 }
             }
             return false;
@@ -367,6 +383,7 @@ public class LeavesFragment extends Fragment {
                 LeavetypesItem selectedLeaveType = leaveTypesList.get(position);
                 String tempLeaveTypeName = selectedLeaveType.getLeavetypeName();
 
+                // Guard to block selection if To Date is empty (except for Short Leave)
                 if (!SHORT_LEAVE.equalsIgnoreCase(tempLeaveTypeName) && etToDate.getText().toString().isEmpty()) {
                     CustomDialogHelper.showInfoDialog(requireContext(), "Select To Date", "Please select To Date first for this leave type.");
                     clearLeaveTypeOnly();
@@ -394,6 +411,13 @@ public class LeavesFragment extends Fragment {
                         return;
                     }
 
+                    // ── ✅ Check probation or confirmed eligibility ───
+                    if (!isEmployeeEligibleForShortLeave()) {
+                        String userTypeLabel = "probation".equalsIgnoreCase(empJoiningType) ? "Probationary" : "Confirmed";
+                        CustomDialogHelper.showErrorDialog(requireContext(), "Not Eligible", "Short Leave is not enabled for " + userTypeLabel + " employees.\n\nPlease contact HR.", () -> clearLeaveTypeOnly());
+                        return;
+                    }
+
                     String fromDateVal = etFromDate.getText().toString();
                     if (!fromDateVal.isEmpty()) {
                         etToDate.setText(fromDateVal);
@@ -407,31 +431,8 @@ public class LeavesFragment extends Fragment {
 
                     llShortTimeContainer.setVisibility(View.VISIBLE);
 
-                    if (shortLeaveTimingEnabled) {
-                        llTimeSlotContainer.setVisibility(View.VISIBLE);
-
-                        etStartTime.setFocusable(false);
-                        etStartTime.setClickable(false);
-                        etEndTime.setFocusable(false);
-                        etEndTime.setClickable(false);
-
-                        if (!shiftDataLoaded) {
-                            CustomDialogHelper.showWarningDialog(requireContext(), "No Shift Assigned", "No shift timing found for your profile.\n\n" + "You can select start and end times manually.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
-                                @Override
-                                public void onConfirm() {
-                                    enableManualTimeSelection();
-                                }
-
-                                @Override
-                                public void onCancel() {
-                                    enableManualTimeSelection();
-                                }
-                            });
-                        }
-                    } else {
-                        llTimeSlotContainer.setVisibility(View.GONE);
-                        enableManualTimeSelection();
-                    }
+                    // ── ✅ Dynamically evaluate timing slot visibility & setup listeners ──
+                    setupTimeSlotAndManualFields();
 
                     // Fetch monthly short leave usage from appliedLeaves API
                     SecurePrefManager pm = SecurePrefManager.getInstance(requireContext());
@@ -445,6 +446,14 @@ public class LeavesFragment extends Fragment {
                     tilLeaveCategoryTo.setVisibility(View.VISIBLE);
                     llShortTimeContainer.setVisibility(View.GONE);
                     llTimeSlotContainer.setVisibility(View.GONE);
+
+                    // Reset listeners to default manual behavior
+                    etStartTime.setOnClickListener(v -> {
+                        if (etStartTime.isFocusable()) showTimePicker(etStartTime);
+                    });
+                    etEndTime.setOnClickListener(v -> {
+                        if (etEndTime.isFocusable()) showTimePicker(etEndTime);
+                    });
                 }
 
                 SecurePrefManager pm = SecurePrefManager.getInstance(requireContext());
@@ -737,17 +746,36 @@ public class LeavesFragment extends Fragment {
     private void updateShortLeaveBalanceUI() {
         if (!SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName)) return;
 
-        int remaining = maxShortLeavesPerMonth - usedShortLeavesThisMonth;
-        if (remaining <= 0) {
-            binding.balanceLeaveTextView.setText("⚠ Monthly limit reached (" + usedShortLeavesThisMonth + "/" + maxShortLeavesPerMonth + " used)");
+        boolean countBounded = maxShortLeavesPerMonth > 0;
+        boolean durationBounded = fixedShortLeaveHours > 0;
+
+        StringBuilder sb = new StringBuilder();
+
+        if (countBounded) {
+            int remaining = maxShortLeavesPerMonth - usedShortLeavesThisMonth;
+            if (remaining <= 0) {
+                sb.append("⚠ Monthly limit reached (").append(usedShortLeavesThisMonth).append("/").append(maxShortLeavesPerMonth).append(" used)");
+                binding.balanceLeaveTextView.setText(sb.toString());
+                return;
+            }
+            sb.append("Short Leave: ").append(remaining).append("/").append(maxShortLeavesPerMonth).append(" remaining");
         } else {
-            String hourText = fixedShortLeaveHours > 0 ? formatHours(fixedShortLeaveHours) + " hrs fixed" : "Flexible hours";
-            binding.balanceLeaveTextView.setText("Short Leave: " + remaining + "/" + maxShortLeavesPerMonth + " remaining this month • " + hourText);
+            sb.append("Short Leave: Unlimited applications");
         }
+
+        sb.append(" • ");
+
+        if (durationBounded) {
+            sb.append(formatHours(fixedShortLeaveHours)).append(" hrs fixed duration");
+        } else {
+            sb.append("Flexible duration");
+        }
+
+        binding.balanceLeaveTextView.setText(sb.toString());
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // ✅ EXTRACT SHIFT DATA FROM USER PROFILE
+    // EXTRACT SHIFT DATA FROM USER PROFILE
     // ══════════════════════════════════════════════════════════════════════
 
     private void extractShiftDataFromProfile(Employee employee) {
@@ -808,6 +836,71 @@ public class LeavesFragment extends Fragment {
         }
     }
 
+    // ── ✅ NEW: Configures and manages inputs in Short Leave Mode ──────
+    // ── ✅ Configures and manages inputs in Short Leave Mode ──────
+    private void setupTimeSlotAndManualFields() {
+        if (shortLeaveTimingEnabled) {
+            // Build the time slot list dynamically based on API flags
+            List<String> dynamicSlots = getAvailableTimeSlots();
+
+            Log.d(TAG, "🎯 Dynamic Slots: " + dynamicSlots + " | morning=" + morningShortLeave + ", evening=" + eveningShortLeave);
+
+            if (dynamicSlots.isEmpty()) {
+                // No slots available → fallback to manual entry
+                llTimeSlotContainer.setVisibility(View.GONE);
+                if (fixedShortLeaveHours > 0) {
+                    setupStartTimeWithAutoCalculatedEnd();
+                } else {
+                    enableManualTimeSelection();
+                }
+            } else {
+                llTimeSlotContainer.setVisibility(View.VISIBLE);
+
+                // ✅ FIX: Force fresh adapter rebuild — prevents cached items
+                spinnerTimeSlot.setText("", false);
+                ArrayAdapter<String> freshAdapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_menu_popup_item, new ArrayList<>(dynamicSlots)  // Fresh copy to avoid reference issues
+                );
+                spinnerTimeSlot.setAdapter(freshAdapter);
+                freshAdapter.notifyDataSetChanged();
+
+                // Lock Start/End time fields (user selects via dropdown)
+                etStartTime.setFocusable(false);
+                etStartTime.setClickable(false);
+                etEndTime.setFocusable(false);
+                etEndTime.setClickable(false);
+                etStartTime.setOnClickListener(null);
+                etEndTime.setOnClickListener(null);
+
+                // If only one slot is available, auto-select it
+                if (dynamicSlots.size() == 1) {
+                    String onlySlot = dynamicSlots.get(0);
+                    spinnerTimeSlot.setText(onlySlot, false);
+                    handleTimeSlotSelection(onlySlot);
+                }
+            }
+        } else {
+            // Timing dropdown disabled — manual mode
+            llTimeSlotContainer.setVisibility(View.GONE);
+            if (fixedShortLeaveHours > 0) {
+                // Exemption fixed → user picks Start, End auto-calculated
+                setupStartTimeWithAutoCalculatedEnd();
+            } else {
+                // Fully manual → user picks both
+                enableManualTimeSelection();
+            }
+        }
+    }
+
+    // ── ✅ Helper: Setup Start Time → Auto-calculate End Time ─────────
+    private void setupStartTimeWithAutoCalculatedEnd() {
+        etStartTime.setFocusable(false);
+        etStartTime.setClickable(true);
+        etEndTime.setFocusable(false);
+        etEndTime.setClickable(false);
+        etEndTime.setOnClickListener(null);
+        etStartTime.setOnClickListener(v -> showTimePickerAndCalculateEnd(etStartTime));
+    }
+
     private void enableManualTimeSelection() {
         llTimeSlotContainer.setVisibility(View.GONE);
         etStartTime.setFocusable(true);
@@ -835,16 +928,22 @@ public class LeavesFragment extends Fragment {
                     app.xedigital.ai.model.ShortLeaveDetails.Data data = response.body().getData();
                     if (data != null) {
                         shortLeaveEnabled = data.isShortLeave();
-                        shortLeaveTimingEnabled = data.isShortLeaveTiming();
                         maxShortLeavesPerMonth = data.getShortLeaveCount();
                         fixedShortLeaveHours = data.getShortLeaveExemption();
+
+                        confirmEmpShortLeave = data.isConfirmEmpShortLeave();
+                        probationEmpShortLeave = data.isProbationEmpShortLeave();
+                        morningShortLeave = data.isMorningShortLeave();
+                        eveningShortLeave = data.isEveningShortLeave();
+
+                        shortLeaveTimingEnabled = morningShortLeave || eveningShortLeave;
 
                         if (maxShortLeavesPerMonth < 0) maxShortLeavesPerMonth = 0;
                         if (fixedShortLeaveHours < 0) fixedShortLeaveHours = 0;
 
                         shortLeaveConfigLoaded = true;
 
-                        Log.d(TAG, "✅ Short Leave Config → enabled=" + shortLeaveEnabled + ", monthlyLimit=" + maxShortLeavesPerMonth + ", fixedHours=" + fixedShortLeaveHours + ", timingDropdown=" + shortLeaveTimingEnabled);
+                        Log.d(TAG, "✅ Short Leave Config → enabled=" + shortLeaveEnabled + ", monthlyLimit=" + maxShortLeavesPerMonth + ", fixedHours=" + fixedShortLeaveHours + ", timingDropdown=" + shortLeaveTimingEnabled + ", confirm=" + confirmEmpShortLeave + ", probation=" + probationEmpShortLeave + ", morning=" + morningShortLeave + ", evening=" + eveningShortLeave);
                     }
                 } else {
                     shortLeaveConfigLoaded = false;
@@ -919,9 +1018,6 @@ public class LeavesFragment extends Fragment {
         return String.valueOf(hours);
     }
 
-    /**
-     * ✅ NEW: Converts a 12-hour formatted time string (e.g. "09:00 AM") into a 24-hour format (e.g. "09:00").
-     */
     private String convertTo24HourFormat(String time12) {
         if (time12 == null || time12.isEmpty()) return "";
         try {
@@ -960,6 +1056,27 @@ public class LeavesFragment extends Fragment {
         picker.show(requireActivity().getSupportFragmentManager(), "timePicker");
     }
 
+    // ── ✅ NEW: Opens time picker and auto-calculates end time ────────
+    private void showTimePickerAndCalculateEnd(final EditText editText) {
+        Calendar now = Calendar.getInstance();
+        MaterialTimePicker picker = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_12H).setHour(now.get(Calendar.HOUR_OF_DAY)).setMinute(now.get(Calendar.MINUTE)).setTitleText("Select Start Time").build();
+
+        picker.addOnPositiveButtonClickListener(v -> {
+            int hour = picker.getHour();
+            int minute = picker.getMinute();
+            String amPm = (hour >= 12) ? "PM" : "AM";
+            int formattedHour = (hour == 0 || hour == 12) ? 12 : hour % 12;
+            String timeString = String.format(Locale.getDefault(), "%02d:%02d %s", formattedHour, minute, amPm);
+            editText.setText(timeString);
+
+            String calculatedEndTime = addHoursToTime(timeString, fixedShortLeaveHours);
+            etEndTime.setText(calculatedEndTime);
+            Log.d(TAG, "⏰ Calculated End Time: " + calculatedEndTime);
+        });
+
+        picker.show(requireActivity().getSupportFragmentManager(), "timePickerCalculated");
+    }
+
     private void validateShortLeaveTimeRange() {
         String startStr = etStartTime.getText().toString();
         String endStr = etEndTime.getText().toString();
@@ -981,6 +1098,30 @@ public class LeavesFragment extends Fragment {
                 etEndTime.setText("");
             }
         }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ✅ NEW: UTILITY ELIGIBILITY EVALUATOR
+    // ══════════════════════════════════════════════════════════════════════
+
+    private boolean isEmployeeEligibleForShortLeave() {
+        if ("probation".equalsIgnoreCase(empJoiningType)) {
+            return probationEmpShortLeave;
+        } else if ("confirm".equalsIgnoreCase(empJoiningType) || "confirmed".equalsIgnoreCase(empJoiningType)) {
+            return confirmEmpShortLeave;
+        }
+        return confirmEmpShortLeave || probationEmpShortLeave;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ✅ NEW: DYNAMIC TIME SLOT CALCULATOR OPTIONS
+    // ══════════════════════════════════════════════════════════════════════
+
+    private List<String> getAvailableTimeSlots() {
+        List<String> dynamicSlots = new ArrayList<>();
+        if (morningShortLeave) dynamicSlots.add("Morning");
+        if (eveningShortLeave) dynamicSlots.add("Evening");
+        return dynamicSlots;
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -1006,6 +1147,11 @@ public class LeavesFragment extends Fragment {
         if (isShortLeave) {
             if (!shortLeaveEnabled) {
                 CustomDialogHelper.showErrorDialog(requireContext(), "Short Leave Disabled", "Short Leave is not enabled for your account.");
+                return false;
+            }
+
+            if (!isEmployeeEligibleForShortLeave()) {
+                CustomDialogHelper.showErrorDialog(requireContext(), "Ineligible", "Short Leave is not configured for your current employment status.");
                 return false;
             }
 
@@ -1262,26 +1408,19 @@ public class LeavesFragment extends Fragment {
         applyLeaveRequest.setReportingManagerName(reportingManagerName);
         applyLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
 
-        // ── ✅ Convert Yes/No → true/false string ──────────────────────
         String leavingStationPayload = "Yes".equalsIgnoreCase(leavingStation) ? "true" : "false";
         applyLeaveRequest.setLeavingStation(leavingStationPayload);
-
-        // ── ✅ Lowercase leave planned (planned / unplanned) ──────────
         applyLeaveRequest.setLeavePlanned(leavePlanned.toLowerCase(Locale.getDefault()));
 
-        // ── ✅ Short Leave vs Standard Leave payload handling ─────────
         if (isShortLeave) {
-            // Short Leave: selectTypeFrom/To must be null
             applyLeaveRequest.setSelectTypeFrom(null);
             applyLeaveRequest.setSelectTypeTo(null);
 
-            // Convert 12-hour → 24-hour format for backend
             String rawStart = etStartTime.getText().toString();
             String rawEnd = etEndTime.getText().toString();
             applyLeaveRequest.setShortLeaveStartTime(convertTo24HourFormat(rawStart));
             applyLeaveRequest.setShortLeaveEndTime(convertTo24HourFormat(rawEnd));
 
-            // Time slot (morning / evening) — lowercase — only if timing enabled
             if (shortLeaveTimingEnabled) {
                 String slot = spinnerTimeSlot.getText().toString().toLowerCase(Locale.getDefault());
                 applyLeaveRequest.setShortLeaveTimingSlot(slot);
@@ -1291,7 +1430,6 @@ public class LeavesFragment extends Fragment {
 
             Log.d(TAG, "Short Leave Payload — Start: " + convertTo24HourFormat(rawStart) + " | End: " + convertTo24HourFormat(rawEnd));
         } else {
-            // Standard leave
             applyLeaveRequest.setSelectTypeFrom(leaveCategoryFrom);
             applyLeaveRequest.setSelectTypeTo(leaveCategoryTo);
             applyLeaveRequest.setShortLeaveStartTime("");
@@ -1299,7 +1437,6 @@ public class LeavesFragment extends Fragment {
             applyLeaveRequest.setShortLeaveTimingSlot(null);
         }
 
-        // ── Cross Functional Manager Guard ────────────────────────────
         if (crossFunctionalManagerName == null || crossFunctionalManagerName.isEmpty() || crossFunctionalManagerEmail == null || crossFunctionalManagerEmail.isEmpty()) {
             CustomDialogHelper.showWarningDialog(requireContext(), "Manager Not Assigned", "No cross-functional manager is assigned to your profile.\n\nPlease contact your Admin or HR.", "OK", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                 @Override
@@ -1337,8 +1474,6 @@ public class LeavesFragment extends Fragment {
                         String databaseId = (data != null) ? data.optString("_id") : null;
 
                         if (isSuccess && databaseId != null && !databaseId.isEmpty()) {
-                            // ✅ For Short Leave, ALWAYS debit (as backend requires tDays=1, fUsedDays=1)
-                            // Only skip debit for LOP
                             boolean skipDebit = Objects.equals(selectedLeaveTypeId, lossOfPayId);
 
                             if (!skipDebit) {
@@ -1376,7 +1511,7 @@ public class LeavesFragment extends Fragment {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // ✅ DEBIT LEAVE — Payload Updated as per Backend Spec
+    // DEBIT LEAVE
     // ══════════════════════════════════════════════════════════════════════
 
     private void debitLeave(String fromDate, String toDate, String leaveCategoryFrom, String leaveCategoryTo, String leavingStation, String leaveStationAdd, String contactNumber, String reason) {
@@ -1388,7 +1523,6 @@ public class LeavesFragment extends Fragment {
 
         boolean isShortLeave = SHORT_LEAVE.equalsIgnoreCase(selectedLeaveTypeName);
 
-        // ── Common fields ──────────────────────────────────────────────
         debitLeaveRequest.setFromDate(fromDate);
         debitLeaveRequest.setToDate(toDate);
         debitLeaveRequest.setLeaveName(selectedLeaveTypeName);
@@ -1407,22 +1541,14 @@ public class LeavesFragment extends Fragment {
         debitLeaveRequest.setReportingManagerName(reportingManagerName);
         debitLeaveRequest.setReportingManagerLastName(reportingManagerLastname);
 
-        // ── ✅ Convert Yes/No → true/false string ─────────────────────
         String leavingStationPayload = "Yes".equalsIgnoreCase(leavingStation) ? "true" : "false";
         debitLeaveRequest.setLeavingStation(leavingStationPayload);
-
-        // ── ✅ Lowercase leave planned ────────────────────────────────
         debitLeaveRequest.setLeavePlanned(binding.spinnerLeavePlanned.getText().toString().toLowerCase(Locale.getDefault()));
-
-        // ── ✅ Cross Manager Fields (missing in old debit — now added) ──
         debitLeaveRequest.setCrossManager(crossFunctionalManagerId);
         debitLeaveRequest.setCrossManagerEmail(crossFunctionalManagerEmail);
         debitLeaveRequest.setCrossManagerName(crossFunctionalManagerName);
-
-        // ── ✅ Add department (missing in old debit — now added) ──────
         debitLeaveRequest.setDepartment(department);
 
-        // ── ✅ Short Leave vs Standard Leave payload handling ─────────
         if (isShortLeave) {
             debitLeaveRequest.setSelectTypeFrom(null);
             debitLeaveRequest.setSelectTypeTo(null);
@@ -1439,7 +1565,6 @@ public class LeavesFragment extends Fragment {
                 debitLeaveRequest.setShortLeaveTimingSlot(null);
             }
 
-            // ✅ Short leave: tDays = 1, fUsedDays = 1 (as per payload)
             debitLeaveRequest.setTDays(1);
             debitLeaveRequest.setFUsedDays(1);
         } else {
@@ -1510,7 +1635,6 @@ public class LeavesFragment extends Fragment {
             }
         });
     }
-
     // ══════════════════════════════════════════════════════════════════════
     // DATE PICKER
     // ══════════════════════════════════════════════════════════════════════

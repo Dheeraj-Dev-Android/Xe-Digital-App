@@ -14,6 +14,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.util.List;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.utills.PermissionManager;
 
 public class PermissionAdapter extends RecyclerView.Adapter<PermissionAdapter.ViewHolder> {
 
@@ -28,30 +29,43 @@ public class PermissionAdapter extends RecyclerView.Adapter<PermissionAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_permission, parent, false);
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_permission, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         PermissionItem item = items.get(position);
+
         holder.title.setText(item.getTitle());
         holder.desc.setText(item.getDescription());
+
+        // ── Switch State ──
+        holder.switchPermission.setOnCheckedChangeListener(null); // prevent recycle bugs
         holder.switchPermission.setChecked(item.isGranted());
+
+        // ── Status Label ──
         if (item.isGranted()) {
             holder.statusLabel.setText("Active");
             holder.statusLabel.setTextColor(Color.parseColor("#2E7D32"));
         } else {
-            holder.statusLabel.setText("Inactive");
-            holder.statusLabel.setTextColor(Color.parseColor("#757575"));
+            holder.statusLabel.setText(item.isMandatory() ? "Required" : "Inactive");
+            holder.statusLabel.setTextColor(item.isMandatory()
+                    ? Color.parseColor("#D32F2F")
+                    : Color.parseColor("#757575"));
         }
+
+        // ── Mandatory Tag ──
         holder.tag.setVisibility(item.isMandatory() ? View.VISIBLE : View.GONE);
-        if (item.getManifestPermission() == null && !"BIOMETRIC".equals(item.getTag())) {
-            holder.switchPermission.setVisibility(View.INVISIBLE);
-            holder.statusLabel.setText("Active");
-        } else {
-            holder.switchPermission.setVisibility(View.VISIBLE);
-        }
+
+        // ── Switch Visibility ──
+        boolean isSystemInfo = (item.getManifestPermission() == null
+                && !PermissionManager.TAG_BIOMETRIC.equals(item.getTag()));
+        holder.switchPermission.setVisibility(isSystemInfo ? View.INVISIBLE : View.VISIBLE);
+        holder.switchPermission.setClickable(false); // Let itemView handle all clicks
+
+        // ── Click → Delegate to Fragment ──
         holder.itemView.setOnClickListener(v -> listener.onItemClick(item));
     }
 

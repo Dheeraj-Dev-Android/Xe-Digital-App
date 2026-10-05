@@ -2,8 +2,9 @@ package app.xedigital.ai.model.userProfileEmail;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Department {
+import java.io.Serializable;
 
+public class Department implements Serializable {
     @SerializedName("default")
     private boolean jsonMemberDefault;
 

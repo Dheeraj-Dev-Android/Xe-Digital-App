@@ -2,9 +2,10 @@ package app.xedigital.ai.model.TeamLeave;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EmployeesItem {
+public class EmployeesItem implements Serializable {
 
     @SerializedName("employeeName")
     private String employeeName;

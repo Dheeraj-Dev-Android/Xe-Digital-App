@@ -44,6 +44,7 @@ import app.xedigital.ai.ui.timesheet.FilterAppliedListener;
 import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.DateTimeUtils;
 import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
+import app.xedigital.ai.utills.PermissionManager;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -421,5 +422,31 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
             return true;
         }
         return false;
+    }
+
+    private void handlePostAttendanceNavigation(String punchInTime, String punchOutTime) {
+        if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
+            boolean hasBackgroundLoc = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                // ── CHANGED: Use central PermissionManager ──
+                hasBackgroundLoc = PermissionManager.getInstance(requireContext()).isGranted(PermissionManager.TAG_BACKGROUND_LOCATION);
+                // hasBackgroundLoc = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            }
+
+            if (!hasBackgroundLoc) {
+                Toast.makeText(requireContext(), "Enable 'Allow all the time' for Precise Location.", Toast.LENGTH_LONG).show();
+                try {
+                    androidx.navigation.Navigation.findNavController(requireView()).navigate(R.id.nav_permission);
+                } catch (Exception e) {
+                    Log.e(TAG, "Navigation failed: " + e.getMessage());
+                }
+                if (getActivity() != null) getActivity().finish();
+                return;
+            }
+        }
+        if (getActivity() != null) {
+            getActivity().setResult(android.app.Activity.RESULT_OK);
+            getActivity().finish();
+        }
     }
 }

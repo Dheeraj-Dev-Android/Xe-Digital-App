@@ -1,50 +1,113 @@
 package app.xedigital.ai.ui.permission;
 
-import android.Manifest;
+import android.app.Application;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PermissionViewModel extends ViewModel {
+import app.xedigital.ai.utills.PermissionManager;
+
+public class PermissionViewModel extends AndroidViewModel {
+
+    private final PermissionManager permissionManager;
     private final MutableLiveData<List<PermissionItem>> permissions = new MutableLiveData<>();
 
+    public PermissionViewModel(@NonNull Application application) {
+        super(application);
+        permissionManager = PermissionManager.getInstance(application);
+        loadPermissions();
+    }
+
     public LiveData<List<PermissionItem>> getPermissions() {
-        if (permissions.getValue() == null) {
-            loadPermissions();
-        }
         return permissions;
+    }
+
+    /**
+     * Re-syncs all permission states from the central manager.
+     * Call this onResume, after returning from Settings, etc.
+     */
+    public void refreshAll() {
+        permissionManager.syncAllPermissions();
+        updateItemsFromManager();
     }
 
     private void loadPermissions() {
         List<PermissionItem> list = new ArrayList<>();
 
-        // 1. Camera (Mandatory for Face Login/Punch)
-        list.add(new PermissionItem("Camera Access", "Required for capturing images to verify identity.", Manifest.permission.CAMERA, true, "CAMERA"));
+        // ── CORE PERMISSIONS ──
+        list.add(new PermissionItem(
+                "Camera Access",
+                "Required for face verification and photo capture.",
+                permissionManager.getManifestPermission(PermissionManager.TAG_CAMERA),
+                true, PermissionManager.TAG_CAMERA, "CORE"));
 
-        // 2. Precise Location (Mandatory for Punch Activity)
-        list.add(new PermissionItem("Precise Location", "Used to verify your work location during attendance.", Manifest.permission.ACCESS_FINE_LOCATION, true, "LOCATION"));
+        list.add(new PermissionItem(
+                "Precise Location",
+                "Verifies your work location during attendance punch.",
+                permissionManager.getManifestPermission(PermissionManager.TAG_LOCATION),
+                true, PermissionManager.TAG_LOCATION, "CORE"));
 
-        // 3. Background Location (Mandatory for Shift Tracking)
+        // ── BACKGROUND SERVICES ──
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            list.add(new PermissionItem("Always-on Location", "Allows tracking even when the app is closed. Select 'Allow all the time'.", Manifest.permission.ACCESS_BACKGROUND_LOCATION, true, "BACKGROUND_LOCATION"));
+            list.add(new PermissionItem(
+                    "Always-on Location",
+                    "Tracks attendance even when the app is closed.",
+                    permissionManager.getManifestPermission(PermissionManager.TAG_BACKGROUND_LOCATION),
+                    true, PermissionManager.TAG_BACKGROUND_LOCATION, "BACKGROUND"));
         }
 
-        // 4. Notifications (Mandatory for Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            list.add(new PermissionItem("Notifications", "Required to keep the shift tracking service active in the background.", Manifest.permission.POST_NOTIFICATIONS, true, "NOTIFICATION"));
+            list.add(new PermissionItem(
+                    "Notifications",
+                    "Keeps shift tracking service active in background.",
+                    permissionManager.getManifestPermission(PermissionManager.TAG_NOTIFICATION),
+                    true, PermissionManager.TAG_NOTIFICATION, "BACKGROUND"));
         }
 
-        // 5. Biometric (Optional)
-        list.add(new PermissionItem("Biometric Login", "Secure login using fingerprint or PIN.", Manifest.permission.USE_BIOMETRIC, false, "BIOMETRIC"));
+        // ── SECURITY ──
+        list.add(new PermissionItem(
+                "Biometric Login",
+                "Secure login using fingerprint or face.",
+                null,
+                false, PermissionManager.TAG_BIOMETRIC, "SECURITY"));
 
-        // 6. System Status (Informational)
-        list.add(new PermissionItem("Internet Access", "Required to sync data with servers.", null, true, "INTERNET"));
+        // ── SYSTEM ──
+        list.add(new PermissionItem(
+                "Internet Access",
+                "Syncs your data with company servers.",
+                null,
+                true, PermissionManager.TAG_INTERNET, "SYSTEM"));
 
         permissions.setValue(list);
+        updateItemsFromManager();
+    }
+
+    /**
+     * Reads the TRUE state from PermissionManager and updates the UI list.
+     */
+    private void updateItemsFromManager() {
+        List<PermissionItem> items = permissions.getValue();
+        if (items == null) return;
+
+        for (PermissionItem item : items) {
+            item.setGranted(permissionManager.isGranted(item.getTag()));
+        }
+
+        // Trigger LiveData update
+        permissions.setValue(items);
+    }
+
+    /**
+     * Toggle an app-level permission (Biometric, etc.)
+     */
+    public void toggleAppPermission(String tag, boolean enabled) {
+        permissionManager.setAppLevelPermission(tag, enabled);
+        updateItemsFromManager();
     }
 }

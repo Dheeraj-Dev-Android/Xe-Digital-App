@@ -2,7 +2,9 @@ package app.xedigital.ai.model.regularizeUpdateStatus;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Component {
+import java.io.Serializable;
+
+public class Component implements Serializable {
 
     @SerializedName("_id")
     private String id;

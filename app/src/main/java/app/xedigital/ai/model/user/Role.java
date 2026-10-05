@@ -2,7 +2,9 @@ package app.xedigital.ai.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Role {
+import java.io.Serializable;
+
+public class Role implements Serializable {
     private String createdAt;
     private boolean jsonMemberDefault;
     private String displayName;

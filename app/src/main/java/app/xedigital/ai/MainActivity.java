@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -45,6 +46,7 @@ import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.ui.deviceRegister.DeviceRegistrationViewModel;
 import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.NetworkUtils;
+import app.xedigital.ai.utills.PermissionManager;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isNoInternetDialogShowing = false;
     private DeviceRegistrationViewModel deviceRegistrationViewModel;
+    private PermissionManager permissionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarMain.toolbar);
+
+        permissionManager = PermissionManager.getInstance(this);
 
         slowInternetLayout = findViewById(R.id.slowInternetLayout);
         tvSpeed = findViewById(R.id.tvSpeed);
@@ -166,6 +171,45 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setCheckedItem(destId);
             if (destId == R.id.nav_dashboard) {
                 collapseAllSubmenus();
+            }
+        });
+
+        // ✅ Handle Back Press using modern OnBackPressedDispatcher (Fixes WindowLeaked crash)
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START);
+                    return;
+                }
+
+                if (navController.getCurrentDestination() != null
+                        && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                    navigateToDashboard();
+                    return;
+                }
+
+                // On Dashboard: Show Exit confirmation dialog
+                if (!isFinishing() && !isDestroyed()) {
+                    CustomDialogHelper.showWarningDialog(
+                            MainActivity.this,
+                            "Exit App",
+                            "Are you sure you want to exit the app?",
+                            "Yes, Exit",
+                            "Cancel",
+                            new CustomDialogHelper.OnWarningActionListener() {
+                                @Override
+                                public void onConfirm() {
+                                    finish();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    // Stay in app - do nothing
+                                }
+                            }
+                    );
+                }
             }
         });
 
@@ -295,6 +339,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showLogoutConfirmationDialog() {
+        if (isFinishing() || isDestroyed()) return;
+
         CustomDialogHelper.showWarningDialog(this, "Logout", "Are you sure you want to logout?\n\nYou will need to login again to access the app.", "Yes, Logout", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
             @Override
             public void onConfirm() {
@@ -376,28 +422,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
-        } else if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
-            navigateToDashboard();
-        } else {
-            CustomDialogHelper.showWarningDialog(this, "Exit App", "Are you sure you want to exit the app?", "Yes, Exit", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
-                @Override
-                public void onConfirm() {
-                    finish();
-                }
-
-                @Override
-                public void onCancel() {
-                    // Stay in app
-                }
-            });
-        }
-    }
-
-    @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
@@ -414,7 +438,9 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 navigateToDashboard();
             } else {
-                CustomDialogHelper.showErrorDialog(this, "Punch Failed", "Attendance punch could not be recorded.\nPlease try again.");
+                if (!isFinishing() && !isDestroyed()) {
+                    CustomDialogHelper.showErrorDialog(this, "Punch Failed", "Attendance punch could not be recorded.\nPlease try again.");
+                }
             }
         }
     }
@@ -423,7 +449,9 @@ public class MainActivity extends AppCompatActivity {
         if (NetworkUtils.isNetworkAvailable(this)) {
             hideNoInternetLayout();
         } else {
-            CustomDialogHelper.showInfoDialog(this, "Still Offline", "No internet connection detected.\nPlease enable Wi-Fi or mobile data and try again.");
+            if (!isFinishing() && !isDestroyed()) {
+                CustomDialogHelper.showInfoDialog(this, "Still Offline", "No internet connection detected.\nPlease enable Wi-Fi or mobile data and try again.");
+            }
         }
     }
 
@@ -562,6 +590,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         registerNetworkReceiver();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (permissionManager != null) {
+            permissionManager.syncAllPermissions();
+        }
     }
 
     @Override

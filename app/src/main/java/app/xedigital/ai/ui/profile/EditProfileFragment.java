@@ -160,17 +160,14 @@ public class EditProfileFragment extends Fragment {
                 ).toString().trim().toLowerCase();
 
                 // Evaluate each rule
-                boolean lengthOk = password.length() >= 12 && password.length() <= 16;
+                boolean lengthOk = password.length() >= 16 && password.length() <= 18;
                 boolean upperOk = password.matches(".*[A-Z].*");
                 boolean lowerOk = password.matches(".*[a-z].*");
                 boolean numberOk = password.matches(".*[0-9].*");
                 boolean specialOk = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|.<>/?`~].*");
                 boolean noSpaceCommaOk = !password.contains(" ") && !password.contains(",");
 
-                boolean nameValid = true;
-                if (!firstName.isEmpty() && password.toLowerCase().contains(firstName)) {
-                    nameValid = false;
-                }
+                boolean nameValid = firstName.isEmpty() || !password.toLowerCase().contains(firstName);
                 if (!lastName.isEmpty() && password.toLowerCase().contains(lastName)) {
                     nameValid = false;
                 }
@@ -490,17 +487,17 @@ public class EditProfileFragment extends Fragment {
             return true;
         }
 
-        if (password.length() < 12) {
+        if (password.length() < 16) {
             binding.textInputLayoutPassword.setError(
-                    "Password must be at least 12 characters"
+                    "Password must be at least 16 characters"
             );
             setPasswordBoxColor(colorRed);
             return false;
         }
 
-        if (password.length() > 16) {
+        if (password.length() > 18) {
             binding.textInputLayoutPassword.setError(
-                    "Password cannot exceed 16 characters"
+                    "Password cannot exceed 18 characters"
             );
             setPasswordBoxColor(colorRed);
             return false;

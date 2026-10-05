@@ -2,7 +2,9 @@ package app.xedigital.ai.model.AttendanceLog;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AttendanceLogsItem {
+import java.io.Serializable;
+
+public class AttendanceLogsItem implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

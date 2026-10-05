@@ -2,9 +2,10 @@ package app.xedigital.ai.model.empAttandance;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EmployeePunchDataItem {
+public class EmployeePunchDataItem implements Serializable {
 
     @SerializedName("punchDateFormat")
     private String punchDateFormat;

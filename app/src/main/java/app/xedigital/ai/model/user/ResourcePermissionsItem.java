@@ -2,9 +2,10 @@ package app.xedigital.ai.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ResourcePermissionsItem {
+public class ResourcePermissionsItem implements Serializable {
     private Resource resource;
     private List<Object> permissions;
     @SerializedName("_id")

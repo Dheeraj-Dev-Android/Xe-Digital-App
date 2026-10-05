@@ -2,9 +2,10 @@ package app.xedigital.ai.model.TeamTimesheetResponse;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Employee {
+public class Employee implements Serializable {
 
     @SerializedName("joiningType")
     private String joiningType;

@@ -2,7 +2,9 @@ package app.xedigital.ai.model.profile;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Shift {
+import java.io.Serializable;
+
+public class Shift implements Serializable {
 
     @SerializedName("format")
     private int format;

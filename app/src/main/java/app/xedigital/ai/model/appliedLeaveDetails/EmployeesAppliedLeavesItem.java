@@ -2,7 +2,9 @@ package app.xedigital.ai.model.appliedLeaveDetails;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeesAppliedLeavesItem {
+import java.io.Serializable;
+
+public class EmployeesAppliedLeavesItem implements Serializable {
 
     @SerializedName("leaveName")
     private String leaveName;

@@ -2,9 +2,10 @@ package app.xedigital.ai.model.employeeOnboarding;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EmployeeOnBoardDetails {
+public class EmployeeOnBoardDetails implements Serializable {
 
     @SerializedName("country")
     private String country;

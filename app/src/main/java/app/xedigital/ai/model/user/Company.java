@@ -2,7 +2,9 @@ package app.xedigital.ai.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Company {
+import java.io.Serializable;
+
+public class Company implements Serializable {
     private String zip;
     private String emailDomain;
     private String website;

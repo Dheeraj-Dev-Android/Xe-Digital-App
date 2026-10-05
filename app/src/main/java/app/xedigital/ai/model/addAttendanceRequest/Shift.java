@@ -2,7 +2,9 @@ package app.xedigital.ai.model.addAttendanceRequest;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Shift {
+import java.io.Serializable;
+
+public class Shift implements Serializable {
 
     @SerializedName("shiftType")
     private String shiftType;

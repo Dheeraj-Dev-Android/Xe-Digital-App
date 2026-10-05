@@ -2,7 +2,9 @@ package app.xedigital.ai.model.UpdateProfile;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Crossmanager {
+import java.io.Serializable;
+
+public class Crossmanager implements Serializable {
 
     @SerializedName("firstname")
     private String firstname;

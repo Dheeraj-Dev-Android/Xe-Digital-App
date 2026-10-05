@@ -2,7 +2,9 @@ package app.xedigital.ai.model.shiftApplied;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeeShiftdataItem {
+import java.io.Serializable;
+
+public class EmployeeShiftdataItem implements Serializable {
 
     @SerializedName("approvedDate")
     private String approvedDate;

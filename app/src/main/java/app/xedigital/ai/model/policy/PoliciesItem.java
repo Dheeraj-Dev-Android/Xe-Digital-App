@@ -2,7 +2,9 @@ package app.xedigital.ai.model.policy;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PoliciesItem {
+import java.io.Serializable;
+
+public class PoliciesItem implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

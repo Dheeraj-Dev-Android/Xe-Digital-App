@@ -2,7 +2,9 @@ package app.xedigital.ai.model.meetingRoom;
 
 import com.google.gson.annotations.SerializedName;
 
-public class RoomDataItem {
+import java.io.Serializable;
+
+public class RoomDataItem implements Serializable {
 
     @SerializedName("docFileURLKey")
     private String docFileURLKey;

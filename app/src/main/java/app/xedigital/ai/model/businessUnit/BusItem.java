@@ -2,7 +2,9 @@ package app.xedigital.ai.model.businessUnit;
 
 import com.google.gson.annotations.SerializedName;
 
-public class BusItem {
+import java.io.Serializable;
+
+public class BusItem implements Serializable {
 
     @SerializedName("buId")
     private String buId;

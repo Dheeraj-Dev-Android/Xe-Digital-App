@@ -2,9 +2,10 @@ package app.xedigital.ai.model.EmployeeByBusinessUnit;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ResultItem {
+public class ResultItem implements Serializable {
 
     @SerializedName("joiningType")
     private String joiningType;

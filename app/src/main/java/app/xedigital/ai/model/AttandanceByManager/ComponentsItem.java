@@ -25,10 +25,10 @@ public class ComponentsItem implements Serializable {
     private Object fixedAmount;
 
     @SerializedName("monthlyAmount")
-    private int monthlyAmount;
+    private double monthlyAmount;
 
     @SerializedName("yearlyAmount")
-    private int yearlyAmount;
+    private double yearlyAmount;
 
     @SerializedName("earningname")
     private String earningname;
@@ -57,11 +57,11 @@ public class ComponentsItem implements Serializable {
         return fixedAmount;
     }
 
-    public int getMonthlyAmount() {
+    public double getMonthlyAmount() {
         return monthlyAmount;
     }
 
-    public int getYearlyAmount() {
+    public double getYearlyAmount() {
         return yearlyAmount;
     }
 

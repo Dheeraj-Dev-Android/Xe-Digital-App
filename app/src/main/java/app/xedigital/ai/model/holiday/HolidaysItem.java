@@ -2,7 +2,9 @@ package app.xedigital.ai.model.holiday;
 
 import com.google.gson.annotations.SerializedName;
 
-public class HolidaysItem {
+import java.io.Serializable;
+
+public class HolidaysItem implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;

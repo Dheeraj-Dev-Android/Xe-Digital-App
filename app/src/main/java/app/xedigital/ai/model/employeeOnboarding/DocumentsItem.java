@@ -2,7 +2,7 @@ package app.xedigital.ai.model.employeeOnboarding;
 
 import com.google.gson.annotations.SerializedName;
 
-public class DocumentsItem {
+public class DocumentsItem implements java.io.Serializable {
 
     @SerializedName("documentName")
     private String documentName;

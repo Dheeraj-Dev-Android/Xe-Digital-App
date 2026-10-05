@@ -2,9 +2,10 @@ package app.xedigital.ai.model.TeamMember;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ChildrenItem {
+public class ChildrenItem implements Serializable {
 
     @SerializedName("joiningType")
     private String joiningType;

@@ -3,7 +3,9 @@ package app.xedigital.ai.model.holiday;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Holiday {
+import java.io.Serializable;
+
+public class Holiday implements Serializable {
 
     @SerializedName("active")
     private boolean active;

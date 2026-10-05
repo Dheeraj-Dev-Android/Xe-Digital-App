@@ -2,7 +2,9 @@ package app.xedigital.ai.model.TeamTimesheetResponse;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ComponentsItem {
+import java.io.Serializable;
+
+public class ComponentsItem implements Serializable {
 
     @SerializedName("calculationType")
     private String calculationType;

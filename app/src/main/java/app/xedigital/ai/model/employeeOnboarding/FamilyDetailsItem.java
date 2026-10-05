@@ -2,7 +2,9 @@ package app.xedigital.ai.model.employeeOnboarding;
 
 import com.google.gson.annotations.SerializedName;
 
-public class FamilyDetailsItem {
+import java.io.Serializable;
+
+public class FamilyDetailsItem implements Serializable {
 
     @SerializedName("familyMobile")
     private String familyMobile;

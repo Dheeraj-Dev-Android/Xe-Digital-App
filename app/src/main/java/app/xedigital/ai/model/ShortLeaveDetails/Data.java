@@ -10,11 +10,20 @@ public class Data {
     @SerializedName("shortLeaveCount")
     private int shortLeaveCount;
 
+    @SerializedName("confirmEmpShortLeave")
+    private boolean confirmEmpShortLeave;
+
+    @SerializedName("eveningShortLeave")
+    private boolean eveningShortLeave;
+
+    @SerializedName("probationEmpShortLeave")
+    private boolean probationEmpShortLeave;
+
+    @SerializedName("morningShortLeave")
+    private boolean morningShortLeave;
+
     @SerializedName("shortLeave")
     private boolean shortLeave;
-
-    @SerializedName("shortLeaveTiming")
-    private boolean shortLeaveTiming;
 
     public int getShortLeaveExemption() {
         return shortLeaveExemption;
@@ -24,11 +33,23 @@ public class Data {
         return shortLeaveCount;
     }
 
-    public boolean isShortLeave() {
-        return shortLeave;
+    public boolean isConfirmEmpShortLeave() {
+        return confirmEmpShortLeave;
     }
 
-    public boolean isShortLeaveTiming() {
-        return shortLeaveTiming;
+    public boolean isEveningShortLeave() {
+        return eveningShortLeave;
+    }
+
+    public boolean isProbationEmpShortLeave() {
+        return probationEmpShortLeave;
+    }
+
+    public boolean isMorningShortLeave() {
+        return morningShortLeave;
+    }
+
+    public boolean isShortLeave() {
+        return shortLeave;
     }
 }
