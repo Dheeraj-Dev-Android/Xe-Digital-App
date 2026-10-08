@@ -9,10 +9,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-    //    private static final String BASE_URL = "http://10.172.6.31:4000/";
-//    private static final String BASE_URL_2 = "http://10.172.6.31:4000/api/v1/";
-//
-//    private static final String BASE_URL_3 = "http://10.172.6.31:4000/api/v1/";
+    //    private static final String BASE_URL = "http://10.172.6.33:4000/";
+//    private static final String BASE_URL_2 = "http://10.172.6.33:4000/api/v1/";
+//    private static final String BASE_URL_3 = "http://10.172.6.33:4000/api/v1/";
     private static final String BASE_URL = "https://app.xedigital.ai/";
     private static final String BASE_URL_2 = "https://app.xedigital.ai/api/v1/";
 
