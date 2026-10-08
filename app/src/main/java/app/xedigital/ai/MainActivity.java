@@ -37,7 +37,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import app.xedigital.ai.activity.LoginActivity;
 import app.xedigital.ai.activity.PunchActivity;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityMainBinding;
@@ -47,6 +46,7 @@ import app.xedigital.ai.ui.deviceRegister.DeviceRegistrationViewModel;
 import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.NetworkUtils;
 import app.xedigital.ai.utills.PermissionManager;
+import app.xedigital.ai.utills.RoleAccessManager;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -108,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        // ✅ Safety guard — if admin user somehow lands here
+        String role = RoleAccessManager.getInstance(this).getRoleName();
+        if (app.xedigital.ai.utills.RoleGroup.isAdminTier(role)) {
+            Intent intent = new Intent(this, AdminMainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
@@ -355,10 +366,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        // 🔒 Use clearSession() so hardware binding is preserved on logout
+        // Clear employee session
         SecurePrefManager.getInstance(MainActivity.this).clearSession();
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        intent.putExtra("isFallback", true);
+        RoleAccessManager.getInstance(this).clear();
+
+        // Also clear admin creds for safety
+        getSharedPreferences("AdminCred", MODE_PRIVATE).edit().clear().apply();
+
+        Intent intent = new Intent(MainActivity.this, app.xedigital.ai.activity.LoginSelectionActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

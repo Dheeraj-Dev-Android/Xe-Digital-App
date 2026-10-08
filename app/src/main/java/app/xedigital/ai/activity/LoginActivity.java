@@ -18,12 +18,15 @@ import com.bumptech.glide.Glide;
 
 import java.util.Objects;
 
+import app.xedigital.ai.AdminMainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityLoginBinding;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.utills.PermissionManager;
+import app.xedigital.ai.utills.RoleAccessManager;
+import app.xedigital.ai.utills.RoleGroup;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,25 +40,17 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isRedirectInProgress = false;
     private boolean isCheckingPermissions = false;
     private PermissionManager permissionManager;
-
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                // ── CHANGED: Sync with central manager ──
                 permissionManager.syncAllPermissions();
                 isCheckingPermissions = false;
                 proceedToAuthCheck();
             });
-
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
-
-    // ─── Session Workflow ─────────────────────────────────────────────────────
     private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                // ── CHANGED: Sync with central manager ──
                 permissionManager.syncAllPermissions();
-
-                // ── CHANGED: Read from PermissionManager instead of raw result ──
                 boolean locationGranted = permissionManager.isGranted(PermissionManager.TAG_LOCATION);
 
                 SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
@@ -63,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (locationGranted) {
                     if (cachedToken != null) {
-                        navigateToFaceLogin(cachedToken);
+                        proceedToRoleBasedNavigation(cachedToken);
                     }
                 } else {
                     showLoginScreen();
@@ -88,7 +83,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         loadingOverlay = binding.loadingOverlay;
 
-        // ── CHANGED: Initialize central permission manager ──
         permissionManager = PermissionManager.getInstance(this);
 
         hideLoginScreen();
@@ -106,10 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // ─── Silent Token Refresh ─────────────────────────────────────────────────
-
     private void evaluateSessionWorkflow() {
-        // ── CHANGED: Use PermissionManager instead of ContextCompat ──
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!permissionManager.isGranted(PermissionManager.TAG_NOTIFICATION)) {
                 isCheckingPermissions = true;
@@ -122,8 +113,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         proceedToAuthCheck();
     }
-
-    // ─── Login API ────────────────────────────────────────────────────────────
 
     private void proceedToAuthCheck() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
@@ -144,8 +133,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // ─── Fetch & Save User Data (after manual login only) ────────────────────
-
     private void silentlyRefreshToken() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         String savedEmail = prefManager.getString("emailId", null);
@@ -161,17 +148,13 @@ public class LoginActivity extends AppCompatActivity {
         callLoginApi(savedEmail, savedPassword, false);
     }
 
-    // ─── Store Credentials ────────────────────────────────────────────────────
-
     private void callLoginApi(String email, String password, boolean isManualLogin) {
         if (isManualLogin) showLoading(true);
 
         Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password);
         call.enqueue(new Callback<LoginModelResponse>() {
-
             @Override
-            public void onResponse(@NonNull Call<LoginModelResponse> call,
-                                   @NonNull Response<LoginModelResponse> response) {
+            public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
                 if (isFinishing() || isDestroyed()) return;
                 showLoading(false);
 
@@ -183,14 +166,13 @@ public class LoginActivity extends AppCompatActivity {
                         String token = loginResponse.getData().getToken();
                         String emailId = loginResponse.getData().getUser().getEmail();
 
-                        storeInSharedPreferences(userId, emailId, password, token);
+                        storeInSecurePrefs(userId, emailId, password, token);
 
                         if (isManualLogin) {
                             fetchAndSaveUserData(userId, token);
                         } else {
                             checkPermissionsAndNavigate(token);
                         }
-
                     } else {
                         if (isManualLogin) {
                             showAlertDialog(loginResponse.getMessage());
@@ -199,7 +181,6 @@ public class LoginActivity extends AppCompatActivity {
                             clearSessionAndShowLogin();
                         }
                     }
-
                 } else {
                     if (isManualLogin) {
                         showAlertDialog("Invalid Credentials");
@@ -224,41 +205,32 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // ─── Session Cleanup ──────────────────────────────────────────────────────
-
     private void fetchAndSaveUserData(String userId, String authToken) {
         showLoading(true);
-
         String authHeaderValue = "jwt " + authToken;
 
-        Call<UserModelResponse> userCall = APIClient.getInstance()
-                .getUser()
-                .getUserData(userId, authHeaderValue);
-
+        Call<UserModelResponse> userCall = APIClient.getInstance().getUser().getUserData(userId, authHeaderValue);
         userCall.enqueue(new Callback<UserModelResponse>() {
-
             @Override
-            public void onResponse(@NonNull Call<UserModelResponse> call,
-                                   @NonNull Response<UserModelResponse> response) {
+            public void onResponse(@NonNull Call<UserModelResponse> call, @NonNull Response<UserModelResponse> response) {
                 if (isFinishing() || isDestroyed()) return;
                 showLoading(false);
 
-                if (response.isSuccessful()
-                        && response.body() != null
-                        && response.body().isSuccess()
-                        && response.body().getData() != null
-                        && response.body().getData().getCompany() != null) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess() && response.body().getData() != null) {
 
-                    String collectionName = response.body().getData().getCompany().getCollectionName();
-                    SecurePrefManager.getInstance(LoginActivity.this)
-                            .putString("collection", collectionName);
+                    app.xedigital.ai.model.user.Data data = response.body().getData();
 
-                    Log.d(TAG, "Collection name saved: " + collectionName);
+                    // ✅ Cache role + permissions + branch toggles
+                    RoleAccessManager.getInstance(LoginActivity.this).applyUserData(data);
 
+                    if (data.getCompany() != null) {
+                        String collectionName = data.getCompany().getCollectionName();
+                        SecurePrefManager.getInstance(LoginActivity.this).putString("collection", collectionName);
+                    }
                 } else {
                     Log.e(TAG, "User data fetch failed: "
-                            + (response.body() != null ? response.body().getMessage()
-                            : response.code()));
+                            + (response.body() != null ? response.body().getMessage() : response.code()));
                 }
 
                 checkPermissionsAndNavigate(authToken);
@@ -273,10 +245,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // ─── Permission Handling ──────────────────────────────────────────────────
-
-    private void storeInSharedPreferences(String userId, String emailId,
-                                          String password, String authToken) {
+    private void storeInSecurePrefs(String userId, String emailId, String password, String authToken) {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         prefManager.putString("userId", userId);
         prefManager.putString("emailId", emailId);
@@ -300,7 +269,17 @@ public class LoginActivity extends AppCompatActivity {
     private void checkPermissionsAndNavigate(String token) {
         SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
 
-        // ── CHANGED: Use PermissionManager instead of direct check ──
+        // ✅ Admin tier should NEVER have landed here, but safety-guard
+        String role = RoleAccessManager.getInstance(this).getRoleName();
+        if (RoleGroup.isAdminTier(role)) {
+            Intent intent = new Intent(this, AdminMainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        // Employee requires location permission
         if (!permissionManager.isGranted(PermissionManager.TAG_LOCATION)) {
             foregroundPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -308,13 +287,13 @@ public class LoginActivity extends AppCompatActivity {
             });
             return;
         }
-        navigateToFaceLogin(token);
+        proceedToRoleBasedNavigation(token);
     }
 
-    // ── REMOVED: hasForegroundLocationPermission() ──
-    // Now handled by PermissionManager.isGranted(TAG_LOCATION)
-
-    // ─── Navigation ───────────────────────────────────────────────────────────
+    private void proceedToRoleBasedNavigation(String token) {
+        if (isFinishing() || isDestroyed()) return;
+        navigateToFaceLogin(token);
+    }
 
     private void navigateToFaceLogin(String token) {
         if (isFinishing() || isDestroyed()) return;
@@ -325,7 +304,7 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    // ─── UI Helpers ───────────────────────────────────────────────────────────
+    // ─── UI Helpers ────────────────────────────────────────────────
 
     private void showLoginScreen() {
         binding.layoutEmail.setVisibility(View.VISIBLE);
@@ -342,28 +321,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showLoading(boolean show) {
-        if (loadingOverlay != null) {
-            loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
-        }
+        if (loadingOverlay != null) loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
-
-        if (infoDialog != null && infoDialog.isShowing()) {
-            infoDialog.dismiss();
-        }
-
+        if (infoDialog != null && infoDialog.isShowing()) infoDialog.dismiss();
         infoDialog = new AlertDialog.Builder(this)
                 .setTitle("Login Info")
                 .setMessage(message)
                 .setPositiveButton("OK", null)
                 .create();
-
         infoDialog.show();
     }
-
-    // ─── Lifecycle ────────────────────────────────────────────────────────────
 
     @Override
     protected void onDestroy() {

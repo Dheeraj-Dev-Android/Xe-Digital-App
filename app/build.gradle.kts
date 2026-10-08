@@ -78,7 +78,7 @@ dependencies {
     implementation(libs.compiler)
     implementation(libs.transport.api)
     implementation(libs.core.i18n)
-    implementation(libs.rendering)
+//    implementation(libs.rendering)
     implementation(libs.ui.text.android)
     implementation(libs.firebase.vertexai)
     implementation(libs.engage.core)
@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.perf)
     implementation(libs.legacy.support.v4)
+//    implementation(libs.scenecore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -117,4 +118,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("androidx.security:security-crypto:1.1.0")
+    // Core ZXing library for barcode logic
+    implementation("com.google.zxing:core:3.5.3")
+    // ZXing Android Embedded for scanning and encoding UI
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

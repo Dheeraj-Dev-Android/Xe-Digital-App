@@ -48,10 +48,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         noInternetAnimation = findViewById(R.id.noInternetAnimation);
-        Glide.with(this)
-                .load(R.mipmap.ic_launcher)
-                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                .into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
+        Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
 
         tvSpeed = findViewById(R.id.tvSpeed);
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
@@ -60,9 +57,7 @@ public class SplashActivity extends AppCompatActivity {
         if (tvAppVersion != null) {
             try {
                 String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-                int versionCode = Build.VERSION.SDK_INT >= 28
-                        ? (int) getPackageManager().getPackageInfo(getPackageName(), 0).getLongVersionCode()
-                        : getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+                int versionCode = Build.VERSION.SDK_INT >= 28 ? (int) getPackageManager().getPackageInfo(getPackageName(), 0).getLongVersionCode() : getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
 
                 tvAppVersion.setText("App Version : " + versionCode + "." + versionName);
             } catch (Exception e) {
@@ -127,7 +122,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void navigateToLogin() {
         splashHandler.removeCallbacksAndMessages(null);
-        Intent mainIntent = new Intent(SplashActivity.this, LoginActivity.class);
+        Intent mainIntent = new Intent(SplashActivity.this, LoginSelectionActivity.class);
         startActivity(mainIntent);
         finish();
     }

@@ -59,6 +59,7 @@ import app.xedigital.ai.utills.BioMetric;
 import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.FaceOverlayView;
 import app.xedigital.ai.utills.PermissionManager;
+import app.xedigital.ai.utills.RoleAccessManager;
 import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -119,6 +120,15 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_login);
+        // ✅ Safety guard — admin users should not reach FaceLogin
+        String role = RoleAccessManager.getInstance(this).getRoleName();
+        if (app.xedigital.ai.utills.RoleGroup.isAdminTier(role)) {
+            Intent intent = new Intent(this, app.xedigital.ai.AdminMainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         securePrefManager = SecurePrefManager.getInstance(this);
         // ── CHANGED: Initialize central permission manager ──

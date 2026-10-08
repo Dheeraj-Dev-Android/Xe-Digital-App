@@ -172,4 +172,42 @@
     <string name="no_shift_change_applied_subtitle">Your submitted shift change requests will appear here</string>
     <string name="no_shift_change_found">No Pending Approvals</string>
     <string name="no_shift_approval_subtitle">Shift change requests awaiting your approval will appear here</string>
+    <string name="admin_email">Admin Email</string>
+    <string name="admin_sign_in">Admin Sign In</string>
+    <string name="capturing_image">Capturing Image...</string>
+    <string name="wait_while_we_are_getting_details">Wait While We are Getting Details...</string>
+
+    <string-array name="status_options">
+        <item>Select Status</item>
+        <item>Active</item>
+        <item>Deactive</item>
+    </string-array>
+
+    <string-array name="differently_able_options">
+        <item>Please Select</item>
+        <item>Visual</item>
+        <item>Hearing</item>
+        <item>Speech</item>
+        <item>Mobility</item>
+        <item>Other</item>
+        <item>Not Differently Abled</item>
+    </string-array>
+
+
+    <string-array name="joining_type_options">
+        <item>Please Select</item>
+        <item>Probation</item>
+        <item>Confirm</item>
+    </string-array>
+
+
+    <string-array name="employee_type_options">
+        <item>Internal Employee</item>
+        <item>Partner</item>
+    </string-array>
+    <string name="manual_check_in">Manual Check In</string>
+    <string name="punch_out">Visitor Check Out</string>
+    <string name="confirm_check_in">Confirm Check In</string>
+    <string name="consultedge_global">ConsultEdge Global</string>
+    <string name="punch_in">Check In</string>
 </resources>

@@ -2,6 +2,7 @@ package app.xedigital.ai.utills;
 
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -10,7 +11,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class DateTimeUtils {
 
@@ -51,6 +54,11 @@ public class DateTimeUtils {
         }
     }
 
+    public static String getCurrentUtcTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
+    }
     public static String formatToReadableDate(String isoString) {
         if (isInvalidInput(isoString)) return "";
         try {

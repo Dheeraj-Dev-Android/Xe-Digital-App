@@ -34,10 +34,13 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
     <!-- WorkManager: restart tracking after device reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <!-- Battery optimization exemption request -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
@@ -66,11 +69,9 @@
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
             tools:node="merge">
-            <!--            <meta-data-->
-            <!--                android:name="androidx.work.WorkManagerInitializer"-->
-            <!--                android:value="androidx.startup"-->
-            <!--                tools:node="remove" />-->
+            <!-- WorkManager configuration if needed -->
         </provider>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -91,7 +92,76 @@
             </intent-filter>
         </receiver>
 
-        <!-- ── Activities ───────────────────────────────────────────────── -->
+        <!-- ── Launcher / Entry Point Activity ──────────────────────────── -->
+        <activity
+            android:name="app.xedigital.ai.activity.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar.Starting">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ── Role Selection Activity ──────────────────────────────────── -->
+        <activity
+            android:name=".activity.LoginSelectionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
+        <!-- ── Authentication Activities ────────────────────────────────── -->
+        <!-- Employee / Manager Login -->
+        <activity
+            android:name=".activity.LoginActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Admin / HR Login -->
+        <activity
+            android:name=".activity.AdminLoginActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Biometric Face Verification (Employee only) -->
+        <activity
+            android:name=".activity.FaceLoginActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.XEDigital.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".admin.adminActivity.AdminPunchActivity"
+            android:exported="true"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name=".admin.adminActivity.AdminCheckOutActivity"
+            android:exported="true"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name=".admin.adminActivity.AdminManualCheckIn"
+            android:exported="true"
+            android:hardwareAccelerated="true" />
+
+        <!-- ── Main Dashboard Activities ────────────────────────────────── -->
+        <!-- Employee & Manager Host Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:enableOnBackInvokedCallback="true"
+            android:exported="false"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
+        <!-- Admin & HR Host Activity -->
+        <activity
+            android:name=".AdminMainActivity"
+            android:enableOnBackInvokedCallback="true"
+            android:exported="false"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
+        <!-- ── Feature / Utility Activities ─────────────────────────────── -->
         <activity
             android:name=".ui.AttendanceByManager.AttendanceDetailActivity"
             android:exported="false"
@@ -106,37 +176,6 @@
             android:exported="false"
             android:theme="@style/Theme.XEDigital.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
-
-        <!-- Launcher Activity -->
-        <activity
-            android:name="app.xedigital.ai.activity.SplashActivity"
-            android:exported="true"
-            android:theme="@style/Theme.XEDigital.NoActionBar.Starting">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".activity.LoginActivity"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.XEDigital.NoActionBar"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".activity.FaceLoginActivity"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.XEDigital.NoActionBar"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".MainActivity"
-            android:enableOnBackInvokedCallback="true"
-            android:exported="false"
-            android:theme="@style/Theme.XEDigital.NoActionBar" />
 
         <!-- ── Meta-data ─────────────────────────────────────────────────── -->
         <meta-data
