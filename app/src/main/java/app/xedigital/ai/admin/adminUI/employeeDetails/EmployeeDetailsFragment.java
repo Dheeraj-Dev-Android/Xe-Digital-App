@@ -1,7 +1,5 @@
 package app.xedigital.ai.admin.adminUI.employeeDetails;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,6 +24,7 @@ import java.util.List;
 import app.xedigital.ai.R;
 import app.xedigital.ai.admin.adminAdapter.EmployeeAdapter;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeesItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class EmployeeDetailsFragment extends Fragment {
 
@@ -43,7 +42,7 @@ public class EmployeeDetailsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_employee_details, container, false);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         token = sharedPreferences.getString("authToken", null);
 
         rvEmployees = view.findViewById(R.id.rvEmployees);

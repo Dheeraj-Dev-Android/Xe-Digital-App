@@ -2,7 +2,6 @@ package app.xedigital.ai.admin.adminActivity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,6 +55,7 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.visitorContact.VisitorContactResponse;
 import app.xedigital.ai.admin.adminModal.visitorFace.VisitorFaceResponse;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -88,9 +88,9 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_checkout);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        token = sharedPreferences.getString("authToken", "");
-        CollectionName = sharedPreferences.getString("collectionName", "");
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        token = prefManager.getString("authToken", "");
+        CollectionName = prefManager.getString("collectionName", "");
         previewView = findViewById(R.id.previewView);
         captureOverlay = findViewById(R.id.capture_overlay);
         progressBar = findViewById(R.id.loadingPanel);

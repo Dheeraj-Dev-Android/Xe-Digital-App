@@ -1,7 +1,6 @@
 package app.xedigital.ai.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,11 +51,11 @@ public class LoginSelectionActivity extends AppCompatActivity {
      */
     private boolean routeIfActiveSession() {
         String cachedRole = RoleAccessManager.getInstance(this).getRoleName();
+        SecurePrefManager securePrefs = SecurePrefManager.getInstance(this);
 
-        // 1️⃣ Admin session check (AdminCred SharedPreferences)
-        SharedPreferences adminPrefs = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        String adminToken = adminPrefs.getString("authToken", "");
-        String adminUserId = adminPrefs.getString("userId", "");
+        // 1️⃣ Admin session check (SecurePrefManager)
+        String adminToken = securePrefs.getString("authToken", "");
+        String adminUserId = securePrefs.getString("userId", "");
 
         if (!adminToken.isEmpty() && !adminUserId.isEmpty() && RoleGroup.isAdminTier(cachedRole)) {
             Intent intent = new Intent(this, AdminMainActivity.class);
@@ -67,7 +66,6 @@ public class LoginSelectionActivity extends AppCompatActivity {
         }
 
         // 2️⃣ Employee session check (SecurePrefManager)
-        SecurePrefManager securePrefs = SecurePrefManager.getInstance(this);
         String empToken = securePrefs.getString("authToken", null);
         String empUserId = securePrefs.getString("userId", null);
 

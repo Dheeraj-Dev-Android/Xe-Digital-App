@@ -2,8 +2,6 @@ package app.xedigital.ai.admin.adminUI.Visitor;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +25,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.admin.adminAdapter.VisitorAdapter;
 import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsItem;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class VisitorsDetailsFragment extends Fragment {
 
@@ -168,7 +167,7 @@ public class VisitorsDetailsFragment extends Fragment {
     }
 
     private String getAuthToken() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         return sharedPreferences.getString("authToken", null);
     }
 

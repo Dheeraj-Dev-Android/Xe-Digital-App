@@ -1,7 +1,6 @@
 package app.xedigital.ai.admin.adminUI.adminDashboard;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +40,7 @@ import java.util.Locale;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.admin.adminModal.LeaveGraph.Data;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class AdminDashboardFragment extends Fragment {
 
@@ -85,7 +85,7 @@ public class AdminDashboardFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (getContext() != null) {
-            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+            SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
             token = sharedPreferences.getString("authToken", "");
         }
         return inflater.inflate(R.layout.fragment_admin_dashboard, container, false);
@@ -170,9 +170,6 @@ public class AdminDashboardFragment extends Fragment {
                 emptyBirthdayState.setVisibility(View.GONE);
 
                 currentPosition = 0;
-
-                // FIX: Only enable auto-scroll when there are multiple items.
-                // Scrolling a single-item list is wasteful and looks broken.
                 if (birthdayEmployees.size() > 1) {
                     shouldAutoScroll = true;
                     scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
@@ -275,9 +272,6 @@ public class AdminDashboardFragment extends Fragment {
         if (legend != null) legend.setEnabled(false);
 
         leavesBarChart.setData(data);
-
-        // FIX: Pass pre-summed total to OptimizedMarkerView
-        // so it doesn't recalculate on every highlight tap
         OptimizedMarkerView mv = new OptimizedMarkerView(leavesBarChart.getContext(), R.layout.marker_view, values);
         mv.setChartView(leavesBarChart);
         leavesBarChart.setMarker(mv);
@@ -324,7 +318,6 @@ public class AdminDashboardFragment extends Fragment {
 
     // ─────────────────────────────────────────────────────────────
     // OptimizedMarkerView
-    // FIX: Total is computed ONCE in constructor, not on every tap
     // ─────────────────────────────────────────────────────────────
     private static class OptimizedMarkerView extends MarkerView {
 
@@ -352,9 +345,7 @@ public class AdminDashboardFragment extends Fragment {
 
                 // FIX: Use pre-computed total — O(1) instead of O(n) per tap
                 float percentage = (precomputedTotal > 0) ? (pieEntry.getValue() / precomputedTotal) * 100f : 0f;
-
                 String label = pieEntry.getLabel() != null ? pieEntry.getLabel() : "Data Not Available";
-
                 markerTextView.setText(String.format(Locale.US, "%s\n%.1f%%", label, percentage));
             }
             super.refreshContent(e, highlight);

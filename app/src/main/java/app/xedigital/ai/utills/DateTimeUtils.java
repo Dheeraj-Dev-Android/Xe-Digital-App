@@ -59,6 +59,7 @@ public class DateTimeUtils {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(new Date());
     }
+
     public static String formatToReadableDate(String isoString) {
         if (isInvalidInput(isoString)) return "";
         try {

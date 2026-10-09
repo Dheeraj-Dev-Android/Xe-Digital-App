@@ -1,7 +1,6 @@
 package app.xedigital.ai.admin.adminAdapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.partners.PartnersItem;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -174,7 +174,7 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
                 // Convert to RequestBody
                 RequestBody requestBody = RequestBody.create(json.toString(), okhttp3.MediaType.parse("application/json"));
 
-                SharedPreferences sharedPreferences = context.getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+                SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(context);
                 String token = sharedPreferences.getString("authToken", "");
                 String authToken = "jwt " + token;
                 String partnerId = partner.getId();
@@ -250,8 +250,6 @@ public class PartnersAdapter extends RecyclerView.Adapter<PartnersAdapter.ViewHo
             createdDate = view.findViewById(R.id.partnerCreatedDate);
             edit = view.findViewById(R.id.btnEdit);
             avatarText = view.findViewById(R.id.avatarText);
-
-
             cardView = view.findViewById(R.id.partnerCard);
         }
     }

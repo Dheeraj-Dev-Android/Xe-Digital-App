@@ -1,7 +1,6 @@
 package app.xedigital.ai.admin.adminAdapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.TooltipCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +23,7 @@ import java.util.List;
 import app.xedigital.ai.R;
 import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsItem;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorViewHolder> {
 
@@ -56,13 +57,13 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
         holder.visCheckInDate.setText(DateTimeUtils.getDayOfWeekAndDate(visitor.getSignIn()));
         //        holder.visApprovalStatus.setText(visitor.getApprovalStatus());
 
-        SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        SecurePrefManager prefs = SecurePrefManager.getInstance(context);
         boolean isFirstTime = prefs.getBoolean("show_visitor_hints", true);
 
         if (position == 0 && isFirstTime) {
             showWorkaroundTooltips(holder);
             // Save that we've shown it
-            prefs.edit().putBoolean("show_visitor_hints", false).apply();
+            prefs.putBoolean("show_visitor_hints", false);
         }
 
 
@@ -120,17 +121,13 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             tvFullName.setText(visitor.getName());
             tvContact.setText(visitor.getContact());
             tvEmail.setText(visitor.getEmail());
-            tvWhomToMeet.setText((visitor.getWhomToMeet() != null ?
-                    visitor.getWhomToMeet().getFirstname() + " " + visitor.getWhomToMeet().getLastname() : "N/A"));
+            tvWhomToMeet.setText((visitor.getWhomToMeet() != null ? visitor.getWhomToMeet().getFirstname() + " " + visitor.getWhomToMeet().getLastname() : "N/A"));
 
             // Date and Time fields
             tvCheckInDate.setText(DateTimeUtils.getDayOfWeekAndDate(visitor.getSignIn()));
-            tvCheckOutDate.setText(visitor.getSignOut() != null ?
-                    DateTimeUtils.getDayOfWeekAndDate(visitor.getSignOut()) : "N/A");
-            tvCheckInTime.setText(visitor.getSignIn() != null ?
-                    DateTimeUtils.extractTime(visitor.getSignIn()) : "N/A");
-            tvCheckOutTime.setText(visitor.getSignOut() != null ?
-                    DateTimeUtils.extractTime(visitor.getSignOut()) : "N/A");
+            tvCheckOutDate.setText(visitor.getSignOut() != null ? DateTimeUtils.getDayOfWeekAndDate(visitor.getSignOut()) : "N/A");
+            tvCheckInTime.setText(visitor.getSignIn() != null ? DateTimeUtils.extractTime(visitor.getSignIn()) : "N/A");
+            tvCheckOutTime.setText(visitor.getSignOut() != null ? DateTimeUtils.extractTime(visitor.getSignOut()) : "N/A");
 
             // Company and laptop serial
             tvCompanyFrom.setText(visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A");
@@ -138,21 +135,16 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
 
             // Profile image
             if (visitor.getProfileImagePath() != null) {
-                Glide.with(context)
-                        .load(visitor.getProfileImagePath())
-                        .placeholder(R.drawable.ic_profile_placeholder)
-                        .into(imgProfile);
+                Glide.with(context).load(visitor.getProfileImagePath()).placeholder(R.drawable.ic_profile_placeholder).into(imgProfile);
             } else {
                 imgProfile.setImageResource(R.drawable.ic_profile_placeholder);
             }
 
             // Build and show dialog
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-            builder.setView(dialogView)
-                    .setCancelable(true)
-                    .setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(dialogView).setCancelable(true).setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
 
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         });
         // 1. Get Statuses

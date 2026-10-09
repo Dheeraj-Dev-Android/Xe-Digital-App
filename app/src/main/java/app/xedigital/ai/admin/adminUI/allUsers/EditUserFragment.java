@@ -2,8 +2,6 @@ package app.xedigital.ai.admin.adminUI.allUsers;
 
 import static app.xedigital.ai.ui.timesheet.SelectedTimesheetFragment.ARG_SELECTED_ITEM;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +31,7 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.AdminUsers.UsersItem;
 import app.xedigital.ai.admin.adminModal.Role.RolesItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -64,7 +63,7 @@ public class EditUserFragment extends Fragment {
             selectedUser = (UsersItem) getArguments().getSerializable(ARG_SELECTED_ITEM);
         }
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         String authToken = sharedPreferences.getString("authToken", "");
         String token = "jwt " + authToken;
         mViewModel.fetchRoles(token);
@@ -158,7 +157,7 @@ public class EditUserFragment extends Fragment {
 
         boolean isActive = status.equalsIgnoreCase("Active");
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         String authToken = "jwt " + sharedPreferences.getString("authToken", "");
 
         // Map role name to ID

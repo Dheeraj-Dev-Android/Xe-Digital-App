@@ -1,7 +1,5 @@
 package app.xedigital.ai.admin.adminUI.allUsers;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,6 +24,7 @@ import java.util.List;
 import app.xedigital.ai.R;
 import app.xedigital.ai.admin.adminAdapter.AllUsersAdapter;
 import app.xedigital.ai.admin.adminModal.AdminUsers.UsersItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 
 public class AllUsersFragment extends Fragment {
 
@@ -64,7 +63,7 @@ public class AllUsersFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mViewModel = new ViewModelProvider(this).get(AllUsersViewModel.class);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         String token = sharedPreferences.getString("authToken", "");
         String authToken = "jwt " + token;
 

@@ -2,7 +2,6 @@ package app.xedigital.ai.admin.adminActivity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -85,6 +84,7 @@ import app.xedigital.ai.admin.adminModal.addFace.Data;
 import app.xedigital.ai.admin.adminModal.addFace.Face;
 import app.xedigital.ai.admin.adminModal.addFace.FaceDetail;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -132,10 +132,10 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        token = sharedPreferences.getString("authToken", "");
-        userId = sharedPreferences.getString("userId", "");
-        CollectionName = sharedPreferences.getString("collectionName", "");
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        token = prefManager.getString("authToken", "");
+        userId = prefManager.getString("userId", "");
+        CollectionName = prefManager.getString("collectionName", "");
         previewView = findViewById(R.id.previewView);
         captureOverlay = findViewById(R.id.capture_overlay);
 

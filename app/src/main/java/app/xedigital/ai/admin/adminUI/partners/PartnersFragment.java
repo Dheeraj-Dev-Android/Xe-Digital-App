@@ -1,7 +1,5 @@
 package app.xedigital.ai.admin.adminUI.partners;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Patterns;
@@ -36,6 +34,7 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminAdapter.PartnersAdapter;
 import app.xedigital.ai.admin.adminModal.partners.PartnersItem;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -55,7 +54,7 @@ public class PartnersFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_partners, container, false);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         authToken = sharedPreferences.getString("authToken", "");
         recyclerView = view.findViewById(R.id.partnersRecyclerView);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);

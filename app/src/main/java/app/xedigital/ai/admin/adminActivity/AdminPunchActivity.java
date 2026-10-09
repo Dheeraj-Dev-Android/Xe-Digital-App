@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -83,6 +82,7 @@ import app.xedigital.ai.admin.adminModal.visitorFace.VisitorFaceResponse;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.utills.CustomAlertDialog;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -162,7 +162,7 @@ public class AdminPunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_punch_activity);
 
-        SharedPreferences prefs = getSharedPreferences("AdminCred", MODE_PRIVATE);
+        SecurePrefManager prefs = SecurePrefManager.getInstance(this);
         token = prefs.getString("authToken", "");
         collectionName = prefs.getString("collectionName", "");
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -508,7 +508,7 @@ public class AdminPunchActivity extends AppCompatActivity {
             Log.e(TAG, "processImage error: " + e.getMessage(), e);
             handleError("Error processing image: " + e.getMessage());
         }
-    }    private final Runnable captureRunnable = this::captureImage;
+    }
 
     private void sendToAPI(RequestBody requestBody) {
         String authToken = "jwt " + token;
@@ -563,6 +563,8 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
+    private final Runnable captureRunnable = this::captureImage;
+
     private void callFaceDetailApi(RequestBody faceDetailsBody) {
         String authToken = "jwt " + token;
         Call<ResponseBody> call = AdminAPIClient.getInstance()
@@ -615,10 +617,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    // =========================================================
-    //  API CHAIN
-    // =========================================================
-
     private void callAttendanceApi(String employeeId, String employeeName, Location location) {
         if (employeeId == null || employeeId.isEmpty()) {
             showAttendanceFailedAlert("User not found.");
@@ -670,6 +668,10 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         });
     }
+
+    // =========================================================
+    //  API CHAIN
+    // =========================================================
 
     private void callVisitorFace(RequestBody requestBodyFace) {
         String authToken = "jwt " + token;
@@ -894,10 +896,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
     }
 
-    // =========================================================
-    //  QR CODE
-    // =========================================================
-
     private void showAlert(String title, String message) {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
@@ -912,6 +910,10 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
+    // =========================================================
+    //  QR CODE
+    // =========================================================
+
     private void showCapturingOverlay() {
         runOnUiThread(() -> {
             captureOverlay.setText(getString(R.string.capturing_image));
@@ -924,16 +926,16 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    // =========================================================
-    //  UI HELPERS — now using CustomAlertDialog
-    // =========================================================
-
     private void hideCapturingOverlay() {
         runOnUiThread(() -> {
             captureOverlay.clearAnimation();
             captureOverlay.setVisibility(View.GONE);
         });
     }
+
+    // =========================================================
+    //  UI HELPERS — now using CustomAlertDialog
+    // =========================================================
 
     private void showAttendanceSuccessAlert(String responseBody) {
         loadingPanel.setVisibility(View.GONE);
@@ -1038,45 +1040,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-//    private void showAttendanceSuccessAlert(String responseBody) {
-//        loadingPanel.setVisibility(View.GONE);
-//        try {
-//            JSONObject json = new JSONObject(responseBody);
-//            boolean success = json.getBoolean("success");
-//            String message = json.getString("message");
-//
-//            if (!success) return;
-//
-//            JSONObject data = json.getJSONObject("data");
-//            String punchIn = data.getString("punchInAddress");
-//            String punchOut = data.getString("punchOutAddress");
-//            String address = punchOut.isEmpty() ? punchIn : punchOut;
-//
-//            String fullMessage = message + "\n\nAddress: " + address;
-//
-//            runOnUiThread(() -> {
-//                if (isFinishing() || isDestroyed()) return;
-//
-//                new CustomAlertDialog(this)
-//                        .setType(CustomAlertDialog.Type.SUCCESS)
-//                        .setTitle("Attendance Success")
-//                        .setMessage(fullMessage)
-//                        .setCancelable(false)
-//                        .setPositiveButton("OK", () -> {
-//                            setResult(Activity.RESULT_OK);
-//                            finish();
-//                        })
-//                        .show();
-//
-//                new Handler().postDelayed(() -> {
-//                    if (!isFinishing()) finish();
-//                }, 5000);
-//            });
-//        } catch (JSONException e) {
-//            showAttendanceFailedAlert("Error parsing attendance response.");
-//        }
-//    }
-
     private void getCurrentLocation(AddressCallback callback) {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean locationEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -1123,6 +1086,45 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         }
     }
+
+//    private void showAttendanceSuccessAlert(String responseBody) {
+//        loadingPanel.setVisibility(View.GONE);
+//        try {
+//            JSONObject json = new JSONObject(responseBody);
+//            boolean success = json.getBoolean("success");
+//            String message = json.getString("message");
+//
+//            if (!success) return;
+//
+//            JSONObject data = json.getJSONObject("data");
+//            String punchIn = data.getString("punchInAddress");
+//            String punchOut = data.getString("punchOutAddress");
+//            String address = punchOut.isEmpty() ? punchIn : punchOut;
+//
+//            String fullMessage = message + "\n\nAddress: " + address;
+//
+//            runOnUiThread(() -> {
+//                if (isFinishing() || isDestroyed()) return;
+//
+//                new CustomAlertDialog(this)
+//                        .setType(CustomAlertDialog.Type.SUCCESS)
+//                        .setTitle("Attendance Success")
+//                        .setMessage(fullMessage)
+//                        .setCancelable(false)
+//                        .setPositiveButton("OK", () -> {
+//                            setResult(Activity.RESULT_OK);
+//                            finish();
+//                        })
+//                        .show();
+//
+//                new Handler().postDelayed(() -> {
+//                    if (!isFinishing()) finish();
+//                }, 5000);
+//            });
+//        } catch (JSONException e) {
+//            showAttendanceFailedAlert("Error parsing attendance response.");
+//        }
+//    }
 
     private void getAddressFromLocation(double lat, double lng, AddressCallback callback) {
         new Thread(() -> {
@@ -1173,15 +1175,15 @@ public class AdminPunchActivity extends AppCompatActivity {
         }).start();
     }
 
-    // =========================================================
-    //  LOCATION
-    // =========================================================
-
     private String getCurrentTime(Location location) {
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
         return fmt.format(location != null ? new Date(location.getTime()) : new Date());
     }
+
+    // =========================================================
+    //  LOCATION
+    // =========================================================
 
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

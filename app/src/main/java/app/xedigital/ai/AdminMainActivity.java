@@ -2,7 +2,6 @@ package app.xedigital.ai;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -36,6 +35,7 @@ import app.xedigital.ai.databinding.ActivityAdminMainBinding;
 import app.xedigital.ai.databinding.NoInternetConnectionBinding;
 import app.xedigital.ai.databinding.SlowInternetConnectionBinding;
 import app.xedigital.ai.utills.NetworkUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import app.xedigital.ai.utills.UserViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -157,8 +157,7 @@ public class AdminMainActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        sharedPreferences.edit().clear().apply();
+        SecurePrefManager.getInstance(this).clearAll();
 
         Intent intent = new Intent(this, AdminLoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -167,9 +166,9 @@ public class AdminMainActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfileData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", "");
-        String userId = sharedPreferences.getString("userId", "");
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        String authToken = prefManager.getString("authToken", "");
+        String userId = prefManager.getString("userId", "");
 
         if (authToken.isEmpty() || userId.isEmpty()) {
             Log.e(TAG, "Missing auth token or user ID");

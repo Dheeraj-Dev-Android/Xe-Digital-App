@@ -1,7 +1,5 @@
 package app.xedigital.ai.admin.adminUI.employeeDetails;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +27,7 @@ import app.xedigital.ai.admin.adminModal.department.DepartmentsItem;
 import app.xedigital.ai.admin.adminModal.updateEmployee.UpdateEmployeeRequest;
 import app.xedigital.ai.databinding.FragmentEditEmployeeBinding;
 import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,7 +46,7 @@ public class EditEmployeeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditEmployeeBinding.inflate(inflater, container, false);
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
+        SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         token = sharedPreferences.getString("authToken", "");
 
         return binding.getRoot();

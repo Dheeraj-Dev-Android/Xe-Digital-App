@@ -1,8 +1,6 @@
 package app.xedigital.ai.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -37,6 +35,7 @@ import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.utills.BlurUtils;
 import app.xedigital.ai.utills.RoleAccessManager;
+import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -69,7 +68,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         loadingOverlay = findViewById(R.id.loadingOverlay);
         rememberMeCheckBox = findViewById(R.id.cb_remember_me);
 
-        SharedPreferences pref = getSharedPreferences("AdminCred", MODE_PRIVATE);
+        SecurePrefManager pref = SecurePrefManager.getInstance(this);
         boolean isRemembered = pref.getBoolean("remember_me", false);
 
         if (isRemembered) {
@@ -241,19 +240,17 @@ public class AdminLoginActivity extends AppCompatActivity {
     }
 
     private void handleRememberMe(String email, String password) {
-        SharedPreferences preferences = getSharedPreferences("AdminCred", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
+        SecurePrefManager preferences = SecurePrefManager.getInstance(this);
 
         if (rememberMeCheckBox.isChecked()) {
-            editor.putString("saved_email", email);
-            editor.putString("saved_password", password);
-            editor.putBoolean("remember_me", true);
+            preferences.putString("saved_email", email);
+            preferences.putString("saved_password", password);
+            preferences.putBoolean("remember_me", true);
         } else {
-            editor.remove("saved_email");
-            editor.remove("saved_password");
-            editor.putBoolean("remember_me", false);
+            preferences.remove("saved_email");
+            preferences.remove("saved_password");
+            preferences.putBoolean("remember_me", false);
         }
-        editor.apply();
     }
 
     /**
@@ -367,14 +364,12 @@ public class AdminLoginActivity extends AppCompatActivity {
     }
 
     private void storeInSharedPreferences(String userId, String authToken, String empEmail, String empFirstName, String collectionName, boolean isEmployee) {
-        SharedPreferences sharedPreferences = getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("userId", userId);
-        editor.putString("authToken", authToken);
-        editor.putString("empEmail", empEmail);
-        editor.putString("empFirstName", empFirstName);
-        editor.putBoolean("isEmployee", isEmployee);
-        editor.putString("collectionName", collectionName);
-        editor.apply();
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        prefManager.putString("userId", userId);
+        prefManager.putString("authToken", authToken);
+        prefManager.putString("empEmail", empEmail);
+        prefManager.putString("empFirstName", empFirstName);
+        prefManager.putBoolean("isEmployee", isEmployee);
+        prefManager.putString("collectionName", collectionName);
     }
 }
