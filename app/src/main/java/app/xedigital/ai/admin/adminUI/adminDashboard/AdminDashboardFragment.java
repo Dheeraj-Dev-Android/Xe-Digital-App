@@ -15,13 +15,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -32,14 +35,18 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import app.xedigital.ai.R;
-import app.xedigital.ai.admin.adminModal.LeaveGraph.Data;
+import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsItem;
+import app.xedigital.ai.utills.DateTimeUtils;
 import app.xedigital.ai.utills.SecurePrefManager;
 
 public class AdminDashboardFragment extends Fragment {
@@ -48,17 +55,46 @@ public class AdminDashboardFragment extends Fragment {
     private static final int SCROLL_INTERVAL = 3000;
     private static final String FALLBACK_SHORT = "N/A";
 
+    // Dynamic Material Fallback Palette for charts when backend returns identical colors
+    private static final int[] SMART_DISTINCT_PALETTE = new int[]{Color.parseColor("#4285F4"), // Vibrant Blue
+            Color.parseColor("#34A853"), // Vibrant Green
+            Color.parseColor("#FB8C00"), // Warm Amber
+            Color.parseColor("#E91E63"), // Vivid Rose
+            Color.parseColor("#9C27B0"), // Purple
+            Color.parseColor("#00ACC1"), // Teal
+            Color.parseColor("#FF7043"), // Coral
+            Color.parseColor("#3949AB")  // Indigo
+    };
+
     private final Handler scrollHandler = new Handler(Looper.getMainLooper());
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
     private String token;
-    private TextView totalSignin, totalSignout, totalEmployees, totalBranches;
+    // Client side state indicators
+    private final List<VisitorsItem> allVisitorsList = new ArrayList<>();
     private TextView birthdayCount;
     private RecyclerView birthdayRecyclerView;
     private LinearLayout emptyBirthdayState;
     private PieChart leavesBarChart;
+    private final List<VisitorsItem> paginatedVisitorList = new ArrayList<>();
+    private final int pageLimit = 5;
+    // Global UI components
+    private TextView totalSignin, totalSignout, totalEmployees, totalBranches;
+    private MaterialCardView btnPunchAttendance;
+    // Integrated: Loading & Chart Widgets
+    private CircularProgressIndicator progressBar;
+    private View dashboardContentContainer;
+    private PieChart signInPieChart;
+    // Integrated: Paginated Visitor list UI components
+    private RecyclerView rvVisitorsList;
+    private LobbyVisitorAdapter visitorAdapter;
+    private MaterialButton btnPreviousPage;
+    private MaterialButton btnNextPage;
+    private TextView tvPaginationStatus;
+    private int currentPage = 1;
     private int currentPosition = 0;
     private boolean shouldAutoScroll = false;
+
     private final Runnable scrollRunnable = new Runnable() {
         @Override
         public void run() {
@@ -71,12 +107,10 @@ public class AdminDashboardFragment extends Fragment {
                 birthdayRecyclerView.smoothScrollToPosition(currentPosition);
                 scrollHandler.postDelayed(this, SCROLL_INTERVAL);
             } else {
-                // Stop auto-scroll silently if items dropped to 1 or 0
                 shouldAutoScroll = false;
             }
         }
     };
-    private MaterialCardView btnPunchAttendance;
 
     public static AdminDashboardFragment newInstance() {
         return new AdminDashboardFragment();
@@ -104,13 +138,15 @@ public class AdminDashboardFragment extends Fragment {
             mViewModel.fetchDashboardData(authToken);
             mViewModel.fetchBirthdayData(authToken);
             mViewModel.fetchLeavesGraph(authToken);
+            mViewModel.fetchSignInGraph(authToken);
+            mViewModel.fetchVisitorsData(authToken);
         } else {
             setDashboardDefaultTexts();
         }
+
         btnPunchAttendance.setOnClickListener(v -> {
             try {
                 NavController navController = Navigation.findNavController(v);
-                // Use action ID — not raw destination ID
                 navController.navigate(R.id.action_dashboard_to_visitorCheckIn);
             } catch (IllegalStateException e) {
                 Log.e(TAG, "NavController not found: " + e.getMessage());
@@ -128,6 +164,34 @@ public class AdminDashboardFragment extends Fragment {
         emptyBirthdayState = view.findViewById(R.id.emptyBirthdayState);
         leavesBarChart = view.findViewById(R.id.pieChart);
         btnPunchAttendance = view.findViewById(R.id.btnPunchAttendance);
+
+        // Integrated views
+        progressBar = view.findViewById(R.id.progressBar);
+        dashboardContentContainer = view.findViewById(R.id.dashboardContentContainer);
+        signInPieChart = view.findViewById(R.id.signInPieChart);
+        rvVisitorsList = view.findViewById(R.id.rvVisitorsList);
+        btnPreviousPage = view.findViewById(R.id.btnPreviousPage);
+        btnNextPage = view.findViewById(R.id.btnNextPage);
+        tvPaginationStatus = view.findViewById(R.id.tvPaginationStatus);
+
+        // Pagination listeners
+        if (btnPreviousPage != null) {
+            btnPreviousPage.setOnClickListener(v -> {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadVisitorPageChunk();
+                }
+            });
+        }
+        if (btnNextPage != null) {
+            btnNextPage.setOnClickListener(v -> {
+                int maxPossibleIndex = currentPage * pageLimit;
+                if (maxPossibleIndex < allVisitorsList.size()) {
+                    currentPage++;
+                    loadVisitorPageChunk();
+                }
+            });
+        }
     }
 
     private void setupRecyclerView() {
@@ -139,10 +203,89 @@ public class AdminDashboardFragment extends Fragment {
         PagerSnapHelper snapHelper = new PagerSnapHelper();
         birthdayRecyclerView.setOnFlingListener(null);
         snapHelper.attachToRecyclerView(birthdayRecyclerView);
+
+        // Direct in-place dialog display on visitor click
+        if (rvVisitorsList != null) {
+            rvVisitorsList.setLayoutManager(new LinearLayoutManager(requireContext()));
+            visitorAdapter = new LobbyVisitorAdapter(paginatedVisitorList, item -> {
+                if (item != null) {
+                    showVisitorDetailsDialog(item);
+                }
+            });
+            rvVisitorsList.setAdapter(visitorAdapter);
+        }
+    }
+
+    /**
+     * Shows full visitor details directly in an in-place AlertDialog
+     */
+    private void showVisitorDetailsDialog(VisitorsItem visitor) {
+        if (!isAdded() || getContext() == null || visitor == null) return;
+
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_visitor_details, null);
+
+        // Find dialog elements
+        ShapeableImageView imgProfile = dialogView.findViewById(R.id.imgProfile);
+        TextView tvFullName = dialogView.findViewById(R.id.tvFullName);
+        TextView tvContact = dialogView.findViewById(R.id.tvContact);
+        TextView tvEmail = dialogView.findViewById(R.id.tvEmail);
+        TextView tvWhomToMeet = dialogView.findViewById(R.id.tvWhomToMeet);
+        TextView tvCheckInDate = dialogView.findViewById(R.id.tvCheckInDate);
+        TextView tvCheckOutDate = dialogView.findViewById(R.id.tvCheckOutDate);
+        TextView tvCheckInTime = dialogView.findViewById(R.id.tvCheckInTime);
+        TextView tvCheckOutTime = dialogView.findViewById(R.id.tvCheckOutTime);
+        TextView tvCompanyFrom = dialogView.findViewById(R.id.tvCompanyFrom);
+        TextView tvLaptopSerial = dialogView.findViewById(R.id.tvLaptopSerial);
+
+        // Set Data
+        tvFullName.setText(visitor.getName() != null ? visitor.getName() : "N/A");
+        tvContact.setText(visitor.getContact() != null ? visitor.getContact() : "N/A");
+        tvEmail.setText(visitor.getEmail() != null ? visitor.getEmail() : "N/A");
+
+        if (visitor.getWhomToMeet() != null) {
+            String hostFirst = visitor.getWhomToMeet().getFirstname() != null ? visitor.getWhomToMeet().getFirstname() : "";
+            String hostLast = visitor.getWhomToMeet().getLastname() != null ? visitor.getWhomToMeet().getLastname() : "";
+            tvWhomToMeet.setText(String.format("%s %s", hostFirst, hostLast).trim());
+        } else {
+            tvWhomToMeet.setText("N/A");
+        }
+
+        // Date and Time fields
+        tvCheckInDate.setText(DateTimeUtils.getDayOfWeekAndDate(visitor.getSignIn()));
+        tvCheckOutDate.setText(visitor.getSignOut() != null ? DateTimeUtils.getDayOfWeekAndDate(visitor.getSignOut()) : "N/A");
+        tvCheckInTime.setText(visitor.getSignIn() != null ? DateTimeUtils.extractTime(visitor.getSignIn()) : "N/A");
+        tvCheckOutTime.setText(visitor.getSignOut() != null ? DateTimeUtils.extractTime(visitor.getSignOut()) : "N/A");
+
+        // Company and serial info
+        tvCompanyFrom.setText(visitor.getCompanyFrom() != null ? visitor.getCompanyFrom() : "N/A");
+        tvLaptopSerial.setText(visitor.getSerialNumber() != null ? visitor.getSerialNumber() : "N/A");
+
+        // Load profile image
+        if (visitor.getProfileImagePath() != null && !visitor.getProfileImagePath().trim().isEmpty()) {
+            Glide.with(this).load(visitor.getProfileImagePath()).placeholder(R.drawable.ic_profile_placeholder).into(imgProfile);
+        } else {
+            imgProfile.setImageResource(R.drawable.ic_profile_placeholder);
+        }
+
+        // Display AlertDialog
+        new AlertDialog.Builder(requireContext()).setView(dialogView).setCancelable(true).setPositiveButton("Close", (dialog, which) -> dialog.dismiss()).show();
     }
 
     private void setupViewModel() {
         mViewModel = new ViewModelProvider(this).get(AdminDashboardViewModel.class);
+
+        // Sync visual spinner layout overlays
+        mViewModel.getIsLoading().observe(getViewLifecycleOwner(), loading -> {
+            if (progressBar != null && dashboardContentContainer != null) {
+                if (loading != null && loading) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    dashboardContentContainer.setAlpha(0.4f);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    dashboardContentContainer.setAlpha(1.0f);
+                }
+            }
+        });
 
         mViewModel.getDashboardData().observe(getViewLifecycleOwner(), data -> {
             if (data != null) {
@@ -185,11 +328,31 @@ public class AdminDashboardFragment extends Fragment {
             }
         });
 
+        // Observation chain: Approved Leave Graph
         mViewModel.getLeavesGraphData().observe(getViewLifecycleOwner(), response -> {
             if (response != null && response.getData() != null) {
-                updatePieChart(response.getData());
+                updateLeavePieChart(leavesBarChart, response.getData());
             } else {
-                showChartEmptyState();
+                showChartEmptyState(leavesBarChart);
+            }
+        });
+
+        // Observation chain: Sign-In Graph
+        mViewModel.getSignInGraphData().observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.getData() != null && response.getData().getSignInVisitors() != null) {
+                updateSignInPieChart(signInPieChart, response.getData().getSignInVisitors());
+            } else {
+                showChartEmptyState(signInPieChart);
+            }
+        });
+
+        // Observation chain: Checked-In Visitors List
+        mViewModel.getVisitorsData().observe(getViewLifecycleOwner(), visitors -> {
+            if (visitors != null) {
+                allVisitorsList.clear();
+                allVisitorsList.addAll(visitors);
+                currentPage = 1;
+                loadVisitorPageChunk();
             }
         });
 
@@ -200,6 +363,37 @@ public class AdminDashboardFragment extends Fragment {
         });
     }
 
+    private void loadVisitorPageChunk() {
+        int totalRecords = allVisitorsList.size();
+        if (totalRecords == 0) {
+            paginatedVisitorList.clear();
+            if (visitorAdapter != null) visitorAdapter.notifyDataSetChanged();
+            if (tvPaginationStatus != null) tvPaginationStatus.setText("0-0 of 0");
+            if (btnPreviousPage != null) btnPreviousPage.setEnabled(false);
+            if (btnNextPage != null) btnNextPage.setEnabled(false);
+            return;
+        }
+
+        int startIndex = (currentPage - 1) * pageLimit;
+        int endIndex = Math.min(startIndex + pageLimit, totalRecords);
+
+        List<VisitorsItem> subList = allVisitorsList.subList(startIndex, endIndex);
+        paginatedVisitorList.clear();
+        paginatedVisitorList.addAll(subList);
+
+        if (visitorAdapter != null) {
+            visitorAdapter.notifyDataSetChanged();
+        }
+
+        if (tvPaginationStatus != null) {
+            String trackingText = String.format(Locale.getDefault(), "%d-%d of %d", (startIndex + 1), endIndex, totalRecords);
+            tvPaginationStatus.setText(trackingText);
+        }
+
+        if (btnPreviousPage != null) btnPreviousPage.setEnabled(currentPage > 1);
+        if (btnNextPage != null) btnNextPage.setEnabled(endIndex < totalRecords);
+    }
+
     private void setDashboardDefaultTexts() {
         if (totalSignin != null) totalSignin.setText(FALLBACK_SHORT);
         if (totalSignout != null) totalSignout.setText(FALLBACK_SHORT);
@@ -207,29 +401,145 @@ public class AdminDashboardFragment extends Fragment {
         if (totalBranches != null) totalBranches.setText(FALLBACK_SHORT);
     }
 
-    private void showChartEmptyState() {
-        if (leavesBarChart != null) {
-            leavesBarChart.clear();
-            leavesBarChart.setNoDataText("No Data Available");
-            leavesBarChart.setNoDataTextColor(Color.GRAY);
-            leavesBarChart.invalidate();
+    private void showChartEmptyState(PieChart chart) {
+        if (chart != null) {
+            chart.clear();
+            chart.setNoDataText("No Data Available");
+            chart.setNoDataTextColor(Color.GRAY);
+            chart.invalidate();
         }
     }
 
-    private void updatePieChart(Data leaveGraphData) {
-        if (leavesBarChart == null) return;
-
+    private void updateLeavePieChart(PieChart chart, app.xedigital.ai.admin.adminModal.LeaveGraph.Data leaveGraphData) {
+        if (chart == null) return;
         if (leaveGraphData == null || leaveGraphData.getGraphData() == null || leaveGraphData.getGraphLabels() == null) {
-            showChartEmptyState();
+            showChartEmptyState(chart);
             return;
         }
+        bindPieChartData(chart, leaveGraphData.getGraphData(), leaveGraphData.getGraphLabels(), leaveGraphData.getGraphBackground());
+    }
 
-        List<Integer> values = leaveGraphData.getGraphData();
-        List<String> labels = leaveGraphData.getGraphLabels();
-        List<String> colors = leaveGraphData.getGraphBackground();
+    private void updateSignInPieChart(PieChart chart, app.xedigital.ai.admin.adminModal.SignInGraph.SignInVisitors signInVisitors) {
+        if (chart == null) return;
+        if (signInVisitors == null || signInVisitors.getGraphData() == null || signInVisitors.getGraphLabels() == null) {
+            showChartEmptyState(chart);
+            return;
+        }
+        bindPieChartData(chart, signInVisitors.getGraphData(), signInVisitors.getGraphLabels(), signInVisitors.getGraphBackground());
+    }
 
+    /**
+     * Checks whether all colors returned by the API are identical.
+     * When true, we fallback to a distinct palette so each slice is distinguishable.
+     */
+    private boolean areAllColorsIdentical(List<String> colors) {
+        if (colors == null || colors.size() <= 1) return false;
+        String first = colors.get(0) != null ? colors.get(0).replaceAll("\\s+", "").toLowerCase() : "";
+        for (int i = 1; i < colors.size(); i++) {
+            String current = colors.get(i) != null ? colors.get(i).replaceAll("\\s+", "").toLowerCase() : "";
+            if (!first.equals(current)) {
+                return false; // Found distinct color entries in API response
+            }
+        }
+        return true; // All entries in API list are the same color
+    }
+
+    /**
+     * Highly Robust color decoder. Decodes Hex codes, RGB, RGBA CSS strings, and direct common English color names.
+     */
+    private int parseColorHelper(String colorStr) {
+        if (colorStr == null || colorStr.trim().isEmpty()) {
+            return Color.LTGRAY;
+        }
+        String cleanStr = colorStr.replaceAll("\\s+", "").toLowerCase();
+
+        switch (cleanStr) {
+            case "orange":
+                return 0xFFFFA500;
+            case "pink":
+                return 0xFFFFC0CB;
+            case "gold":
+                return 0xFFFFD700;
+            case "brown":
+                return 0xFFA52A2A;
+            case "violet":
+                return 0xFFEE82EE;
+            case "indigo":
+                return 0xFF4B0082;
+            case "turquoise":
+                return 0xFF40E0D0;
+            case "plum":
+                return 0xFFDDA0DD;
+            case "lime":
+                return 0xFF00FF00;
+            case "maroon":
+                return 0xFF800000;
+            case "navy":
+                return 0xFF000080;
+            case "olive":
+                return 0xFF808000;
+            case "teal":
+                return 0xFF008080;
+            case "green":
+                return 0xFF008000;
+            case "blue":
+                return 0xFF0000FF;
+            case "red":
+                return 0xFFFF0000;
+            case "yellow":
+                return 0xFFFFFF00;
+            case "purple":
+                return 0xFF800080;
+            case "cyan":
+                return 0xFF00FFFF;
+            case "magenta":
+                return 0xFFFF00FF;
+            case "silver":
+                return 0xFFC0C0C0;
+            case "gray":
+            case "grey":
+                return 0xFF808080;
+            case "black":
+                return 0xFF000000;
+            case "white":
+                return 0xFFFFFFFF;
+        }
+
+        try {
+            if (cleanStr.startsWith("rgba")) {
+                String content = cleanStr.substring(cleanStr.indexOf("(") + 1, cleanStr.indexOf(")"));
+                String[] segments = content.split(",");
+                if (segments.length == 4) {
+                    int r = Integer.parseInt(segments[0]);
+                    int g = Integer.parseInt(segments[1]);
+                    int b = Integer.parseInt(segments[2]);
+                    float a = Float.parseFloat(segments[3]);
+                    int alpha = Math.round(a * 255);
+                    return Color.argb(alpha, r, g, b);
+                }
+            } else if (cleanStr.startsWith("rgb")) {
+                String content = cleanStr.substring(cleanStr.indexOf("(") + 1, cleanStr.indexOf(")"));
+                String[] segments = content.split(",");
+                if (segments.length == 3) {
+                    int r = Integer.parseInt(segments[0]);
+                    int g = Integer.parseInt(segments[1]);
+                    int b = Integer.parseInt(segments[2]);
+                    return Color.rgb(r, g, b);
+                }
+            } else if (cleanStr.startsWith("#")) {
+                return Color.parseColor(colorStr.trim());
+            } else {
+                return Color.parseColor(cleanStr);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Color structure matching failed: " + colorStr + " | " + e.getMessage());
+        }
+        return Color.LTGRAY;
+    }
+
+    private void bindPieChartData(PieChart chart, List<Integer> values, List<String> labels, List<String> colors) {
         if (values.isEmpty() || labels.isEmpty() || values.size() != labels.size()) {
-            showChartEmptyState();
+            showChartEmptyState(chart);
             return;
         }
 
@@ -241,49 +551,64 @@ public class AdminDashboardFragment extends Fragment {
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setSliceSpace(1f);
+        dataSet.setSliceSpace(1.2f);
         dataSet.setSelectionShift(10f);
 
+        // Smart color resolution: If API returned identical colors or empty array, assign distinct colors!
         List<Integer> colorInts = new ArrayList<>();
-        if (colors != null) {
-            for (String colorName : colors) {
-                try {
-                    if (colorName != null && !colorName.trim().isEmpty()) {
-                        colorInts.add(Color.parseColor(colorName));
-                    } else {
-                        colorInts.add(Color.LTGRAY);
-                    }
-                } catch (Exception e) {
-                    colorInts.add(Color.LTGRAY);
-                }
+        boolean useDistinctPalette = (colors == null || colors.isEmpty() || areAllColorsIdentical(colors));
+
+        for (int i = 0; i < values.size(); i++) {
+            if (useDistinctPalette) {
+                colorInts.add(SMART_DISTINCT_PALETTE[i % SMART_DISTINCT_PALETTE.length]);
+            } else {
+                colorInts.add(parseColorHelper(colors.get(i)));
             }
         }
-        if (colorInts.isEmpty()) colorInts.add(Color.GRAY);
         dataSet.setColors(colorInts);
 
-        PieData data = new PieData(dataSet);
-        data.setDrawValues(false);
+        PieData pieData = new PieData(dataSet);
+        pieData.setDrawValues(false);
 
-        leavesBarChart.getDescription().setEnabled(false);
-        leavesBarChart.setDrawHoleEnabled(false);
-        leavesBarChart.setDrawEntryLabels(false);
+        chart.getDescription().setEnabled(false);
+        chart.setDrawHoleEnabled(false);
+        chart.setDrawEntryLabels(false);
 
-        Legend legend = leavesBarChart.getLegend();
-        if (legend != null) legend.setEnabled(false);
+        // Extra bottom offset so Legend has ample room to display
+        chart.setExtraBottomOffset(10f);
 
-        leavesBarChart.setData(data);
-        OptimizedMarkerView mv = new OptimizedMarkerView(leavesBarChart.getContext(), R.layout.marker_view, values);
-        mv.setChartView(leavesBarChart);
-        leavesBarChart.setMarker(mv);
+        // Styling the Legend layout beautifully
+        Legend legend = chart.getLegend();
+        if (legend != null) {
+            legend.setEnabled(true);
+            legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+            legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+            legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+            legend.setDrawInside(false);
+            legend.setWordWrapEnabled(true);
 
-        leavesBarChart.animateY(1400, Easing.EaseInOutQuad);
-        leavesBarChart.invalidate();
+            // Layout padding controls
+            legend.setXEntrySpace(8f);
+            legend.setYEntrySpace(6f);
+            legend.setYOffset(10f);
+
+            // Typography & Colors
+            legend.setTextSize(10f);
+            legend.setTextColor(Color.parseColor("#4A4A4A"));
+        }
+
+        chart.setData(pieData);
+        OptimizedMarkerView mv = new OptimizedMarkerView(chart.getContext(), R.layout.marker_view, values);
+        mv.setChartView(chart);
+        chart.setMarker(mv);
+
+        chart.animateY(1400, Easing.EaseInOutQuad);
+        chart.invalidate();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Restart scroll only if conditions still valid after resume
         if (shouldAutoScroll && birthdayAdapter != null && birthdayAdapter.getItemCount() > 1) {
             scrollHandler.removeCallbacks(scrollRunnable);
             scrollHandler.postDelayed(scrollRunnable, SCROLL_INTERVAL);
@@ -300,8 +625,7 @@ public class AdminDashboardFragment extends Fragment {
     public void onDestroyView() {
         scrollHandler.removeCallbacks(scrollRunnable);
 
-        // Null out all view references to prevent memory leaks
-        // when fragment stays on back stack but view is destroyed
+        // Null out all view references
         totalSignin = null;
         totalSignout = null;
         totalEmployees = null;
@@ -313,6 +637,16 @@ public class AdminDashboardFragment extends Fragment {
         birthdayAdapter = null;
         btnPunchAttendance = null;
 
+        // Nullify integrated views
+        progressBar = null;
+        dashboardContentContainer = null;
+        signInPieChart = null;
+        rvVisitorsList = null;
+        btnPreviousPage = null;
+        btnNextPage = null;
+        tvPaginationStatus = null;
+        visitorAdapter = null;
+
         super.onDestroyView();
     }
 
@@ -322,12 +656,11 @@ public class AdminDashboardFragment extends Fragment {
     private static class OptimizedMarkerView extends MarkerView {
 
         private final TextView markerTextView;
-        private final float precomputedTotal; // computed once
+        private final float precomputedTotal;
 
         public OptimizedMarkerView(Context context, int layoutResource, List<Integer> values) {
             super(context, layoutResource);
 
-            // Pre-calculate total here instead of in refreshContent
             float sum = 0f;
             if (values != null) {
                 for (Integer val : values) {
@@ -342,8 +675,6 @@ public class AdminDashboardFragment extends Fragment {
         public void refreshContent(Entry e, Highlight highlight) {
             if (e instanceof PieEntry && markerTextView != null) {
                 PieEntry pieEntry = (PieEntry) e;
-
-                // FIX: Use pre-computed total — O(1) instead of O(n) per tap
                 float percentage = (precomputedTotal > 0) ? (pieEntry.getValue() / precomputedTotal) * 100f : 0f;
                 String label = pieEntry.getLabel() != null ? pieEntry.getLabel() : "Data Not Available";
                 markerTextView.setText(String.format(Locale.US, "%s\n%.1f%%", label, percentage));

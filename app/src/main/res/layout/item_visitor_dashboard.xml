@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/avatar_bg"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- First Row: Visitor Name & Approval Badge -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvVisitorName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/tvApprovalStatus"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Visitor Name"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvApprovalStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_status_badge"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:text="Approved"
+                android:textColor="#2E7D32"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <!-- Divider Line (Optional visual separation, can be removed) -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="6dp"
+            android:background="#10000000" />
+
+        <!-- Main Body: Divided cleanly into 3:7 ratio -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <!-- LEFT CONTAINER: Profile picture / Initials (Weight = 3) -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_weight="3">
+
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center">
+
+                    <!-- Glow + border background -->
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:contentDescription="Profile Picture Background"
+                        android:src="@drawable/bg_profile_glow" />
+
+                    <!-- Actual profile image, inset to sit inside the border -->
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivVisitorProfile"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:scaleType="centerCrop"
+                        android:src="@mipmap/ic_default_profile"
+                        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+                    <!-- NEW ADDITION: Circle text initials fallback (hidden by default) -->
+                    <TextView
+                        android:id="@+id/tvProfileInitials"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_shape"
+                        android:gravity="center"
+                        android:text="--"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- RIGHT CONTAINER: Details (Weight = 7) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="7"
+                android:orientation="vertical">
+
+                <!-- Timings row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Check-in"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvTimingDatesIn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="--"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Check-out"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvTimingDatesOut"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="--"
+                            android:textColor="@color/avatar_text"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Meeting Host -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Meeting Host"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvWhomToMeet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="--"
+                    android:textColor="@color/avatar_text"
+                    android:textSize="13sp" />
+
+                <!-- Meeting Status -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Meeting Status"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvMeetingOverStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="--"
+                    android:textColor="?attr/colorError"
+                    android:textSize="13sp"
+                    android:textStyle="italic" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

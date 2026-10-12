@@ -8,6 +8,7 @@ import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.admin.adminModal.EmployeeLeaves.EmployeeLeaveResponse;
 import app.xedigital.ai.admin.adminModal.LeaveGraph.LeaveGraphResponse;
 import app.xedigital.ai.admin.adminModal.Role.UserRoleResponse;
+import app.xedigital.ai.admin.adminModal.SignInGraph.SignInGraphResponse;
 import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.admin.adminModal.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
@@ -48,6 +49,10 @@ public interface AdminAPIInterface {
 
     @GET("leaves/dashboard/graph/approved/employees")
     Call<LeaveGraphResponse> getLeavesGraph(@Header("Authorization") String authToken);
+
+    //    https://app.xedigital.ai/api/v2/dashboard/graph/signin
+    @GET("dashboard/graph/signin")
+    Call<SignInGraphResponse> getSignInGraphData(@Header("Authorization") String token);
 
     @GET("partners")
     Call<PartnersResponse> getPartners(@Header("Authorization") String authToken);

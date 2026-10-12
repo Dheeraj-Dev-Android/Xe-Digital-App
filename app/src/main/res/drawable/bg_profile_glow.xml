@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Outermost glow ring (most transparent) -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#1A6750A4" />
+        </shape>
+    </item>
+
+    <!-- Middle glow ring -->
+    <item
+        android:bottom="3dp"
+        android:left="3dp"
+        android:right="3dp"
+        android:top="3dp">
+        <shape android:shape="oval">
+            <solid android:color="#331565C0" />
+        </shape>
+    </item>
+
+    <!-- Border ring (solid, your brand color) -->
+    <item
+        android:bottom="7dp"
+        android:left="7dp"
+        android:right="7dp"
+        android:top="7dp">
+        <shape android:shape="oval">
+            <solid android:color="#1565C0" />
+        </shape>
+    </item>
+
+    <!-- White gap between border and image -->
+    <item
+        android:bottom="9dp"
+        android:left="9dp"
+        android:right="9dp"
+        android:top="9dp">
+        <shape android:shape="oval">
+            <solid android:color="?attr/colorSurface" />
+        </shape>
+    </item>
+
+</layer-list>

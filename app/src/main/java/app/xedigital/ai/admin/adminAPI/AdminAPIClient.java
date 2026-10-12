@@ -16,10 +16,13 @@ public class AdminAPIClient {
 
     private static final String BASE_URL = "https://app.xedigital.ai/";
     private static final String BASE_URL_2 = "https://app.xedigital.ai/api/v1/";
+    private static final String BASE_URL_3 = "https://app.xedigital.ai/api/v2/";
 
     private static AdminAPIClient instance;
     private final Retrofit retrofit1;
     private final Retrofit retrofit2;
+    private final Retrofit retrofit3;
+
 
     private AdminAPIClient() {
         // Optional: Enable for debugging
@@ -49,6 +52,11 @@ public class AdminAPIClient {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
                 .build();
+        retrofit3 = new Retrofit.Builder()
+                .baseUrl(BASE_URL_3)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build();
     }
 
     public static synchronized AdminAPIClient getInstance() {
@@ -64,6 +72,10 @@ public class AdminAPIClient {
 
     public AdminAPIInterface getBase2() {
         return retrofit2.create(AdminAPIInterface.class);
+    }
+
+    public AdminAPIInterface getBase3() {
+        return retrofit3.create(AdminAPIInterface.class);
     }
 
 }

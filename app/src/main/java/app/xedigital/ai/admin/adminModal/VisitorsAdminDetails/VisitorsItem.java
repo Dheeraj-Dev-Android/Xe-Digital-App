@@ -2,7 +2,9 @@ package app.xedigital.ai.admin.adminModal.VisitorsAdminDetails;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VisitorsItem {
+import java.io.Serializable;
+
+public class VisitorsItem implements Serializable {
 
     @SerializedName("whomToMeet")
     private WhomToMeet whomToMeet;
@@ -16,8 +18,14 @@ public class VisitorsItem {
     @SerializedName("isPreApproved")
     private boolean isPreApproved;
 
+    @SerializedName("nameWhomToMeet")
+    private String nameWhomToMeet;
+
     @SerializedName("meetingOverStatus")
     private String meetingOverStatus;
+
+    @SerializedName("roomId")
+    private String roomId;
 
     @SerializedName("createdAt")
     private String createdAt;
@@ -70,6 +78,9 @@ public class VisitorsItem {
     @SerializedName("companyFrom")
     private String companyFrom;
 
+    @SerializedName("emailWhomToMeet")
+    private String emailWhomToMeet;
+
     @SerializedName("roomName")
     private String roomName;
 
@@ -100,19 +111,12 @@ public class VisitorsItem {
     @SerializedName("preApprovedDate")
     private String preApprovedDate;
 
-    @SerializedName("roomId")
-    private String roomId;
-
     public WhomToMeet getWhomToMeet() {
         return whomToMeet;
     }
 
     public String getApprovalDate() {
         return approvalDate;
-    }
-
-    public void setApprovalDate(String approvalDate) {
-        this.approvalDate = approvalDate;
     }
 
     public String getGovernmentIdUploadedImagePath() {
@@ -123,12 +127,16 @@ public class VisitorsItem {
         return isPreApproved;
     }
 
+    public String getNameWhomToMeet() {
+        return nameWhomToMeet;
+    }
+
     public String getMeetingOverStatus() {
         return meetingOverStatus;
     }
 
-    public void setMeetingOverStatus(String meetingOverStatus) {
-        this.meetingOverStatus = meetingOverStatus;
+    public String getRoomId() {
+        return roomId;
     }
 
     public String getCreatedAt() {
@@ -167,11 +175,6 @@ public class VisitorsItem {
         return approvalStatus;
     }
 
-    // Setters
-    public void setApprovalStatus(String approvalStatus) {
-        this.approvalStatus = approvalStatus;
-    }
-
     public boolean isIsRequired() {
         return isRequired;
     }
@@ -182,10 +185,6 @@ public class VisitorsItem {
 
     public String getMeetingOverDate() {
         return meetingOverDate;
-    }
-
-    public void setMeetingOverDate(String meetingOverDate) {
-        this.meetingOverDate = meetingOverDate;
     }
 
     public boolean isIsVisitorVisited() {
@@ -206,6 +205,10 @@ public class VisitorsItem {
 
     public String getCompanyFrom() {
         return companyFrom;
+    }
+
+    public String getEmailWhomToMeet() {
+        return emailWhomToMeet;
     }
 
     public String getRoomName() {
@@ -248,7 +251,28 @@ public class VisitorsItem {
         return preApprovedDate;
     }
 
-    public String getRoomId() {
-        return roomId;
+    // Setters required by VisitorsDetailsFragment
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public void setApprovalDate(String approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
+    public void setMeetingOverStatus(String meetingOverStatus) {
+        this.meetingOverStatus = meetingOverStatus;
+    }
+
+    public void setMeetingOverDate(String meetingOverDate) {
+        this.meetingOverDate = meetingOverDate;
+    }
+
+    public void setSignIn(String signIn) {
+        this.signIn = signIn;
+    }
+
+    public void setSignOut(String signOut) {
+        this.signOut = signOut;
     }
 }

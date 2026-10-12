@@ -22,6 +22,9 @@ import app.xedigital.ai.admin.adminModal.Dashboard.CounterData;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeesItem;
 import app.xedigital.ai.admin.adminModal.LeaveGraph.LeaveGraphResponse;
+import app.xedigital.ai.admin.adminModal.SignInGraph.SignInGraphResponse;
+import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
+import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsItem;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,10 +36,17 @@ public class AdminDashboardViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<LeaveGraphResponse> leavesGraphData = new MutableLiveData<>();
-    private final AdminAPIInterface apiInterface;
+
+    // Integrated LiveData sources
+    private final MutableLiveData<SignInGraphResponse> signInGraphData = new MutableLiveData<>();
+    private final MutableLiveData<List<VisitorsItem>> visitorsData = new MutableLiveData<>();
+
+    private final AdminAPIInterface apiInterface;   // Standard API (Base 2 - api/v1)
+    private final AdminAPIInterface apiInterfaceV3; // V2 API (Base 3 - api/v2)
 
     public AdminDashboardViewModel() {
         apiInterface = AdminAPIClient.getInstance().getBase2();
+        apiInterfaceV3 = AdminAPIClient.getInstance().getBase3();
     }
 
     public LiveData<CounterData> getDashboardData() {
@@ -57,6 +67,14 @@ public class AdminDashboardViewModel extends ViewModel {
 
     public LiveData<LeaveGraphResponse> getLeavesGraphData() {
         return leavesGraphData;
+    }
+
+    public LiveData<SignInGraphResponse> getSignInGraphData() {
+        return signInGraphData;
+    }
+
+    public LiveData<List<VisitorsItem>> getVisitorsData() {
+        return visitorsData;
     }
 
     public void fetchDashboardData(String token) {
@@ -91,7 +109,6 @@ public class AdminDashboardViewModel extends ViewModel {
                 isLoading.setValue(false);
                 if (response.isSuccessful() && response.body() != null &&
                         response.body().getData() != null && response.body().getData().getEmployees() != null) {
-
                     List<EmployeesItem> employees = response.body().getData().getEmployees();
                     birthdayData.setValue(processAndSortBirthdays(employees));
                 } else {
@@ -105,6 +122,77 @@ public class AdminDashboardViewModel extends ViewModel {
                 isLoading.setValue(false);
                 birthdayData.setValue(new ArrayList<>());
                 errorMessage.setValue("Network connectivity failure");
+            }
+        });
+    }
+
+    public void fetchLeavesGraph(String token) {
+        isLoading.setValue(true);
+        apiInterface.getLeavesGraph(token).enqueue(new Callback<LeaveGraphResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<LeaveGraphResponse> call, @NonNull Response<LeaveGraphResponse> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    leavesGraphData.setValue(response.body());
+                } else {
+                    leavesGraphData.setValue(null);
+                    errorMessage.setValue("Graph statistics not available");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<LeaveGraphResponse> call, @NonNull Throwable throwable) {
+                isLoading.setValue(false);
+                leavesGraphData.setValue(null);
+                errorMessage.setValue("Network error loading graph parameters");
+            }
+        });
+    }
+
+    // Integrated: Fetch Sign-In graph metrics (Base 3 / API v2 Router)
+    public void fetchSignInGraph(String token) {
+        isLoading.setValue(true);
+        apiInterfaceV3.getSignInGraphData(token).enqueue(new Callback<SignInGraphResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<SignInGraphResponse> call, @NonNull Response<SignInGraphResponse> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    signInGraphData.setValue(response.body());
+                } else {
+                    signInGraphData.setValue(null);
+                    errorMessage.setValue("Sign-In Graph data not available");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<SignInGraphResponse> call, @NonNull Throwable t) {
+                isLoading.setValue(false);
+                signInGraphData.setValue(null);
+                errorMessage.setValue("Network error loading sign-in parameters: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    // Integrated: Fetch Checked-In Visitors list (Base 2 / API v1 Router)
+    public void fetchVisitorsData(String token) {
+        isLoading.setValue(true);
+        apiInterface.getVisitors(token).enqueue(new Callback<VisitorsAdminDetailsResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<VisitorsAdminDetailsResponse> call, @NonNull Response<VisitorsAdminDetailsResponse> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && response.body().getData().getVisitors() != null) {
+                    visitorsData.setValue(response.body().getData().getVisitors());
+                } else {
+                    visitorsData.setValue(new ArrayList<>());
+                    errorMessage.setValue("Checked-in visitor records not available");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<VisitorsAdminDetailsResponse> call, @NonNull Throwable t) {
+                isLoading.setValue(false);
+                visitorsData.setValue(new ArrayList<>());
+                errorMessage.setValue("Network error loading visitors: " + t.getLocalizedMessage());
             }
         });
     }
@@ -132,7 +220,7 @@ public class AdminDashboardViewModel extends ViewModel {
                         try {
                             birthDate = alternateFormat.parse(dobString);
                         } catch (ParseException e2) {
-                            continue; // Unparseable format, skip safely to protect dataset loop integrity
+                            continue;
                         }
                     }
 
@@ -149,7 +237,6 @@ public class AdminDashboardViewModel extends ViewModel {
             }
         }
 
-        // Safe sort algorithm with full internal element null handling
         filteredList.sort((e1, e2) -> {
             if (e1 == null && e2 == null) return 0;
             if (e1 == null) return 1;
@@ -193,28 +280,5 @@ public class AdminDashboardViewModel extends ViewModel {
                 return null;
             }
         }
-    }
-
-    public void fetchLeavesGraph(String token) {
-        isLoading.setValue(true);
-        apiInterface.getLeavesGraph(token).enqueue(new Callback<LeaveGraphResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<LeaveGraphResponse> call, @NonNull Response<LeaveGraphResponse> response) {
-                isLoading.setValue(false);
-                if (response.isSuccessful() && response.body() != null) {
-                    leavesGraphData.setValue(response.body());
-                } else {
-                    leavesGraphData.setValue(null);
-                    errorMessage.setValue("Graph statistics not available");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<LeaveGraphResponse> call, @NonNull Throwable throwable) {
-                isLoading.setValue(false);
-                leavesGraphData.setValue(null);
-                errorMessage.setValue("Network error loading graph dashboard parameters");
-            }
-        });
     }
 }
