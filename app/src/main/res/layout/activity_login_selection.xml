@@ -3,127 +3,214 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    android:fitsSystemWindows="true">
 
+    <!-- ===== Background gradient pattern ===== -->
     <View
         android:id="@+id/backgroundPattern"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:alpha="0.7"
+        android:layout_height="350dp"
         android:background="@drawable/gradient_3"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Header TextView -->
+    <!-- Decorative overlay circle -->
+    <View
+        android:id="@+id/decorCircle"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="-60dp"
+        android:alpha="0.15"
+        android:background="@drawable/circle_shape"
+        android:backgroundTint="@color/surface_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/backgroundPattern" />
+
+    <!-- Guideline marking where the white sheet starts -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideSheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.42" />
+
+    <!-- Rounded white "bottom sheet" container -->
+    <View
+        android:id="@+id/sheetBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_rounded_top_sheet"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideSheet" />
+
+    <!-- Floating circular logo card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/logoCard"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginBottom="-40dp"
+        app:cardBackgroundColor="@color/surface_white"
+        app:cardCornerRadius="55dp"
+        app:cardElevation="10dp"
+        app:layout_constraintBottom_toTopOf="@id/guideSheet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/ivCompanyLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Company Logo"
+            android:padding="10dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher_round" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Header -->
     <TextView
         android:id="@+id/tvHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="70dp"
+        android:fontFamily="@font/quicksand_font_family"
         android:text="Welcome To XeDigital"
-        android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textColor="@color/text_primary"
+        android:textSize="22sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideSheet" />
 
-    <!-- Company Logo -->
-    <ImageView
-        android:id="@+id/ivCompanyLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="Company Logo"
-        android:src="@mipmap/ic_launcher_round"
-        app:layout_constraintBottom_toTopOf="@+id/tvHeader"
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/tvSubHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Choose how you'd like to sign in"
+        android:textColor="@color/text_tertiary"
+        android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvHeader" />
 
-    <!-- Horizontal LinearLayout for login options -->
+    <!-- Role selection cards: NOW PINNED top AND bottom -->
     <LinearLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/tvSubHeader"
+        app:layout_constraintVertical_bias="0.5">
 
         <!-- Admin Login Card -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvAdminLogin"
             android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginEnd="20dp"
+            android:layout_height="160dp"
+            android:layout_marginEnd="10dp"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="8dp">
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/surface_white"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:rippleColor="@color/ripple_color"
+            app:strokeColor="@color/border_light"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:contentDescription="Admin Icon"
-                    android:src="@mipmap/admin_login" />
+                <androidx.cardview.widget.CardView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    app:cardBackgroundColor="@color/icon_background"
+                    app:cardCornerRadius="32dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Admin Icon"
+                        android:padding="12dp"
+                        android:src="@mipmap/admin_login" />
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="14dp"
                     android:text="Admin Login"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Employee Login Card -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvEmployeeLogin"
             android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginStart="20dp"
+            android:layout_height="160dp"
+            android:layout_marginStart="10dp"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="8dp">
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/surface_white"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:rippleColor="@color/ripple_color"
+            app:strokeColor="@color/border_light"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:contentDescription="Employee Icon"
-                    android:src="@mipmap/employee_login" />
+                <androidx.cardview.widget.CardView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    app:cardBackgroundColor="@color/icon_background"
+                    app:cardCornerRadius="32dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Employee Icon"
+                        android:padding="12dp"
+                        android:src="@mipmap/employee_login" />
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="14dp"
                     android:text="Employee Login"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
+
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

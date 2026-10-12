@@ -563,8 +563,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void callFaceDetailApi(RequestBody faceDetailsBody) {
         String authToken = "jwt " + token;
         Call<ResponseBody> call = AdminAPIClient.getInstance()
@@ -616,6 +614,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         });
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private void callAttendanceApi(String employeeId, String employeeName, Location location) {
         if (employeeId == null || employeeId.isEmpty()) {
@@ -669,10 +669,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    // =========================================================
-    //  API CHAIN
-    // =========================================================
-
     private void callVisitorFace(RequestBody requestBodyFace) {
         String authToken = "jwt " + token;
         Call<VisitorFaceResponse> call = AdminAPIClient.getInstance()
@@ -725,6 +721,10 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         });
     }
+
+    // =========================================================
+    //  API CHAIN
+    // =========================================================
 
     private void callGetCheckedInApi(String visitorContact) {
         String authToken = "jwt " + token;
@@ -910,10 +910,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    // =========================================================
-    //  QR CODE
-    // =========================================================
-
     private void showCapturingOverlay() {
         runOnUiThread(() -> {
             captureOverlay.setText(getString(R.string.capturing_image));
@@ -926,16 +922,16 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
+    // =========================================================
+    //  QR CODE
+    // =========================================================
+
     private void hideCapturingOverlay() {
         runOnUiThread(() -> {
             captureOverlay.clearAnimation();
             captureOverlay.setVisibility(View.GONE);
         });
     }
-
-    // =========================================================
-    //  UI HELPERS — now using CustomAlertDialog
-    // =========================================================
 
     private void showAttendanceSuccessAlert(String responseBody) {
         loadingPanel.setVisibility(View.GONE);
@@ -985,6 +981,10 @@ public class AdminPunchActivity extends AppCompatActivity {
             showAttendanceFailedAlert("Error parsing attendance response.");
         }
     }
+
+    // =========================================================
+    //  UI HELPERS — now using CustomAlertDialog
+    // =========================================================
 
     private void showAttendanceFailedAlert(String message) {
         loadingPanel.setVisibility(View.GONE);
@@ -1087,45 +1087,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
     }
 
-//    private void showAttendanceSuccessAlert(String responseBody) {
-//        loadingPanel.setVisibility(View.GONE);
-//        try {
-//            JSONObject json = new JSONObject(responseBody);
-//            boolean success = json.getBoolean("success");
-//            String message = json.getString("message");
-//
-//            if (!success) return;
-//
-//            JSONObject data = json.getJSONObject("data");
-//            String punchIn = data.getString("punchInAddress");
-//            String punchOut = data.getString("punchOutAddress");
-//            String address = punchOut.isEmpty() ? punchIn : punchOut;
-//
-//            String fullMessage = message + "\n\nAddress: " + address;
-//
-//            runOnUiThread(() -> {
-//                if (isFinishing() || isDestroyed()) return;
-//
-//                new CustomAlertDialog(this)
-//                        .setType(CustomAlertDialog.Type.SUCCESS)
-//                        .setTitle("Attendance Success")
-//                        .setMessage(fullMessage)
-//                        .setCancelable(false)
-//                        .setPositiveButton("OK", () -> {
-//                            setResult(Activity.RESULT_OK);
-//                            finish();
-//                        })
-//                        .show();
-//
-//                new Handler().postDelayed(() -> {
-//                    if (!isFinishing()) finish();
-//                }, 5000);
-//            });
-//        } catch (JSONException e) {
-//            showAttendanceFailedAlert("Error parsing attendance response.");
-//        }
-//    }
-
     private void getAddressFromLocation(double lat, double lng, AddressCallback callback) {
         new Thread(() -> {
             Geocoder geocoder = new Geocoder(AdminPunchActivity.this, Locale.getDefault());
@@ -1175,21 +1136,60 @@ public class AdminPunchActivity extends AppCompatActivity {
         }).start();
     }
 
+//    private void showAttendanceSuccessAlert(String responseBody) {
+//        loadingPanel.setVisibility(View.GONE);
+//        try {
+//            JSONObject json = new JSONObject(responseBody);
+//            boolean success = json.getBoolean("success");
+//            String message = json.getString("message");
+//
+//            if (!success) return;
+//
+//            JSONObject data = json.getJSONObject("data");
+//            String punchIn = data.getString("punchInAddress");
+//            String punchOut = data.getString("punchOutAddress");
+//            String address = punchOut.isEmpty() ? punchIn : punchOut;
+//
+//            String fullMessage = message + "\n\nAddress: " + address;
+//
+//            runOnUiThread(() -> {
+//                if (isFinishing() || isDestroyed()) return;
+//
+//                new CustomAlertDialog(this)
+//                        .setType(CustomAlertDialog.Type.SUCCESS)
+//                        .setTitle("Attendance Success")
+//                        .setMessage(fullMessage)
+//                        .setCancelable(false)
+//                        .setPositiveButton("OK", () -> {
+//                            setResult(Activity.RESULT_OK);
+//                            finish();
+//                        })
+//                        .show();
+//
+//                new Handler().postDelayed(() -> {
+//                    if (!isFinishing()) finish();
+//                }, 5000);
+//            });
+//        } catch (JSONException e) {
+//            showAttendanceFailedAlert("Error parsing attendance response.");
+//        }
+//    }
+
     private String getCurrentTime(Location location) {
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
         return fmt.format(location != null ? new Date(location.getTime()) : new Date());
     }
 
-    // =========================================================
-    //  LOCATION
-    // =========================================================
-
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
+
+    // =========================================================
+    //  LOCATION
+    // =========================================================
 
     private File getOutputDirectory() {
         File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "AdminPunch");

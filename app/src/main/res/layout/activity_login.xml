@@ -22,6 +22,18 @@
             android:background="@drawable/gradient_attendance_card"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintTop_toTopOf="parent" />
+        <!-- Decorative overlay circle for depth -->
+        <View
+            android:id="@+id/decorCircle"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_marginTop="-60dp"
+            android:alpha="0.15"
+            android:background="@drawable/circle_shape"
+            android:backgroundTint="@color/surface_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/topGradientBackground" />
+
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"

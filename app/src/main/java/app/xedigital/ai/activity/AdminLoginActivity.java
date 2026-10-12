@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,6 +85,13 @@ public class AdminLoginActivity extends AppCompatActivity {
         }
 
         loginButton.setOnClickListener(v -> performLogin());
+        // ✅ Back button → go to LoginSelectionActivity instead of exiting the app
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                navigateToLoginSelection();
+            }
+        });
     }
 
     private void performLogin() {
@@ -102,6 +110,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     LoginModelResponse loginResponse = response.body();
 
@@ -125,6 +134,7 @@ public class AdminLoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<LoginModelResponse> call, @NonNull Throwable t) {
+                if (isFinishing() || isDestroyed()) return;
                 showLoading(false);
                 Toast.makeText(AdminLoginActivity.this, "Login failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -149,6 +159,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         employees.enqueue(new Callback<UserDetailsResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     UserDetailsResponse userDetailResponse = response.body();
@@ -178,29 +189,26 @@ public class AdminLoginActivity extends AppCompatActivity {
                             }
                         } else {
                             // Role missing from an otherwise successful response — treat as unverifiable, fail closed.
-                            showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName,
-                                    "Your account role could not be determined. Please contact support or try again.");
+                            showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName, "Your account role could not be determined. Please contact support or try again.");
                         }
                     } else {
                         // Response succeeded but payload signals failure — fail closed.
-                        showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName,
-                                "We couldn't verify your account details. Please try again.");
+                        showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName, "We couldn't verify your account details. Please try again.");
                     }
                 } else {
                     // Server returned an error status — fail closed, do NOT auto-login.
                     Log.e(TAG, "Server profile fetch failed with HTTP error. Blocking access until role is verified.");
-                    showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName,
-                            "We couldn't verify your account role due to a server error. Please try again.");
+                    showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName, "We couldn't verify your account role due to a server error. Please try again.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable throwable) {
+                if (isFinishing() || isDestroyed()) return;
                 showLoading(false);
                 // Network/connection failure — fail closed, do NOT auto-login.
                 Log.e(TAG, "Network error while verifying role: " + throwable.getMessage());
-                showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName,
-                        "Network error. We couldn't verify your account role. Please check your connection and try again.");
+                showRoleVerificationFailedDialog(authToken, userId, empEmail, empFirstName, "Network error. We couldn't verify your account role. Please check your connection and try again.");
             }
         });
     }
@@ -213,30 +221,15 @@ public class AdminLoginActivity extends AppCompatActivity {
         verifyRetryCount++;
 
         if (verifyRetryCount > MAX_VERIFY_RETRIES) {
-            showStyledDialog(
-                    "Verification Failed",
-                    "We're unable to verify your account after multiple attempts. Please try logging in again later.",
-                    R.drawable.ic_error_outline,
-                    R.color.error_bg,
-                    R.color.error_tint,
-                    true,
-                    null // no retry — force user to restart login flow
+            showStyledDialog("Verification Failed", "We're unable to verify your account after multiple attempts. Please try logging in again later.", R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true, null // no retry — force user to restart login flow
             );
             return;
         }
 
-        showStyledDialog(
-                "Verification Failed",
-                message,
-                R.drawable.ic_error_outline,
-                R.color.error_bg,
-                R.color.error_tint,
-                true,
-                () -> {
-                    showLoading(true);
-                    GetEmployee(authToken, userId, empEmail, empFirstName);
-                }
-        );
+        showStyledDialog("Verification Failed", message, R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true, () -> {
+            showLoading(true);
+            GetEmployee(authToken, userId, empEmail, empFirstName);
+        });
     }
 
     private void handleRememberMe(String email, String password) {
@@ -256,9 +249,7 @@ public class AdminLoginActivity extends AppCompatActivity {
     /**
      * Single-button styled dialog (backward-compatible convenience overload).
      */
-    private void showStyledDialog(String title, String message, int iconRes,
-                                  int iconBgColorRes, int iconTintColorRes,
-                                  boolean cancelable) {
+    private void showStyledDialog(String title, String message, int iconRes, int iconBgColorRes, int iconTintColorRes, boolean cancelable) {
         showStyledDialog(title, message, iconRes, iconBgColorRes, iconTintColorRes, cancelable, null);
     }
 
@@ -268,9 +259,7 @@ public class AdminLoginActivity extends AppCompatActivity {
      * - a single "OK" button (onRetry == null), or
      * - a "Cancel" / "Retry" button pair (onRetry != null)
      */
-    private void showStyledDialog(String title, String message, int iconRes,
-                                  int iconBgColorRes, int iconTintColorRes,
-                                  boolean cancelable, Runnable onRetry) {
+    private void showStyledDialog(String title, String message, int iconRes, int iconBgColorRes, int iconTintColorRes, boolean cancelable, Runnable onRetry) {
         if (isFinishing() || isDestroyed()) return;
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_custom_alert_admin, null);
@@ -290,25 +279,17 @@ public class AdminLoginActivity extends AppCompatActivity {
         }
 
         icon.setImageResource(iconRes);
-        iconBackground.setBackgroundTintList(
-                ColorStateList.valueOf(ContextCompat.getColor(this, iconBgColorRes)));
-        icon.setImageTintList(
-                ColorStateList.valueOf(ContextCompat.getColor(this, iconTintColorRes)));
+        iconBackground.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, iconBgColorRes)));
+        icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, iconTintColorRes)));
 
         titleView.setText(title);
         messageView.setText(message);
 
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setCancelable(cancelable)
-                .create();
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(dialogView).setCancelable(cancelable).create();
 
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-            dialog.getWindow().setLayout(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            );
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
 
@@ -334,25 +315,11 @@ public class AdminLoginActivity extends AppCompatActivity {
     }
 
     private void showAlertDialogWithLogout() {
-        showStyledDialog(
-                "Access Denied",
-                "Please login with Admin or HR credentials",
-                R.drawable.ic_warning_outline,
-                R.color.warning_bg,
-                R.color.warning_tint,
-                false
-        );
+        showStyledDialog("Access Denied", "Please login with Admin or HR credentials", R.drawable.ic_warning_outline, R.color.warning_bg, R.color.warning_tint, false);
     }
 
     private void showAlertDialog(String message) {
-        showStyledDialog(
-                "Login Failed",
-                message,
-                R.drawable.ic_error_outline,
-                R.color.error_bg,
-                R.color.error_tint,
-                true
-        );
+        showStyledDialog("Login Failed", message, R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true);
     }
 
     // ================================================================
@@ -371,5 +338,12 @@ public class AdminLoginActivity extends AppCompatActivity {
         prefManager.putString("empFirstName", empFirstName);
         prefManager.putBoolean("isEmployee", isEmployee);
         prefManager.putString("collectionName", collectionName);
+    }
+
+    private void navigateToLoginSelection() {
+        Intent intent = new Intent(AdminLoginActivity.this, LoginSelectionActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 }

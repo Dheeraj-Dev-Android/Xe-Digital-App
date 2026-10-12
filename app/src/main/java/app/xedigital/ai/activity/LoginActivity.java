@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -40,31 +41,29 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isRedirectInProgress = false;
     private boolean isCheckingPermissions = false;
     private PermissionManager permissionManager;
-    private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                permissionManager.syncAllPermissions();
-                isCheckingPermissions = false;
-                proceedToAuthCheck();
-            });
+    private final ActivityResultLauncher<String> notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        permissionManager.syncAllPermissions();
+        isCheckingPermissions = false;
+        proceedToAuthCheck();
+    });
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
-    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                permissionManager.syncAllPermissions();
-                boolean locationGranted = permissionManager.isGranted(PermissionManager.TAG_LOCATION);
+    private final ActivityResultLauncher<String[]> foregroundPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+        permissionManager.syncAllPermissions();
+        boolean locationGranted = permissionManager.isGranted(PermissionManager.TAG_LOCATION);
 
-                SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-                String cachedToken = prefManager.getString("cachedTokenPermission", null);
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
+        String cachedToken = prefManager.getString("cachedTokenPermission", null);
 
-                if (locationGranted) {
-                    if (cachedToken != null) {
-                        proceedToRoleBasedNavigation(cachedToken);
-                    }
-                } else {
-                    showLoginScreen();
-                    showAlertDialog("Foreground location permission is required for shift tracking.");
-                }
-            });
+        if (locationGranted) {
+            if (cachedToken != null) {
+                proceedToRoleBasedNavigation(cachedToken);
+            }
+        } else {
+            showLoginScreen();
+            showAlertDialog("Foreground location permission is required for shift tracking.");
+        }
+    });
 
     @Override
     protected void onResume() {
@@ -96,6 +95,13 @@ public class LoginActivity extends AppCompatActivity {
                 if (password.isEmpty()) binding.editPassword.setError("Password Required");
             } else {
                 callLoginApi(email, password, true);
+            }
+        });
+        // ✅ Back button → go to LoginSelectionActivity instead of exiting the app
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                navigateToLoginSelection();
             }
         });
     }
@@ -216,8 +222,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) return;
                 showLoading(false);
 
-                if (response.isSuccessful() && response.body() != null
-                        && response.body().isSuccess() && response.body().getData() != null) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess() && response.body().getData() != null) {
 
                     app.xedigital.ai.model.user.Data data = response.body().getData();
 
@@ -229,8 +234,7 @@ public class LoginActivity extends AppCompatActivity {
                         SecurePrefManager.getInstance(LoginActivity.this).putString("collection", collectionName);
                     }
                 } else {
-                    Log.e(TAG, "User data fetch failed: "
-                            + (response.body() != null ? response.body().getMessage() : response.code()));
+                    Log.e(TAG, "User data fetch failed: " + (response.body() != null ? response.body().getMessage() : response.code()));
                 }
 
                 checkPermissionsAndNavigate(authToken);
@@ -281,10 +285,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Employee requires location permission
         if (!permissionManager.isGranted(PermissionManager.TAG_LOCATION)) {
-            foregroundPermissionLauncher.launch(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            });
+            foregroundPermissionLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
             return;
         }
         proceedToRoleBasedNavigation(token);
@@ -327,11 +328,7 @@ public class LoginActivity extends AppCompatActivity {
     private void showAlertDialog(String message) {
         if (isFinishing() || isDestroyed()) return;
         if (infoDialog != null && infoDialog.isShowing()) infoDialog.dismiss();
-        infoDialog = new AlertDialog.Builder(this)
-                .setTitle("Login Info")
-                .setMessage(message)
-                .setPositiveButton("OK", null)
-                .create();
+        infoDialog = new AlertDialog.Builder(this).setTitle("Login Info").setMessage(message).setPositiveButton("OK", null).create();
         infoDialog.show();
     }
 
@@ -340,5 +337,12 @@ public class LoginActivity extends AppCompatActivity {
         if (batteryDialog != null && batteryDialog.isShowing()) batteryDialog.dismiss();
         if (infoDialog != null && infoDialog.isShowing()) infoDialog.dismiss();
         super.onDestroy();
+    }
+
+    private void navigateToLoginSelection() {
+        Intent intent = new Intent(LoginActivity.this, LoginSelectionActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 }

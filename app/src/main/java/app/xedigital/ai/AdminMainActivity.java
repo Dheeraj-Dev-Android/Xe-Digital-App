@@ -27,7 +27,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import app.xedigital.ai.activity.AdminLoginActivity;
+import app.xedigital.ai.activity.LoginSelectionActivity;
 import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
@@ -159,7 +159,7 @@ public class AdminMainActivity extends AppCompatActivity {
     private void handleLogout() {
         SecurePrefManager.getInstance(this).clearAll();
 
-        Intent intent = new Intent(this, AdminLoginActivity.class);
+        Intent intent = new Intent(this, LoginSelectionActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
