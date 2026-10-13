@@ -221,7 +221,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         verifyRetryCount++;
 
         if (verifyRetryCount > MAX_VERIFY_RETRIES) {
-            showStyledDialog("Verification Failed", "We're unable to verify your account after multiple attempts. Please try logging in again later.", R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true, null // no retry — force user to restart login flow
+            showStyledDialog("Verification Failed", "We're unable to verify your account after multiple attempts. Please try logging in again later.", R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true, null
             );
             return;
         }

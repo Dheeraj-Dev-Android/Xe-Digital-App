@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,6 +35,9 @@ public class EmployeeDetailsFragment extends Fragment {
     private String token;
     private RecyclerView rvEmployees;
     private EmployeeAdapter adapter;
+    private View emptyStateView;
+    private ProgressBar progressBar;
+    private EditText etSearch;
 
     public static EmployeeDetailsFragment newInstance() {
         return new EmployeeDetailsFragment();
@@ -49,19 +53,21 @@ public class EmployeeDetailsFragment extends Fragment {
         rvEmployees.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new EmployeeAdapter(getContext(), employeeList);
         rvEmployees.setAdapter(adapter);
+
+        emptyStateView = view.findViewById(R.id.emptyStateView);
+        progressBar = view.findViewById(R.id.progressBar);
+
         Chip chipAll = view.findViewById(R.id.chipAll);
         Chip chipActive = view.findViewById(R.id.chipActive);
         Chip chipInactive = view.findViewById(R.id.chipInactive);
 
-// Set default selection to "All"
         chipAll.setChecked(true);
 
-// Chip click listeners
         chipAll.setOnClickListener(v -> filterEmployees("ALL"));
         chipActive.setOnClickListener(v -> filterEmployees("ACTIVE"));
         chipInactive.setOnClickListener(v -> filterEmployees("INACTIVE"));
 
-        EditText etSearch = view.findViewById(R.id.etSearchEmployee);
+        etSearch = view.findViewById(R.id.etSearchEmployee);
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -94,6 +100,7 @@ public class EmployeeDetailsFragment extends Fragment {
         }
 
         adapter.notifyDataSetChanged();
+        updateEmptyState();
     }
 
     @Override
@@ -102,17 +109,21 @@ public class EmployeeDetailsFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(EmployeeDetailsViewModel.class);
 
         mViewModel.getEmployeeList().observe(getViewLifecycleOwner(), employees -> {
+            progressBar.setVisibility(View.GONE);
             fullEmployeeList.clear();
             employeeList.clear();
             fullEmployeeList.addAll(employees);
             employeeList.addAll(employees);
             adapter.notifyDataSetChanged();
+            updateEmptyState();
         });
 
+        mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), message -> {
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        });
 
-        // Observe error messages
-        mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), message -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
-
+        progressBar.setVisibility(View.VISIBLE);
         mViewModel.fetchEmployees(token);
     }
 
@@ -142,6 +153,16 @@ public class EmployeeDetailsFragment extends Fragment {
         }
 
         adapter.notifyDataSetChanged();
+        updateEmptyState();
     }
 
+    private void updateEmptyState() {
+        if (employeeList.isEmpty()) {
+            emptyStateView.setVisibility(View.VISIBLE);
+            rvEmployees.setVisibility(View.GONE);
+        } else {
+            emptyStateView.setVisibility(View.GONE);
+            rvEmployees.setVisibility(View.VISIBLE);
+        }
+    }
 }

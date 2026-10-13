@@ -615,8 +615,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void callAttendanceApi(String employeeId, String employeeName, Location location) {
         if (employeeId == null || employeeId.isEmpty()) {
             showAttendanceFailedAlert("User not found.");
@@ -668,6 +666,12 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         });
     }
+
+    private String getCurrentTime(Location location) {
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return fmt.format(location != null ? new Date(location.getTime()) : new Date());
+    }    private final Runnable captureRunnable = this::captureImage;
 
     private void callVisitorFace(RequestBody requestBodyFace) {
         String authToken = "jwt " + token;
@@ -722,10 +726,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    // =========================================================
-    //  API CHAIN
-    // =========================================================
-
     private void callGetCheckedInApi(String visitorContact) {
         String authToken = "jwt " + token;
         AdminAPIClient.getInstance()
@@ -761,6 +761,10 @@ public class AdminPunchActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    // =========================================================
+    //  API CHAIN
+    // =========================================================
 
     private void addBucket(String base64Image) {
         String authToken = "jwt " + token;
@@ -922,16 +926,16 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    // =========================================================
-    //  QR CODE
-    // =========================================================
-
     private void hideCapturingOverlay() {
         runOnUiThread(() -> {
             captureOverlay.clearAnimation();
             captureOverlay.setVisibility(View.GONE);
         });
     }
+
+    // =========================================================
+    //  QR CODE
+    // =========================================================
 
     private void showAttendanceSuccessAlert(String responseBody) {
         loadingPanel.setVisibility(View.GONE);
@@ -982,10 +986,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
     }
 
-    // =========================================================
-    //  UI HELPERS — now using CustomAlertDialog
-    // =========================================================
-
     private void showAttendanceFailedAlert(String message) {
         loadingPanel.setVisibility(View.GONE);
         runOnUiThread(() -> {
@@ -1008,6 +1008,10 @@ public class AdminPunchActivity extends AppCompatActivity {
                     .show();
         });
     }
+
+    // =========================================================
+    //  UI HELPERS — now using CustomAlertDialog
+    // =========================================================
 
     private void handleError(String message) {
         runOnUiThread(() -> {
@@ -1136,6 +1140,8 @@ public class AdminPunchActivity extends AppCompatActivity {
         }).start();
     }
 
+
+
 //    private void showAttendanceSuccessAlert(String responseBody) {
 //        loadingPanel.setVisibility(View.GONE);
 //        try {
@@ -1175,21 +1181,11 @@ public class AdminPunchActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private String getCurrentTime(Location location) {
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return fmt.format(location != null ? new Date(location.getTime()) : new Date());
-    }
-
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
-
-    // =========================================================
-    //  LOCATION
-    // =========================================================
 
     private File getOutputDirectory() {
         File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "AdminPunch");
@@ -1198,6 +1194,10 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
         return dir;
     }
+
+    // =========================================================
+    //  LOCATION
+    // =========================================================
 
     interface AddressCallback {
         void onAddressReceived(String address, Location location);

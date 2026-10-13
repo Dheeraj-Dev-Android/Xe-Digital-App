@@ -25,6 +25,7 @@ public class LobbyVisitorAdapter extends RecyclerView.Adapter<LobbyVisitorAdapte
 
     private final List<VisitorsItem> visitors;
     private final OnVisitorClickListener clickListener;
+
     public LobbyVisitorAdapter(List<VisitorsItem> visitors, OnVisitorClickListener clickListener) {
         this.visitors = visitors;
         this.clickListener = clickListener;

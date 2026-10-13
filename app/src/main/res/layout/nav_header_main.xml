@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/nav_header_background"
+    android:background="@drawable/fragment_dashboard_bg"
     android:padding="24dp">
 
     <ImageView
@@ -46,7 +46,8 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/nav_header_desc"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_profile_placeholder" />
+                app:srcCompat="@drawable/ic_person"
+                app:tint="@color/avatar_text" />
 
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.card.MaterialCardView>
@@ -56,7 +57,7 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:fontFamily="@font/quicksand_font_family"
         android:maxLines="1"

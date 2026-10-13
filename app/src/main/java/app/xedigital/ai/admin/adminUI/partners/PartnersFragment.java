@@ -1,7 +1,9 @@
 package app.xedigital.ai.admin.adminUI.partners;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +30,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import app.xedigital.ai.R;
@@ -43,30 +47,51 @@ import retrofit2.Response;
 
 public class PartnersFragment extends Fragment {
 
+    private final List<PartnersItem> fullPartnersList = new ArrayList<>();
+    private final List<PartnersItem> filteredPartnersList = new ArrayList<>();
     private PartnersViewModel partnersViewModel;
     private RecyclerView recyclerView;
     private PartnersAdapter adapter;
     private String authToken;
     private View emptyStateContainer;
     private SwipeRefreshLayout swipeRefreshLayout;
-
+    private ProgressBar progressBar;
+    private EditText etSearchPartner;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_partners, container, false);
         SecurePrefManager sharedPreferences = SecurePrefManager.getInstance(requireContext());
         authToken = sharedPreferences.getString("authToken", "");
+
         recyclerView = view.findViewById(R.id.partnersRecyclerView);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        progressBar = view.findViewById(R.id.progressBar);
+        etSearchPartner = view.findViewById(R.id.etSearchPartner);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+
         swipeRefreshLayout.setOnRefreshListener(() -> {
             String token = "jwt " + authToken;
             partnersViewModel.fetchPartners(token);
         });
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
+        etSearchPartner.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterPartnersByName(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         return view;
     }
@@ -80,32 +105,58 @@ public class PartnersFragment extends Fragment {
 
         partnersViewModel.getPartnersList().observe(getViewLifecycleOwner(), this::updateUI);
 
+        progressBar.setVisibility(View.VISIBLE);
         String token = "jwt " + authToken;
         partnersViewModel.fetchPartners(token);
     }
 
-
     private void updateUI(List<PartnersItem> partners) {
         swipeRefreshLayout.setRefreshing(false);
+        progressBar.setVisibility(View.GONE);
 
-        if (partners != null && !partners.isEmpty()) {
+        fullPartnersList.clear();
+        if (partners != null) {
+            fullPartnersList.addAll(partners);
+        }
+
+        // Re-apply current search filter
+        String currentQuery = etSearchPartner.getText().toString().trim();
+        filterPartnersByName(currentQuery);
+    }
+
+    private void filterPartnersByName(String query) {
+        filteredPartnersList.clear();
+
+        if (query.isEmpty()) {
+            filteredPartnersList.addAll(fullPartnersList);
+        } else {
+            for (PartnersItem partner : fullPartnersList) {
+                if (partner.getName() != null && partner.getName().toLowerCase().contains(query.toLowerCase())) {
+                    filteredPartnersList.add(partner);
+                }
+            }
+        }
+
+        if (adapter == null) {
+            adapter = new PartnersAdapter(getContext(), filteredPartnersList, () -> {
+                String token = "jwt " + authToken;
+                partnersViewModel.fetchPartners(token);
+            });
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.setData(filteredPartnersList);
+        }
+
+        updateEmptyState();
+    }
+
+    private void updateEmptyState() {
+        if (filteredPartnersList.isEmpty()) {
+            emptyStateContainer.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
             emptyStateContainer.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-
-            if (adapter == null) {
-                adapter = new PartnersAdapter(getContext(), partners, () -> {
-                    String token = "jwt " + authToken;
-                    partnersViewModel.fetchPartners(token);
-                });
-                recyclerView.setAdapter(adapter);
-            } else {
-                adapter.setData(partners);
-            }
-
-
-        } else {
-            recyclerView.setVisibility(View.GONE);
-            emptyStateContainer.setVisibility(View.VISIBLE);
         }
     }
 
@@ -113,16 +164,15 @@ public class PartnersFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         LayoutInflater inflater = LayoutInflater.from(requireContext());
 
-        // Inflate the full form layout
         View dialogView = inflater.inflate(R.layout.edit_partner_form, null);
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
         dialog.show();
+
         TextView title = dialogView.findViewById(R.id.titleEditPartner);
         title.setText("Add New Partner");
 
-        // Reference form fields
         EditText nameInput = dialogView.findViewById(R.id.editName);
         EditText emailInput = dialogView.findViewById(R.id.editEmail);
         EditText contactInput = dialogView.findViewById(R.id.editContact);
@@ -140,12 +190,10 @@ public class PartnersFragment extends Fragment {
         TextView emailLabel = dialogView.findViewById(R.id.emailLabel);
         TextView contactLabel = dialogView.findViewById(R.id.contactLabel);
 
-        // Set labels with red asterisk
         nameLabel.setText(Html.fromHtml("Name <font color='#FF0000'>*</font>"));
         emailLabel.setText(Html.fromHtml("Email <font color='#FF0000'>*</font>"));
         contactLabel.setText(Html.fromHtml("Contact <font color='#FF0000'>*</font>"));
 
-        // Submit Button Click
         submitButton.setOnClickListener(v -> {
             String name = nameInput.getText().toString().trim();
             String email = emailInput.getText().toString().trim();
@@ -157,8 +205,6 @@ public class PartnersFragment extends Fragment {
             String website = websiteInput.getText().toString().trim();
             String status = statusSpinner.getSelectedItem().toString();
 
-
-            // === FORM VALIDATION ===
             if (name.isEmpty()) {
                 nameInput.setError("Name is required");
                 nameInput.requestFocus();
@@ -207,7 +253,6 @@ public class PartnersFragment extends Fragment {
                 return;
             }
 
-            // === All validations passed ===
             Toast.makeText(requireContext(), "Partner added: " + name, Toast.LENGTH_SHORT).show();
 
             try {
@@ -227,7 +272,6 @@ public class PartnersFragment extends Fragment {
 
                 String token = "jwt " + authToken;
 
-
                 AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
                 Call<ResponseBody> call = apiService.addPartner(token, requestBody);
 
@@ -237,8 +281,6 @@ public class PartnersFragment extends Fragment {
                         if (response.isSuccessful()) {
                             Toast.makeText(requireContext(), "Partner added successfully!", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
-
-                            // Refresh list
                             partnersViewModel.fetchPartners(token);
                         } else {
                             Toast.makeText(requireContext(), "Failed to add partner", Toast.LENGTH_SHORT).show();
@@ -259,7 +301,6 @@ public class PartnersFragment extends Fragment {
             dialog.dismiss();
         });
 
-        // Clear Button Click
         clearButton.setOnClickListener(v -> {
             nameInput.setText("");
             emailInput.setText("");
@@ -272,7 +313,6 @@ public class PartnersFragment extends Fragment {
             statusSpinner.setSelection(0);
         });
     }
-
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -288,5 +328,4 @@ public class PartnersFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

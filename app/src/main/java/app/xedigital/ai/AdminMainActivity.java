@@ -27,6 +27,9 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import app.xedigital.ai.activity.LoginSelectionActivity;
 import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
@@ -46,13 +49,25 @@ public class AdminMainActivity extends AppCompatActivity {
     private static final String TAG = "AdminMainActivity";
 
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
+    // Tracks which group menus are currently expanded
+    private final Map<Integer, Boolean> expandedGroups = new HashMap<>();
+    // Maps each parent menu header ID to its child sub-item IDs
+    private final Map<Integer, int[]> groupChildMap = new HashMap<Integer, int[]>() {{
+        put(R.id.nav_digital_identity_menu, new int[]{R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_employee_onboard, R.id.nav_partners, R.id.nav_allUsers});
+        put(R.id.nav_workforce_menu, new int[]{R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf});
+        put(R.id.nav_talent_menu, new int[]{R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter});
+        put(R.id.nav_bgv_menu, new int[]{R.id.nav_candidates_verification, R.id.nav_employment_verification});
+        put(R.id.nav_payroll_menu, new int[]{R.id.nav_payroll_employees, R.id.nav_salary_component, R.id.nav_upload_payroll, R.id.nav_generate_payroll, R.id.nav_payroll_config});
+        put(R.id.nav_meeting_menu, new int[]{R.id.nav_meeting_rooms, R.id.nav_book_meeting});
+        put(R.id.nav_claim_menu, new int[]{R.id.nav_claim_managements, R.id.nav_travel_expenses, R.id.nav_food_expenses, R.id.nav_accommodation_expenses, R.id.nav_miscellaneous_expenses});
+        put(R.id.nav_config_menu, new int[]{R.id.nav_visitor_categories, R.id.nav_leave_config, R.id.nav_notification});
+    }};
     private ActivityAdminMainBinding binding;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
     private UserViewModel userViewModel;
     private FirebaseAnalytics mFirebaseAnalytics;
     private boolean isNetworkChangeReceiverRegistered = false;
-
     private SlowInternetConnectionBinding slowInternetBinding;
     private NoInternetConnectionBinding noInternetBinding;
 
@@ -76,15 +91,15 @@ public class AdminMainActivity extends AppCompatActivity {
 
         navController = Navigation.findNavController(this, R.id.admin_nav_host_fragment_content_main);
 
-        // ── Top-level destinations ───────────────────────────────────────
-        // These are destinations where the hamburger icon shows instead of
-        // the back arrow. Add ONLY screens that should show the hamburger.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard          // ← ONLY dashboard is top-level
-        ).setOpenableLayout(drawer).build();
-
+        // ── FIX: All drawer destinations are now top-level ──────────────
+        // This ensures the hamburger icon stays visible on ALL screens
+        // opened from the drawer, instead of showing a back arrow.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_employee_onboard, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf, R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter, R.id.nav_candidates_verification, R.id.nav_employment_verification, R.id.nav_payroll_employees, R.id.nav_salary_component, R.id.nav_upload_payroll, R.id.nav_generate_payroll, R.id.nav_payroll_config, R.id.nav_meeting_rooms, R.id.nav_book_meeting, R.id.nav_claim_managements, R.id.nav_travel_expenses, R.id.nav_food_expenses, R.id.nav_accommodation_expenses, R.id.nav_miscellaneous_expenses, R.id.nav_productivity, R.id.nav_access_management, R.id.nav_new_features, R.id.nav_visitor_categories, R.id.nav_leave_config, R.id.nav_notification, R.id.nav_visitorCheckInFragment).setOpenableLayout(drawer).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+
+        // Custom drawer listener for expandable groups
+        setupNavigationDrawer(navigationView, drawer);
 
         slowInternetBinding.btnDismiss.setOnClickListener(v -> slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
 
@@ -94,49 +109,97 @@ public class AdminMainActivity extends AppCompatActivity {
             Log.e(TAG, "Navigation view is null");
         }
 
-        // Logout menu item
-        MenuItem logout = navigationView.getMenu().findItem(R.id.nav_logout);
-        logout.setOnMenuItemClickListener(item -> {
-            handleLogout();
-            return true;
-        });
-
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         setupBackPressedHandling(drawer);
     }
 
-    // ── FIX: Back pressed logic ──────────────────────────────────────────
-    // Old code called finishAffinity() for any non-drawer-open state,
-    // which killed the app from any fragment. Now we correctly:
-    //   1. Close drawer if open
-    //   2. Let NavController pop back stack if not on start destination
-    //   3. Only finish the app when on the start (dashboard) destination
+    /**
+     * Sets up the NavigationView with a custom listener that handles:
+     * 1. Group parent items → toggle sub-menu visibility
+     * 2. Leaf navigation items → navigate via NavController
+     * 3. Logout → clear session and redirect
+     */
+    private void setupNavigationDrawer(NavigationView navigationView, DrawerLayout drawer) {
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            // ── LOGOUT ──────────────────────────────────────────
+            if (itemId == R.id.nav_logout) {
+                drawer.closeDrawer(GravityCompat.START);
+                handleLogout();
+                return true;
+            }
+
+            // ── GROUP PARENT TOGGLE ─────────────────────────────
+            if (groupChildMap.containsKey(itemId)) {
+                toggleSubMenu(navigationView, itemId);
+                return true;
+            }
+
+            // ── STANDALONE / LEAF NAVIGATION ITEMS ──────────────
+            boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
+            if (handled) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                Toast.makeText(this, item.getTitle() + " — Coming Soon", Toast.LENGTH_SHORT).show();
+                drawer.closeDrawer(GravityCompat.START);
+            }
+            return true;
+        });
+    }
+
+    /**
+     * Toggles the visibility of all child items under a group parent.
+     * Accordion behavior: opening one group auto-collapses others.
+     */
+    private void toggleSubMenu(NavigationView navigationView, int parentId) {
+        boolean isCurrentlyExpanded = Boolean.TRUE.equals(expandedGroups.get(parentId));
+
+        // Collapse all other groups first
+        for (Map.Entry<Integer, int[]> entry : groupChildMap.entrySet()) {
+            if (entry.getKey() != parentId) {
+                setChildrenVisibility(navigationView, entry.getValue(), false);
+                expandedGroups.put(entry.getKey(), false);
+            }
+        }
+
+        // Toggle the clicked group
+        boolean newState = !isCurrentlyExpanded;
+        setChildrenVisibility(navigationView, groupChildMap.get(parentId), newState);
+        expandedGroups.put(parentId, newState);
+    }
+
+    private void setChildrenVisibility(NavigationView navigationView, int[] childIds, boolean visible) {
+        if (childIds == null) return;
+        for (int childId : childIds) {
+            MenuItem childItem = navigationView.getMenu().findItem(childId);
+            if (childItem != null) {
+                childItem.setVisible(visible);
+            }
+        }
+    }
+
+    // ── Back Pressed Logic ──────────────────────────────────────────
     private void setupBackPressedHandling(DrawerLayout drawer) {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-
-                // Priority 1: Close drawer if it's open
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
                     return;
                 }
 
-                // Priority 2: Let NavController handle the back stack
-                // This pops VisitorCheckInFragment → back to Dashboard, etc.
                 if (navController.navigateUp()) {
-                    return; // NavController handled it ✅
+                    return;
                 }
 
-                // Priority 3: We're on the start destination (Dashboard)
-                // with nothing left to pop — exit the app
                 finish();
             }
         });
     }
 
-    // ── Internet UI Handlers ─────────────────────────────────────────────
+    // ── Internet UI Handlers ─────────────────────────────────────────
 
     public void showNoInternetLayout() {
         noInternetBinding.getRoot().setVisibility(View.VISIBLE);
@@ -198,6 +261,7 @@ public class AdminMainActivity extends AppCompatActivity {
     }
 
     private void bindUserToDrawer(UserDetailsResponse userDetails) {
+        SecurePrefManager preferences = SecurePrefManager.getInstance(this);
         NavigationView navigationView = binding.adminNavView;
         View headerView = navigationView.getHeaderView(0);
 
@@ -208,9 +272,10 @@ public class AdminMainActivity extends AppCompatActivity {
         String firstName = userDetails.getData().getUser().getFirstname();
         String lastName = userDetails.getData().getUser().getLastname();
 
-        // FIX: Added space between first and last name
         nameText.setText(firstName + " " + lastName);
         subtitleText.setText(userDetails.getData().getUser().getEmail());
+        preferences.putString("company_logo", userDetails.getData().getCompany().getLogo());
+
 
         if (userDetails.getData() != null) {
             Glide.with(this).load(userDetails.getData().getCompany().getLogo()).placeholder(R.drawable.ic_profile_placeholder).into(profileImage);
@@ -264,7 +329,6 @@ public class AdminMainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        // This handles the toolbar back arrow / hamburger clicks
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 }

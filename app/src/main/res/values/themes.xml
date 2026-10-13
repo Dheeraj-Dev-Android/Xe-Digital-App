@@ -45,5 +45,20 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+    <!-- Navigation Drawer Item Text Style with Quicksand Font -->
+    <style name="NavDrawerItemTextAppearance" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">@font/quicksand_font_family</item>
+        <item name="android:fontFamily">@font/quicksand_font_family</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Navigation Drawer Sub-Header / Group Title Style -->
+    <style name="NavDrawerGroupTextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/quicksand_font_family</item>
+        <item name="android:fontFamily">@font/quicksand_font_family</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 </resources>

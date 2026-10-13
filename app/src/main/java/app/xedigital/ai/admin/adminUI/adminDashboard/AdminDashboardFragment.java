@@ -67,17 +67,17 @@ public class AdminDashboardFragment extends Fragment {
     };
 
     private final Handler scrollHandler = new Handler(Looper.getMainLooper());
+    // Client side state indicators
+    private final List<VisitorsItem> allVisitorsList = new ArrayList<>();
+    private final List<VisitorsItem> paginatedVisitorList = new ArrayList<>();
+    private final int pageLimit = 5;
     private AdminDashboardViewModel mViewModel;
     private BirthdayEmployeesAdapter birthdayAdapter;
     private String token;
-    // Client side state indicators
-    private final List<VisitorsItem> allVisitorsList = new ArrayList<>();
     private TextView birthdayCount;
     private RecyclerView birthdayRecyclerView;
     private LinearLayout emptyBirthdayState;
     private PieChart leavesBarChart;
-    private final List<VisitorsItem> paginatedVisitorList = new ArrayList<>();
-    private final int pageLimit = 5;
     // Global UI components
     private TextView totalSignin, totalSignout, totalEmployees, totalBranches;
     private MaterialCardView btnPunchAttendance;

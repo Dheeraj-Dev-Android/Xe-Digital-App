@@ -29,6 +29,7 @@
         android:elevation="4dp"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/admin_nav_header_main"
+        app:itemIconTint="@color/accent_employee"
         app:itemTextAppearance="@style/NavigationViewTextAppearance"
         app:menu="@menu/admin_drawer_menu" />
 

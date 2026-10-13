@@ -5,286 +5,300 @@
     android:id="@+id/partnerCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="12dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="8dp"
     android:clickable="true"
     android:focusable="true"
     app:cardCornerRadius="16dp"
-    app:cardElevation="3dp"
+    app:cardElevation="2dp"
     app:rippleColor="@color/primary_light"
-    app:strokeWidth="0dp">
+    app:strokeColor="@color/divider"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="12dp">
 
-        <!-- Partner Avatar -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/avatarCard"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="2dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:strokeWidth="0dp">
-
-            <TextView
-                android:id="@+id/avatarText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/primary_light"
-                android:gravity="center"
-                android:textColor="@color/primary"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="PN" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Partner Name -->
-        <TextView
-            android:id="@+id/partnerName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Partner Name"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/partnerStatus"
-            app:layout_constraintStart_toEndOf="@id/avatarCard"
-            app:layout_constraintTop_toTopOf="@id/avatarCard" />
-
-        <!-- Email -->
-        <TextView
-            android:id="@+id/partnerEmail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:autoLink="email"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="partner@example.com"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/partnerStatus"
-            app:layout_constraintStart_toEndOf="@id/avatarCard"
-            app:layout_constraintTop_toBottomOf="@id/partnerName" />
-
-        <!-- Status Chip -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/partnerStatus"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="false"
-            android:clickable="false"
-            android:text="Active"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            app:chipBackgroundColor="@color/success_light"
-            app:chipCornerRadius="12dp"
-            app:chipMinHeight="24dp"
-            app:chipStrokeWidth="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/avatarCard" />
-
-        <!-- Contact Info -->
+        <!-- ================= TOP SECTION (3:7) ================= -->
         <LinearLayout
-            android:id="@+id/contactLayout"
-            android:layout_width="0dp"
+            android:id="@+id/topSectionLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:weightSum="10"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/avatarCard"
-            app:layout_constraintTop_toBottomOf="@id/partnerEmail">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/ic_phone"
-                app:tint="@color/text_secondary" />
-
-            <TextView
-                android:id="@+id/partnerContact"
-                android:layout_width="wrap_content"
+            <!-- Left: Name Initials (30%) -->
+            <FrameLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:autoLink="phone"
-                android:text="+1 (555) 123-4567"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:layout_weight="3">
+
+                <TextView
+                    android:id="@+id/avatarText"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:text="PN" />
+
+            </FrameLayout>
+
+            <!-- Right: Full Name + Email (70%) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="7"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FULL NAME"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/partnerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="Partner Name" />
+
+                <!-- Email directly below name, no label -->
+                <TextView
+                    android:id="@+id/partnerEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:autoLink="email"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    tools:text="partner@example.com" />
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Divider -->
+        <!-- Divider Line -->
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/divider_light"
+            android:layout_marginTop="10dp"
+            android:background="@color/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/contactLayout" />
+            app:layout_constraintTop_toBottomOf="@id/topSectionLayout" />
 
-        <!-- Address & Website Info -->
+        <!-- ================= BOTTOM SECTION ================= -->
         <LinearLayout
-            android:id="@+id/detailsLayout"
+            android:id="@+id/bottomSectionLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider">
 
-            <!-- Address Info -->
+            <!-- Row 1: Website & Created At -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
+                <!-- Website Field -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="6dp"
-                        android:src="@drawable/ic_location"
-                        app:tint="@color/text_secondary" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="6dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Address"
+                        android:text="WEBSITE"
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/partnerWebsite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginTop="2dp"
+                        android:autoLink="web"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        tools:text="www.partner.com" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/partnerAddress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:paddingStart="16dp"
-                    android:text="Gurugram, Haryana"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
-
-            </LinearLayout>
-
-            <!-- Website Info -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
+                <!-- Created At Field -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="6dp"
-                        android:src="@mipmap/web_browser" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="6dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Website"
+                        android:text="CREATED AT"
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/partnerCreatedDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        tools:text="Jan 15, 2025" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/partnerWebsite"
+            </LinearLayout>
+
+            <!-- Row 2: Contact & Address -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <!-- Contact Field -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CONTACT"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/partnerContact"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginTop="2dp"
+                        android:autoLink="phone"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        tools:text="+91 9876543210" />
+                </LinearLayout>
+
+                <!-- Address Field -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ADDRESS"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/partnerAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        tools:text="Gurugram, Haryana" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Row 3: Status (Left) & Edit Button (Right) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Status Chip (Left) -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/partnerStatus"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:autoLink="web"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:paddingStart="16dp"
-                    android:text="www.partner.com"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
+                    android:checkable="false"
+                    android:clickable="false"
+                    android:text="Active"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="@color/success_light"
+                    app:chipCornerRadius="12dp"
+                    app:chipMinHeight="24dp"
+                    app:chipStrokeWidth="0dp" />
+
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Edit Button (Right) -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnEdit"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circular_background"
+                    android:contentDescription="Edit Partner"
+                    android:padding="8dp"
+                    android:src="@mipmap/edit_profile_round"
+                    app:shapeAppearanceOverlay="@style/CircularImageView" />
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <!-- Created Date -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detailsLayout">
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/ic_calendar"
-                app:tint="@color/text_secondary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Created: "
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/partnerCreatedDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Jan 15, 2025"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-
-        </LinearLayout>
-
-        <!-- Action Button -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/btnEdit"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/circular_background"
-            android:contentDescription="Edit Partner"
-            android:padding="8dp"
-            android:src="@mipmap/edit_profile_round"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detailsLayout"
-            app:shapeAppearanceOverlay="@style/CircularImageView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

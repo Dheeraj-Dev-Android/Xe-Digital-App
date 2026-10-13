@@ -119,6 +119,10 @@ public class VisitorsItem implements Serializable {
         return approvalDate;
     }
 
+    public void setApprovalDate(String approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
     public String getGovernmentIdUploadedImagePath() {
         return governmentIdUploadedImagePath;
     }
@@ -133,6 +137,10 @@ public class VisitorsItem implements Serializable {
 
     public String getMeetingOverStatus() {
         return meetingOverStatus;
+    }
+
+    public void setMeetingOverStatus(String meetingOverStatus) {
+        this.meetingOverStatus = meetingOverStatus;
     }
 
     public String getRoomId() {
@@ -175,6 +183,11 @@ public class VisitorsItem implements Serializable {
         return approvalStatus;
     }
 
+    // Setters required by VisitorsDetailsFragment
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
     public boolean isIsRequired() {
         return isRequired;
     }
@@ -185,6 +198,10 @@ public class VisitorsItem implements Serializable {
 
     public String getMeetingOverDate() {
         return meetingOverDate;
+    }
+
+    public void setMeetingOverDate(String meetingOverDate) {
+        this.meetingOverDate = meetingOverDate;
     }
 
     public boolean isIsVisitorVisited() {
@@ -201,6 +218,10 @@ public class VisitorsItem implements Serializable {
 
     public String getSignOut() {
         return signOut;
+    }
+
+    public void setSignOut(String signOut) {
+        this.signOut = signOut;
     }
 
     public String getCompanyFrom() {
@@ -231,6 +252,10 @@ public class VisitorsItem implements Serializable {
         return signIn;
     }
 
+    public void setSignIn(String signIn) {
+        this.signIn = signIn;
+    }
+
     public String getName() {
         return name;
     }
@@ -249,30 +274,5 @@ public class VisitorsItem implements Serializable {
 
     public String getPreApprovedDate() {
         return preApprovedDate;
-    }
-
-    // Setters required by VisitorsDetailsFragment
-    public void setApprovalStatus(String approvalStatus) {
-        this.approvalStatus = approvalStatus;
-    }
-
-    public void setApprovalDate(String approvalDate) {
-        this.approvalDate = approvalDate;
-    }
-
-    public void setMeetingOverStatus(String meetingOverStatus) {
-        this.meetingOverStatus = meetingOverStatus;
-    }
-
-    public void setMeetingOverDate(String meetingOverDate) {
-        this.meetingOverDate = meetingOverDate;
-    }
-
-    public void setSignIn(String signIn) {
-        this.signIn = signIn;
-    }
-
-    public void setSignOut(String signOut) {
-        this.signOut = signOut;
     }
 }

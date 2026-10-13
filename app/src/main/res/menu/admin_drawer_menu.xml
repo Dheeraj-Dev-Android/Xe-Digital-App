@@ -2,25 +2,310 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. DASHBOARD (Standalone)                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <item
         android:id="@+id/nav_admin_dashboard"
+        android:icon="@drawable/ic_dashboard"
         android:title="Dashboard" />
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. DIGITAL IDENTITY                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_digital_identity_menu"
+            android:icon="@drawable/ic_person"
+            android:title="Digital Identity" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_visitorDetailsFragment"
+            android:title="Visitors"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_employees"
+            android:title="Employees"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_employee_onboard"
+            android:title="Employee Onboard Details"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_partners"
+            android:title="Partners"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_allUsers"
+            android:title="Users"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. WORKFORCE MANAGEMENT                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_workforce_menu"
+            android:icon="@drawable/ic_collections_bookmark"
+            android:title="Workforce Management" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_wf_attendance"
+            android:title="Attendance"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_employee_leaves"
+            android:title="Employee Leaves"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_timesheet"
+            android:title="TimeSheet Management"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_shifts"
+            android:title="Shifts"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_departments"
+            android:title="Departments"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_business_unit"
+            android:title="Business Unit"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_holidays"
+            android:title="Holidays"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_leave_types"
+            android:title="Leave Types"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_policy"
+            android:title="Policy"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_claim_management_wf"
+            android:title="Claim Managements"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. TALENT ACQUISITION                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_talent_menu"
+            android:icon="@drawable/ic_document"
+            android:title="Talent Acquisition" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_job_posting"
+            android:title="Job Posting"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_sourcing"
+            android:title="Sourcing (Resume)"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_assessment"
+            android:title="Assessment"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_interviews"
+            android:title="Interviews"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_feedback_review"
+            android:title="Feedback &amp; Review"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_offer_letter"
+            android:title="Offer Letter"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. BACKGROUND VERIFICATION (BGV)                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_bgv_menu"
+            android:icon="@drawable/ic_policy"
+            android:title="Background Verification" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_candidates_verification"
+            android:title="Candidates Verification"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_employment_verification"
+            android:title="Employment Verification"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. PAYROLL MANAGEMENT                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_payroll_menu"
+            android:icon="@drawable/ic_payments"
+            android:title="Payroll Management" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_payroll_employees"
+            android:title="Employees"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_salary_component"
+            android:title="Salary Component"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_upload_payroll"
+            android:title="Upload Payroll Data"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_generate_payroll"
+            android:title="Generate Payroll"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_payroll_config"
+            android:title="Payroll Configuration"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 7. MEETING MANAGEMENT                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_meeting_menu"
+            android:icon="@drawable/ic_calendar"
+            android:title="Meeting Management" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_meeting_rooms"
+            android:title="Meeting Rooms"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_book_meeting"
+            android:title="Book Meeting Rooms"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 8. CLAIM MANAGEMENT                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_claim_menu"
+            android:icon="@drawable/ic_payments"
+            android:title="Claim Management" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_claim_managements"
+            android:title="Claim Managements"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_travel_expenses"
+            android:title="Travel Expenses"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_food_expenses"
+            android:title="Food Expenses"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_accommodation_expenses"
+            android:title="Accommodation Expenses"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_miscellaneous_expenses"
+            android:title="Miscellaneous Expenses"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 9. PRODUCTIVITY MANAGEMENT (Standalone)                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <item
+        android:id="@+id/nav_productivity"
+        android:icon="@drawable/ic_dcr"
+        android:title="Productivity Management" />
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 10. ACCESS MANAGEMENT (Standalone)                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <item
+        android:id="@+id/nav_access_management"
+        android:icon="@drawable/ic_policy"
+        android:title="Access Management" />
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 11. NEW FEATURES (Standalone)                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <item
+        android:id="@+id/nav_new_features"
+        android:icon="@drawable/ic_dashboard"
+        android:title="New Features" />
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 12. CONFIGURATION                                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_config_menu"
+            android:icon="@drawable/ic_settings"
+            android:title="Configuration" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_visitor_categories"
+            android:title="Visitor Categories"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_leave_config"
+            android:title="Leave Config"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_notification"
+            android:title="Notification"
+            android:visible="false" />
+    </group>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- QUICK ACTION: Visitor Check In                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <item
         android:id="@+id/nav_visitorCheckInFragment"
-        android:title="Visitor Check In "
-        android:visible="true" />
-    <item
-        android:id="@+id/nav_visitorDetailsFragment"
-        android:title="Visitor Details"
-        android:visible="true" />
-    <item
-        android:id="@+id/nav_employees"
-        android:title="Employees"
-        android:visible="true" />
+        android:icon="@drawable/ic_visitor"
+        android:title="Visitor Check In"
+        android:visible="false" />
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LOGOUT                                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <item
         android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
         android:title="Logout" />
 
 </menu>
