@@ -4,22 +4,37 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
+    <!-- Head -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M9,11.75C8.31,11.75 7.75,12.31 7.75,13C7.75,13.69 8.31,14.25 9,14.25C9.69,14.25 10.25,13.69 10.25,13C10.25,12.31 9.69,11.75 9,11.75Z" />
+        android:pathData="M15,8.63A3.05,3.05 0 1 1 8.9,8.63A3.05,3.05 0 1 1 15,8.63Z" />
+    <!-- Shoulders -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M15,11.75C14.31,11.75 13.75,12.31 13.75,13C13.75,13.69 14.31,14.25 15,14.25C15.69,14.25 16.25,13.69 16.25,13C16.25,12.31 15.69,11.75 15,11.75Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20ZM12,17.5C14.33,17.5 16.31,16.04 17.11,14H6.89C7.69,16.04 9.67,17.5 12,17.5Z" />
+        android:pathData="M9.38,12.28L14.63,12.28C16.41,12.28 17.67,13.69 17.67,15.38C17.67,17.44 15.47,18.84 11.95,18.84C8.44,18.84 6.28,17.44 6.28,15.38C6.28,13.69 7.5,12.28 9.38,12.28Z" />
     <!-- Corner scan brackets -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M1,4.5L1,2L3.5,2" />
+        android:pathData="M6.61,3.42L4.55,3.42Q3.42,3.42 3.42,4.55L3.42,6.61"
+        android:strokeWidth="0.75"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M20.5,2L23,2L23,4.5"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFFF" />
+        android:pathData="M17.39,3.42L19.45,3.42Q20.58,3.42 20.58,4.55L20.58,6.61"
+        android:strokeWidth="0.75"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M3.42,17.39L3.42,19.45Q3.42,20.58 4.55,20.58L6.61,20.58"
+        android:strokeWidth="0.75"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M20.58,17.39L20.58,19.45Q20.58,20.58 19.45,20.58L17.39,20.58"
+        android:strokeWidth="0.75"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
