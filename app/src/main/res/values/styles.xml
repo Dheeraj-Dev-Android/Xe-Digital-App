@@ -5,4 +5,30 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+    <!-- Employee Details BottomSheet - Field Label -->
+    <style name="DetailsFieldLabel" parent="android:Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- Employee Details BottomSheet - Field Value -->
+    <style name="DetailsFieldValue" parent="android:Widget.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:text">N/A</item>
+    </style>
+
+    <!-- Employee Details BottomSheet - Section Divider -->
+    <style name="DetailsSectionDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:background">@color/divider</item>
+    </style>
 </resources>

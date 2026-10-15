@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -37,6 +38,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
@@ -97,7 +99,7 @@ public class AdminManualCheckIn extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final Handler handler = new Handler();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String bucketName = "visitors-profile-images";
+    private final String bucketName = "xe-digital-bucket/visitors-profile-images";
     private final Map<String, EmployeesItem> selectedEmployeeMap = new HashMap<>();
     private final boolean hasDevice = false;
     private String CollectionName;
@@ -223,8 +225,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
                 cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-
-                // CHANGED: Set target resolution to 1280×720 (720p) for optimal face recognition
                 imageCapture = new ImageCapture.Builder()
                         .setTargetResolution(new Size(1280, 720))
                         .build();
@@ -285,6 +285,32 @@ public class AdminManualCheckIn extends AppCompatActivity {
                     if (bitmap.get() == null) {
                         handleError("Failed to parse captured image.");
                         return;
+                    }
+
+                    // Fix EXIF rotation from front camera
+                    try {
+                        ExifInterface exif = new ExifInterface(savedImagePath);
+                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                        int rotationDegrees = 0;
+                        switch (orientation) {
+                            case ExifInterface.ORIENTATION_ROTATE_90:
+                                rotationDegrees = 90;
+                                break;
+                            case ExifInterface.ORIENTATION_ROTATE_180:
+                                rotationDegrees = 180;
+                                break;
+                            case ExifInterface.ORIENTATION_ROTATE_270:
+                                rotationDegrees = 270;
+                                break;
+                        }
+                        if (rotationDegrees != 0) {
+                            Matrix matrix = new Matrix();
+                            matrix.postRotate(rotationDegrees);
+                            bitmap.set(Bitmap.createBitmap(bitmap.get(), 0, 0,
+                                    bitmap.get().getWidth(), bitmap.get().getHeight(), matrix, true));
+                        }
+                    } catch (IOException e) {
+                        Log.w("AdminManualCheckIn", "Could not read EXIF data, using original orientation: " + e.getMessage());
                     }
 
                     // CHANGED: Resize width from 500 → 1280 (matches camera 720p output)

@@ -1,523 +1,972 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollViewEmployeeDetails"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:background="@drawable/fragment_dashboard_bg"
+    android:paddingTop="?attr/actionBarSize"
     tools:context=".admin.adminUI.employeeDetails.EditEmployeeFragment">
 
-    <LinearLayout
-        android:id="@+id/linearLayoutMain"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewEmployeeDetails"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="96dp">
 
-        <!-- Status Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilStatus"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Status *">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:entries="@array/status_options"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Employee Type Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilEmployeeType"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Employee Type *">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerEmployeeType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Department Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDepartment"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Department *">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerDepartment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Shift Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilShift"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Shift *"
-            app:startIconDrawable="@drawable/ic_shift">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerShift"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Employee Code -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilEmployeeCode"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Employee Code *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmployeeCode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapCharacters"
-                android:maxLength="20" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- First Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilFirstName"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="First Name *"
-            app:startIconDrawable="@drawable/ic_person">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etFirstName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName|textCapWords"
-                android:maxLength="50" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Last Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilLastName"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Last Name *"
-            app:startIconDrawable="@drawable/ic_person">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etLastName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName|textCapWords"
-                android:maxLength="50" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Father's Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilFatherName"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Father's Name *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etFatherName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName|textCapWords"
-                android:maxLength="50" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Email -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilEmail"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Email *"
-            app:startIconDrawable="@drawable/ic_email">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLength="100" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Contact -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilContact"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Contact *"
-            app:startIconDrawable="@drawable/ic_phone">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etContact"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:digits="0123456789+-()"
-                android:inputType="phone"
-                android:maxLength="15" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Designation -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDesignation"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Designation *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDesignation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:maxLength="100" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Level -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilLevel"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Level *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etLevel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapCharacters"
-                android:maxLength="10" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Grade -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilGrade"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Grade *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etGrade"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapCharacters"
-                android:maxLength="5" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Date of Birth -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDOB"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Date of Birth (DOB) *"
-            app:startIconDrawable="@drawable/ic_calendar">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDOB"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="false"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Joining Date -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilJoiningDate"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Joining Date *"
-            app:startIconDrawable="@drawable/ic_calendar">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etJoiningDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="false"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Joining Type Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilJoiningType"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Joining Type *">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerJoiningType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Reporting Manager Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilReportingManager"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Reporting Manager *">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerReportingManager"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Cross-Functional Manager Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilCrossFunctionalManager"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Cross-Functional Manager">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerCrossFunctionalManager"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- PAN -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPAN"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="PAN *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPAN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapCharacters"
-                android:maxLength="10" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Aadhaar No -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAadhaar"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Aadhaar No *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAadhaar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:digits="0123456789"
-                android:inputType="number"
-                android:maxLength="12" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Differently Abled Type Spinner -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDifferentlyAbledType"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Differently Abled Type *">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerDifferentlyAbledType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Residential Address -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilResidentialAddress"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Residential Address *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etResidentialAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textCapSentences"
-                android:maxLength="250"
-                android:maxLines="4"
-                android:minLines="2" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- State -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilState"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="State *"
-            app:startIconDrawable="@drawable/ic_location">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textCapSentences"
-                android:maxLength="250"
-                android:maxLines="4"
-                android:minLines="2" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Pin Code -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPinCode"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Pin Code *">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPinCode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:digits="0123456789"
-                android:inputType="number"
-                android:maxLength="6" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Is HR or Admin Switch -->
         <LinearLayout
-            android:id="@+id/layoutHRAdminSwitch"
+            android:id="@+id/linearLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/ivAdminIcon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="Admin Icon"
-                android:src="@mipmap/admin_login_foreground" />
-
-            <TextView
-                android:id="@+id/tvHRAdminLabel"
-                android:layout_width="0dp"
+            <!-- ========== ASSIGNMENT (first card style) ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Is HR or Admin"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:layout_marginHorizontal="12dp"
+                app:cardBackgroundColor="@color/background_surface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switchIsHROrAdmin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@color/accent_employee" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="ASSIGNMENT"
+                            android:textAllCaps="true"
+                            android:textColor="@color/accent_employee"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Status | Employee Type -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilStatus"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Status *">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerStatus"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEmployeeType"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Employee Type *">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerEmployeeType"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Partner (full width, visible only when Employee Type = Partner) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilPartner"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Partner *"
+                        android:visibility="gone">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerPartner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Department | Business Unit (BU) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilDepartment"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Department *">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerDepartment"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilBusinessUnit"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Business Unit (BU)">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerBusinessUnit"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Shift | Employee Code -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilShift"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Shift *"
+                            app:startIconDrawable="@drawable/ic_shift"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerShift"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEmployeeCode"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Employee Code *">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etEmployeeCode"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapCharacters"
+                                android:maxLength="20" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ========== PERSONAL INFORMATION ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/background_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="4dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@color/accent_employee" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="PERSONAL INFORMATION"
+                            android:textAllCaps="true"
+                            android:textColor="@color/accent_employee"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- First Name | Last Name -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilFirstName"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="First Name *"
+                            app:startIconDrawable="@drawable/ic_person"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etFirstName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName|textCapWords"
+                                android:maxLength="50"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilLastName"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Last Name *"
+                            app:startIconDrawable="@drawable/ic_person"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLastName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName|textCapWords"
+                                android:maxLength="50"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Father's Name (full width) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilFatherName"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Father's Name *">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etFatherName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName|textCapWords"
+                            android:maxLength="50" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Email | Contact -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEmail"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Email *"
+                            app:startIconDrawable="@drawable/ic_email"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textEmailAddress"
+                                android:maxLength="100"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilContact"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Contact *"
+                            app:startIconDrawable="@drawable/ic_phone"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etContact"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:digits="0123456789+-()"
+                                android:inputType="phone"
+                                android:maxLength="15"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Designation (full width) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilDesignation"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Designation *">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etDesignation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapWords"
+                            android:maxLength="100" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Level | Grade -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilLevel"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Level *">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLevel"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapCharacters"
+                                android:maxLength="10" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilGrade"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Grade *">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etGrade"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapCharacters"
+                                android:maxLength="5" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Date of Birth | Joining Date -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilDOB"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Date of Birth *"
+                            app:startIconDrawable="@drawable/ic_calendar"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etDOB"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:inputType="none"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilJoiningDate"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Joining Date *"
+                            app:startIconDrawable="@drawable/ic_calendar"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etJoiningDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:inputType="none"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Joining Type (full width) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilJoiningType"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Joining Type *">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerJoiningType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ========== REPORTING ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/background_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="4dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@color/accent_reporting" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="REPORTING"
+                            android:textAllCaps="true"
+                            android:textColor="@color/accent_reporting"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilReportingManager"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Reporting Manager *">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerReportingManager"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilCrossFunctionalManager"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Cross-Functional Manager *">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerCrossFunctionalManager"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ========== COMPLIANCE & IDs ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/background_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="4dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@color/accent_cross" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="COMPLIANCE &amp; IDs"
+                            android:textAllCaps="true"
+                            android:textColor="@color/accent_cross"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- PAN | Aadhaar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilPAN"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="PAN *">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etPAN"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapCharacters"
+                                android:maxLength="10" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilAadhaar"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Aadhaar No *">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etAadhaar"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:digits="0123456789"
+                                android:inputType="number"
+                                android:maxLength="12" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- Differently Abled Type (full width) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilDifferentlyAbledType"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Differently Abled Type *">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerDifferentlyAbledType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ========== ADDRESS ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/background_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="4dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@color/accent_employee" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="ADDRESS"
+                            android:textAllCaps="true"
+                            android:textColor="@color/accent_employee"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Residential Address (full width, multi-line) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilResidentialAddress"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Residential Address *">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etResidentialAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:maxLength="250"
+                            android:maxLines="4"
+                            android:minLines="2" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- State | Pin Code -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilState"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="State *"
+                            app:startIconDrawable="@drawable/ic_location"
+                            app:startIconMinSize="48dp"
+                            app:startIconTint="@color/accent_employee">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etState"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapWords"
+                                android:maxLength="50"
+                                android:paddingStart="40dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilPinCode"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_weight="1"
+                            android:hint="Pin Code *">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etPinCode"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:digits="0123456789"
+                                android:inputType="number"
+                                android:maxLength="6" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ========== PERMISSIONS ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/background_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@color/accent_employee" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="PERMISSIONS"
+                            android:textAllCaps="true"
+                            android:textColor="@color/accent_employee"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutHRAdminSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/ivAdminIcon"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:contentDescription="Admin Icon"
+                            android:src="@mipmap/admin_login_foreground" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvHRAdminLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="HR or Admin"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Grant HR/Admin privileges"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchIsHROrAdmin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-        <!-- Action Buttons -->
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ===== STICKY BOTTOM ACTION BAR ===== -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:cardBackgroundColor="@color/background_surface"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp">
+
         <LinearLayout
             android:id="@+id/layoutActionButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSubmit"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="Submit" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClear"
-                style="@style/Widget.MaterialComponents.Button"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="Clear"
+                android:textColor="@color/accent_employee"
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/accent_employee" />
+
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="Clear" />
+                android:layout_weight="1">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSubmit"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@color/accent_employee"
+                    android:text="Submit"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:cornerRadius="14dp" />
+
+                <ProgressBar
+                    android:id="@+id/submitProgressBar"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="gone" />
+            </FrameLayout>
 
         </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
-
-</ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

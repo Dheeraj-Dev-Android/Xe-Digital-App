@@ -4,283 +4,405 @@
     android:id="@+id/visitorCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
     android:layout_marginVertical="12dp"
-    android:clickable="true"
-    android:focusable="true"
-    app:rippleColor="@color/primary_light"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeColor="#E0E7FF"
     app:strokeWidth="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:orientation="vertical">
 
-        <!-- Profile Image -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgProfile"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginBottom="16dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile_placeholder"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/CircularImageView" />
-
-        <!-- Full Name -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvFullName"
-            android:layout_width="wrap_content"
+        <!-- ===== HEADER SECTION ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Visitor Name"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imgProfile" />
+            android:background="#F8F9FF"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="20dp">
 
-        <!-- Contact Label -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelContact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Contact"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvFullName" />
+            <!-- Accent bar -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_marginBottom="16dp"
+                android:background="#4F46E5" />
 
-        <!-- Contact -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvContact"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="+91 9876543210"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelContact" />
+            <!-- Profile Image -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginBottom="12dp"
+                android:padding="5dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_person"
+                app:shapeAppearanceOverlay="@style/CircularImageView"
+                app:strokeColor="#4F46E5"
+                app:strokeWidth="3dp" />
 
-        <!-- Email Label -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Email"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvContact" />
+            <!-- Full Name -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Visitor Name"
+                android:textColor="@color/avatar_text"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <!-- Email -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvEmail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:autoLink="email"
-            android:text="visitor@example.com"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelEmail" />
-
-        <!-- Whom to Meet Label -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelWhomToMeet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Whom to Meet"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvEmail" />
-
-        <!-- Whom to Meet -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvWhomToMeet"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Mr. Sharma"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelWhomToMeet" />
-
-        <!-- Guideline for center division -->
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_center"
-            android:layout_width="wrap_content"
+        <!-- ===== BODY SECTIONS ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
+            android:paddingHorizontal="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
 
-        <!-- Check-in Date Label (Left side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelCheckInDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Check-in Date"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvWhomToMeet" />
+            <!-- ── SECTION: CONTACT INFORMATION ── -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <!-- Check-in Date (Left side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvCheckInDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:text="28 July 2025"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@id/guideline_center"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelCheckInDate" />
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_employee" />
 
-        <!-- Check-out Date Label (Right side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelCheckOutDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:text="Check-out Date"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/guideline_center"
-            app:layout_constraintTop_toBottomOf="@id/tvWhomToMeet" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.12"
+                    android:text="CONTACT INFORMATION"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_employee"
+                    android:textSize="11sp" />
+            </LinearLayout>
 
-        <!-- Check-out Date (Right side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvCheckOutDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:text="28 July 2025"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/guideline_center"
-            app:layout_constraintTop_toBottomOf="@id/labelCheckOutDate" />
+            <!-- Contact -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contact"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
 
-        <!-- Check-in Time Label (Left side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelCheckInTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Check-in Time"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvCheckInDate" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvContact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:autoLink="phone"
+                android:text="+91 9876543210"
+                android:textColor="#111827"
+                android:textSize="14sp" />
 
-        <!-- Check-in Time (Left side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvCheckInTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:text="10:00 AM"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@id/guideline_center"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelCheckInTime" />
+            <!-- Email -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Email"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
 
-        <!-- Check-out Time Label (Right side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelCheckOutTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="12dp"
-            android:text="Check-out Time"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/guideline_center"
-            app:layout_constraintTop_toBottomOf="@id/tvCheckOutDate" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:autoLink="email"
+                android:text="visitor@example.com"
+                android:textColor="#111827"
+                android:textSize="14sp" />
 
-        <!-- Check-out Time (Right side) -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvCheckOutTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:text="6:00 PM"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/guideline_center"
-            app:layout_constraintTop_toBottomOf="@id/labelCheckOutTime" />
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:background="#F3F4F6" />
 
-        <!-- Company From Label -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelCompanyFrom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Company From"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvCheckInTime" />
+            <!-- ── SECTION: MEETING DETAILS ── -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <!-- Company From Name -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvCompanyFrom"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="ConsultEdge Global"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelCompanyFrom" />
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_employee" />
 
-        <!-- Laptop Serial Label -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/labelLaptopSerial"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.12"
+                    android:text="MEETING DETAILS"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_employee"
+                    android:textSize="11sp" />
+            </LinearLayout>
 
-            android:layout_marginTop="12dp"
-            android:text="Laptop Serial No."
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvCompanyFrom" />
+            <!-- Whom to Meet -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whom to Meet"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
 
-        <!-- Laptop Serial Number -->
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvLaptopSerial"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="abcd1234"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/labelLaptopSerial" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvWhomToMeet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Mr. Sharma"
+                android:textColor="#111827"
+                android:textSize="14sp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Company From -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Company From"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvCompanyFrom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="ConsultEdge Global"
+                android:textColor="#111827"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:background="#F3F4F6" />
+
+            <!-- ── SECTION: VISIT TIMELINE ── -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_employee" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.12"
+                    android:text="VISIT TIMELINE"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_employee"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- 2-Column: Check-in Date | Check-out Date -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <!-- Left: Check-in Date -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Check-in Date"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tvCheckInDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="28 July 2025"
+                        android:textColor="#111827"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Right: Check-out Date -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Check-out Date"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tvCheckOutDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="28 July 2025"
+                        android:textColor="#111827"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-Column: Check-in Time | Check-out Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <!-- Left: Check-in Time -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Check-in Time"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tvCheckInTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="10:00 AM"
+                        android:textColor="#111827"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Right: Check-out Time -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Check-out Time"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tvCheckOutTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="6:00 PM"
+                        android:textColor="#111827"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:background="#F3F4F6" />
+
+            <!-- ── SECTION: DEVICE ── -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_employee" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.12"
+                    android:text="DEVICE"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_employee"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Laptop Serial -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Laptop Serial No."
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvLaptopSerial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="abcd1234"
+                android:textColor="#111827"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

@@ -11,19 +11,22 @@ public class LeavesItem {
     private String assignDate;
 
     @SerializedName("creditLeave")
-    private int creditLeave;
+	private double creditLeave;
 
     @SerializedName("debitLeave")
-    private int debitLeave;
+	private double debitLeave;
+
+	@SerializedName("appliedLeave")
+	private double appliedLeave;
 
     @SerializedName("_id")
     private String id;
 
     @SerializedName("usedLeave")
-    private int usedLeave;
+	private double usedLeave;
 
     @SerializedName("openingLeave")
-    private int openingLeave;
+	private double openingLeave;
 
     public String getLeavetype() {
         return leavetype;
@@ -33,23 +36,27 @@ public class LeavesItem {
         return assignDate;
     }
 
-    public int getCreditLeave() {
+	public double getCreditLeave() {
         return creditLeave;
     }
 
-    public int getDebitLeave() {
+	public double getDebitLeave() {
         return debitLeave;
     }
+
+	public double getAppliedLeave() {
+		return appliedLeave;
+	}
 
     public String getId() {
         return id;
     }
 
-    public int getUsedLeave() {
+	public double getUsedLeave() {
         return usedLeave;
     }
 
-    public int getOpeningLeave() {
+	public double getOpeningLeave() {
         return openingLeave;
     }
 }

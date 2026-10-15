@@ -42,6 +42,9 @@ public class UpdateEmployeeRequest {
     @SerializedName("createdAt")
     private String createdAt;
 
+    @SerializedName("bu")
+    private String bu;
+
     @SerializedName("ctc")
     private int ctc;
 
@@ -52,7 +55,7 @@ public class UpdateEmployeeRequest {
     private int percentage1;
 
     @SerializedName("esiNo")
-    private boolean esiNo;
+    private String esiNo;
 
     @SerializedName("isHROrAdmin")
     private boolean isHROrAdmin;
@@ -69,6 +72,9 @@ public class UpdateEmployeeRequest {
     @SerializedName("department")
     private String department;
 
+    @SerializedName("fixedAmount_3")
+    private int fixedAmount3;
+
     @SerializedName("email")
     private String email;
 
@@ -82,13 +88,16 @@ public class UpdateEmployeeRequest {
     private String address;
 
     @SerializedName("totalYearlySalary")
-    private Object totalYearlySalary;
+    private String totalYearlySalary;
 
     @SerializedName("totalMonthly")
-    private Object totalMonthly;
+    private int totalMonthly;
 
     @SerializedName("fixedAmount_2")
-    private Object fixedAmount2;
+    private int fixedAmount2;
+
+    @SerializedName("totalYearly")
+    private int totalYearly;
 
     @SerializedName("level")
     private String level;
@@ -183,6 +192,10 @@ public class UpdateEmployeeRequest {
         this.createdAt = createdAt;
     }
 
+    public void setBu(String bu) {
+        this.bu = bu;
+    }
+
     public void setCtc(int ctc) {
         this.ctc = ctc;
     }
@@ -195,7 +208,7 @@ public class UpdateEmployeeRequest {
         this.percentage1 = percentage1;
     }
 
-    public void setEsiNo(boolean esiNo) {
+    public void setEsiNo(String esiNo) {
         this.esiNo = esiNo;
     }
 
@@ -219,6 +232,10 @@ public class UpdateEmployeeRequest {
         this.department = department;
     }
 
+    public void setFixedAmount3(int fixedAmount3) {
+        this.fixedAmount3 = fixedAmount3;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -235,16 +252,20 @@ public class UpdateEmployeeRequest {
         this.address = address;
     }
 
-    public void setTotalYearlySalary(Object totalYearlySalary) {
+    public void setTotalYearlySalary(String totalYearlySalary) {
         this.totalYearlySalary = totalYearlySalary;
     }
 
-    public void setTotalMonthly(Object totalMonthly) {
+    public void setTotalMonthly(int totalMonthly) {
         this.totalMonthly = totalMonthly;
     }
 
-    public void setFixedAmount2(Object fixedAmount2) {
+    public void setFixedAmount2(int fixedAmount2) {
         this.fixedAmount2 = fixedAmount2;
+    }
+
+    public void setTotalYearly(int totalYearly) {
+        this.totalYearly = totalYearly;
     }
 
     public void setLevel(String level) {

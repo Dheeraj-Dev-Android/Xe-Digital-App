@@ -46,7 +46,6 @@
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_person"
-                    android:tint="@color/avatar_text"
                     app:shapeAppearanceOverlay="@style/CircularImageView" />
 
                 <TextView

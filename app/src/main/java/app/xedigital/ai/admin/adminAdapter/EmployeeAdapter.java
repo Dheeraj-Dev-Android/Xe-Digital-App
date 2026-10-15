@@ -1,9 +1,9 @@
 package app.xedigital.ai.admin.adminAdapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -35,10 +34,15 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeesItem;
+import app.xedigital.ai.admin.adminModal.EmployeeLeaves.EmployeeLeaveResponse;
+import app.xedigital.ai.admin.adminModal.EmployeeLeaves.LeavesItem;
 import app.xedigital.ai.admin.adminModal.assignLeave.AssignLeaveRequest;
 import app.xedigital.ai.admin.adminModal.leaveBalance.LeaveBalanceResponse;
 import app.xedigital.ai.admin.adminModal.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.admin.adminModal.leaveType.LeavetypesItem;
+import app.xedigital.ai.utills.CustomAlertDialog;
+import app.xedigital.ai.utills.DateTimeUtils;
+import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,6 +51,9 @@ import retrofit2.Response;
 public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
 
     private static final int[] AVATAR_COLORS = {0xFF1E88E5, 0xFF43A047, 0xFFE53935, 0xFF8E24AA, 0xFFFB8C00, 0xFF00ACC1, 0xFF3949AB, 0xFFD81B60, 0xFF00897B, 0xFF6D4C41};
+
+    private static final String SHORT_LEAVE_ID = "6ab39a2abbe29c32b2003ed1";
+    private static final String SHORT_LEAVE_NAME = "Short Leave";
 
     private final List<EmployeesItem> employeeList;
     private final Context context;
@@ -118,7 +125,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         if (profileUrl != null && !profileUrl.trim().isEmpty()) {
             holder.ivProfile.setVisibility(View.VISIBLE);
             holder.tvProfileInitials.setVisibility(View.GONE);
-            Glide.with(context).load(profileUrl).placeholder(R.drawable.ic_profile_placeholder).into(holder.ivProfile);
+            Glide.with(context).load(profileUrl).placeholder(R.drawable.ic_person).into(holder.ivProfile);
         } else {
             holder.ivProfile.setVisibility(View.GONE);
             holder.tvProfileInitials.setVisibility(View.VISIBLE);
@@ -136,17 +143,16 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             View sheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_employee_actions, null);
             bottomSheet.setContentView(sheetView);
 
-            // CHANGED: Now lookups return the full row LinearLayout (as View) instead of inner icon
             View sheetBtnViewMore = sheetView.findViewById(R.id.btnViewMore);
             View sheetEmpEditBtn = sheetView.findViewById(R.id.empEditBtn);
             View sheetEmpAddFace = sheetView.findViewById(R.id.empAddFace);
             View sheetEmpAddLeave = sheetView.findViewById(R.id.empAddLeave);
             View sheetEmpLeaveDetails = sheetView.findViewById(R.id.empLeaveDetails);
 
-            // View More
+            // View More — shows employee details bottom sheet
             sheetBtnViewMore.setOnClickListener(btnView -> {
                 bottomSheet.dismiss();
-                Toast.makeText(context, "View more for " + finalDisplayName, Toast.LENGTH_SHORT).show();
+                showEmployeeDetailsBottomSheet(employee, finalDisplayName);
             });
 
             // Edit Employee — DELEGATE TO FRAGMENT
@@ -173,6 +179,8 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             sheetEmpAddLeave.setOnClickListener(btnView -> {
                 bottomSheet.dismiss();
 
+                selectedId = null;
+
                 View dialogView = LayoutInflater.from(context).inflate(R.layout.item_add_leave, null);
                 TextView tvTitle = dialogView.findViewById(R.id.tvTitle);
                 tvTitle.setText("Leave Assign - " + finalDisplayName);
@@ -191,8 +199,10 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                 actCalculationType.setText(calculationTypes[0], false);
 
                 AutoCompleteTextView actLeaveType = dialogView.findViewById(R.id.actLeaveType);
-                SharedPreferences sharedPreferences = context.getSharedPreferences("AdminCred", Context.MODE_PRIVATE);
-                String token = sharedPreferences.getString("authToken", "");
+
+                SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+                String token = prefManager.getString("authToken", "");
+
                 AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
                 Call<LeaveTypeResponse> call = apiService.getLeaveTypes("jwt " + token);
 
@@ -201,9 +211,25 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                     public void onResponse(@NonNull Call<LeaveTypeResponse> call, @NonNull Response<LeaveTypeResponse> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                             List<LeavetypesItem> leaveTypes = response.body().getData().getLeavetypes();
+
+                            List<LeavetypesItem> filteredLeaveTypes = new ArrayList<>();
+                            if (leaveTypes != null) {
+                                for (LeavetypesItem item : leaveTypes) {
+                                    if (item == null) continue;
+                                    String id = item.getId();
+                                    String name = item.getLeavetypeName();
+                                    boolean isShortLeave =
+                                            (SHORT_LEAVE_ID.equalsIgnoreCase(id))
+                                                    || (name != null && SHORT_LEAVE_NAME.equalsIgnoreCase(name.trim()));
+                                    if (!isShortLeave) {
+                                        filteredLeaveTypes.add(item);
+                                    }
+                                }
+                            }
+
                             List<String> leaveTypeNames = new ArrayList<>();
                             leaveTypeNames.add("Please select");
-                            for (LeavetypesItem item : leaveTypes)
+                            for (LeavetypesItem item : filteredLeaveTypes)
                                 leaveTypeNames.add(item.getLeavetypeName());
 
                             ArrayAdapter<String> leaveAdapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, leaveTypeNames);
@@ -211,7 +237,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                             actLeaveType.setText(leaveTypeNames.get(0), false);
 
                             Map<String, String> leaveTypeNameToIdMap = new HashMap<>();
-                            for (LeavetypesItem item : leaveTypes)
+                            for (LeavetypesItem item : filteredLeaveTypes)
                                 leaveTypeNameToIdMap.put(item.getLeavetypeName(), item.getId());
 
                             actLeaveType.setOnItemClickListener((adapterView, view1, pos, id1) -> {
@@ -224,25 +250,45 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                                             if (r.isSuccessful() && r.body() != null) {
                                                 tvLeaveBalance.setText(r.body().getData().getCreditLeave() + " Leaves");
                                             } else {
-                                                Toast.makeText(context, "Failed to fetch leave balance", Toast.LENGTH_SHORT).show();
+                                                new CustomAlertDialog(context)
+                                                        .setType(CustomAlertDialog.Type.ERROR)
+                                                        .setTitle("Leave Balance Error")
+                                                        .setMessage("Failed to fetch leave balance.")
+                                                        .setPositiveButton("OK", null)
+                                                        .show();
                                             }
                                         }
 
                                         @Override
                                         public void onFailure(@NonNull Call<LeaveBalanceResponse> c, @NonNull Throwable t) {
-                                            Toast.makeText(context, "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                            new CustomAlertDialog(context)
+                                                    .setType(CustomAlertDialog.Type.ERROR)
+                                                    .setTitle("API Error")
+                                                    .setMessage("Failed to fetch leave balance: " + t.getMessage())
+                                                    .setPositiveButton("OK", null)
+                                                    .show();
                                         }
                                     });
                                 }
                             });
                         } else {
-                            Toast.makeText(context, "Failed to load leave types", Toast.LENGTH_SHORT).show();
+                            new CustomAlertDialog(context)
+                                    .setType(CustomAlertDialog.Type.ERROR)
+                                    .setTitle("Error")
+                                    .setMessage("Failed to load leave types.")
+                                    .setPositiveButton("OK", null)
+                                    .show();
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<LeaveTypeResponse> call, @NonNull Throwable t) {
-                        Toast.makeText(context, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.ERROR)
+                                .setTitle("Network Error")
+                                .setMessage("Could not load leave types: " + t.getMessage())
+                                .setPositiveButton("OK", null)
+                                .show();
                     }
                 });
 
@@ -270,32 +316,135 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                 });
 
                 btnClose.setOnClickListener(view -> dialog.dismiss());
+
                 btnSubmit.setOnClickListener(view -> {
-                    String input = etAssignedLeave.getText().toString().trim();
-                    String total = etTotalLeave.getText().toString().trim();
+                    // ===== VALIDATION =====
+
+                    String leaveTypeText = actLeaveType.getText() != null ? actLeaveType.getText().toString().trim() : "";
+                    if (TextUtils.isEmpty(leaveTypeText)
+                            || "Please select".equalsIgnoreCase(leaveTypeText)
+                            || TextUtils.isEmpty(selectedId)) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.WARNING)
+                                .setTitle("Validation")
+                                .setMessage("Please select a leave type.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+
+                    String calcTypeText = actCalculationType.getText() != null ? actCalculationType.getText().toString().trim() : "";
+                    if (TextUtils.isEmpty(calcTypeText) || "Please select".equalsIgnoreCase(calcTypeText)) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.WARNING)
+                                .setTitle("Validation")
+                                .setMessage("Please select a calculation type.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+
+                    String input = etAssignedLeave.getText() != null ? etAssignedLeave.getText().toString().trim() : "";
+                    if (TextUtils.isEmpty(input)) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.WARNING)
+                                .setTitle("Validation")
+                                .setMessage("Please enter the number of assigned leave.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+                    double assignedLeaveVal;
+                    try {
+                        assignedLeaveVal = Double.parseDouble(input);
+                    } catch (NumberFormatException e) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.WARNING)
+                                .setTitle("Validation")
+                                .setMessage("Please enter a valid number for assigned leave.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+
+                    String total = etTotalLeave.getText() != null ? etTotalLeave.getText().toString().trim() : "";
+                    if (TextUtils.isEmpty(total)) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.WARNING)
+                                .setTitle("Validation")
+                                .setMessage("Total leave calculation failed. Please re-check inputs.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+                    double totalLeaveVal;
+                    try {
+                        totalLeaveVal = Double.parseDouble(total);
+                    } catch (NumberFormatException e) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.WARNING)
+                                .setTitle("Validation")
+                                .setMessage("Total leave calculation failed. Please re-check inputs.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+
+                    if (employee.getId() == null || employee.getId().trim().isEmpty()) {
+                        new CustomAlertDialog(context)
+                                .setType(CustomAlertDialog.Type.ERROR)
+                                .setTitle("Error")
+                                .setMessage("Employee ID is missing.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return;
+                    }
+
+                    // ===== BUILD REQUEST =====
                     AssignLeaveRequest request = new AssignLeaveRequest();
                     request.setLeavetype(selectedId);
-                    request.setLeaveCalculationType(actCalculationType.getText().toString().toLowerCase());
-                    request.setAssignedLeave(Double.parseDouble(input));
-                    request.setRemarks(etRemarks.getText().toString().trim());
-                    request.setTotalLeave(Double.parseDouble(total));
+                    request.setLeaveCalculationType(calcTypeText.toLowerCase());
+                    request.setAssignedLeave(assignedLeaveVal);
+                    request.setRemarks(etRemarks.getText() != null ? etRemarks.getText().toString().trim() : "");
+                    request.setTotalLeave(totalLeaveVal);
                     request.setEmployee(employee.getId());
                     request.setAssignType("manual");
+
+                    btnSubmit.setEnabled(false);
+                    btnClose.setEnabled(false);
 
                     apiService.assignLeave("jwt " + token, request).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(@NonNull Call<ResponseBody> c, @NonNull Response<ResponseBody> r) {
+                            btnSubmit.setEnabled(true);
+                            btnClose.setEnabled(true);
                             if (r.isSuccessful()) {
-                                Toast.makeText(context, "Leave assigned successfully", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
+                                new CustomAlertDialog(context)
+                                        .setType(CustomAlertDialog.Type.SUCCESS)
+                                        .setTitle("Success")
+                                        .setMessage("Leave assigned successfully.")
+                                        .setPositiveButton("OK", () -> dialog.dismiss())
+                                        .show();
                             } else {
-                                Toast.makeText(context, "Error: " + r.code(), Toast.LENGTH_SHORT).show();
+                                new CustomAlertDialog(context)
+                                        .setType(CustomAlertDialog.Type.ERROR)
+                                        .setTitle("Error")
+                                        .setMessage("Failed to assign leave. Server returned code: " + r.code())
+                                        .setPositiveButton("OK", null)
+                                        .show();
                             }
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<ResponseBody> c, @NonNull Throwable t) {
-                            Toast.makeText(context, "API call failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            btnSubmit.setEnabled(true);
+                            btnClose.setEnabled(true);
+                            new CustomAlertDialog(context)
+                                    .setType(CustomAlertDialog.Type.ERROR)
+                                    .setTitle("Network Error")
+                                    .setMessage("API call failed: " + t.getMessage())
+                                    .setPositiveButton("OK", null)
+                                    .show();
                         }
                     });
                 });
@@ -305,11 +454,365 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             // Leave Details
             sheetEmpLeaveDetails.setOnClickListener(btnView -> {
                 bottomSheet.dismiss();
-                Toast.makeText(context, "Leave Details for " + finalDisplayName, Toast.LENGTH_SHORT).show();
+                showLeaveDetailsBottomSheet(employee, finalDisplayName);
             });
 
             bottomSheet.show();
         });
+    }
+
+    private void showEmployeeDetailsBottomSheet(EmployeesItem employee, String displayName) {
+        BottomSheetDialog detailsSheet = new BottomSheetDialog(context);
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_employee_details, null);
+        detailsSheet.setContentView(sheetView);
+
+        // ===== HEADER =====
+        ShapeableImageView profileImage = sheetView.findViewById(R.id.detailsProfileImage);
+        TextView profileInitials = sheetView.findViewById(R.id.detailsProfileInitials);
+        MaterialTextView tvFullName = sheetView.findViewById(R.id.detailsFullName);
+        MaterialTextView tvDesignationHeader = sheetView.findViewById(R.id.detailsDesignation);
+        Chip chipStatus = sheetView.findViewById(R.id.detailsStatusChip);
+        MaterialTextView tvEmpCodeBadge = sheetView.findViewById(R.id.detailsEmployeeCodeBadge);
+
+        tvFullName.setText(displayName);
+        tvDesignationHeader.setText(safe(employee.getDesignation()));
+
+        String empCode = employee.getEmployeeCode();
+        tvEmpCodeBadge.setText((empCode != null && !empCode.trim().isEmpty()) ? empCode : "N/A");
+
+        if (employee.isActive()) {
+            chipStatus.setText("Active");
+            chipStatus.setChipBackgroundColorResource(R.color.active_green);
+        } else {
+            chipStatus.setText("Inactive");
+            chipStatus.setChipBackgroundColorResource(R.color.inactive_gray);
+        }
+
+        String profileUrl = (String) employee.getProfileImageUrl();
+        if (profileUrl != null && !profileUrl.trim().isEmpty()) {
+            profileImage.setVisibility(View.VISIBLE);
+            profileInitials.setVisibility(View.GONE);
+            Glide.with(context)
+                    .load(profileUrl)
+                    .placeholder(R.drawable.ic_person)
+                    .error(R.drawable.ic_person)
+                    .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@androidx.annotation.Nullable com.bumptech.glide.load.engine.GlideException e, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, boolean isFirstResource) {
+                            profileImage.setVisibility(View.GONE);
+                            profileInitials.setVisibility(View.VISIBLE);
+                            profileInitials.setText(getInitials(displayName));
+                            GradientDrawable bg = new GradientDrawable();
+                            bg.setShape(GradientDrawable.OVAL);
+                            bg.setColor(getAvatarColor(displayName));
+                            profileInitials.setBackground(bg);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
+                    .into(profileImage);
+        } else {
+            profileImage.setVisibility(View.GONE);
+            profileInitials.setVisibility(View.VISIBLE);
+            profileInitials.setText(getInitials(displayName));
+            GradientDrawable bg = new GradientDrawable();
+            bg.setShape(GradientDrawable.OVAL);
+            bg.setColor(getAvatarColor(displayName));
+            profileInitials.setBackground(bg);
+        }
+
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_fullName)).setText(displayName);
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_fatherName)).setText(safe(employee.getFatherName()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_dob)).setText(safeDate(employee.getDateOfBirth()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_contact)).setText(safe(employee.getContact()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_email)).setText(safe(employee.getEmail()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_address)).setText(safe(employee.getAddress()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_state)).setText(safe(employee.getState()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_pincode)).setText(safe(employee.getPincode()));
+
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_empCode)).setText(safe(employee.getEmployeeCode()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_designation)).setText(safe(employee.getDesignation()));
+
+        String deptName = (employee.getDepartment() != null) ? employee.getDepartment().getName() : null;
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_department)).setText(safe(deptName));
+
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_level)).setText(safe(employee.getLevel()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_grade)).setText(safe(employee.getGrade()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_empType)).setText(safe(employee.getEmployeeType()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_joiningType)).setText(safe(employee.getJoiningType()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_joiningDate)).setText(safeDate(employee.getJoiningDate()));
+
+        String shiftText = "N/A";
+        if (employee.getShift() != null
+                && employee.getShift().getName() != null && !employee.getShift().getName().trim().isEmpty()) {
+            String sName = employee.getShift().getName().trim();
+            String sStart = employee.getShift().getStartTime();
+            String sEnd = employee.getShift().getEndTime();
+            if (sStart != null && !sStart.trim().isEmpty() && sEnd != null && !sEnd.trim().isEmpty()) {
+                shiftText = sName + " (" + sStart.trim() + " - " + sEnd.trim() + ")";
+            } else {
+                shiftText = sName;
+            }
+        }
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_shift)).setText(shiftText);
+
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_status)).setText(employee.isActive() ? "Active" : "Inactive");
+
+        String reportingMgr = "N/A";
+        if (employee.getReportingManager() != null) {
+            String rFirst = null, rLast = null;
+            try {
+                rFirst = (String) employee.getReportingManager().getClass().getMethod("getFirstname").invoke(employee.getReportingManager());
+                rLast = (String) employee.getReportingManager().getClass().getMethod("getLastname").invoke(employee.getReportingManager());
+            } catch (Exception ignored) {
+            }
+            StringBuilder rb = new StringBuilder();
+            if (rFirst != null && !rFirst.trim().isEmpty()) rb.append(rFirst.trim());
+            if (rLast != null && !rLast.trim().isEmpty()) {
+                if (rb.length() > 0) rb.append(" ");
+                rb.append(rLast.trim());
+            }
+            if (rb.length() > 0) reportingMgr = rb.toString();
+        }
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_reportingManager)).setText(reportingMgr);
+
+        String crossMgr = "N/A";
+        if (employee.getCrossmanager() != null) {
+            String cFirst = null, cLast = null;
+            try {
+                cFirst = (String) employee.getCrossmanager().getClass().getMethod("getFirstname").invoke(employee.getCrossmanager());
+                cLast = (String) employee.getCrossmanager().getClass().getMethod("getLastname").invoke(employee.getCrossmanager());
+            } catch (Exception ignored) {
+            }
+            StringBuilder cb = new StringBuilder();
+            if (cFirst != null && !cFirst.trim().isEmpty()) cb.append(cFirst.trim());
+            if (cLast != null && !cLast.trim().isEmpty()) {
+                if (cb.length() > 0) cb.append(" ");
+                cb.append(cLast.trim());
+            }
+            if (cb.length() > 0) crossMgr = cb.toString();
+        }
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_crossManager)).setText(crossMgr);
+
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_pan)).setText(safe(employee.getPanNo()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_aadhar)).setText(safe(employee.getAdharNo()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_uan)).setText(safe(employee.getUanno()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_pf)).setText(safe(employee.getPfAccountNo()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_epf)).setText(employee.isEpf() ? "Yes" : "No");
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_esi)).setText(employee.isEsi() ? "Yes" : "No");
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_differentlyAbled)).setText(safe(employee.getDifferentlyAbled()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_verified)).setText(employee.isIsVerified() ? "Yes" : "No");
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_hrAdmin)).setText(employee.isIsHROrAdmin() ? "Yes" : "No");
+
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_createdAt)).setText(safeDateTime(employee.getCreatedAt()));
+        ((MaterialTextView) sheetView.findViewById(R.id.detailsField_updatedAt)).setText(safeDateTime(employee.getUpdatedAt()));
+
+        detailsSheet.show();
+    }
+
+    private void showLeaveDetailsBottomSheet(EmployeesItem employee, String displayName) {
+        if (employee == null || employee.getId() == null || employee.getId().trim().isEmpty()) {
+            new CustomAlertDialog(context)
+                    .setType(CustomAlertDialog.Type.ERROR)
+                    .setTitle("Error")
+                    .setMessage("Employee ID is missing.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+        String token = prefManager.getString("authToken", "");
+
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        Call<EmployeeLeaveResponse> call = apiService.getLeavesEmployee("jwt " + token, employee.getId());
+
+        call.enqueue(new Callback<EmployeeLeaveResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EmployeeLeaveResponse> call, @NonNull Response<EmployeeLeaveResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<LeavesItem> leaves = null;
+                    if (response.body().getData() != null) {
+                        leaves = response.body().getData().getLeaves();
+                    }
+                    renderLeaveDetailsSheet(employee, displayName, leaves);
+                } else {
+                    new CustomAlertDialog(context)
+                            .setType(CustomAlertDialog.Type.ERROR)
+                            .setTitle("Error")
+                            .setMessage("Failed to load leave details. Server returned code: " + response.code())
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EmployeeLeaveResponse> call, @NonNull Throwable t) {
+                new CustomAlertDialog(context)
+                        .setType(CustomAlertDialog.Type.ERROR)
+                        .setTitle("Network Error")
+                        .setMessage("Could not load leave details: " + t.getMessage())
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
+        });
+    }
+
+    private void renderLeaveDetailsSheet(EmployeesItem employee, String displayName, List<LeavesItem> leaves) {
+        BottomSheetDialog sheet = new BottomSheetDialog(context);
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_leave_details, null);
+        sheet.setContentView(sheetView);
+
+        MaterialTextView tvEmpName = sheetView.findViewById(R.id.leaveDetailsEmployeeName);
+        MaterialTextView tvEmpCodeBadge = sheetView.findViewById(R.id.leaveDetailsEmployeeCodeBadge);
+        View loadingView = sheetView.findViewById(R.id.leaveDetailsLoadingView);
+        View emptyView = sheetView.findViewById(R.id.leaveDetailsEmptyView);
+        ViewGroup container = sheetView.findViewById(R.id.leaveDetailsContainer);
+
+        tvEmpName.setText(displayName);
+        String empCode = employee.getEmployeeCode();
+        tvEmpCodeBadge.setText((empCode != null && !empCode.trim().isEmpty()) ? empCode : "N/A");
+
+        // Hide loading immediately since data is already fetched before showing sheet
+        loadingView.setVisibility(View.GONE);
+
+        if (leaves == null || leaves.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+            container.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            container.setVisibility(View.VISIBLE);
+            container.removeAllViews();
+
+            LayoutInflater inflater = LayoutInflater.from(context);
+            for (LeavesItem item : leaves) {
+                if (item == null) continue;
+
+                View card = inflater.inflate(R.layout.item_leave_detail_card, container, false);
+
+                View accentStrip = card.findViewById(R.id.leaveAccentStrip);
+                MaterialTextView tvLeaveType = card.findViewById(R.id.leaveTypeName);
+                MaterialTextView tvAssignDate = card.findViewById(R.id.leaveAssignDate);
+                MaterialTextView tvBalance = card.findViewById(R.id.leaveBalance);
+                MaterialTextView tvOpening = card.findViewById(R.id.leaveOpening);
+                MaterialTextView tvCredit = card.findViewById(R.id.leaveCredit);
+                MaterialTextView tvUsed = card.findViewById(R.id.leaveUsed);
+                MaterialTextView tvDebit = card.findViewById(R.id.leaveDebit);
+                MaterialTextView tvApplied = card.findViewById(R.id.leaveApplied);
+
+                String leaveTypeName = item.getLeavetype() != null ? item.getLeavetype().trim() : "N/A";
+                tvLeaveType.setText(leaveTypeName);
+
+                int accentColor = getLeaveTypeColor(leaveTypeName);
+                accentStrip.setBackgroundColor(accentColor);
+                tvLeaveType.setTextColor(accentColor);
+
+                // Assign date
+                tvAssignDate.setText(safeDate(item.getAssignDate()));
+
+                // Stats
+                double opening = item.getOpeningLeave();
+                double credit = item.getCreditLeave();
+                double debit = item.getDebitLeave();
+                double used = item.getUsedLeave();
+                double applied = item.getAppliedLeave();
+
+                tvOpening.setText(String.valueOf(opening));
+                tvCredit.setText(String.valueOf(credit));
+                tvUsed.setText(String.valueOf(used));
+                tvDebit.setText(String.valueOf(debit));
+                tvApplied.setText(String.valueOf(applied));
+
+                // Balance
+                double balance = (opening + credit) - (debit + used + applied);
+                if (balance == Math.floor(balance)) {
+                    tvBalance.setText(String.valueOf((long) balance));
+                } else {
+                    tvBalance.setText(String.valueOf(balance));
+                }
+                tvBalance.setTextColor(getBalanceColor(balance));
+
+                container.addView(card);
+            }
+        }
+
+        sheet.show();
+    }
+
+    private int getLeaveTypeColor(String leaveTypeName) {
+        if (leaveTypeName == null) {
+            return androidx.core.content.ContextCompat.getColor(context, R.color.accent_employee);
+        }
+        String n = leaveTypeName.trim().toLowerCase();
+        int colorRes;
+        if (n.contains("casual")) {
+            colorRes = R.color.CasualLeave;
+        } else if (n.contains("sick")) {
+            colorRes = R.color.SickLeave;
+        } else if (n.contains("privilege")) {
+            colorRes = R.color.PrivilegeLeave;
+        } else if (n.contains("occasional")) {
+            colorRes = R.color.OccasionalLeave;
+        } else if (n.contains("restricted")) {
+            colorRes = R.color.RestrictedHoliday;
+        } else if (n.contains("national")) {
+            colorRes = R.color.NationalHoliday;
+        } else if (n.contains("loss of pay") || n.contains("lossofpay")) {
+            colorRes = R.color.LossOfPay;
+        } else if (n.contains("leave without pay") || n.contains("leavewithoutpay")) {
+            colorRes = R.color.LeaveWithoutPay;
+        } else {
+            colorRes = R.color.accent_employee;
+        }
+        return androidx.core.content.ContextCompat.getColor(context, colorRes);
+    }
+
+    private int getBalanceColor(double balance) {
+        int colorRes;
+        if (balance > 0) {
+            colorRes = R.color.leave_balance_positive;
+        } else if (balance == 0) {
+            colorRes = R.color.leave_balance_zero;
+        } else {
+            colorRes = R.color.error_color;
+        }
+        return androidx.core.content.ContextCompat.getColor(context, colorRes);
+    }
+
+    private String safe(String value) {
+        if (value == null || value.trim().isEmpty()) return "N/A";
+        return value.trim();
+    }
+
+    private String safeDate(String isoString) {
+        if (isoString == null || isoString.trim().isEmpty()) return "N/A";
+        try {
+            String formatted = DateTimeUtils.formatToReadableDate(isoString.trim());
+            if (formatted == null || formatted.trim().isEmpty()) return "N/A";
+            return formatted;
+        } catch (Exception e) {
+            return "N/A";
+        }
+    }
+
+    private String safeDateTime(String isoString) {
+        if (isoString == null || isoString.trim().isEmpty()) return "N/A";
+        try {
+            String datePart = DateTimeUtils.formatToReadableDate(isoString.trim());
+            String timePart = DateTimeUtils.extractTime(isoString.trim());
+            boolean hasDate = datePart != null && !datePart.trim().isEmpty();
+            boolean hasTime = timePart != null && !timePart.trim().isEmpty() && !timePart.equalsIgnoreCase("N/A");
+            if (hasDate && hasTime) return datePart + ", " + timePart;
+            if (hasDate) return datePart;
+            if (hasTime) return timePart;
+            return "N/A";
+        } catch (Exception e) {
+            return "N/A";
+        }
     }
 
     private void calculateAndSetTotalLeave(String assignedLeaveText, String balanceText, String calculationType, EditText etTotalLeave) {

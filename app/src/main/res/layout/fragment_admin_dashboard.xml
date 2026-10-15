@@ -14,14 +14,14 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/fragment_dashboard_bg">
+            android:background="@drawable/fragment_dashboard_bg"
+            android:paddingTop="?attr/actionBarSize">
 
             <!-- ================= Dashboard Stats Container ================= -->
             <LinearLayout
                 android:id="@+id/dashboardContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -13,8 +13,12 @@ import app.xedigital.ai.admin.adminModal.ActiveShift.ActiveShiftResponse;
 import app.xedigital.ai.admin.adminModal.ActiveShift.ShiftsItem;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeeDetailResponse;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeesItem;
+import app.xedigital.ai.admin.adminModal.businessUnit.AllBuResponse;
+import app.xedigital.ai.admin.adminModal.businessUnit.BusItem;
 import app.xedigital.ai.admin.adminModal.department.DepartmentResponse;
 import app.xedigital.ai.admin.adminModal.department.DepartmentsItem;
+import app.xedigital.ai.admin.adminModal.partners.PartnersItem;
+import app.xedigital.ai.admin.adminModal.partners.PartnersResponse;
 import app.xedigital.ai.admin.adminModal.updateEmployee.UpdateEmployeeRequest;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -27,10 +31,15 @@ public class EditEmployeeViewModel extends ViewModel {
     private final MutableLiveData<List<DepartmentsItem>> departments = new MutableLiveData<>();
     private final MutableLiveData<List<ShiftsItem>> shifts = new MutableLiveData<>();
     private final MutableLiveData<List<EmployeesItem>> employees = new MutableLiveData<>();
+    private final MutableLiveData<List<PartnersItem>> partners = new MutableLiveData<>();
+    private final MutableLiveData<List<BusItem>> bus = new MutableLiveData<>();
+
     private DepartmentsItem selectedDepartment;
     private ShiftsItem selectedShift;
     private EmployeesItem selectedReportingManager;
     private EmployeesItem selectedCrossManager;
+    private PartnersItem selectedPartner;
+    private BusItem selectedBu;
 
     public LiveData<EmployeesItem> getSelectedEmployee() {
         return selectedEmployee;
@@ -64,6 +73,14 @@ public class EditEmployeeViewModel extends ViewModel {
         employees.setValue(list);
     }
 
+    public LiveData<List<PartnersItem>> getPartners() {
+        return partners;
+    }
+
+    public LiveData<List<BusItem>> getBus() {
+        return bus;
+    }
+
     public DepartmentsItem getSelectedDepartment() {
         return selectedDepartment;
     }
@@ -94,6 +111,22 @@ public class EditEmployeeViewModel extends ViewModel {
 
     public void setSelectedCrossManager(EmployeesItem item) {
         this.selectedCrossManager = item;
+    }
+
+    public PartnersItem getSelectedPartner() {
+        return selectedPartner;
+    }
+
+    public void setSelectedPartner(PartnersItem item) {
+        this.selectedPartner = item;
+    }
+
+    public BusItem getSelectedBu() {
+        return selectedBu;
+    }
+
+    public void setSelectedBu(BusItem item) {
+        this.selectedBu = item;
     }
 
     public void fetchDepartments(String token) {
@@ -154,10 +187,49 @@ public class EditEmployeeViewModel extends ViewModel {
         });
     }
 
+    public void fetchPartners(String token) {
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        Call<PartnersResponse> call = apiService.getPartners("jwt " + token);
+        call.enqueue(new Callback<PartnersResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<PartnersResponse> call, @NonNull Response<PartnersResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    partners.setValue(response.body().getData().getPartners());
+                } else {
+                    partners.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PartnersResponse> call, @NonNull Throwable t) {
+                partners.setValue(null);
+            }
+        });
+    }
+
+    public void fetchBus(String token) {
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        Call<AllBuResponse> call = apiService.getBus("jwt " + token);
+        call.enqueue(new Callback<AllBuResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<AllBuResponse> call, @NonNull Response<AllBuResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    bus.setValue(response.body().getData().getBus());
+                } else {
+                    bus.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<AllBuResponse> call, @NonNull Throwable t) {
+                bus.setValue(null);
+            }
+        });
+    }
+
     public void updateEmployee(String token, String employeeId, UpdateEmployeeRequest payload, Callback<ResponseBody> callback) {
         AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
         Call<ResponseBody> call = apiService.updateEmployee("jwt " + token, employeeId, payload);
         call.enqueue(callback);
     }
-
 }

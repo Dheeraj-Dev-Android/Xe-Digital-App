@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background_surface"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <!-- Drag Handle -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/divider" />
+
+        <!-- ===== HEADER SECTION ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/avatar_bg"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+
+            <!-- Profile Image / Initials Container -->
+            <FrameLayout
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginBottom="14dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/detailsProfileImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_person"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:strokeColor="@color/profile_ring"
+                    app:strokeWidth="3dp" />
+
+                <TextView
+                    android:id="@+id/detailsProfileInitials"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="XE"
+                    tools:visibility="visible" />
+            </FrameLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="N/A"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="XeDigital" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsDesignation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="N/A"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                tools:text="Senior Android Developer" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/detailsStatusChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:checkable="false"
+                    android:clickable="false"
+                    android:text="Active"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="@color/active_green"
+                    app:chipCornerRadius="12dp"
+                    app:chipMinHeight="24dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/badge_bg"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsEmployeeCodeBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="N/A"
+                        android:textColor="@color/badge_text"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        tools:text="EMP-001" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ===== BODY ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp">
+
+            <!-- ========== PERSONAL INFORMATION ========== -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_employee" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:text="PERSONAL INFORMATION"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_employee"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Full Name" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_fullName"
+                style="@style/DetailsFieldValue"
+                tools:text="Xedigital.ai" />
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Father's Name" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_fatherName"
+                style="@style/DetailsFieldValue"
+                android:layout_height="18dp"
+                tools:text="Xedigital.ai" />
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Email" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_email"
+                style="@style/DetailsFieldValue"
+                android:autoLink="email"
+                tools:text="xedigital@xedigital.com" />
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Address" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_address"
+                style="@style/DetailsFieldValue"
+                tools:text="123 Main Street" />
+
+            <!-- 2-column: DOB | Contact -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Date of Birth" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_dob"
+                        style="@style/DetailsFieldValue"
+                        tools:text="12 Jan 1990" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Contact" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_contact"
+                        style="@style/DetailsFieldValue"
+                        android:autoLink="phone"
+                        tools:text="+91 9876543210" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: State | Pincode -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="State" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_state"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Delhi" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Pincode" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_pincode"
+                        style="@style/DetailsFieldValue"
+                        tools:text="110001" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View style="@style/DetailsSectionDivider" />
+
+            <!-- ========== EMPLOYMENT DETAILS ========== -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_employee" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:text="EMPLOYMENT DETAILS"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_employee"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Designation" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_designation"
+                style="@style/DetailsFieldValue"
+                tools:text="Senior Developer" />
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Department" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_department"
+                style="@style/DetailsFieldValue"
+                tools:text="Engineering" />
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Shift" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_shift"
+                style="@style/DetailsFieldValue"
+                tools:text="Morning (9:00 - 18:00)" />
+
+            <!-- 2-column: Employee Code | Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Employee Code" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_empCode"
+                        style="@style/DetailsFieldValue"
+                        tools:text="EMP-001" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Status" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_status"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Active" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: Level | Grade -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Level" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_level"
+                        style="@style/DetailsFieldValue"
+                        tools:text="L3" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Grade" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_grade"
+                        style="@style/DetailsFieldValue"
+                        tools:text="A" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: Employee Type | Joining Type -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Employee Type" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_empType"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Full-time" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Joining Type" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_joiningType"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Permanent" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: Joining Date | (empty) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Joining Date" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_joiningDate"
+                        style="@style/DetailsFieldValue"
+                        tools:text="01 Jan 2024" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp" />
+            </LinearLayout>
+
+            <View style="@style/DetailsSectionDivider" />
+
+            <!-- ========== REPORTING ========== -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_reporting" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:text="REPORTING"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_reporting"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Reporting Manager" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_reportingManager"
+                style="@style/DetailsFieldValue"
+                tools:text="Jane Smith" />
+
+            <TextView
+                style="@style/DetailsFieldLabel"
+                android:text="Cross Manager" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detailsField_crossManager"
+                style="@style/DetailsFieldValue"
+                tools:text="Mike Johnson" />
+
+            <View style="@style/DetailsSectionDivider" />
+
+            <!-- ========== COMPLIANCE & IDs ========== -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/accent_cross" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:text="COMPLIANCE &amp; IDs"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent_cross"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 2-column: PAN | Aadhar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="PAN No." />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_pan"
+                        style="@style/DetailsFieldValue"
+                        tools:text="ABCDE1234F" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Aadhar No." />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_aadhar"
+                        style="@style/DetailsFieldValue"
+                        tools:text="XXXX XXXX 1234" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: UAN | PF Account -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="UAN No." />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_uan"
+                        style="@style/DetailsFieldValue"
+                        tools:text="100123456789" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="PF Account No." />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_pf"
+                        style="@style/DetailsFieldValue"
+                        tools:text="PF-123456" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: EPF | ESI -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="EPF Enrolled" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_epf"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Yes" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="ESI Enrolled" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_esi"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Yes" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: Differently Abled | Verified -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Differently Abled" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_differentlyAbled"
+                        style="@style/DetailsFieldValue"
+                        tools:text="No" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Verified" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_verified"
+                        style="@style/DetailsFieldValue"
+                        tools:text="Yes" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2-column: HR/Admin | (empty) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="HR / Admin" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_hrAdmin"
+                        style="@style/DetailsFieldValue"
+                        tools:text="No" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp" />
+            </LinearLayout>
+
+            <View style="@style/DetailsSectionDivider" />
+
+            <!-- ========== RECORD INFO ========== -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/text_tertiary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:text="RECORD INFO"
+                    android:textAllCaps="true"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 2-column: Created At | Updated At -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Created At" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_createdAt"
+                        style="@style/DetailsFieldValue"
+                        tools:text="01 Jan 2024, 10:00 AM" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        style="@style/DetailsFieldLabel"
+                        android:text="Updated At" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsField_updatedAt"
+                        style="@style/DetailsFieldValue"
+                        tools:text="15 Jun 2024, 03:45 PM" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

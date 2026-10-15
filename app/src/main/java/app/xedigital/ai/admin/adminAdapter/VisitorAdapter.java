@@ -28,18 +28,7 @@ import app.xedigital.ai.utills.SecurePrefManager;
 
 public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorViewHolder> {
 
-    private static final int[] AVATAR_COLORS = {
-            0xFF1E88E5,
-            0xFF43A047,
-            0xFFE53935,
-            0xFF8E24AA,
-            0xFFFB8C00,
-            0xFF00ACC1,
-            0xFF3949AB,
-            0xFFD81B60,
-            0xFF00897B,
-            0xFF6D4C41
-    };
+    private static final int[] AVATAR_COLORS = {0xFF1E88E5, 0xFF43A047, 0xFFE53935, 0xFF8E24AA, 0xFFFB8C00, 0xFF00ACC1, 0xFF3949AB, 0xFFD81B60, 0xFF00897B, 0xFF6D4C41};
 
     private final List<VisitorsItem> visitorList;
     private final Context context;
@@ -142,7 +131,26 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
         if (profileImage != null && !profileImage.trim().isEmpty()) {
             holder.visProfile.setVisibility(View.VISIBLE);
             holder.tvProfileInitials.setVisibility(View.GONE);
-            Glide.with(context).load(profileImage).placeholder(R.drawable.ic_profile_placeholder).into(holder.visProfile);
+            Glide.with(context).load(profileImage).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                @Override
+                public boolean onLoadFailed(@androidx.annotation.Nullable com.bumptech.glide.load.engine.GlideException e, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, boolean isFirstResource) {
+                    holder.visProfile.setVisibility(View.GONE);
+                    holder.tvProfileInitials.setVisibility(View.VISIBLE);
+                    String initials = getInitials(displayName);
+                    int avatarColor = getAvatarColor(displayName);
+                    holder.tvProfileInitials.setText(initials);
+                    GradientDrawable circularBg = new GradientDrawable();
+                    circularBg.setShape(GradientDrawable.OVAL);
+                    circularBg.setColor(avatarColor);
+                    holder.tvProfileInitials.setBackground(circularBg);
+                    return true;
+                }
+
+                @Override
+                public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+                    return false;
+                }
+            }).into(holder.visProfile);
         } else {
             holder.visProfile.setVisibility(View.GONE);
             holder.tvProfileInitials.setVisibility(View.VISIBLE);
@@ -219,7 +227,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             tvLaptopSerial.setText((serialNumber != null && !serialNumber.trim().isEmpty()) ? serialNumber : "N/A");
 
             if (profileImage != null && !profileImage.trim().isEmpty()) {
-                Glide.with(context).load(profileImage).placeholder(R.drawable.ic_profile_placeholder).into(imgProfile);
+                Glide.with(context).load(profileImage).placeholder(R.drawable.ic_person).into(imgProfile);
             } else {
                 String initials = getInitials(dialogDisplayName);
                 int avatarColor = getAvatarColor(dialogDisplayName);
@@ -290,7 +298,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
         if (parts.length == 1) {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
         }
-        return String.valueOf((parts[0].charAt(0) + parts[parts.length - 1].charAt(0)));
+        return ("" + parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
     }
 
     private int getAvatarColor(String name) {

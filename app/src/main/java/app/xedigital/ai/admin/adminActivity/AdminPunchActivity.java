@@ -706,7 +706,7 @@ public class AdminPunchActivity extends AppCompatActivity {
                 showAlert("TinyURL Error", t.getMessage());
             }
         });
-    }    private final Runnable captureRunnable = this::captureImage;
+    }
 
     private void generateQRCode(String data) {
         try {
@@ -740,6 +740,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             showAlert("QR Error", "Failed to generate QR code.");
         }
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private void showAlert(String title, String message) {
         runOnUiThread(() -> {
@@ -946,8 +948,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 
-
-
     private File getOutputDirectory() {
         File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "AdminPunch");
         if (!dir.exists() && !dir.mkdirs()) {
@@ -955,6 +955,7 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
         return dir;
     }
+
 
     interface AddressCallback {
         void onAddressReceived(String address, Location location);

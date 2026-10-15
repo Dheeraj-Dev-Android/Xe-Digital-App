@@ -16,6 +16,7 @@ import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsItem;
 import app.xedigital.ai.admin.adminModal.addBucket.AddBucketRequest;
 import app.xedigital.ai.admin.adminModal.addFace.AddFaceResponse;
 import app.xedigital.ai.admin.adminModal.assignLeave.AssignLeaveRequest;
+import app.xedigital.ai.admin.adminModal.businessUnit.AllBuResponse;
 import app.xedigital.ai.admin.adminModal.department.DepartmentResponse;
 import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmployeeFaceAddResponse;
 import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmpolyeeFaceAddRequest;
@@ -62,6 +63,10 @@ public interface AdminAPIInterface {
 
     @GET("partners/profile/{partnerId}")
     Call<UserDetailsResponse> getPartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId);
+
+    //    https://app.xedigital.ai/api/v1/bus/getAll
+    @GET("bus/getAll")
+    Call<AllBuResponse> getBus(@Header("Authorization") String authToken);
 
     @GET("users")
     Call<AdminUserResponse> getAllUsers(@Header("Authorization") String authToken);
