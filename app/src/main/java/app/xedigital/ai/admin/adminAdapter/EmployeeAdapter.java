@@ -46,10 +46,7 @@ import retrofit2.Response;
 
 public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.EmployeeViewHolder> {
 
-    private static final int[] AVATAR_COLORS = {
-            0xFF1E88E5, 0xFF43A047, 0xFFE53935, 0xFF8E24AA, 0xFFFB8C00,
-            0xFF00ACC1, 0xFF3949AB, 0xFFD81B60, 0xFF00897B, 0xFF6D4C41
-    };
+    private static final int[] AVATAR_COLORS = {0xFF1E88E5, 0xFF43A047, 0xFFE53935, 0xFF8E24AA, 0xFFFB8C00, 0xFF00ACC1, 0xFF3949AB, 0xFFD81B60, 0xFF00897B, 0xFF6D4C41};
 
     private final List<EmployeesItem> employeeList;
     private final Context context;
@@ -94,18 +91,14 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         holder.tvDesignation.setText((designation != null && !designation.trim().isEmpty()) ? designation : "N/A");
 
         // Safe Department
-        if (employee.getDepartment() != null && employee.getDepartment().getName() != null
-                && !employee.getDepartment().getName().trim().isEmpty()) {
+        if (employee.getDepartment() != null && employee.getDepartment().getName() != null && !employee.getDepartment().getName().trim().isEmpty()) {
             holder.tvDepartment.setText(employee.getDepartment().getName());
         } else {
             holder.tvDepartment.setText("N/A");
         }
 
         // Safe Shift
-        if (employee.getShift() != null
-                && employee.getShift().getName() != null && !employee.getShift().getName().trim().isEmpty()
-                && employee.getShift().getStartTime() != null && !employee.getShift().getStartTime().trim().isEmpty()
-                && employee.getShift().getEndTime() != null && !employee.getShift().getEndTime().trim().isEmpty()) {
+        if (employee.getShift() != null && employee.getShift().getName() != null && !employee.getShift().getName().trim().isEmpty() && employee.getShift().getStartTime() != null && !employee.getShift().getStartTime().trim().isEmpty() && employee.getShift().getEndTime() != null && !employee.getShift().getEndTime().trim().isEmpty()) {
             holder.tvShift.setText(employee.getShift().getName() + " ( " + employee.getShift().getStartTime() + " - " + employee.getShift().getEndTime() + " )");
         } else {
             holder.tvShift.setText("N/A");
@@ -348,7 +341,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         String[] parts = name.trim().split("\\s+");
         if (parts.length == 1)
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
-        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        return ("" + parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
     }
 
     private int getAvatarColor(String name) {
