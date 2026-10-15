@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
@@ -120,10 +121,8 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private ObjectAnimator scannerAnimator;
     private PermissionManager permissionManager;
 
-    // ── Permission launcher ────────────────────────────────────────────
     private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                // ── CHANGED: Sync with central manager ──
                 permissionManager.syncAllPermissions();
 
                 if (allPermissionsGranted()) {
@@ -133,7 +132,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 }
             });
 
-    // ── Dialog references (kept for dismissing on destroy) ────────────
     private AlertDialog attendanceSuccessDialog;
     private AlertDialog securityDialog;
 
@@ -146,17 +144,12 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     private String currentAddress = "";
     private BioMetric bioMetric;
 
-    // ══════════════════════════════════════════════════════════════════════
-    // LIFECYCLE
-    // ══════════════════════════════════════════════════════════════════════
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_punch);
 
-        // ── CHANGED: Initialize central permission manager ──
         permissionManager = PermissionManager.getInstance(this);
 
         previewView = findViewById(R.id.viewFinder);
@@ -229,19 +222,11 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         safeUnbindCamera();
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // VERIFICATION FLOW
-    // ══════════════════════════════════════════════════════════════════════
-
     private void initiateVerificationFlow() {
         currentState = ActivityState.SCANNING;
         setRandomChallenge();
         startCamera();
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // LIVENESS INSTRUCTIONS
-    // ══════════════════════════════════════════════════════════════════════
 
     private void showLivenessInstructions() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_liveness_instructions, null);
@@ -264,10 +249,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         infoDialog.show();
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // PERMISSIONS
-    // ══════════════════════════════════════════════════════════════════════
-
     private void showPermissionDeniedAlert() {
         CustomDialogHelper.showErrorDialog(this,
                 "Permissions Required",
@@ -277,7 +258,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
     }
 
     private boolean allPermissionsGranted() {
-        // ── CHANGED: Check status using central PermissionManager ──
         return permissionManager.isGranted(PermissionManager.TAG_CAMERA)
                 && permissionManager.isGranted(PermissionManager.TAG_LOCATION);
     }
@@ -289,10 +269,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             bioMetric.handlePermissionResult(requestCode, permissions, grantResults, false);
         }
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // CAMERA
-    // ══════════════════════════════════════════════════════════════════════
 
     private void startCamera() {
         if (!isActivityAlive() || currentState != ActivityState.SCANNING) return;
@@ -310,8 +286,10 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 Preview previewComp = new Preview.Builder().build();
                 previewComp.setSurfaceProvider(previewView.getSurfaceProvider());
 
+                // CHANGED: Set target resolution to 1280×720 (720p) for optimal face recognition
                 imageCapture = new ImageCapture.Builder()
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .setTargetResolution(new Size(1280, 720))
                         .build();
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
@@ -343,10 +321,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // LIVENESS CHALLENGE
-    // ══════════════════════════════════════════════════════════════════════
-
     private void setRandomChallenge() {
         LivenessChallenge[] challenges = LivenessChallenge.values();
         currentChallenge = challenges[new Random().nextInt(challenges.length)];
@@ -372,10 +346,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 return "Follow the prompt";
         }
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // FACE ANALYSIS
-    // ══════════════════════════════════════════════════════════════════════
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void analyzeFace(@NonNull ImageProxy imageProxy) {
@@ -472,10 +442,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return sum / (double) data.length;
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // IMAGE CAPTURE
-    // ══════════════════════════════════════════════════════════════════════
-
     private void captureImage() {
         File photoFile = new File(getOutputDirectory(), System.currentTimeMillis() + "_photo.jpg");
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
@@ -500,7 +466,8 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                             return;
                         }
 
-                        int newWidth = 500;
+                        // CHANGED: Resize width from 500 → 1280 (matches camera 720p output)
+                        int newWidth = 1280;
                         int newHeight = (int) (bitmap.getHeight() * (newWidth / (float) bitmap.getWidth()));
 
                         Bitmap scaled = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
@@ -532,10 +499,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         });
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // API CALLS
-    // ══════════════════════════════════════════════════════════════════════
-
     private void prepareJsonAndSend(@NonNull String base64Image) {
         try {
             JSONObject json = new JSONObject();
@@ -551,7 +514,8 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
 
     private String convertImageToBase64(@NonNull Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        // CHANGED: JPEG quality from 70 → 92 (industry standard for face recognition)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 92, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 
@@ -756,10 +720,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return android.provider.Settings.Global.getInt(getContentResolver(), android.provider.Settings.Global.AUTO_TIME, 0) == 1;
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // ATTENDANCE RESULT DIALOGS
-    // ══════════════════════════════════════════════════════════════════════
-
     private void showAttendanceSuccessAlert(@NonNull String responseBody) throws JSONException, IOException {
         toggleScannerAnimation(false);
         setLoadingVisible(false);
@@ -835,7 +795,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
             boolean hasBackgroundLoc = true;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                // ── CHANGED: Check background location status through central PermissionManager ──
                 hasBackgroundLoc = permissionManager.isGranted(PermissionManager.TAG_BACKGROUND_LOCATION);
             }
 
@@ -905,10 +864,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         CustomDialogHelper.showErrorDialog(this, "Verification Error", userMessage, this::initiateVerificationFlow);
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // BIOMETRIC CALLBACKS
-    // ══════════════════════════════════════════════════════════════════════
-
     @Override
     public void onAuthenticationSucceeded() {
         if (!isActivityAlive()) return;
@@ -942,10 +897,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         updateStatus("Biometric authentication failed. Please try again.");
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // LOCATION
-    // ══════════════════════════════════════════════════════════════════════
-
     private void getCurrentLocation(@NonNull AddressCallback callback) {
         if (!isActivityAlive()) return;
 
@@ -963,7 +914,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         boolean isLocationEnabled = locationManager != null && (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
-        // ── CHANGED: Verify location status through central PermissionManager ──
         if (permissionManager.isGranted(PermissionManager.TAG_LOCATION) && isLocationEnabled) {
 
             LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
@@ -1001,7 +951,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
                 }
             };
 
-            // Double check safety validation context parameters
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
             }
@@ -1120,10 +1069,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
         return location != null ? fmt.format(new Date(location.getTime())) : fmt.format(new Date());
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // UI HELPERS
-    // ══════════════════════════════════════════════════════════════════════
-
     private boolean isActivityAlive() {
         return !isFinishing() && !isDestroyed();
     }
@@ -1180,10 +1125,6 @@ public class PunchActivity extends AppCompatActivity implements BioMetric.Biomet
             }
         });
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // ENUMS & INTERFACES
-    // ══════════════════════════════════════════════════════════════════════
 
     private enum ActivityState {
         IDLE, SCANNING, PROCESSING_LIVENESS, UPLOADING, BIOMETRIC_FALLBACK

@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -96,7 +97,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.loadingPanel);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        // ✅ FIXED: Corrected permission evaluation boolean logic inversion
         ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), result -> {
                     if (isFinishing() || isDestroyed()) return;
@@ -158,7 +158,12 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                 }
 
                 Preview preview = new Preview.Builder().build();
-                imageCapture = new ImageCapture.Builder().build();
+
+                // CHANGED: Set target resolution to 1280×720 (720p) for optimal face recognition
+                imageCapture = new ImageCapture.Builder()
+                        .setTargetResolution(new Size(1280, 720))
+                        .build();
+
                 CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
                 if (previewView != null && previewView.getSurfaceProvider() != null) {
@@ -203,7 +208,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                 hideCapturingOverlay();
                 if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
-                // ✅ FIXED: Asynchronously unbind camera pipelines using listenable futures to completely eliminate UI execution blocks
                 ListenableFuture<ProcessCameraProvider> providerFuture = ProcessCameraProvider.getInstance(AdminCheckOutActivity.this);
                 providerFuture.addListener(() -> {
                     try {
@@ -222,7 +226,8 @@ public class AdminCheckOutActivity extends AppCompatActivity {
                     try {
                         String savedPath = photoFile.getAbsolutePath();
 
-                        Bitmap bitmap = decodeSampledBitmap(savedPath, 640);
+                        // CHANGED: Decode sample width from 640 → 1280 (matches camera 720p output)
+                        Bitmap bitmap = decodeSampledBitmap(savedPath, 1280);
                         if (bitmap == null) {
                             runOnUiThread(() -> {
                                 if (!isFinishing() && !isDestroyed())
@@ -339,7 +344,8 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     private String convertImageToBase64(Bitmap bitmap) {
         if (bitmap == null) return null;
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            // CHANGED: JPEG quality from 100 → 92 (industry standard for face recognition)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 92, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             return Base64.encodeToString(byteArray, Base64.NO_WRAP);
         } catch (Throwable t) {
@@ -576,7 +582,6 @@ public class AdminCheckOutActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // ✅ Shuts down the background execution pools safely
         if (cameraExecutor != null) {
             cameraExecutor.shutdownNow();
         }

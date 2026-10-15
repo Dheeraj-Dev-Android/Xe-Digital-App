@@ -290,7 +290,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
         if (parts.length == 1) {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
         }
-        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        return String.valueOf((parts[0].charAt(0) + parts[parts.length - 1].charAt(0)));
     }
 
     private int getAvatarColor(String name) {

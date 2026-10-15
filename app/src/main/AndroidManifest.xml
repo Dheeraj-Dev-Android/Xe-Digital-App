@@ -136,15 +136,20 @@
         <activity
             android:name=".admin.adminActivity.AdminPunchActivity"
             android:exported="true"
-            android:hardwareAccelerated="true" />
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
         <activity
             android:name=".admin.adminActivity.AdminCheckOutActivity"
             android:exported="true"
-            android:hardwareAccelerated="true" />
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
+
         <activity
             android:name=".admin.adminActivity.AdminManualCheckIn"
             android:exported="true"
-            android:hardwareAccelerated="true" />
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.XEDigital.NoActionBar" />
 
         <!-- ── Main Dashboard Activities ────────────────────────────────── -->
         <!-- Employee & Manager Host Activity -->

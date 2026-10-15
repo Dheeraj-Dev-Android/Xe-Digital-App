@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,16 +52,35 @@ public class EmployeeDetailsFragment extends Fragment {
 
         rvEmployees = view.findViewById(R.id.rvEmployees);
         rvEmployees.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new EmployeeAdapter(getContext(), employeeList);
-        rvEmployees.setAdapter(adapter);
-
         emptyStateView = view.findViewById(R.id.emptyStateView);
         progressBar = view.findViewById(R.id.progressBar);
+
+        // CRITICAL: 3-argument constructor with listener for navigation delegation
+        adapter = new EmployeeAdapter(getContext(), employeeList, new EmployeeAdapter.OnEmployeeActionListener() {
+            @Override
+            public void onEditEmployee(EmployeesItem employee) {
+                String userId = employee.getId();
+                if (userId != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(EditEmployeeFragment.ARG_SELECTED_ITEM, employee);
+                    Navigation.findNavController(requireView()).navigate(R.id.nav_employees_to_nav_editEmployee, bundle);
+                } else {
+                    Toast.makeText(requireContext(), "Employee ID is null", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onAddFace(EmployeesItem employee) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("selected_employee", employee);
+                Navigation.findNavController(requireView()).navigate(R.id.nav_employees_to_nav_addFace, bundle);
+            }
+        });
+        rvEmployees.setAdapter(adapter);
 
         Chip chipAll = view.findViewById(R.id.chipAll);
         Chip chipActive = view.findViewById(R.id.chipActive);
         Chip chipInactive = view.findViewById(R.id.chipInactive);
-
         chipAll.setChecked(true);
 
         chipAll.setOnClickListener(v -> filterEmployees("ALL"));
@@ -88,7 +108,6 @@ public class EmployeeDetailsFragment extends Fragment {
 
     private void filterByName(String query) {
         employeeList.clear();
-
         if (query.isEmpty()) {
             employeeList.addAll(fullEmployeeList);
         } else {
@@ -98,7 +117,6 @@ public class EmployeeDetailsFragment extends Fragment {
                 }
             }
         }
-
         adapter.notifyDataSetChanged();
         updateEmptyState();
     }
@@ -129,29 +147,17 @@ public class EmployeeDetailsFragment extends Fragment {
 
     private void filterEmployees(String filterType) {
         employeeList.clear();
-
         switch (filterType) {
             case "ALL":
                 employeeList.addAll(fullEmployeeList);
                 break;
-
             case "ACTIVE":
-                for (EmployeesItem employee : fullEmployeeList) {
-                    if (employee.isActive()) {
-                        employeeList.add(employee);
-                    }
-                }
+                for (EmployeesItem e : fullEmployeeList) if (e.isActive()) employeeList.add(e);
                 break;
-
             case "INACTIVE":
-                for (EmployeesItem employee : fullEmployeeList) {
-                    if (!employee.isActive()) {
-                        employeeList.add(employee);
-                    }
-                }
+                for (EmployeesItem e : fullEmployeeList) if (!e.isActive()) employeeList.add(e);
                 break;
         }
-
         adapter.notifyDataSetChanged();
         updateEmptyState();
     }

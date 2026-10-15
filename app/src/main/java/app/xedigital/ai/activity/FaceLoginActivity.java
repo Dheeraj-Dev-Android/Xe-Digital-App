@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageButton;
@@ -71,7 +72,6 @@ import retrofit2.Response;
 public class FaceLoginActivity extends AppCompatActivity implements BioMetric.BiometricAuthListener {
 
     private static final String TAG = "FaceLoginActivity";
-    // ── Demo Account For Google Play Review ───────────────────────────
     private static final String REVIEWER_EMAIL = "emp@xyzdemo.ai";
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
@@ -95,12 +95,10 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     private ObjectAnimator scannerAnimator;
     private PermissionManager permissionManager;
 
-    // ── Permission Launcher ───────────────────────────────────────────
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isFinishing() || isDestroyed()) return;
 
-                // ── CHANGED: Sync with central manager ──
                 permissionManager.syncAllPermissions();
 
                 if (permissionManager.isGranted(PermissionManager.TAG_CAMERA)) {
@@ -120,7 +118,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_login);
-        // ✅ Safety guard — admin users should not reach FaceLogin
         String role = RoleAccessManager.getInstance(this).getRoleName();
         if (app.xedigital.ai.utills.RoleGroup.isAdminTier(role)) {
             Intent intent = new Intent(this, app.xedigital.ai.AdminMainActivity.class);
@@ -131,7 +128,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         }
 
         securePrefManager = SecurePrefManager.getInstance(this);
-        // ── CHANGED: Initialize central permission manager ──
         permissionManager = PermissionManager.getInstance(this);
 
         authToken = getIntent().getStringExtra("authToken");
@@ -180,7 +176,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
 
     private void loadCollectionAndProceed() {
 
-        // ── Check if this is Google Play reviewer account ──────────────
         String loggedInEmail = securePrefManager.getString("emailId", null);
         if (loggedInEmail != null && loggedInEmail.equalsIgnoreCase(REVIEWER_EMAIL)) {
             Log.d(TAG, "Demo account detected. Showing bypass dialog.");
@@ -201,7 +196,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         }
     }
 
-    // REVIEWER BYPASS DIALOG
     private void showReviewerBypassDialog() {
         if (isFinishing() || isDestroyed()) return;
         String htmlMessage = "This app uses <b>face recognition</b> with "
@@ -280,7 +274,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
     }
 
     private void verifyCameraPermission() {
-        // ── CHANGED: Use PermissionManager instead of direct check ──
         if (permissionManager.isGranted(PermissionManager.TAG_CAMERA)) {
             setRandomChallenge();
             if (previewView != null) {
@@ -303,9 +296,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             }
         }
     }
-
-    // ── REMOVED: allPermissionsGranted() ──
-    // Now handled by PermissionManager.isGranted(TAG_CAMERA)
 
     private void showPermissionDeniedAlert() {
         if (isFinishing() || isDestroyed()) return;
@@ -337,10 +327,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         infoDialog.show();
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // CAMERA  (ALL UNTOUCHED)
-    // ══════════════════════════════════════════════════════════════════════
-
     private void startCamera() {
         if (isFinishing() || isDestroyed()) return;
         ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(this);
@@ -356,12 +342,14 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
+                // CHANGED: Set target resolution to 1280×720 (720p) for optimal face recognition
                 imageCapture = new ImageCapture.Builder()
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .setTargetResolution(new Size(1280, 720))
                         .build();
                 imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .setTargetResolution(new android.util.Size(480, 640))
+                        .setTargetResolution(new Size(480, 640))
                         .build();
                 imageAnalysis.setAnalyzer(backgroundExecutor, this::analyzeFace);
 
@@ -390,8 +378,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         }
     }
 
-    // LIVENESS CHALLENGE (ALL UNTOUCHED)
-
     private void setRandomChallenge() {
         LivenessChallenge[] challenges = LivenessChallenge.values();
         currentChallenge = challenges[new Random().nextInt(challenges.length)];
@@ -415,8 +401,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                 return "Follow the prompt";
         }
     }
-
-    // FACE ANALYSIS (ALL UNTOUCHED)
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void analyzeFace(@NonNull ImageProxy imageProxy) {
@@ -497,8 +481,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         }
     }
 
-    // IMAGE CAPTURE (ALL UNTOUCHED)
-
     private void captureImage() {
         if (imageCapture == null) {
             handleError("Camera capture pipeline is uninitialized.");
@@ -530,7 +512,8 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                                     return;
                                 }
 
-                                int newWidth = 500;
+                                // CHANGED: Resize width from 500 → 1280 (matches camera 720p output)
+                                int newWidth = 1280;
                                 int newHeight = (int) (bitmap.getHeight() * (newWidth / (float) bitmap.getWidth()));
                                 Bitmap scaled = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
 
@@ -560,8 +543,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
                     }
                 });
     }
-
-    // API CALLS (ALL UNTOUCHED)
 
     private void prepareJsonAndSend(String base64Image) {
         if (COLLECTION_NAME == null) {
@@ -678,10 +659,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         });
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // RESULT HANDLERS (ALL UNTOUCHED)
-    // ══════════════════════════════════════════════════════════════════════
-
     private void handleSuccess() {
         attemptCount = 0;
         safeUnbindCamera();
@@ -796,10 +773,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         });
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // NAVIGATION (ALL UNTOUCHED)
-    // ══════════════════════════════════════════════════════════════════════
-
     private void navigateToManualLogin() {
         if (isFinishing() || isDestroyed()) return;
         safeUnbindCamera();
@@ -821,10 +794,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         startActivity(intent);
         finish();
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // BIOMETRIC CALLBACKS (ALL UNTOUCHED)
-    // ══════════════════════════════════════════════════════════════════════
 
     @Override
     public void onAuthenticationSucceeded() {
@@ -860,10 +829,6 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
             updateStatus("Device authentication failed. Please try again.");
         });
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // UI HELPERS (ALL UNTOUCHED)
-    // ══════════════════════════════════════════════════════════════════════
 
     private void updateStatus(String text) {
         runOnUiThread(() -> {
@@ -909,11 +874,10 @@ public class FaceLoginActivity extends AppCompatActivity implements BioMetric.Bi
         });
     }
 
-    // FILE HELPERS (ALL UNTOUCHED)
-
     private String convertImageToBase64(@NonNull Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        // CHANGED: JPEG quality from 70 → 92 (industry standard for face recognition)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 92, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
     }
 

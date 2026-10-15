@@ -17,6 +17,9 @@ import app.xedigital.ai.admin.adminModal.addBucket.AddBucketRequest;
 import app.xedigital.ai.admin.adminModal.addFace.AddFaceResponse;
 import app.xedigital.ai.admin.adminModal.assignLeave.AssignLeaveRequest;
 import app.xedigital.ai.admin.adminModal.department.DepartmentResponse;
+import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmployeeFaceAddResponse;
+import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmpolyeeFaceAddRequest;
+import app.xedigital.ai.admin.adminModal.employeeProfileImage.EmployeeProfileImageRequest;
 import app.xedigital.ai.admin.adminModal.leaveBalance.LeaveBalanceResponse;
 import app.xedigital.ai.admin.adminModal.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.admin.adminModal.partners.PartnersResponse;
@@ -139,6 +142,12 @@ public interface AdminAPIInterface {
 
     @POST("face/add")
     Call<AddFaceResponse> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("employees/face/add")
+    Call<EmployeeFaceAddResponse> addEmployeeFace(@Header("Authorization") String authToken, @Body EmpolyeeFaceAddRequest requestBody);
+
+    @PUT("employees/profile/image/{employeeId}")
+    Call<ResponseBody> addEmployeeProfileImage(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body EmployeeProfileImageRequest requestBody);
 
     @POST("images/add/bucket")
     Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body RequestBody requestBody);

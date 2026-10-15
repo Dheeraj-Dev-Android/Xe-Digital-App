@@ -39,17 +39,19 @@
             android:orientation="vertical"
             android:paddingHorizontal="6dp">
 
-            <!-- View More -->
+            <!-- View More Row (clickable) -->
             <LinearLayout
+                android:id="@+id/btnViewMore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/btnViewMore"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/circular_background"
@@ -69,17 +71,19 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Edit Employee -->
+            <!-- Edit Employee Row (clickable) -->
             <LinearLayout
+                android:id="@+id/empEditBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/empEditBtn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/circular_background"
@@ -98,17 +102,19 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Add Face -->
+            <!-- Add Face Row (clickable) -->
             <LinearLayout
+                android:id="@+id/empAddFace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/empAddFace"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/circular_background"
@@ -127,17 +133,19 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Add Leave -->
+            <!-- Add Leave Row (clickable) -->
             <LinearLayout
+                android:id="@+id/empAddLeave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/empAddLeave"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/circular_background"
@@ -156,17 +164,19 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Leave Details -->
+            <!-- Leave Details Row (clickable) -->
             <LinearLayout
+                android:id="@+id/empLeaveDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/empLeaveDetails"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/circular_background"

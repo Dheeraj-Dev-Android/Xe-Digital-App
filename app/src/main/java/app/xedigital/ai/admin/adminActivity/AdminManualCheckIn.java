@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -222,7 +223,12 @@ public class AdminManualCheckIn extends AppCompatActivity {
                 cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-                imageCapture = new ImageCapture.Builder().build();
+
+                // CHANGED: Set target resolution to 1280×720 (720p) for optimal face recognition
+                imageCapture = new ImageCapture.Builder()
+                        .setTargetResolution(new Size(1280, 720))
+                        .build();
+
                 CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
@@ -281,7 +287,8 @@ public class AdminManualCheckIn extends AppCompatActivity {
                         return;
                     }
 
-                    int newWidth = 500;
+                    // CHANGED: Resize width from 500 → 1280 (matches camera 720p output)
+                    int newWidth = 1280;
                     int newHeight = (int) (bitmap.get().getHeight() * (newWidth / (float) bitmap.get().getWidth()));
                     bitmap.set(Bitmap.createScaledBitmap(bitmap.get(), newWidth, newHeight, false));
 
@@ -520,7 +527,6 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess() && response.body().getData() != null && response.body().getData().getEmployees() != null) {
 
-                    // ✅ FIX 1: Move data loop entirely into the runOnUiThread UI-thread block to guard against background thread model leaks
                     runOnUiThread(() -> {
                         if (isFinishing() || isDestroyed()) return;
 
@@ -837,7 +843,8 @@ public class AdminManualCheckIn extends AppCompatActivity {
 
     private String convertImageToBase64(Bitmap bitmap) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            // CHANGED: JPEG quality from 100 → 92 (industry standard for face recognition)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 92, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             return Base64.encodeToString(byteArray, Base64.NO_WRAP);
         } catch (Throwable t) {

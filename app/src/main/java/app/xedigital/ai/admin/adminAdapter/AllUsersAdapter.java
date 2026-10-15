@@ -27,8 +27,7 @@ import app.xedigital.ai.admin.adminModal.AdminUsers.UsersItem;
 
 public class AllUsersAdapter extends RecyclerView.Adapter<AllUsersAdapter.UserViewHolder> {
 
-    private static final int[] AVATAR_COLORS = {
-            0xFF1E88E5, // Blue
+    private static final int[] AVATAR_COLORS = {0xFF1E88E5, // Blue
             0xFF43A047, // Green
             0xFFE53935, // Red
             0xFF8E24AA, // Purple
@@ -80,7 +79,7 @@ public class AllUsersAdapter extends RecyclerView.Adapter<AllUsersAdapter.UserVi
         if (parts.length == 1) {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
         }
-        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        return String.valueOf((parts[0].charAt(0) + parts[parts.length - 1].charAt(0)));
     }
 
     // Helper: Returns a consistent color from the palette based on the name's hash
@@ -134,24 +133,21 @@ public class AllUsersAdapter extends RecyclerView.Adapter<AllUsersAdapter.UserVi
             emailText.setText((email != null && !email.trim().isEmpty()) ? email : "N/A");
 
             // Safe Role Resolution
-            if (user.getRole() != null && user.getRole().getDisplayName() != null
-                    && !user.getRole().getDisplayName().trim().isEmpty()) {
+            if (user.getRole() != null && user.getRole().getDisplayName() != null && !user.getRole().getDisplayName().trim().isEmpty()) {
                 roleText.setText(user.getRole().getDisplayName());
             } else {
                 roleText.setText("N/A");
             }
 
             // Safe Company Resolution
-            if (user.getCompany() != null && user.getCompany().getName() != null
-                    && !user.getCompany().getName().trim().isEmpty()) {
+            if (user.getCompany() != null && user.getCompany().getName() != null && !user.getCompany().getName().trim().isEmpty()) {
                 companyText.setText(user.getCompany().getName());
             } else {
                 companyText.setText("N/A");
             }
 
             // Safe Branch Resolution
-            if (user.getBranch() != null && user.getBranch().getName() != null
-                    && !user.getBranch().getName().trim().isEmpty()) {
+            if (user.getBranch() != null && user.getBranch().getName() != null && !user.getBranch().getName().trim().isEmpty()) {
                 branchText.setText(user.getBranch().getName());
             } else {
                 branchText.setText("N/A");
