@@ -29,7 +29,7 @@ public class Employee implements Serializable {
     private boolean addpayroll;
 
     @SerializedName("totalMonthlySalary")
-    private int totalMonthlySalary;
+    private double totalMonthlySalary;
 
     @SerializedName("joiningDate")
     private String joiningDate;
@@ -41,7 +41,7 @@ public class Employee implements Serializable {
     private String createdAt;
 
     @SerializedName("ctc")
-    private int ctc;
+    private double ctc;
 
     @SerializedName("bu")
     private String bu;
@@ -167,7 +167,7 @@ public class Employee implements Serializable {
         return addpayroll;
     }
 
-    public int getTotalMonthlySalary() {
+    public double getTotalMonthlySalary() {
         return totalMonthlySalary;
     }
 
@@ -183,7 +183,7 @@ public class Employee implements Serializable {
         return createdAt;
     }
 
-    public int getCtc() {
+    public double getCtc() {
         return ctc;
     }
 

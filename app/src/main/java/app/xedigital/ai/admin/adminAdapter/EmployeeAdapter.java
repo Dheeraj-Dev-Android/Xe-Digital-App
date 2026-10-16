@@ -3,6 +3,7 @@ package app.xedigital.ai.admin.adminAdapter;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -37,6 +38,10 @@ import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeesItem;
 import app.xedigital.ai.admin.adminModal.EmployeeLeaves.EmployeeLeaveResponse;
 import app.xedigital.ai.admin.adminModal.EmployeeLeaves.LeavesItem;
 import app.xedigital.ai.admin.adminModal.assignLeave.AssignLeaveRequest;
+import app.xedigital.ai.admin.adminModal.empTimesheet.EmployeeDcrItem;
+import app.xedigital.ai.admin.adminModal.empTimesheet.EmployeeTimesheetResponse;
+import app.xedigital.ai.admin.adminModal.employeeAppliedLeave.AppliedLeavesItem;
+import app.xedigital.ai.admin.adminModal.employeeAppliedLeave.EmployeeAppliedLeaveResponse;
 import app.xedigital.ai.admin.adminModal.leaveBalance.LeaveBalanceResponse;
 import app.xedigital.ai.admin.adminModal.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.admin.adminModal.leaveType.LeavetypesItem;
@@ -148,6 +153,8 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
             View sheetEmpAddFace = sheetView.findViewById(R.id.empAddFace);
             View sheetEmpAddLeave = sheetView.findViewById(R.id.empAddLeave);
             View sheetEmpLeaveDetails = sheetView.findViewById(R.id.empLeaveDetails);
+            View sheetEmpAppliedLeave = sheetView.findViewById(R.id.empAppliedLeave);
+            View sheetEmpTimesheet = sheetView.findViewById(R.id.empTimesheet);
 
             // View More — shows employee details bottom sheet
             sheetBtnViewMore.setOnClickListener(btnView -> {
@@ -457,6 +464,22 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
                 showLeaveDetailsBottomSheet(employee, finalDisplayName);
             });
 
+            // View Applied Leave [NEW]
+            if (sheetEmpAppliedLeave != null) {
+                sheetEmpAppliedLeave.setOnClickListener(btnView -> {
+                    bottomSheet.dismiss();
+                    fetchAndShowAppliedLeaves(employee, finalDisplayName);
+                });
+            }
+
+            // View Timesheet [NEW]
+            if (sheetEmpTimesheet != null) {
+                sheetEmpTimesheet.setOnClickListener(btnView -> {
+                    bottomSheet.dismiss();
+                    fetchAndShowTimesheet(employee, finalDisplayName);
+                });
+            }
+
             bottomSheet.show();
         });
     }
@@ -742,6 +765,475 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
         sheet.show();
     }
+
+    // ========================= NEW: View Applied Leaves =========================
+
+    private void fetchAndShowAppliedLeaves(EmployeesItem employee, String displayName) {
+        if (employee == null || employee.getId() == null || employee.getId().trim().isEmpty()) {
+            new CustomAlertDialog(context)
+                    .setType(CustomAlertDialog.Type.ERROR)
+                    .setTitle("Error")
+                    .setMessage("Employee ID is missing.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+        String token = prefManager.getString("authToken", "");
+
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        Call<EmployeeAppliedLeaveResponse> call = apiService.getLeavesApplied("jwt " + token, employee.getId());
+
+        call.enqueue(new Callback<EmployeeAppliedLeaveResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EmployeeAppliedLeaveResponse> call, @NonNull Response<EmployeeAppliedLeaveResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<AppliedLeavesItem> appliedLeaves = null;
+                    if (response.body().getData() != null) {
+                        appliedLeaves = response.body().getData().getAppliedLeaves();
+                    }
+                    renderAppliedLeavesSheet(employee, displayName, appliedLeaves);
+                } else {
+                    new CustomAlertDialog(context)
+                            .setType(CustomAlertDialog.Type.ERROR)
+                            .setTitle("Error")
+                            .setMessage("Failed to load applied leaves. Server returned code: " + response.code())
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EmployeeAppliedLeaveResponse> call, @NonNull Throwable t) {
+                new CustomAlertDialog(context)
+                        .setType(CustomAlertDialog.Type.ERROR)
+                        .setTitle("Network Error")
+                        .setMessage("Could not load applied leaves: " + t.getMessage())
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
+        });
+    }
+
+    private void renderAppliedLeavesSheet(EmployeesItem employee, String displayName, List<AppliedLeavesItem> appliedLeaves) {
+        BottomSheetDialog sheet = new BottomSheetDialog(context);
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_applied_leave, null);
+        sheet.setContentView(sheetView);
+
+        MaterialTextView tvEmpName = sheetView.findViewById(R.id.appliedLeaveEmployeeName);
+        MaterialTextView tvEmpCodeBadge = sheetView.findViewById(R.id.appliedLeaveEmployeeCodeBadge);
+        View emptyView = sheetView.findViewById(R.id.appliedLeaveEmptyView);
+        ViewGroup container = sheetView.findViewById(R.id.appliedLeaveContainer);
+
+        tvEmpName.setText(displayName != null && !displayName.trim().isEmpty() ? displayName : "N/A");
+        String empCode = (employee != null) ? employee.getEmployeeCode() : null;
+        tvEmpCodeBadge.setText((empCode != null && !empCode.trim().isEmpty()) ? empCode : "N/A");
+
+        if (appliedLeaves == null || appliedLeaves.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+            container.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            container.setVisibility(View.VISIBLE);
+            container.removeAllViews();
+
+            LayoutInflater inflater = LayoutInflater.from(context);
+            for (AppliedLeavesItem item : appliedLeaves) {
+                if (item == null) continue;
+
+                View card = inflater.inflate(R.layout.item_applied_leave_card, container, false);
+
+                View accentStrip = card.findViewById(R.id.appliedLeaveAccentStrip);
+                MaterialTextView tvLeaveType = card.findViewById(R.id.appliedLeaveTypeName);
+                MaterialTextView tvStatus = card.findViewById(R.id.appliedLeaveStatusBadge);
+                MaterialTextView tvPlanned = card.findViewById(R.id.appliedLeavePlannedBadge);
+                MaterialTextView tvFromDate = card.findViewById(R.id.appliedLeaveFromDate);
+                MaterialTextView tvToDate = card.findViewById(R.id.appliedLeaveToDate);
+                View shortLeaveSection = card.findViewById(R.id.appliedLeaveShortLeaveSection);
+                MaterialTextView tvShortStart = card.findViewById(R.id.appliedLeaveShortStart);
+                MaterialTextView tvShortEnd = card.findViewById(R.id.appliedLeaveShortEnd);
+                View reasonSection = card.findViewById(R.id.appliedLeaveReasonSection);
+                MaterialTextView tvReason = card.findViewById(R.id.appliedLeaveReason);
+                MaterialTextView tvAppliedDate = card.findViewById(R.id.appliedLeaveAppliedDate);
+                MaterialTextView tvReportingMgr = card.findViewById(R.id.appliedLeaveReportingManager);
+                MaterialTextView tvCrossMgr = card.findViewById(R.id.appliedLeaveCrossManager);
+                View approvalSection = card.findViewById(R.id.appliedLeaveApprovalSection);
+                MaterialTextView tvApprovedBy = card.findViewById(R.id.appliedLeaveApprovedBy);
+                MaterialTextView tvApprovedDate = card.findViewById(R.id.appliedLeaveApprovedDate);
+                View commentSection = card.findViewById(R.id.appliedLeaveCommentSection);
+                MaterialTextView tvComment = card.findViewById(R.id.appliedLeaveComment);
+
+                // Leave type name
+                String leaveName = item.getLeaveName();
+                if (leaveName == null || leaveName.trim().isEmpty()) {
+                    if (item.getLeavetype() != null && item.getLeavetype().getLeavetypeName() != null
+                            && !item.getLeavetype().getLeavetypeName().trim().isEmpty()) {
+                        leaveName = item.getLeavetype().getLeavetypeName().trim();
+                    } else {
+                        leaveName = "N/A";
+                    }
+                }
+                tvLeaveType.setText(leaveName);
+
+                // Status badge
+                String status = item.getStatus();
+                if (status == null || status.trim().isEmpty()) {
+                    status = "Pending";
+                }
+                tvStatus.setText(capitalizeFirst(status));
+                int statusColor = getStatusColor(status);
+                accentStrip.setBackgroundColor(statusColor);
+                if (tvStatus.getBackground() instanceof GradientDrawable) {
+                    ((GradientDrawable) tvStatus.getBackground().mutate()).setColor(statusColor);
+                } else {
+                    GradientDrawable bg = new GradientDrawable();
+                    bg.setShape(GradientDrawable.RECTANGLE);
+                    bg.setCornerRadius(dpToPx(12));
+                    bg.setColor(statusColor);
+                    tvStatus.setBackground(bg);
+                }
+
+                // Planned badge
+                String planned = item.getLeavePlanned();
+                if (planned != null && !planned.trim().isEmpty()) {
+                    tvPlanned.setVisibility(View.VISIBLE);
+                    tvPlanned.setText(planned.trim().toUpperCase());
+                } else {
+                    tvPlanned.setVisibility(View.GONE);
+                }
+
+                // From date
+                tvFromDate.setText(safeDate(item.getFromDate()));
+
+                // To date (may be Object or null)
+                String toDateStr = null;
+                Object toDateObj = item.getToDate();
+                if (toDateObj instanceof String) {
+                    toDateStr = (String) toDateObj;
+                }
+                if (toDateStr != null && !toDateStr.trim().isEmpty()) {
+                    tvToDate.setText(safeDate(toDateStr));
+                } else {
+                    tvToDate.setText(safeDate(item.getFromDate()));
+                }
+
+                // Short leave times
+                String shortStart = item.getShortLeaveStartTime();
+                String shortEnd = item.getShortLeaveEndTime();
+                boolean hasShortTimes = (shortStart != null && !shortStart.trim().isEmpty())
+                        || (shortEnd != null && !shortEnd.trim().isEmpty());
+                if (hasShortTimes) {
+                    shortLeaveSection.setVisibility(View.VISIBLE);
+                    tvShortStart.setText((shortStart != null && !shortStart.trim().isEmpty()) ? shortStart.trim() : "N/A");
+                    tvShortEnd.setText((shortEnd != null && !shortEnd.trim().isEmpty()) ? shortEnd.trim() : "N/A");
+                } else {
+                    shortLeaveSection.setVisibility(View.GONE);
+                }
+
+                // Reason
+                String reason = item.getReason();
+                if (reason != null && !reason.trim().isEmpty()) {
+                    reasonSection.setVisibility(View.VISIBLE);
+                    tvReason.setText(reason.trim());
+                } else {
+                    reasonSection.setVisibility(View.GONE);
+                }
+
+                // Applied date
+                tvAppliedDate.setText(safeDateTime(item.getAppliedDate()));
+
+                // Reporting manager
+                String rName = item.getReportingManagerName();
+                String rLast = item.getReportingManagerLastName();
+                StringBuilder rb = new StringBuilder();
+                if (rName != null && !rName.trim().isEmpty()) rb.append(rName.trim());
+                if (rLast != null && !rLast.trim().isEmpty()) {
+                    if (rb.length() > 0) rb.append(" ");
+                    rb.append(rLast.trim());
+                }
+                tvReportingMgr.setText(rb.length() > 0 ? rb.toString() : "N/A");
+
+                // Cross manager
+                String cName = item.getCrossManagerName();
+                tvCrossMgr.setText((cName != null && !cName.trim().isEmpty()) ? cName.trim() : "N/A");
+
+                // Approval section
+                String approvedBy = item.getApprovedByName();
+                String approvedDateRaw = item.getApprovedDate();
+                boolean validApprovedDate = approvedDateRaw != null
+                        && !approvedDateRaw.trim().isEmpty()
+                        && !approvedDateRaw.startsWith("1900");
+                boolean hasApprover = approvedBy != null && !approvedBy.trim().isEmpty();
+
+                if (hasApprover || validApprovedDate) {
+                    approvalSection.setVisibility(View.VISIBLE);
+                    tvApprovedBy.setText(hasApprover ? approvedBy.trim() : "N/A");
+                    tvApprovedDate.setText(validApprovedDate ? safeDate(approvedDateRaw) : "N/A");
+
+                    String comment = item.getComment();
+                    if (comment != null && !comment.trim().isEmpty()) {
+                        commentSection.setVisibility(View.VISIBLE);
+                        tvComment.setText(comment.trim());
+                    } else {
+                        commentSection.setVisibility(View.GONE);
+                    }
+                } else {
+                    approvalSection.setVisibility(View.GONE);
+                }
+
+                container.addView(card);
+            }
+        }
+
+        sheet.show();
+    }
+
+    // ========================= NEW: View Timesheet =========================
+
+    private void fetchAndShowTimesheet(EmployeesItem employee, String displayName) {
+        if (employee == null || employee.getId() == null || employee.getId().trim().isEmpty()) {
+            new CustomAlertDialog(context)
+                    .setType(CustomAlertDialog.Type.ERROR)
+                    .setTitle("Error")
+                    .setMessage("Employee ID is missing.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
+        String token = prefManager.getString("authToken", "");
+
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+        Call<EmployeeTimesheetResponse> call = apiService.getTimesheetData("jwt " + token, employee.getId());
+
+        call.enqueue(new Callback<EmployeeTimesheetResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EmployeeTimesheetResponse> call, @NonNull Response<EmployeeTimesheetResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<EmployeeDcrItem> dcrList = null;
+                    if (response.body().getData() != null) {
+                        dcrList = response.body().getData().getEmployeeDcr();
+                    }
+                    renderTimesheetSheet(employee, displayName, dcrList);
+                } else {
+                    new CustomAlertDialog(context)
+                            .setType(CustomAlertDialog.Type.ERROR)
+                            .setTitle("Error")
+                            .setMessage("Failed to load timesheet. Server returned code: " + response.code())
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EmployeeTimesheetResponse> call, @NonNull Throwable t) {
+                new CustomAlertDialog(context)
+                        .setType(CustomAlertDialog.Type.ERROR)
+                        .setTitle("Network Error")
+                        .setMessage("Could not load timesheet: " + t.getMessage())
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
+        });
+    }
+
+    private void renderTimesheetSheet(EmployeesItem employee, String displayName, List<EmployeeDcrItem> dcrList) {
+        BottomSheetDialog sheet = new BottomSheetDialog(context);
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_timesheet, null);
+        sheet.setContentView(sheetView);
+
+        MaterialTextView tvEmpName = sheetView.findViewById(R.id.timesheetEmployeeName);
+        MaterialTextView tvEmpCodeBadge = sheetView.findViewById(R.id.timesheetEmployeeCodeBadge);
+        View emptyView = sheetView.findViewById(R.id.timesheetEmptyView);
+        ViewGroup container = sheetView.findViewById(R.id.timesheetContainer);
+
+        tvEmpName.setText(displayName != null && !displayName.trim().isEmpty() ? displayName : "N/A");
+        String empCode = (employee != null) ? employee.getEmployeeCode() : null;
+        tvEmpCodeBadge.setText((empCode != null && !empCode.trim().isEmpty()) ? empCode : "N/A");
+
+        if (dcrList == null || dcrList.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+            container.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            container.setVisibility(View.VISIBLE);
+            container.removeAllViews();
+
+            LayoutInflater inflater = LayoutInflater.from(context);
+            for (EmployeeDcrItem item : dcrList) {
+                if (item == null) continue;
+
+                View card = inflater.inflate(R.layout.item_timesheet_card, container, false);
+
+                MaterialTextView tvDate = card.findViewById(R.id.timesheetDate);
+                MaterialTextView tvDurationBadge = card.findViewById(R.id.timesheetDurationBadge);
+                MaterialTextView tvInTime = card.findViewById(R.id.timesheetInTime);
+                MaterialTextView tvOutTime = card.findViewById(R.id.timesheetOutTime);
+                View reportSection = card.findViewById(R.id.timesheetReportSection);
+                MaterialTextView tvTodayReport = card.findViewById(R.id.timesheetTodayReport);
+                View outcomeSection = card.findViewById(R.id.timesheetOutcomeSection);
+                MaterialTextView tvOutcome = card.findViewById(R.id.timesheetOutcome);
+                View feelingSection = card.findViewById(R.id.timesheetFeelingSection);
+                MaterialTextView tvFeeling = card.findViewById(R.id.timesheetFeeling);
+                View planSection = card.findViewById(R.id.timesheetPlanSection);
+                MaterialTextView tvPlan = card.findViewById(R.id.timesheetTomorrowPlan);
+                MaterialTextView tvReportingMgr = card.findViewById(R.id.timesheetReportingManager);
+
+                // DCR date
+                tvDate.setText(safeDate(item.getDcrDate()));
+
+                // In/Out time (ISO datetime -> extract time)
+                String inRaw = item.getInTime();
+                String outRaw = item.getOutTime();
+                String inTimeStr = extractTimeSafe(inRaw);
+                String outTimeStr = extractTimeSafe(outRaw);
+                tvInTime.setText(inTimeStr);
+                tvOutTime.setText(outTimeStr);
+
+                // Duration badge (best-effort; if both are present and parseable)
+                String duration = computeDuration(inRaw, outRaw);
+                if (duration != null && !duration.isEmpty()) {
+                    tvDurationBadge.setVisibility(View.VISIBLE);
+                    tvDurationBadge.setText(duration);
+                } else {
+                    tvDurationBadge.setVisibility(View.GONE);
+                }
+
+                // Today's report (may contain HTML)
+                String todayReport = item.getTodayReport();
+                if (todayReport != null && !todayReport.trim().isEmpty()) {
+                    reportSection.setVisibility(View.VISIBLE);
+                    tvTodayReport.setText(safeHtml(todayReport));
+                } else {
+                    reportSection.setVisibility(View.GONE);
+                }
+
+                // Outcome (may contain HTML)
+                String outcome = item.getOutcome();
+                if (outcome != null && !outcome.trim().isEmpty()) {
+                    outcomeSection.setVisibility(View.VISIBLE);
+                    tvOutcome.setText(safeHtml(outcome));
+                } else {
+                    outcomeSection.setVisibility(View.GONE);
+                }
+
+                // Today's feeling
+                String feeling = item.getTodayFeeling();
+                if (feeling != null && !feeling.trim().isEmpty()) {
+                    feelingSection.setVisibility(View.VISIBLE);
+                    tvFeeling.setText(safeHtml(feeling));
+                } else {
+                    feelingSection.setVisibility(View.GONE);
+                }
+
+                // Tomorrow's plan (may contain HTML)
+                String plan = item.getTommarowPlan();
+                if (plan != null && !plan.trim().isEmpty()) {
+                    planSection.setVisibility(View.VISIBLE);
+                    tvPlan.setText(safeHtml(plan));
+                } else {
+                    planSection.setVisibility(View.GONE);
+                }
+
+                // Reporting manager
+                String rFirst = item.getReportingManagerFirstName();
+                String rLast = item.getReportingManagerLastName();
+                StringBuilder rb = new StringBuilder();
+                if (rFirst != null && !rFirst.trim().isEmpty() && !"NA".equalsIgnoreCase(rFirst.trim())) {
+                    rb.append(rFirst.trim());
+                }
+                if (rLast != null && !rLast.trim().isEmpty() && !"NA".equalsIgnoreCase(rLast.trim())) {
+                    if (rb.length() > 0) rb.append(" ");
+                    rb.append(rLast.trim());
+                }
+                tvReportingMgr.setText(rb.length() > 0 ? rb.toString() : "N/A");
+
+                container.addView(card);
+            }
+        }
+
+        sheet.show();
+    }
+
+    // ========================= Helpers (new) =========================
+
+    private int getStatusColor(String status) {
+        int colorRes;
+        if (status == null) {
+            colorRes = R.color.default_status_color;
+        } else {
+            String s = status.trim().toLowerCase();
+            if (s.equals("approved")) {
+                colorRes = R.color.status_approved;
+            } else if (s.equals("rejected")) {
+                colorRes = R.color.status_rejected;
+            } else if (s.equals("cancelled") || s.equals("canceled")) {
+                colorRes = R.color.default_status_color;
+            } else if (s.equals("unapproved") || s.equals("pending")) {
+                colorRes = R.color.status_pending;
+            } else {
+                colorRes = R.color.default_status_color;
+            }
+        }
+        return androidx.core.content.ContextCompat.getColor(context, colorRes);
+    }
+
+    private CharSequence safeHtml(String html) {
+        if (html == null) return "";
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                return Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT).toString().trim();
+            } else {
+                return Html.fromHtml(html).toString().trim();
+            }
+        } catch (Exception e) {
+            return html;
+        }
+    }
+
+    private String extractTimeSafe(String isoString) {
+        if (isoString == null || isoString.trim().isEmpty()) return "N/A";
+        try {
+            String t = DateTimeUtils.extractTime(isoString.trim());
+            if (t == null || t.trim().isEmpty()) return "N/A";
+            return t;
+        } catch (Exception e) {
+            return "N/A";
+        }
+    }
+
+    private String computeDuration(String inIso, String outIso) {
+        if (inIso == null || outIso == null) return null;
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US);
+            sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            java.util.Date inDate = sdf.parse(inIso);
+            java.util.Date outDate = sdf.parse(outIso);
+            if (inDate == null || outDate == null) return null;
+            long diffMs = outDate.getTime() - inDate.getTime();
+            if (diffMs <= 0) return null;
+            long totalMinutes = diffMs / (60 * 1000);
+            long hours = totalMinutes / 60;
+            long mins = totalMinutes % 60;
+            return hours + "h " + String.format(java.util.Locale.US, "%02d", mins) + "m";
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String capitalizeFirst(String s) {
+        if (s == null || s.trim().isEmpty()) return "";
+        String t = s.trim();
+        return Character.toUpperCase(t.charAt(0)) + t.substring(1).toLowerCase();
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
+    // ========================= Existing helpers (unchanged) =========================
 
     private int getLeaveTypeColor(String leaveTypeName) {
         if (leaveTypeName == null) {

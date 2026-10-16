@@ -18,6 +18,8 @@ import app.xedigital.ai.admin.adminModal.addFace.AddFaceResponse;
 import app.xedigital.ai.admin.adminModal.assignLeave.AssignLeaveRequest;
 import app.xedigital.ai.admin.adminModal.businessUnit.AllBuResponse;
 import app.xedigital.ai.admin.adminModal.department.DepartmentResponse;
+import app.xedigital.ai.admin.adminModal.empTimesheet.EmployeeTimesheetResponse;
+import app.xedigital.ai.admin.adminModal.employeeAppliedLeave.EmployeeAppliedLeaveResponse;
 import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmployeeFaceAddResponse;
 import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmpolyeeFaceAddRequest;
 import app.xedigital.ai.admin.adminModal.employeeProfileImage.EmployeeProfileImageRequest;
@@ -122,6 +124,14 @@ public interface AdminAPIInterface {
     @GET("leaves/employee/{employeeId}")
     Call<EmployeeLeaveResponse> getLeavesEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
+    //    https://app.xedigital.ai/api/v1/leaves/applied/638da3b5be7db33ba2934d34
+    @GET("leaves/applied/{employeeId}")
+    Call<EmployeeAppliedLeaveResponse> getLeavesApplied(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+
+    //    https://app.xedigital.ai/api/v1/employees/dcrData
+//    https://app.xedigital.ai/api/v1/employees/dcrList/685ce653877f7453b52fbc5c
+    @GET("employees/dcrList/{employeeId}")
+    Call<EmployeeTimesheetResponse> getTimesheetData(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
     //    POST APIs
     @POST("face/recognize")

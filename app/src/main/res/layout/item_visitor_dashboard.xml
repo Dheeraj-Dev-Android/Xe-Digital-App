@@ -31,8 +31,8 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Visitor Name"
-                android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -50,7 +50,7 @@
 
         </RelativeLayout>
 
-        <!-- Divider Line (Optional visual separation, can be removed) -->
+        <!-- Divider Line -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -93,7 +93,7 @@
                         android:src="@mipmap/ic_default_profile"
                         app:shapeAppearanceOverlay="@style/CircleImageView" />
 
-                    <!-- NEW ADDITION: Circle text initials fallback (hidden by default) -->
+                    <!-- Circle text initials fallback (hidden by default) -->
                     <TextView
                         android:id="@+id/tvProfileInitials"
                         android:layout_width="65dp"
@@ -134,7 +134,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Check-in"
-                            android:textColor="?android:attr/textColorSecondary"
+                            android:textColor="@color/secondary_text"
                             android:textSize="11sp" />
 
                         <TextView
@@ -157,7 +157,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Check-out"
-                            android:textColor="?android:attr/textColorSecondary"
+                            android:textColor="@color/secondary_text"
                             android:textSize="11sp" />
 
                         <TextView
@@ -178,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Meeting Host"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="@color/secondary_text"
                     android:textSize="11sp" />
 
                 <TextView
@@ -196,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Meeting Status"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="@color/secondary_text"
                     android:textSize="11sp" />
 
                 <TextView
@@ -205,7 +205,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
                     android:text="--"
-                    android:textColor="?attr/colorError"
+                    android:textColor="@color/error_color"
                     android:textSize="13sp"
                     android:textStyle="italic" />
 

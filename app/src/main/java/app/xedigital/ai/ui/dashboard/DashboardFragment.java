@@ -339,89 +339,105 @@ public class DashboardFragment extends Fragment {
                 binding.tvEmployeeEmailValue.setText("N/A");
                 binding.ivEmployeeProfile.setImageResource(R.drawable.ic_profile_placeholder);
             }
+
+            if (employeeCardShimmer != null) {
+                employeeCardShimmer.stopShimmer();
+                employeeCardShimmer.setVisibility(View.GONE);
+            }
+            if (employeeCard != null) employeeCard.setVisibility(View.VISIBLE);
+
             isProfileDataLoaded = true;
             checkAllDataLoaded();
         });
 
+        // ── FIX: try-finally guarantees shimmer always hides and punch card always shows ──
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceResponse -> {
-            if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
-                new Thread(() -> {
-                    // Thread-safe instance for background thread
-                    SimpleDateFormat threadLocalDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    String currentDate = threadLocalDateFormat.format(new Date());
+            try {
+                if (attendanceResponse == null) {
+                    resetPunchUI();
+                    return;
+                }
+                if (attendanceResponse.getData() != null && attendanceResponse.getData().getEmployeePunchData() != null) {
+                    new Thread(() -> {
+                        SimpleDateFormat threadLocalDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                        String currentDate = threadLocalDateFormat.format(new Date());
 
-                    List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
-                        try {
-                            if (punchData.getPunchDateFormat() == null) return false;
-                            Date punchDate = threadLocalDateFormat.parse(punchData.getPunchDateFormat());
-                            String formattedPunchDate = threadLocalDateFormat.format(punchDate);
-                            return formattedPunchDate.equals(currentDate);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                            return false;
-                        }
-                    }).collect(Collectors.toList());
+                        List<EmployeePunchDataItem> currentPunchData = attendanceResponse.getData().getEmployeePunchData().stream().filter(punchData -> {
+                            try {
+                                if (punchData.getPunchDateFormat() == null) return false;
+                                Date punchDate = threadLocalDateFormat.parse(punchData.getPunchDateFormat());
+                                String formattedPunchDate = threadLocalDateFormat.format(punchDate);
+                                return formattedPunchDate.equals(currentDate);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                return false;
+                            }
+                        }).collect(Collectors.toList());
 
-                    requireActivity().runOnUiThread(() -> {
-                        if (binding != null) {
-                            boolean isDataAvailable = !currentPunchData.isEmpty();
-                            boolean isToday = false;
+                        requireActivity().runOnUiThread(() -> {
+                            if (binding != null) {
+                                boolean isDataAvailable = !currentPunchData.isEmpty();
+                                boolean isToday = false;
 
-                            if (isDataAvailable) {
-                                String punchDateStr = currentPunchData.get(0).getPunchDateFormat();
+                                if (isDataAvailable) {
+                                    String punchDateStr = currentPunchData.get(0).getPunchDateFormat();
 
-                                if (punchDateStr != null && !punchDateStr.trim().isEmpty()) {
-                                    try {
-                                        LocalDate localPunchDate = LocalDate.parse(punchDateStr);
-                                        LocalDate today = LocalDate.now();
-                                        isToday = localPunchDate.equals(today);
-                                    } catch (DateTimeParseException e) {
-                                        e.printStackTrace();
-                                        isToday = false;
+                                    if (punchDateStr != null && !punchDateStr.trim().isEmpty()) {
+                                        try {
+                                            LocalDate localPunchDate = LocalDate.parse(punchDateStr);
+                                            LocalDate today = LocalDate.now();
+                                            isToday = localPunchDate.equals(today);
+                                        } catch (DateTimeParseException e) {
+                                            e.printStackTrace();
+                                            isToday = false;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (isDataAvailable && isToday) {
-                                String rawPunchIn = currentPunchData.get(0).getPunchIn();
-                                String rawPunchOut = currentPunchData.get(0).getPunchOut();
+                                if (isDataAvailable && isToday) {
+                                    String rawPunchIn = currentPunchData.get(0).getPunchIn();
+                                    String rawPunchOut = currentPunchData.get(0).getPunchOut();
 
-                                punchIn = DateTimeUtils.formatTime(rawPunchIn);
-                                punchOut = DateTimeUtils.formatTime(rawPunchOut);
+                                    punchIn = DateTimeUtils.formatTime(rawPunchIn);
+                                    punchOut = DateTimeUtils.formatTime(rawPunchOut);
 
-                                binding.tvPunchInTimeValue.setText(punchIn != null && !punchIn.isEmpty() ? punchIn : "--:--");
-                                binding.tvPunchOutTimeValue.setText(punchOut != null && !punchOut.isEmpty() ? punchOut : "--:--");
+                                    binding.tvPunchInTimeValue.setText(punchIn != null && !punchIn.isEmpty() ? punchIn : "--:--");
+                                    binding.tvPunchOutTimeValue.setText(punchOut != null && !punchOut.isEmpty() ? punchOut : "--:--");
 
-                                // Thorough check to ensure user actually punched in today
-                                boolean isValidPunchIn = rawPunchIn != null && !rawPunchIn.trim().isEmpty() && !rawPunchIn.equalsIgnoreCase("null") && !rawPunchIn.equals("-") && !rawPunchIn.startsWith("00:00") && punchIn != null && !punchIn.trim().isEmpty() && !punchIn.equals("-");
+                                    boolean isValidPunchIn = rawPunchIn != null && !rawPunchIn.trim().isEmpty() && !rawPunchIn.equalsIgnoreCase("null") && !rawPunchIn.equals("-") && !rawPunchIn.startsWith("00:00") && punchIn != null && !punchIn.trim().isEmpty() && !punchIn.equals("-");
 
-                                if (isValidPunchIn) {
-                                    binding.tvPunchStatusValue.setText("Punched In");
-                                    binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
+                                    if (isValidPunchIn) {
+                                        binding.tvPunchStatusValue.setText("Punched In");
+                                        binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
-                                    binding.tvPunchButtonLabel.setText("Punch Out");
-                                    binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color.rejected_color, requireContext().getTheme()));
+                                        binding.tvPunchButtonLabel.setText("Punch Out");
+                                        binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color.rejected_color, requireContext().getTheme()));
+                                    } else {
+                                        resetPunchUI();
+                                    }
                                 } else {
                                     resetPunchUI();
                                 }
-                            } else {
-                                resetPunchUI();
                             }
-                        }
-                    });
-                }).start();
-            } else {
-                if (binding != null) {
-                    resetPunchUI();
-                    punchCardView.setVisibility(View.VISIBLE);
+                        });
+                    }).start();
                 } else {
-                    Toast.makeText(requireContext(), "No attendance data available", Toast.LENGTH_SHORT).show();
+                    if (binding != null) {
+                        resetPunchUI();
+                    } else {
+                        Toast.makeText(requireContext(), "No attendance data available", Toast.LENGTH_SHORT).show();
+                    }
                 }
+            } finally {
+                // GUARANTEE: shimmer always hides, punch card always shows, flag always set
+                if (punchCardView != null) punchCardView.setVisibility(View.VISIBLE);
+                if (punchCardShimmer != null) {
+                    punchCardShimmer.stopShimmer();
+                    punchCardShimmer.setVisibility(View.GONE);
+                }
+                isAttendanceDataLoaded = true;
+                checkAllDataLoaded();
             }
-            punchCardShimmer.stopShimmer();
-            punchCardShimmer.setVisibility(View.GONE);
-            isAttendanceDataLoaded = true;
-            checkAllDataLoaded();
         });
 
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
@@ -430,6 +446,8 @@ public class DashboardFragment extends Fragment {
                 if (leaves == null || leaves.isEmpty()) {
                     Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
                 } else {
+                    if (leavePieChartContainer != null)
+                        leavePieChartContainer.setVisibility(View.VISIBLE);
                     binding.leavePieChart.setVisibility(View.VISIBLE);
                     updatePieChartData(binding.leavePieChart, leaves);
                 }
@@ -437,11 +455,14 @@ public class DashboardFragment extends Fragment {
                 Toast.makeText(requireContext(), "No leaves data available", Toast.LENGTH_SHORT).show();
             }
 
+            if (leavePieChartShimmer != null) {
+                leavePieChartShimmer.stopShimmer();
+                leavePieChartShimmer.setVisibility(View.GONE);
+            }
+            if (leavePieChartContainer != null) leavePieChartContainer.setVisibility(View.VISIBLE);
+
             isLeavesDataLoaded = true;
             checkAllDataLoaded();
-            employeeCardShimmer.stopShimmer();
-            employeeCardShimmer.setVisibility(View.GONE);
-            employeeCard.setVisibility(View.VISIBLE);
         });
 
         viewModal.getEmployeeBirthdayData().observe(getViewLifecycleOwner(), response -> {
@@ -469,19 +490,19 @@ public class DashboardFragment extends Fragment {
         if (hour >= 4 && hour < 12) {
             greeting = "Good Morning!";
             iconRes = R.drawable.ic_greeting_morning;
-            tintColor = Color.parseColor("#FFB74D"); // warm amber sunrise
+            tintColor = Color.parseColor("#FFB74D");
         } else if (hour >= 12 && hour < 17) {
             greeting = "Good Afternoon!";
             iconRes = R.drawable.ic_greeting_afternoon;
-            tintColor = Color.parseColor("#FFD54F"); // bright sun yellow
+            tintColor = Color.parseColor("#FFD54F");
         } else if (hour >= 17 && hour < 22) {
             greeting = "Good Evening!";
             iconRes = R.drawable.ic_greeting_evening;
-            tintColor = Color.parseColor("#FF8A65"); // sunset orange
+            tintColor = Color.parseColor("#FF8A65");
         } else {
             greeting = "Good Night!";
             iconRes = R.drawable.ic_greeting_night;
-            tintColor = Color.parseColor("#9FA8DA"); // soft indigo moonlight
+            tintColor = Color.parseColor("#9FA8DA");
         }
 
         binding.tvGreeting.setText(greeting);
@@ -492,19 +513,15 @@ public class DashboardFragment extends Fragment {
     private void resetPunchUI() {
         if (binding == null) return;
 
-        // Reset Times
         binding.tvPunchInTimeValue.setText("--:--");
         binding.tvPunchOutTimeValue.setText("--:--");
 
-        // Reset Status Value
         binding.tvPunchStatusValue.setText("Not Punched Yet");
         binding.tvPunchStatusValue.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
-        // Reset Button Label & Text Color
         binding.tvPunchButtonLabel.setText("Punch In");
         binding.tvPunchButtonLabel.setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
 
-        // Reset Card Background
         binding.punchButton.setCardBackgroundColor(getResources().getColor(R.color._0000, requireContext().getTheme()));
     }
 
@@ -517,7 +534,6 @@ public class DashboardFragment extends Fragment {
 
     private void checkAllDataLoaded() {
         if (isProfileDataLoaded && isAttendanceDataLoaded && isLeavesDataLoaded) {
-            stopShimmerAnimations();
             hideLoaderWithBlur();
         }
     }
@@ -543,27 +559,24 @@ public class DashboardFragment extends Fragment {
         punchCardView.setVisibility(View.GONE);
         employeeCard.setVisibility(View.GONE);
         leavePieChartContainer.setVisibility(View.GONE);
-
-        binding.quickActionsShimmer.setVisibility(View.VISIBLE);
-        binding.quickActionsShimmer.startShimmer();
     }
 
     private void stopShimmerAnimations() {
-        punchCardShimmer.stopShimmer();
-        punchCardShimmer.setVisibility(View.GONE);
-
-        employeeCardShimmer.stopShimmer();
-        employeeCardShimmer.setVisibility(View.GONE);
-
-        leavePieChartShimmer.stopShimmer();
-        leavePieChartShimmer.setVisibility(View.GONE);
-
-        punchCardView.setVisibility(View.VISIBLE);
-        employeeCard.setVisibility(View.VISIBLE);
-        leavePieChartContainer.setVisibility(View.VISIBLE);
-
-        binding.quickActionsShimmer.stopShimmer();
-        binding.quickActionsShimmer.setVisibility(View.GONE);
+        if (punchCardShimmer != null) {
+            punchCardShimmer.stopShimmer();
+            punchCardShimmer.setVisibility(View.GONE);
+        }
+        if (employeeCardShimmer != null) {
+            employeeCardShimmer.stopShimmer();
+            employeeCardShimmer.setVisibility(View.GONE);
+        }
+        if (leavePieChartShimmer != null) {
+            leavePieChartShimmer.stopShimmer();
+            leavePieChartShimmer.setVisibility(View.GONE);
+        }
+        if (punchCardView != null) punchCardView.setVisibility(View.VISIBLE);
+        if (employeeCard != null) employeeCard.setVisibility(View.VISIBLE);
+        if (leavePieChartContainer != null) leavePieChartContainer.setVisibility(View.VISIBLE);
     }
 
     private void initializeViews(View root) {

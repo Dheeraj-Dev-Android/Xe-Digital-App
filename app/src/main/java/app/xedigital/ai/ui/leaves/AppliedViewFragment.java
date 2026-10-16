@@ -1,6 +1,7 @@
 package app.xedigital.ai.ui.leaves;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +22,14 @@ import app.xedigital.ai.model.appliedLeaves.AppliedLeavesItem;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class AppliedViewFragment extends Fragment {
+
     public static final String ARG_APPLIED_LEAVE = "applied_leave_item";
+    private static final String TAG = "AppliedViewFragment";
+
     private AppliedLeavesItem appliedLeaveItem;
     private AppliedLeaveItemBinding binding;
 
     public AppliedViewFragment() {
-
     }
 
     @Override
@@ -62,7 +65,7 @@ public class AppliedViewFragment extends Fragment {
             binding.endDateTextView.setText(formatDateOrNA(appliedLeaveItem.getToDate()));
             binding.approvedDateTextView.setText(formatDateOrNA(appliedLeaveItem.getApprovedDate()));
 
-            // Total days with null check
+            // Total days with null + empty + format safety
             int totalDays = getTotalDays(appliedLeaveItem);
             binding.totalDaysTextView.setText(totalDays > 0 ? totalDays + " Days" : "N/A");
 
@@ -98,15 +101,49 @@ public class AppliedViewFragment extends Fragment {
         return (formatted != null && !formatted.trim().isEmpty()) ? formatted : "N/A";
     }
 
+    /**
+     * Extracts just the "yyyy-MM-dd" portion from a date string.
+     * Handles both plain dates ("2024-10-16") and ISO timestamps ("2024-10-16T00:00:00.000Z").
+     * Returns null if the input is null, empty, or unparseable.
+     */
+    private String extractDatePortion(String dateStr) {
+        if (dateStr == null) return null;
+        String trimmed = dateStr.trim();
+        if (trimmed.isEmpty()) return null;
+
+        // If ISO format like "2024-10-16T00:00:00.000Z", extract just "2024-10-16"
+        int tIndex = trimmed.indexOf('T');
+        if (tIndex > 0) {
+            trimmed = trimmed.substring(0, tIndex);
+        }
+
+        // Validate it looks like yyyy-MM-dd (at least 10 chars)
+        if (trimmed.length() < 10) return null;
+
+        return trimmed.substring(0, 10);
+    }
+
     private int getTotalDays(AppliedLeavesItem appliedLeave) {
-        if (appliedLeave == null || appliedLeave.getFromDate() == null || appliedLeave.getToDate() == null) {
+        if (appliedLeave == null) {
+            return 0;
+        }
+
+        // Extract and validate both date strings
+        String fromStr = extractDatePortion(appliedLeave.getFromDate());
+        String toStr = extractDatePortion(appliedLeave.getToDate());
+
+        if (fromStr == null || toStr == null) {
+            Log.w(TAG, "getTotalDays: missing dates — from='" + appliedLeave.getFromDate()
+                    + "' to='" + appliedLeave.getToDate() + "'");
             return 0;
         }
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date startDate = dateFormat.parse(appliedLeave.getFromDate());
-            Date endDate = dateFormat.parse(appliedLeave.getToDate());
+            dateFormat.setLenient(false); // Strict parsing — rejects invalid dates
+
+            Date startDate = dateFormat.parse(fromStr);
+            Date endDate = dateFormat.parse(toStr);
 
             if (startDate == null || endDate == null) {
                 return 0;
@@ -117,6 +154,12 @@ public class AppliedViewFragment extends Fragment {
 
             Calendar endCal = Calendar.getInstance();
             endCal.setTime(endDate);
+
+            // Safety: if start is after end, swap or return 0
+            if (startCal.after(endCal)) {
+                Log.w(TAG, "getTotalDays: fromDate is after toDate");
+                return 0;
+            }
 
             int totalDays = 0;
             while (!startCal.after(endCal)) {
@@ -129,7 +172,7 @@ public class AppliedViewFragment extends Fragment {
 
             return totalDays;
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.e(TAG, "getTotalDays: parse error — from='" + fromStr + "' to='" + toStr + "'", e);
             return 0;
         }
     }

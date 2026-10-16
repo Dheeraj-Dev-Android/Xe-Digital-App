@@ -764,6 +764,22 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Shimmer skeleton overlay -->
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:shimmer_auto_start="false"
+        app:shimmer_base_color="#E0E0E0"
+        app:shimmer_direction="left_to_right"
+        app:shimmer_duration="1200"
+        app:shimmer_highlight_color="#F5F5F5">
+
+        <include layout="@layout/shimmer_admin_dashboard" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
     <!-- Full Screen progress layout indicator overlay -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"

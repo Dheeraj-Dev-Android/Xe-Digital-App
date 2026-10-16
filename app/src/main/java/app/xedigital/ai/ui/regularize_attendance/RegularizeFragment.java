@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,7 +45,7 @@ public class RegularizeFragment extends Fragment {
     public static final String ARG_ATTENDANCE_ITEM = "attendanceItem";
     private static final String TAG = "RegularizeFragment";
 
-    // ── Static Formatters — Avoid allocations during workflow ──
+    // ── Static Formatters ──
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("HH:mm", Locale.getDefault());
     private static final SimpleDateFormat INPUT_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
@@ -54,7 +55,6 @@ public class RegularizeFragment extends Fragment {
         INPUT_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    // ── Active loader counter ──
     private final AtomicInteger activeLoaderCount = new AtomicInteger(0);
 
     private EmployeePunchDataItem attendanceItem;
@@ -156,18 +156,15 @@ public class RegularizeFragment extends Fragment {
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         profileViewModel.storeLoginData(userId, authToken);
 
-        // ── Regularize ViewModel ──
         regularizeViewModel = new ViewModelProvider(this).get(RegularizeViewModel.class);
         setupRegularizeObservers();
 
-        // ── Concurrently Trigger APIs ──
-        showLoader(); // +1 loader count (for Profile)
+        showLoader();
         profileViewModel.fetchUserProfile();
 
-        showLoader(); // +1 loader count (for HR Notification Email APIs)
+        showLoader();
         regularizeViewModel.fetchHrEmail(userId, authToken);
 
-        // ── Safe Autofill Logic ──
         if (attendanceItem != null) {
             autofillAttendanceFields();
         }
@@ -175,12 +172,12 @@ public class RegularizeFragment extends Fragment {
         // ── Submit Button ──
         btSubmit.setOnClickListener(v -> {
             if (validateForm()) {
-                String date = Objects.requireNonNull(atDate.getText()).toString();
-                String punchIn = Objects.requireNonNull(timePunchIn.getText()).toString();
-                String punchOut = Objects.requireNonNull(timePunchOut.getText()).toString();
-                String punchInAddress = Objects.requireNonNull(etPunchInAddress.getText()).toString();
-                String punchOutAddress = Objects.requireNonNull(etPunchOutAddress.getText()).toString();
-                String remarks = Objects.requireNonNull(etRemarks.getText()).toString();
+                String date = Objects.requireNonNull(atDate.getText()).toString().trim();
+                String punchIn = Objects.requireNonNull(timePunchIn.getText()).toString().trim();
+                String punchOut = Objects.requireNonNull(timePunchOut.getText()).toString().trim();
+                String punchInAddress = Objects.requireNonNull(etPunchInAddress.getText()).toString().trim();
+                String punchOutAddress = Objects.requireNonNull(etPunchOutAddress.getText()).toString().trim();
+                String remarks = Objects.requireNonNull(etRemarks.getText()).toString().trim();
 
                 if (attendanceItem != null) {
                     regularize(token, attendanceItem.getId(), date, punchIn, punchOut, punchInAddress, punchOutAddress, remarks);
@@ -200,33 +197,37 @@ public class RegularizeFragment extends Fragment {
 
             @Override
             public void onCancel() {
-                // User cancelled — do nothing
             }
         }));
 
-        // ── Punch In Time Picker ──
-        timePunchIn.setOnClickListener(v -> {
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+        // ── Punch In Time Picker — click on BOTH the field AND its parent layout ──
+        View.OnClickListener punchInPickerListener = v -> showTimePicker(timePunchIn);
+        timePunchIn.setOnClickListener(punchInPickerListener);
+        TextInputLayout tPunchInLayout = view.findViewById(R.id.tPunchIn);
+        if (tPunchInLayout != null) {
+            tPunchInLayout.setOnClickListener(punchInPickerListener);
+        }
 
-            new TimePickerDialog(requireContext(), (view12, hourOfDay, minute1) -> {
-                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
-                timePunchIn.setText(selectedTime);
-            }, hour, minute, false).show();
-        });
+        // ── Punch Out Time Picker — click on BOTH the field AND its parent layout ──
+        View.OnClickListener punchOutPickerListener = v -> showTimePicker(timePunchOut);
+        timePunchOut.setOnClickListener(punchOutPickerListener);
+        TextInputLayout tPunchOutLayout = view.findViewById(R.id.tPunchOut);
+        if (tPunchOutLayout != null) {
+            tPunchOutLayout.setOnClickListener(punchOutPickerListener);
+        }
+    }
 
-        // ── Punch Out Time Picker ──
-        timePunchOut.setOnClickListener(v -> {
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+    // ── Reusable Time Picker ──
+    private void showTimePicker(TextInputEditText targetField) {
+        final Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
 
-            new TimePickerDialog(requireContext(), (view12, hourOfDay, minute1) -> {
-                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
-                timePunchOut.setText(selectedTime);
-            }, hour, minute, false).show();
-        });
+        new TimePickerDialog(requireContext(), (view, hourOfDay, minute1) -> {
+            String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
+            targetField.setText(selectedTime);
+            targetField.setError(null); // Clear any validation error
+        }, hour, minute, false).show();
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -234,7 +235,6 @@ public class RegularizeFragment extends Fragment {
     // ══════════════════════════════════════════════════════════════════════
 
     private void setupRegularizeObservers() {
-        // Submit request progress loader
         regularizeViewModel.getIsLoadingLiveData().observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null) {
                 if (isLoading) {
@@ -247,16 +247,14 @@ public class RegularizeFragment extends Fragment {
             }
         });
 
-        // Observes nested API sequence load completion
         regularizeViewModel.getHrEmailLiveData().observe(getViewLifecycleOwner(), email -> {
             if (email != null) {
                 this.hrEmail = email;
                 Log.d(TAG, "HR notification email dynamically loaded: '" + email + "'");
             }
-            hideLoader(); // Subtracts 1 from loader tracking cleanly
+            hideLoader();
         });
 
-        // Submission Success
         regularizeViewModel.getSuccessMessageLiveData().observe(getViewLifecycleOwner(), message -> {
             if (message != null) {
                 CustomDialogHelper.showSuccessDialog(requireContext(), "Request Submitted! ✅", message + "\n\nYour attendance regularization request has been sent for approval.", () -> clearForm());
@@ -264,7 +262,6 @@ public class RegularizeFragment extends Fragment {
             }
         });
 
-        // Submission Error
         regularizeViewModel.getErrorMessageLiveData().observe(getViewLifecycleOwner(), errorMessage -> {
             if (errorMessage != null) {
                 CustomDialogHelper.showErrorDialog(requireContext(), "Submission Failed", errorMessage);
@@ -272,7 +269,6 @@ public class RegularizeFragment extends Fragment {
             }
         });
 
-        // Safe Fallback observer in case UserData fetch fails
         profileViewModel.userProfile.observe(getViewLifecycleOwner(), userProfile -> {
             if (userProfile != null) {
                 this.userProfile = userProfile;
@@ -281,7 +277,7 @@ public class RegularizeFragment extends Fragment {
                 Log.d(TAG, "User Profile is null");
                 CustomDialogHelper.showErrorDialog(requireContext(), "Profile Error", "Could not load your profile data.\nSome fields may not be filled automatically.");
             }
-            hideLoader(); // Subtracts 1 from loader tracking cleanly
+            hideLoader();
         });
     }
 
@@ -296,14 +292,12 @@ public class RegularizeFragment extends Fragment {
 
         Log.d(TAG, "autofill → punchDate='" + punchDateString + "' punchIn='" + punchInString + "' punchOut='" + punchOutString + "'");
 
-        // ── Punch Date ──
+        // ── Punch Date (LOCKED — must match attendance record) ──
         if (isValidDateString(punchDateString)) {
             try {
                 Date punchDate = INPUT_FORMATTER.parse(punchDateString);
                 if (punchDate != null) {
                     atDate.setText(DATE_FORMATTER.format(punchDate));
-                    atDate.setFocusable(false);
-                    atDate.clearFocus();
                     Log.d(TAG, "punchDate set: " + DATE_FORMATTER.format(punchDate));
                 }
             } catch (ParseException e) {
@@ -328,7 +322,7 @@ public class RegularizeFragment extends Fragment {
                 timePunchIn.setText("");
             }
         } else {
-            Log.w(TAG, "punchIn skipped (invalid value): '" + punchInString + "'");
+            Log.w(TAG, "punchIn skipped (invalid/missing): '" + punchInString + "'");
             timePunchIn.setText("");
         }
 
@@ -345,7 +339,7 @@ public class RegularizeFragment extends Fragment {
                 timePunchOut.setText("");
             }
         } else {
-            Log.w(TAG, "punchOut skipped (invalid value): '" + punchOutString + "'");
+            Log.w(TAG, "punchOut skipped (invalid/missing): '" + punchOutString + "'");
             timePunchOut.setText("");
         }
 
@@ -402,35 +396,43 @@ public class RegularizeFragment extends Fragment {
     private boolean validateForm() {
         boolean isValid = true;
 
-        if (Objects.requireNonNull(timePunchIn.getText()).toString().isEmpty()) {
+        // ── Date (locked to attendance record — must not be empty) ──
+        if (Objects.requireNonNull(atDate.getText()).toString().trim().isEmpty()) {
+            atDate.setError("Date is missing from the attendance record");
+            isValid = false;
+        } else {
+            atDate.setError(null);
+        }
+
+        if (Objects.requireNonNull(timePunchIn.getText()).toString().trim().isEmpty()) {
             timePunchIn.setError("Punch-in time is required");
             isValid = false;
         } else {
             timePunchIn.setError(null);
         }
 
-        if (Objects.requireNonNull(timePunchOut.getText()).toString().isEmpty()) {
+        if (Objects.requireNonNull(timePunchOut.getText()).toString().trim().isEmpty()) {
             timePunchOut.setError("Punch-out time is required");
             isValid = false;
         } else {
             timePunchOut.setError(null);
         }
 
-        if (Objects.requireNonNull(etPunchInAddress.getText()).toString().isEmpty()) {
+        if (Objects.requireNonNull(etPunchInAddress.getText()).toString().trim().isEmpty()) {
             etPunchInAddress.setError("Punch-in address is required");
             isValid = false;
         } else {
             etPunchInAddress.setError(null);
         }
 
-        if (Objects.requireNonNull(etPunchOutAddress.getText()).toString().isEmpty()) {
+        if (Objects.requireNonNull(etPunchOutAddress.getText()).toString().trim().isEmpty()) {
             etPunchOutAddress.setError("Punch-out address is required");
             isValid = false;
         } else {
             etPunchOutAddress.setError(null);
         }
 
-        if (Objects.requireNonNull(etRemarks.getText()).toString().isEmpty()) {
+        if (Objects.requireNonNull(etRemarks.getText()).toString().trim().isEmpty()) {
             etRemarks.setError("Remarks is required");
             isValid = false;
         } else {
@@ -471,11 +473,10 @@ public class RegularizeFragment extends Fragment {
         requestBody.setEmployeeId(attendanceItem.getEmployee().getEmployeeCode());
         requestBody.setEmployeeLastName(attendanceItem.getEmployee().getLastname());
 
-        // Pass dynamic dynamically-loaded HR Notification email into the Request payload
         requestBody.setHrEmail(hrEmail != null ? hrEmail : "");
         requestBody.setPunchIn(attendanceItem.getPunchIn());
 
-        String dateFieldStr = Objects.requireNonNull(atDate.getText()).toString();
+        String dateFieldStr = date != null ? date.trim() : "";
 
         if (dateFieldStr.isEmpty()) {
             CustomDialogHelper.showErrorDialog(requireContext(), "Date Missing", "The attendance date is missing.\nPlease go back and select a valid attendance record.");
@@ -504,13 +505,11 @@ public class RegularizeFragment extends Fragment {
         DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
 
         try {
-            // ── PunchIn UTC conversion ──
             LocalTime localPunchInTime = LocalTime.parse(punchIn, timeFormatter);
             ZonedDateTime zonedPunchInTime = ZonedDateTime.of(punchDate, localPunchInTime, inputTimeZone);
             OffsetDateTime utcPunchInTime = zonedPunchInTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
             requestBody.setPunchInUpdate(utcPunchInTime.format(outFormatter));
 
-            // ── PunchOut UTC conversion ──
             LocalTime localPunchOutTime = LocalTime.parse(punchOut, timeFormatter);
             ZonedDateTime zonedPunchOutTime = ZonedDateTime.of(punchDate, localPunchOutTime, inputTimeZone);
             OffsetDateTime utcPunchOutTime = zonedPunchOutTime.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
@@ -522,7 +521,6 @@ public class RegularizeFragment extends Fragment {
             return;
         }
 
-        // ── Reporting & Cross Manager ──
         if (userProfile != null) {
             try {
                 String reportingManagerId = userProfile.getData().getEmployee().getReportingManager().getId();
@@ -549,7 +547,6 @@ public class RegularizeFragment extends Fragment {
             return;
         }
 
-        // ── Delegate API execution cleanly to ViewModel ──
         regularizeViewModel.submitRegularize(token, attendanceId, requestBody);
     }
 
@@ -559,5 +556,6 @@ public class RegularizeFragment extends Fragment {
         etPunchInAddress.setText("");
         etPunchOutAddress.setText("");
         etRemarks.setText("");
+        // NOTE: atDate is NOT cleared — it's locked to the attendance record
     }
 }

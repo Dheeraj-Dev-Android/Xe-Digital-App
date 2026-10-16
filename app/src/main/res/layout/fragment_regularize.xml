@@ -67,7 +67,7 @@
 
                     </LinearLayout>
 
-                    <!-- Date Input -->
+                    <!-- Date Input — LOCKED to attendance record date -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
@@ -85,9 +85,13 @@
                             android:id="@+id/atDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:cursorVisible="false"
                             android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:fontFamily="@font/quicksand_font_family"
-                            android:hint="Date"
+                            android:hint="Date (from record)"
+                            android:inputType="none"
                             android:paddingStart="40dp"
                             android:textColor="@color/primary_text"
                             android:textColorHint="@color/secondary_text" />
@@ -100,13 +104,15 @@
                         android:orientation="horizontal"
                         android:spacing="16dp">
 
-                        <!-- Punch In Time -->
+                        <!-- Punch In Time — TAPPABLE for time picker -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/tPunchIn"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:paddingStart="3dp"
                             android:paddingEnd="3dp"
                             app:boxCornerRadiusBottomEnd="8dp"
@@ -121,21 +127,27 @@
                                 android:id="@+id/timePunchIn"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:focusable="false"
+                                android:clickable="true"
+                                android:cursorVisible="false"
+                                android:focusable="true"
+                                android:focusableInTouchMode="false"
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:hint="In Time"
+                                android:inputType="none"
                                 android:paddingStart="40dp"
                                 android:textColor="@color/primary_text"
                                 android:textColorHint="@color/secondary_text" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- Punch Out Time -->
+                        <!-- Punch Out Time — TAPPABLE for time picker -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/tPunchOut"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:paddingStart="3dp"
                             android:paddingEnd="3dp"
                             app:boxCornerRadiusBottomEnd="8dp"
@@ -150,9 +162,13 @@
                                 android:id="@+id/timePunchOut"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:focusable="false"
+                                android:clickable="true"
+                                android:cursorVisible="false"
+                                android:focusable="true"
+                                android:focusableInTouchMode="false"
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:hint="Out Time"
+                                android:inputType="none"
                                 android:paddingStart="40dp"
                                 android:textColor="@color/primary_text"
                                 android:textColorHint="@color/secondary_text" />
@@ -377,7 +393,6 @@
                     app:strokeWidth="1dp" />
 
             </LinearLayout>
-
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

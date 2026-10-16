@@ -305,68 +305,8 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
-            <!-- ============== QUICK ACTIONS SHIMMER ============== -->
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/quickActionsShimmer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/punchCardShimmer">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/text_primary"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="18dp"
-                        android:weightSum="4">
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_circle_tint"
-                            android:backgroundTint="@color/primary_text_color" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_circle_tint"
-                            android:backgroundTint="@color/primary_text_color" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_circle_tint"
-                            android:backgroundTint="@color/primary_text_color" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_circle_tint"
-                            android:backgroundTint="@color/primary_text_color" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </com.facebook.shimmer.ShimmerFrameLayout>
-
-            <!-- ============== QUICK ACTIONS CARD ============== -->
+            <!-- ============== QUICK ACTIONS CARD (no shimmer — no API dependency) ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/quickActionsCard"
                 android:layout_width="0dp"
@@ -585,7 +525,7 @@
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/quickActionsShimmer">
+                app:layout_constraintTop_toBottomOf="@id/quickActionsCard">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -965,7 +905,7 @@
                                 android:layout_height="wrap_content"
                                 android:autoSizePresetSizes="@array/autoSize_text_sizes"
                                 android:autoSizeTextType="uniform"
-                                android:text="09:00 AM"
+                                android:text="--:--"
                                 android:textColor="@color/progress_fill"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -1014,7 +954,7 @@
                                 android:layout_height="wrap_content"
                                 android:autoSizePresetSizes="@array/autoSize_text_sizes"
                                 android:autoSizeTextType="uniform"
-                                android:text="05:00 PM"
+                                android:text="--:--"
                                 android:textColor="@color/SickLeave"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />

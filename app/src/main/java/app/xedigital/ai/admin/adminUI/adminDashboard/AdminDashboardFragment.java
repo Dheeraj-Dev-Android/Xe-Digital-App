@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -94,7 +95,7 @@ public class AdminDashboardFragment extends Fragment {
     private int currentPage = 1;
     private int currentPosition = 0;
     private boolean shouldAutoScroll = false;
-
+    private ShimmerFrameLayout shimmerLayout;
     private final Runnable scrollRunnable = new Runnable() {
         @Override
         public void run() {
@@ -173,6 +174,7 @@ public class AdminDashboardFragment extends Fragment {
         btnPreviousPage = view.findViewById(R.id.btnPreviousPage);
         btnNextPage = view.findViewById(R.id.btnNextPage);
         tvPaginationStatus = view.findViewById(R.id.tvPaginationStatus);
+        shimmerLayout = view.findViewById(R.id.shimmerLayout);
 
         // Pagination listeners
         if (btnPreviousPage != null) {
@@ -276,13 +278,28 @@ public class AdminDashboardFragment extends Fragment {
 
         // Sync visual spinner layout overlays
         mViewModel.getIsLoading().observe(getViewLifecycleOwner(), loading -> {
-            if (progressBar != null && dashboardContentContainer != null) {
-                if (loading != null && loading) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    dashboardContentContainer.setAlpha(0.4f);
-                } else {
+            if (loading != null && loading) {
+                if (shimmerLayout != null) {
+                    shimmerLayout.setVisibility(View.VISIBLE);
+                    shimmerLayout.startShimmer();
+                }
+                if (dashboardContentContainer != null) {
+                    dashboardContentContainer.setVisibility(View.INVISIBLE);
+                }
+                if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
+                }
+            } else {
+                if (shimmerLayout != null) {
+                    shimmerLayout.stopShimmer();
+                    shimmerLayout.setVisibility(View.GONE);
+                }
+                if (dashboardContentContainer != null) {
+                    dashboardContentContainer.setVisibility(View.VISIBLE);
                     dashboardContentContainer.setAlpha(1.0f);
+                }
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
@@ -646,6 +663,7 @@ public class AdminDashboardFragment extends Fragment {
         btnNextPage = null;
         tvPaginationStatus = null;
         visitorAdapter = null;
+        shimmerLayout = null;
 
         super.onDestroyView();
     }
