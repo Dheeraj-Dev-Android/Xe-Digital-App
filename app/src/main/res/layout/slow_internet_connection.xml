@@ -9,29 +9,41 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/warning_bg"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        app:cardBackgroundColor="#FFFBEB"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#FDE68A"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingStart="14dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="12dp">
 
+            <!-- Warning Indicator -->
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
-                app:indicatorSize="24dp"
-                app:trackThickness="2dp" />
+                app:indicatorColor="#F59E0B"
+                app:indicatorSize="22dp"
+                app:trackColor="#FDE68A"
+                app:trackThickness="2.5dp" />
 
+            <!-- Text Content -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -39,23 +51,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Slow Internet Connection"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                    android:textColor="#92400E"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvSpeed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:text="Current speed: 0.5 Mbps"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                    android:textColor="#B45309"
+                    android:textSize="12.5sp" />
             </LinearLayout>
 
+            <!-- Dismiss Button -->
             <ImageButton
                 android:id="@+id/btnDismiss"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Dismiss"
-                android:src="@drawable/ic_close" />
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_close"
+                app:tint="#92400E" />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

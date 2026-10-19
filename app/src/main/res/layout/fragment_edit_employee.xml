@@ -275,18 +275,14 @@
                             android:layout_marginEnd="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="First Name *"
-                            app:startIconDrawable="@drawable/ic_person"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="First Name *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etFirstName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textPersonName|textCapWords"
-                                android:maxLength="50"
-                                android:paddingStart="40dp" />
+                                android:maxLength="50" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -297,18 +293,14 @@
                             android:layout_marginStart="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="Last Name *"
-                            app:startIconDrawable="@drawable/ic_person"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="Last Name *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etLastName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textPersonName|textCapWords"
-                                android:maxLength="50"
-                                android:paddingStart="40dp" />
+                                android:maxLength="50" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 

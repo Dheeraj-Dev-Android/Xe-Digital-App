@@ -57,7 +57,8 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
 
         String formattedIn = formatTime(item.getInTime());
         String formattedOut = formatTime(item.getOutTime());
-        holder.tvTimingSummary.setText("Punch In: " + formattedIn + " | Punch Out: " + formattedOut);
+        holder.timesheetInTime.setText(formattedIn);
+        holder.timesheetOutTime.setText(formattedOut);
 
         holder.btnViewDetails.setOnClickListener(v -> {
             if (clickListener != null) {
@@ -84,7 +85,7 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
             DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("hh:mm a").withLocale(Locale.ROOT);
             return outputFormat.format(localTime);
         } catch (DateTimeParseException e) {
-            Log.e("DcrAdapter", "Error parsing time: " + e.getMessage());
+            Log.e("TimesheetAdapter", "Error parsing time: " + e.getMessage());
             return "N/A";
         }
     }
@@ -99,14 +100,15 @@ public class TimesheetAdapter extends RecyclerView.Adapter<TimesheetAdapter.Time
     }
 
     static class TimesheetViewHolder extends RecyclerView.ViewHolder {
-        TextView tvEmpName, tvDate, tvTimingSummary;
+        TextView tvEmpName, tvDate, timesheetInTime, timesheetOutTime;
         ShapeableImageView btnViewDetails;
 
         public TimesheetViewHolder(@NonNull View itemView) {
             super(itemView);
             tvEmpName = itemView.findViewById(R.id.tvEmpName);
             tvDate = itemView.findViewById(R.id.tvDate);
-            tvTimingSummary = itemView.findViewById(R.id.tvTimingSummary);
+            timesheetInTime = itemView.findViewById(R.id.timesheetInTime);
+            timesheetOutTime = itemView.findViewById(R.id.timesheetOutTime);
             btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
         }
     }

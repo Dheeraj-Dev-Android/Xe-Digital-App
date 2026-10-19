@@ -47,6 +47,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/quicksand_medium"
                         android:letterSpacing="0.01"
+                        android:text="Employee Name"
                         android:textColor="@color/white"
                         android:textSize="22sp"
                         android:textStyle="bold" />

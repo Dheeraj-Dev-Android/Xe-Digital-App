@@ -89,7 +89,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:indeterminateTint="@color/text_primary"
+                android:indeterminateTint="@color/surface_white"
                 android:visibility="gone"
                 tools:visibility="gone" />
 

@@ -33,7 +33,7 @@
                 android:background="@drawable/circular_background"
                 android:importantForAccessibility="no"
                 android:padding="4dp"
-                android:src="@drawable/ic_profile_placeholder" />
+                android:src="@drawable/ic_person" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -53,7 +53,7 @@
                     android:textColor="@color/attendance_card_text"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    tools:text="John Doe" />
+                    tools:text="Xedigital.ai" />
 
                 <!-- Value: Email with icon -->
                 <LinearLayout
@@ -80,7 +80,7 @@
                         android:maxLines="1"
                         android:textColor="@color/attendance_card_text"
                         android:textSize="12sp"
-                        tools:text="john.doe@xedigital.ai" />
+                        tools:text="abc@xedigital.ai" />
                 </LinearLayout>
 
                 <!-- Value: Contact with icon -->
@@ -191,7 +191,7 @@
                         android:fontFamily="@font/quicksand_font_family"
                         android:text="Shift Time"
                         android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:textSize="11sp" />
 
                     <!-- Value: Shift Time -->
                     <TextView
@@ -213,7 +213,7 @@
                         android:fontFamily="@font/quicksand_font_family"
                         android:text="Shift Type"
                         android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:textSize="11sp" />
 
                     <!-- Value: Shift Type -->
                     <TextView
@@ -235,7 +235,7 @@
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="12dp"
+                android:layout_marginVertical="6dp"
                 android:background="@color/divider_color" />
 
             <!-- ======== REQUESTED UPDATE ROW ======== -->
@@ -288,7 +288,7 @@
                         android:fontFamily="@font/quicksand_font_family"
                         android:text="New Shift"
                         android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:textSize="11sp" />
 
                     <!-- Value: Shift Update -->
                     <TextView
@@ -310,7 +310,7 @@
                         android:fontFamily="@font/quicksand_font_family"
                         android:text="Requested Date"
                         android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:textSize="11sp" />
 
                     <!-- Value: Requested Date -->
                     <TextView
@@ -348,7 +348,7 @@
                     android:text="Update Details"
                     android:textAllCaps="true"
                     android:textColor="@color/status_approved"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
                 <!-- Same Row: Updated By | Updated Date -->
@@ -372,7 +372,7 @@
                             android:fontFamily="@font/quicksand_font_family"
                             android:text="Updated By"
                             android:textColor="@color/text_secondary"
-                            android:textSize="10sp" />
+                            android:textSize="11sp" />
 
                         <!-- Value -->
                         <TextView
@@ -411,7 +411,7 @@
                             android:fontFamily="@font/quicksand_font_family"
                             android:text="Updated Date"
                             android:textColor="@color/text_secondary"
-                            android:textSize="10sp" />
+                            android:textSize="11sp" />
 
                         <!-- Value -->
                         <TextView

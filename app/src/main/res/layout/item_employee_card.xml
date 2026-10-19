@@ -9,7 +9,7 @@
     android:layout_marginVertical="8dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
     app:rippleColor="@color/primary_light"
     app:strokeColor="@color/divider"
@@ -58,7 +58,7 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:visibility="gone"
-                    tools:text="JD"
+                    tools:text="XE"
                     tools:visibility="visible" />
 
             </FrameLayout>
@@ -89,7 +89,7 @@
                     android:textColor="@color/text_primary"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    tools:text="John Doe" />
+                    tools:text="XeDigital.ai" />
 
                 <!-- Email directly below name, no label -->
                 <com.google.android.material.textview.MaterialTextView
@@ -102,7 +102,7 @@
                     android:maxLines="1"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
-                    tools:text="john@xedigital.ai" />
+                    tools:text="abc@xedigital.ai" />
             </LinearLayout>
 
             <!-- Right: Three-Dot Menu (10%) -->

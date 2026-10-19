@@ -17,7 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/avatar_bg"
+            android:background="@drawable/gradient_attendance_card"
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
@@ -29,7 +29,7 @@
                 android:layout_width="48dp"
                 android:layout_height="4dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/accent_employee" />
+                android:background="@color/color_white" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
                 android:letterSpacing="0.12"
                 android:text="LEAVE DETAILS"
                 android:textAllCaps="true"
-                android:textColor="@color/accent_employee"
+                android:textColor="@color/surface_white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -49,7 +49,7 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:text="N/A"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="XeDigital.ai" />

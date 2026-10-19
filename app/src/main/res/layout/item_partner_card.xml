@@ -9,7 +9,7 @@
     android:layout_marginVertical="8dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
     app:rippleColor="@color/primary_light"
     app:strokeColor="@color/divider"
@@ -45,7 +45,7 @@
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:textColor="@color/white"
+                    android:textColor="@color/CasualLeave"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     tools:text="PN" />

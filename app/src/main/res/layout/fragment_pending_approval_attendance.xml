@@ -127,7 +127,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="No Records Available"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/surface_white"
             android:textSize="16sp" />
     </LinearLayout>
 

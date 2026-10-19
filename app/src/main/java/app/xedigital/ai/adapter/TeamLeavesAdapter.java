@@ -37,8 +37,7 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
     @NonNull
     @Override
     public EmployeeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_team_leave, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_team_leave, parent, false);
         return new EmployeeViewHolder(view);
     }
 
@@ -54,11 +53,7 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
 
         holder.tvName.setText(employee.getEmployeeName());
         holder.tvEmail.setText(employee.getEmail());
-
-        // Clear previous leave rows to avoid duplication during view recycling
         holder.llLeavesContainer.removeAllViews();
-
-        // Track if at least one current year row was added for this employee
         boolean hasCurrentYearLeaves = false;
 
         // Populate leave rows
@@ -66,10 +61,7 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
 
             // Get the current system year dynamically (e.g., 2026)
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-
             for (LeavesItem leave : employee.getLeaves()) {
-
-                // Extract year from assignDate (Format example: "2026-05-29T05:57:31.565Z")
                 String assignDate = leave.getAssignDate();
                 int recordYear = 0;
 
@@ -80,8 +72,6 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
                         recordYear = 0;
                     }
                 }
-
-                // Filter: Only allow records matching the current year
                 if (recordYear != currentYear) {
                     continue;
                 }
@@ -106,9 +96,7 @@ public class TeamLeavesAdapter extends RecyclerView.Adapter<TeamLeavesAdapter.Em
                 double balance = leave.getCreditLeave() - leave.getUsedLeave();
                 tvBalance.setText(String.valueOf(balance));
 
-                int balanceColor = balance > 0
-                        ? ContextCompat.getColor(containerContext, R.color.leave_balance_positive)
-                        : ContextCompat.getColor(containerContext, R.color.leave_balance_zero);
+                int balanceColor = balance > 0 ? ContextCompat.getColor(containerContext, R.color.leave_balance_positive) : ContextCompat.getColor(containerContext, R.color.leave_balance_zero);
                 tvBalance.setTextColor(balanceColor);
 
                 double totalAllotted = leave.getCreditLeave();

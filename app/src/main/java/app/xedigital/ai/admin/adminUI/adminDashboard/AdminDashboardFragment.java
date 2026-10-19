@@ -95,7 +95,6 @@ public class AdminDashboardFragment extends Fragment {
     private int currentPage = 1;
     private int currentPosition = 0;
     private boolean shouldAutoScroll = false;
-    private ShimmerFrameLayout shimmerLayout;
     private final Runnable scrollRunnable = new Runnable() {
         @Override
         public void run() {
@@ -112,6 +111,7 @@ public class AdminDashboardFragment extends Fragment {
             }
         }
     };
+    private ShimmerFrameLayout shimmerLayout;
 
     public static AdminDashboardFragment newInstance() {
         return new AdminDashboardFragment();

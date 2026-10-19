@@ -87,9 +87,7 @@
         app:hintTextColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textDateRangeLabel"
-        app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
-        app:startIconTint="#FFFFFF">
+        app:layout_constraintTop_toBottomOf="@id/textDateRangeLabel">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etFromDate"
@@ -98,7 +96,6 @@
             android:clickable="true"
             android:focusable="false"
             android:inputType="none"
-            android:paddingStart="40dp"
             android:textColor="@color/white" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,9 +114,7 @@
         app:hintTextColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tilFromDate"
-        app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
-        app:startIconTint="#FFFFFF">
+        app:layout_constraintTop_toBottomOf="@id/tilFromDate">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etToDate"
@@ -128,7 +123,6 @@
             android:clickable="true"
             android:focusable="false"
             android:inputType="none"
-            android:paddingStart="40dp"
             android:textColor="@color/white" />
     </com.google.android.material.textfield.TextInputLayout>
 

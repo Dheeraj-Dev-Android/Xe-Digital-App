@@ -90,7 +90,7 @@
                         android:layout_height="65dp"
                         android:layout_gravity="center"
                         android:scaleType="centerCrop"
-                        android:src="@mipmap/ic_default_profile"
+                        android:src="@drawable/ic_person"
                         app:shapeAppearanceOverlay="@style/CircleImageView" />
 
                     <!-- Circle text initials fallback (hidden by default) -->

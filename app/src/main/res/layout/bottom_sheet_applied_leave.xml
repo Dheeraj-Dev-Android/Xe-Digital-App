@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/background_page"
+    android:background="@drawable/gradient_attendance_card"
     android:orientation="vertical"
     android:paddingBottom="16dp">
 
@@ -14,7 +14,7 @@
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
-        android:background="@color/avatar_text" />
+        android:background="@color/badge_bg" />
 
     <!-- Header -->
     <LinearLayout
@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Applied Leaves"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/color_white"
                 android:textSize="14sp"
                 tools:text="Dheeraj Tripathi" />
         </LinearLayout>

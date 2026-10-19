@@ -741,8 +741,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void showAlert(String title, String message) {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
@@ -750,6 +748,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             }).show();
         });
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private void setViewsInvisible(int... ids) {
         for (int id : ids) {
@@ -956,12 +956,9 @@ public class AdminPunchActivity extends AppCompatActivity {
         return dir;
     }
 
-
     interface AddressCallback {
         void onAddressReceived(String address, Location location);
     }
-
-
 
 
 }

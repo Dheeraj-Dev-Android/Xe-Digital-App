@@ -49,7 +49,7 @@
                 android:layout_weight="3"
                 android:foregroundGravity="center">
 
-                <!-- Profile Image (Shown when image URL is available) -->
+                <!-- Profile Image -->
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/visProfile"
                     android:layout_width="70dp"
@@ -59,7 +59,7 @@
                     android:src="@drawable/ic_person"
                     app:shapeAppearanceOverlay="@style/CircularImageView" />
 
-                <!-- Initials Avatar (Shown when image is missing/null) -->
+                <!-- Initials Avatar -->
                 <TextView
                     android:id="@+id/tvProfileInitials"
                     android:layout_width="80dp"
@@ -75,162 +75,34 @@
 
             </FrameLayout>
 
-            <!-- Right Side: Action Buttons on Top -> Name Below -->
+            <!-- Right Side: Name Only (Buttons moved to bottom) -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="7"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
 
-                <!-- Row of Action Buttons -->
-                <LinearLayout
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FULL NAME"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/visName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end|center_vertical"
-                    android:orientation="horizontal">
-
-                    <!-- Check-In Action -->
-                    <LinearLayout
-                        android:id="@+id/checkInContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/btnCheckInVisitor"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/circular_background"
-                            android:contentDescription="Check In Visitor"
-                            android:padding="6dp"
-                            android:src="@mipmap/ic_check_in"
-                            app:shapeAppearanceOverlay="@style/CircularImageView" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Check In"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="9sp" />
-                    </LinearLayout>
-
-                    <!-- Check-Out Action -->
-                    <LinearLayout
-                        android:id="@+id/checkOutContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/btnCheckOutVisitor"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/circular_background"
-                            android:contentDescription="Check Out Visitor"
-                            android:padding="6dp"
-                            android:src="@mipmap/ic_check_out"
-                            app:shapeAppearanceOverlay="@style/CircularImageView" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Check Out"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="9sp" />
-                    </LinearLayout>
-
-                    <!-- View Action -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/btnViewMoreVisitor"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/circular_background"
-                            android:contentDescription="View Details"
-                            android:padding="6dp"
-                            android:src="@drawable/ic_eye"
-                            app:shapeAppearanceOverlay="@style/CircularImageView"
-                            app:tint="@color/icon_tint" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="View"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="9sp" />
-                    </LinearLayout>
-
-                    <!-- Print Action -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/btnPrintVisitor"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/circular_background"
-                            android:contentDescription="Print Visitor Details"
-                            android:padding="6dp"
-                            android:src="@drawable/ic_print"
-                            app:shapeAppearanceOverlay="@style/CircularImageView"
-                            app:tint="@color/icon_tint" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Print"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="9sp" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Visitor Name Section (Below Buttons) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="FULL NAME"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/visName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textColor="@color/avatar_text"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        tools:text="XeDigital.ai" />
-                </LinearLayout>
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/avatar_text"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="XeDigital.ai" />
 
             </LinearLayout>
 
@@ -241,20 +113,19 @@
             android:id="@+id/actionDivider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="12dp"
             android:background="@color/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/topSectionLayout" />
 
-        <!-- ================= BOTTOM SECTION ================= -->
+        <!-- ================= MIDDLE SECTION: DETAILS ================= -->
         <LinearLayout
             android:id="@+id/VisitorDetailsLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/actionDivider">
@@ -266,7 +137,6 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <!-- Whom to Meet Field -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -294,7 +164,6 @@
                         tools:text="Consultedge" />
                 </LinearLayout>
 
-                <!-- Contact Field -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -333,7 +202,6 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <!-- Email Field -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -362,7 +230,6 @@
                         tools:text="visitor@domain.com" />
                 </LinearLayout>
 
-                <!-- Check-In Date Field -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -397,6 +264,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -421,6 +289,146 @@
                     app:chipBackgroundColor="@color/success_light"
                     app:chipCornerRadius="12dp"
                     app:chipMinHeight="24dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ================= BOTTOM SECTION: ACTION BUTTONS ================= -->
+
+        <!-- Divider above buttons -->
+        <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/VisitorDetailsLayout" />
+
+        <!-- Action Buttons Row -->
+        <LinearLayout
+            android:id="@+id/actionButtonsLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider">
+
+            <!-- Check-In Action -->
+            <LinearLayout
+                android:id="@+id/checkInContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnCheckInVisitor"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/circular_background"
+                    android:contentDescription="Check In Visitor"
+                    android:padding="6dp"
+                    android:src="@mipmap/ic_check_in"
+                    app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Check In"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- Check-Out Action -->
+            <LinearLayout
+                android:id="@+id/checkOutContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnCheckOutVisitor"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/circular_background"
+                    android:contentDescription="Check Out Visitor"
+                    android:padding="6dp"
+                    android:src="@mipmap/ic_check_out"
+                    app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Check Out"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- View Action -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnViewMoreVisitor"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/circular_background"
+                    android:contentDescription="View Details"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_eye"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:tint="@color/icon_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="View"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- Print Action -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnPrintVisitor"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/circular_background"
+                    android:contentDescription="Print Visitor Details"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_print"
+                    app:shapeAppearanceOverlay="@style/CircularImageView"
+                    app:tint="@color/icon_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Print"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp" />
             </LinearLayout>
 
         </LinearLayout>

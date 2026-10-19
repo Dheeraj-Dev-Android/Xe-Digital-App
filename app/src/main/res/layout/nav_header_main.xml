@@ -46,8 +46,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/nav_header_desc"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_person"
-                app:tint="@color/avatar_text" />
+                app:srcCompat="@drawable/ic_person" />
 
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.card.MaterialCardView>

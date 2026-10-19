@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.teamTimesheet.TeamTimesheetFragment">
 
     <LinearLayout
@@ -123,14 +124,6 @@
                         android:orientation="horizontal"
                         android:paddingHorizontal="12dp">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginEnd="8dp"
-                            android:contentDescription="Employee"
-                            android:src="@drawable/ic_person"
-                            app:tint="#3F7DE8" />
-
                         <TextView
                             android:id="@+id/tvSelectedEmployee"
                             android:layout_width="wrap_content"
@@ -181,7 +174,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:indeterminateTint="@color/color_primary"
+        android:indeterminateTint="@color/color_white"
         android:visibility="gone" />
 
     <LinearLayout
@@ -208,7 +201,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="No Data Found"
-            android:textColor="@color/color_primary"
+            android:textColor="@color/white"
             android:textSize="16sp" />
 
     </LinearLayout>

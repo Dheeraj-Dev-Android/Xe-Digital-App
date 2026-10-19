@@ -46,7 +46,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -76,8 +75,11 @@ import retrofit2.Response;
 public class FaceLoginActivity extends AppCompatActivity implements BioMetric.BiometricAuthListener {
 
     private static final String TAG = "FaceLoginActivity";
-    private static final Set<String> BYPASS_EMAILS = new HashSet<>(Collections.singletonList(
-            "emp@xyzdemo.ai"
+    //    private static final Set<String> BYPASS_EMAILS = new HashSet<>(Collections.singletonList(
+//            "emp@xyzdemo.ai" ));
+    private static final Set<String> BYPASS_EMAILS = new HashSet<>(Arrays.asList(
+            "emp@xyzdemo.ai",
+            "dheeraj.t@cloudfencedemotest.ai"
     ));
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();

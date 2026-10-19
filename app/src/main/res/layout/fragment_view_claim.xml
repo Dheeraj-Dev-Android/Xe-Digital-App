@@ -115,7 +115,6 @@
                         android:background="@drawable/bg_filter_btn"
                         android:contentDescription="Filter claims"
                         android:elevation="0dp"
-
                         android:src="@mipmap/ic_filter"
                         app:layout_constraintBottom_toBottomOf="@+id/toDateInputLayout"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -148,7 +147,7 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             android:visibility="gone"
-            app:indicatorColor="@color/colorPrimary"
+            app:indicatorColor="@color/avatar_text"
             app:indicatorSize="48dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -188,7 +187,7 @@
                 android:fontFamily="@font/quicksand_font_family"
                 android:gravity="center"
                 android:text="No Claims Found"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -199,7 +198,7 @@
                 android:fontFamily="@font/quicksand_font_family"
                 android:gravity="center"
                 android:text="Try adjusting your date filters"
-                android:textColor="@color/text_tertiary"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>
 

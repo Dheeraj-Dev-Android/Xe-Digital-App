@@ -101,6 +101,7 @@
                 android:gravity="center"
                 android:letterSpacing="0.05"
                 android:paddingVertical="18dp"
+                android:textColor="#5A5A72"
                 android:textSize="@dimen/dialog_button_text_size"
                 android:textStyle="bold"
                 tools:text="OK" />

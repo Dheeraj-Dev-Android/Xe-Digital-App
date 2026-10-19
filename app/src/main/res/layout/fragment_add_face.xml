@@ -6,9 +6,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <!-- ============================================================ -->
-    <!-- ========== STATE 1: CAMERA PREVIEW (MODERN UI) ========== -->
-    <!-- ============================================================ -->
     <LinearLayout
         android:id="@+id/cameraStateLayout"
         android:layout_width="match_parent"

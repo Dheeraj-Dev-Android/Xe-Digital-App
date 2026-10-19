@@ -33,7 +33,7 @@
                 android:background="@drawable/circular_background"
                 android:importantForAccessibility="no"
                 android:padding="4dp"
-                android:src="@drawable/ic_profile_placeholder" />
+                android:src="@drawable/ic_person" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -53,7 +53,7 @@
                     android:textColor="@color/attendance_card_text"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    tools:text="John Doe" />
+                    tools:text="Xedigital.ai" />
 
                 <!-- Email with icon -->
                 <LinearLayout
@@ -80,7 +80,7 @@
                         android:maxLines="1"
                         android:textColor="@color/attendance_card_text"
                         android:textSize="12sp"
-                        tools:text="john.doe@xedigital.ai" />
+                        tools:text="abc@xedigital.ai" />
                 </LinearLayout>
 
                 <!-- Contact with icon -->
@@ -179,7 +179,7 @@
                         android:text="Current Shift"
                         android:textAllCaps="true"
                         android:textColor="@color/icon_tint"
-                        android:textSize="10sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                     <!-- Same Row: Shift Time | Shift Type -->
@@ -202,7 +202,7 @@
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:text="Shift Time"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="10sp" />
+                                android:textSize="11sp" />
 
                             <TextView
                                 android:id="@+id/shiftTimeCurrent"
@@ -236,7 +236,7 @@
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:text="Shift Type"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="10sp" />
+                                android:textSize="11sp" />
 
                             <TextView
                                 android:id="@+id/tvShiftType"
@@ -300,7 +300,7 @@
                         android:text="Requested Update"
                         android:textAllCaps="true"
                         android:textColor="@color/time_overtime"
-                        android:textSize="10sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                     <!-- Same Row: New Shift | Requested Date -->
@@ -323,7 +323,7 @@
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:text="New Shift"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="10sp" />
+                                android:textSize="11sp" />
 
                             <TextView
                                 android:id="@+id/tvShiftUpdate"
@@ -357,7 +357,7 @@
                                 android:fontFamily="@font/quicksand_font_family"
                                 android:text="Requested Date"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="10sp" />
+                                android:textSize="11sp" />
 
                             <TextView
                                 android:id="@+id/tvRequestedDate"
@@ -396,7 +396,7 @@
                     android:text="Update Details"
                     android:textAllCaps="true"
                     android:textColor="@color/status_approved"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
                 <!-- Same Row: Approved By | Approved Date -->
@@ -419,7 +419,7 @@
                             android:fontFamily="@font/quicksand_font_family"
                             android:text="Updated By"
                             android:textColor="@color/text_secondary"
-                            android:textSize="10sp" />
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvApprovedBy"
@@ -432,7 +432,7 @@
                             android:textColor="@color/status_approved"
                             android:textSize="13sp"
                             android:textStyle="bold"
-                            tools:text="Jane Smith" />
+                            tools:text="Xedigital.ai" />
                     </LinearLayout>
 
                     <!-- Vertical Separator -->
@@ -455,7 +455,7 @@
                             android:fontFamily="@font/quicksand_font_family"
                             android:text="Updated Date"
                             android:textColor="@color/text_secondary"
-                            android:textSize="10sp" />
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvApprovedDate"
@@ -477,7 +477,7 @@
                 android:id="@+id/actionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="6dp"
                 android:background="@drawable/bg_actions_strip"
                 android:orientation="vertical"
                 android:padding="12dp"
@@ -494,14 +494,13 @@
                     android:text="Actions"
                     android:textAllCaps="true"
                     android:textColor="@color/text_secondary"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
                 <!-- Buttons Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -517,13 +516,7 @@
                         android:textSize="13sp"
                         android:textStyle="bold"
                         app:backgroundTint="@color/RestrictedHoliday"
-                        app:cornerRadius="10dp"
-                        app:icon="@drawable/ic_close"
-                        app:iconGravity="textStart"
-                        app:iconSize="16dp"
-                        app:iconTint="@color/white"
-                        app:strokeColor="@color/status_rejected"
-                        app:strokeWidth="1dp" />
+                        app:cornerRadius="12dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnApprove"
@@ -538,11 +531,7 @@
                         android:textSize="13sp"
                         android:textStyle="bold"
                         app:backgroundTint="@color/status_approved"
-                        app:cornerRadius="10dp"
-                        app:icon="@drawable/ic_check"
-                        app:iconGravity="textStart"
-                        app:iconSize="16dp"
-                        app:iconTint="@color/white" />
+                        app:cornerRadius="12dp" />
 
                 </LinearLayout>
             </LinearLayout>

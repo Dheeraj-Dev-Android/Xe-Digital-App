@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="10dp"
-    android:background="@color/color_white"
+    android:background="@drawable/fragment_dashboard_bg"
     android:fontFamily="@font/quicksand_font_family"
     tools:context=".ui.document_upload.ViewDocumentFragment">
 
@@ -103,7 +102,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="No Documents found"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
 

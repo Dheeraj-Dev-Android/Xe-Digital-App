@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/avatar_bg">
+    android:background="@drawable/fragment_dashboard_bg">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -203,7 +203,7 @@
                         android:textColor="@color/white"
                         android:textSize="17sp"
                         android:textStyle="bold"
-                        tools:text="AB" />
+                        tools:text="XE" />
 
                     <!-- Name + Role -->
                     <LinearLayout
@@ -221,7 +221,7 @@
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold"
-                            tools:text="John Doe" />
+                            tools:text="XeDigital.ai" />
 
                         <TextView
                             android:id="@+id/me_role"
@@ -376,7 +376,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="No team members found"
-            android:textColor="@color/text_tertiary"
+            android:textColor="@color/surface_white"
             android:textSize="14sp" />
 
     </LinearLayout>

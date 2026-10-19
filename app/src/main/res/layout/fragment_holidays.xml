@@ -68,7 +68,7 @@
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:indeterminateTint="@color/text_primary"
+        android:indeterminateTint="@color/color_white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -117,7 +117,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:text="@string/no_items_found"
             android:textAlignment="center"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -130,7 +130,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:text="@string/empty_state_subtitle"
             android:textAlignment="center"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/white"
             android:textSize="14sp" />
 
         <!-- Retry button -->

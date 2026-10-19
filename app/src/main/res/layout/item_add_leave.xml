@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/header_background"
+            android:background="@drawable/gradient_square"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="16dp">
