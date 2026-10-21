@@ -519,6 +519,19 @@
         <action
             android:id="@+id/action_navManager_attendance_menu_to_nav_pendingApprovalFragment"
             app:destination="@id/nav_pendingApprovalFragment" />
+        <action
+            android:id="@+id/action_navManager_attendance_menu_to_nav_attendance_detail"
+            app:destination="@id/nav_attendance_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_attendance_detail"
+        android:name="app.xedigital.ai.ui.AttendanceByManager.AttendanceDetailFragment"
+        android:label="Attendance Detail"
+        tools:layout="@layout/fragment_attendance_detail">
+        <action
+            android:id="@+id/action_nav_attendance_detail_to_navManager_attendance_menu"
+            app:destination="@id/navManager_attendance_menu" />
     </fragment>
 
     <fragment

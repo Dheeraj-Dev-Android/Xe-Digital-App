@@ -749,8 +749,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void setViewsInvisible(int... ids) {
         for (int id : ids) {
             View v = findViewById(id);
@@ -820,6 +818,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             captureOverlay.setVisibility(View.GONE);
         });
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private void showAttendanceFailedAlert(String message) {
         loadingPanel.setVisibility(View.GONE);

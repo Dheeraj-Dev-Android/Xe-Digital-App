@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fragment_dashboard_bg"
-    android:orientation="vertical"
     tools:context=".ui.regularize_attendance.RegularizeAppliedFragment">
 
     <HorizontalScrollView
@@ -13,7 +12,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fadeScrollbars="false"
-        android:paddingTop="14dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            app:singleSelection="false">
+            app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipAll"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:text="Cancelled"
                 android:textColor="@android:color/white"
-                app:chipBackgroundColor="#F44336" />
+                app:chipBackgroundColor="#78909C" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
@@ -95,7 +95,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView" />
 
     <!-- Enhanced empty state container -->
     <LinearLayout
@@ -130,4 +130,3 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

@@ -19,6 +19,8 @@ import retrofit2.Response;
 
 public class AttendanceByManagerViewModel extends AndroidViewModel {
 
+    private static final String TAG = "AttendanceByManagerVM";
+
     private final MutableLiveData<AttandanceByManagerResponse> attendanceData = new MutableLiveData<>();
     private final MutableLiveData<TeamUnderManagerResponse> teamMemberData = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -39,44 +41,39 @@ public class AttendanceByManagerViewModel extends AndroidViewModel {
         return errorMessage;
     }
 
-    // Updated to pull the encrypted auth token securely
     private String getToken() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(getApplication());
         return "jwt " + prefManager.getString("authToken", "");
     }
 
-    // Updated to pull the encrypted userId safely
     private String getManagerId() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(getApplication());
         return prefManager.getString("userId", "");
     }
 
-    /**
-     * Fetch employees reporting to this manager (populates the dropdown)
-     */
-    public void fetchEmployeesUnderManager(String token, String userId) {
-        APIClient.getInstance().getApi().getEmployeesUnderManager(getToken(), getManagerId()).enqueue(new Callback<TeamUnderManagerResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<TeamUnderManagerResponse> call, @NonNull Response<TeamUnderManagerResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    teamMemberData.setValue(response.body());
-                }
-            }
+    public void fetchEmployeesUnderManager() {
+        APIClient.getInstance().getApi()
+                .getEmployeesUnderManager(getToken(), getManagerId())
+                .enqueue(new Callback<TeamUnderManagerResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<TeamUnderManagerResponse> call,
+                                           @NonNull Response<TeamUnderManagerResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            teamMemberData.setValue(response.body());
+                        } else {
+                            errorMessage.setValue("Failed to load team members");
+                        }
+                    }
 
-            @Override
-            public void onFailure(@NonNull Call<TeamUnderManagerResponse> call, @NonNull Throwable t) {
-                errorMessage.setValue(t.getMessage());
-            }
-        });
+                    @Override
+                    public void onFailure(@NonNull Call<TeamUnderManagerResponse> call,
+                                          @NonNull Throwable t) {
+                        Log.e(TAG, "fetchEmployeesUnderManager failed", t);
+                        errorMessage.setValue(t.getMessage());
+                    }
+                });
     }
 
-    /**
-     * Fetch attendance with server-side filtering.
-     *
-     * @param startDate  "yyyy-MM-dd"
-     * @param endDate    "yyyy-MM-dd"
-     * @param employeeId employee _id, or null to fetch all employees
-     */
     public void fetchAttendance(String startDate, String endDate, @Nullable String employeeId) {
         APIClient.getInstance().getApi()
                 .getAttendanceByManager(getToken(), getManagerId(), startDate, endDate, employeeId)
@@ -85,7 +82,6 @@ public class AttendanceByManagerViewModel extends AndroidViewModel {
                     public void onResponse(@NonNull Call<AttandanceByManagerResponse> call,
                                            @NonNull Response<AttandanceByManagerResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            Log.e("Attendance", "Fetched attendance: " + response.body().getData().getEmployeePunchData());
                             attendanceData.setValue(response.body());
                         } else {
                             errorMessage.setValue("Error: " + response.code());
@@ -95,6 +91,7 @@ public class AttendanceByManagerViewModel extends AndroidViewModel {
                     @Override
                     public void onFailure(@NonNull Call<AttandanceByManagerResponse> call,
                                           @NonNull Throwable t) {
+                        Log.e(TAG, "fetchAttendance failed", t);
                         errorMessage.setValue(t.getMessage());
                     }
                 });

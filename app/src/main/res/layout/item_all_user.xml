@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- ================= TOP SECTION (3:7) ================= -->
         <LinearLayout
             android:id="@+id/topSectionLayout"
             android:layout_width="match_parent"

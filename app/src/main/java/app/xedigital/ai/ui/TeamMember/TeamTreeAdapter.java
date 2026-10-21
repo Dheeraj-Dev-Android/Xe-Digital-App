@@ -101,7 +101,7 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
         }
 
         holder.itemView.setOnClickListener(v -> {
-            int currentPos = holder.getAdapterPosition();
+            int currentPos = holder.getBindingAdapterPosition();
             if (listener != null && currentPos != RecyclerView.NO_POSITION) {
                 listener.onMemberClick(visibleList.get(currentPos));
             }
@@ -112,6 +112,7 @@ public class TeamTreeAdapter extends RecyclerView.Adapter<TeamTreeAdapter.TreeVi
         Drawable bg = holder.avatarInitials.getBackground();
         if (bg instanceof GradientDrawable) ((GradientDrawable) bg).setColor(bgColor);
         holder.avatarInitials.setTextColor(textColor);
+        holder.managerType.setVisibility(View.VISIBLE);
         holder.managerType.setText(label);
         holder.managerType.setTextColor(textColor);
         holder.managerType.setChipBackgroundColor(ColorStateList.valueOf(bgColor));

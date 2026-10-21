@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fragment_dashboard_bg"
-    android:orientation="vertical"
     tools:context=".ui.regularize_attendance.PendingApprovalAttendance">
 
     <!-- Chips Filter Section -->
@@ -13,7 +12,8 @@
         android:id="@+id/horizontalScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,8 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
-            android:paddingEnd="12dp"
-            app:singleSelection="false">
+            android:paddingEnd="16dp"
+            app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipAll"
@@ -44,7 +44,6 @@
                 android:text="Approved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#4CAF50" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipUnapproved"
@@ -54,7 +53,6 @@
                 android:text="Unapproved"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#FF9800" />
-            <!--            android:onClick="onChipClicked"-->
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipRejected"
@@ -64,7 +62,7 @@
                 android:text="Rejected"
                 android:textColor="@android:color/white"
                 app:chipBackgroundColor="#F44336" />
-            <!--            android:onClick="onChipClicked"-->
+
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipCancelled"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -72,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:text="Cancelled"
                 android:textColor="@android:color/white"
-                app:chipBackgroundColor="#F44336" />
+                app:chipBackgroundColor="#78909C" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
@@ -85,7 +83,6 @@
         android:scrollbarStyle="outsideOverlay"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
 
@@ -97,7 +94,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView" />
 
     <LinearLayout
         android:id="@+id/emptyStateContainer"
@@ -109,8 +106,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView"
         app:layout_constraintVertical_bias="0.3">
 
         <ImageView

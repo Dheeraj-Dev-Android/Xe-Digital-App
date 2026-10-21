@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/fragment_dashboard_bg"
-            android:paddingTop="?attr/actionBarSize">
+            android:paddingTop="8dp">
 
             <!-- ================= Dashboard Stats Container ================= -->
             <LinearLayout
@@ -573,7 +573,7 @@
 
             </LinearLayout>
 
-            <!-- ================= NEW: Sign-In status graph card ================= -->
+            <!-- ================= Sign-In status graph card ================= -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/signInGraphContainer"
                 android:layout_width="0dp"
@@ -674,12 +674,14 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ================= NEW: Checked-In Visitors Section ================= -->
+            <!-- ================= Checked-In Visitors Section ================= -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/visitorsCardContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@color/surface_white"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
@@ -754,7 +756,7 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvVisitorsList"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
                         tools:listitem="@layout/item_visitor_dashboard" />
 

@@ -5,31 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fragment_dashboard_bg"
-    android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:paddingTop="?attr/actionBarSize"
     tools:context=".ui.TeamLeaves.TeamLeavesFragment">
 
     <!-- Search Filter -->
     <EditText
         android:id="@+id/etSearchName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_info_block"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_filter_field"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="10dp"
         android:hint="Search by employee name"
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:maxLines="1"
-        android:padding="12dp"
-        android:textColor="@color/text_secondary"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:visibility="gone"
+        app:drawableTint="@color/text_hint"
         tools:visibility="visible" />
 
-    <!-- Content Area: RecyclerView + Overlaid States -->
+    <!-- Content Area -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -41,16 +45,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="12dp"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="24dp"
             tools:listitem="@layout/item_team_leave" />
 
         <!-- Loading State -->
-        <ProgressBar
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:indeterminate="true"
             android:visibility="gone"
+            app:indicatorColor="@color/colorPrimary"
+            app:indicatorSize="48dp"
+            app:trackColor="@color/divider"
             tools:visibility="visible" />
 
         <!-- Empty State -->
@@ -61,23 +72,25 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="gone">
+            android:padding="24dp"
+            android:visibility="gone">
 
             <ImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_empty_state"
-                app:tint="@color/text_hint" />
+                app:tint="@color/icon_background" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/quicksand_font_family"
+                android:gravity="center"
                 android:text="No team data found"
                 android:textColor="@color/text_secondary"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 

@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
@@ -81,23 +80,8 @@ public class ViewAddedAttendanceFragment extends Fragment {
                 filterLeaves("All");
             }
         });
-        // Attach click listeners to chips
-        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-            View child = chipGroup.getChildAt(i);
-            if (child instanceof Chip) {
-                child.setOnClickListener(this::onChipClicked);
-            }
-        }
+
         return binding.getRoot();
-    }
-
-    public void onChipClicked(View view) {
-        // Get the ChipGroup and the clicked chip
-        ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
-        Chip clickedChip = (Chip) view;
-
-        // Check the clicked chip
-        chipGroup.check(clickedChip.getId());
     }
 
     private void filterLeaves(String status) {
@@ -135,7 +119,6 @@ public class ViewAddedAttendanceFragment extends Fragment {
 
         loadingProgress.setVisibility(View.VISIBLE);
         getAddedAttendance(authToken);
-
     }
 
     private void getAddedAttendance(String authToken) {
@@ -146,15 +129,17 @@ public class ViewAddedAttendanceFragment extends Fragment {
 
             @Override
             public void onResponse(@NonNull Call<AddedAttendanceListResponse> call, @NonNull Response<AddedAttendanceListResponse> response) {
+                if (binding == null) return;
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     addedAttendanceListResponse = response.body();
-                    if (addedAttendanceListResponse.getData() != null && !addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied().isEmpty()) {
-                        recyclerView.setAdapter(new AddedAttendanceAdapter(addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied()));
-                        addedAttendanceAdapter = (AddedAttendanceAdapter) recyclerView.getAdapter();
-                        if (addedAttendanceAdapter != null) {
-                            addedAttendanceAdapter.updateAttendanceData(addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied());
-                        }
+                    if (addedAttendanceListResponse.getData() != null
+                            && addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied() != null
+                            && !addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied().isEmpty()) {
+                        emptyStateContainer.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        addedAttendanceAdapter.updateAttendanceData(
+                                addedAttendanceListResponse.getData().getAddAttendanceRegularizeApplied());
                     } else {
                         emptyStateContainer.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
@@ -169,18 +154,23 @@ public class ViewAddedAttendanceFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<AddedAttendanceListResponse> call, @NonNull Throwable throwable) {
+                if (binding == null) return;
                 loadingProgress.setVisibility(View.GONE);
                 emptyStateContainer.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
                 emptyStateText.setText("Failed to load data. Please try again.");
                 Log.e("API Error", "API call failed: " + throwable.getMessage());
             }
         });
-
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        recyclerView = null;
+        loadingProgress = null;
+        emptyStateText = null;
+        emptyStateContainer = null;
         binding = null;
     }
 }

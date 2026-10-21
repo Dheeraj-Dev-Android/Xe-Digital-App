@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,6 +33,7 @@ import retrofit2.Callback;
 
 public class RegularizeAppliedFragment extends Fragment {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private RecyclerView recyclerView;
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
     private LinearLayout emptyStateContainer;
@@ -48,29 +48,26 @@ public class RegularizeAppliedFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_regularize_applied, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.regularize_applied_recycler_view);
+        recyclerView = view.findViewById(R.id.regularize_applied_recycler_view);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
-
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
         loadingProgress.setVisibility(View.VISIBLE);
         APIInterface apiInterface = APIClient.getInstance().getRegularizeApplied();
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
 
-        retrofit2.Call<RegularizeAppliedResponse> call = apiInterface.getRegularizeApplied("jwt " + authToken);
+        Call<RegularizeAppliedResponse> call = apiInterface.getRegularizeApplied("jwt " + authToken);
         call.enqueue(new Callback<RegularizeAppliedResponse>() {
 
             @Override
             public void onResponse(@NonNull Call<RegularizeAppliedResponse> call, @NonNull retrofit2.Response<RegularizeAppliedResponse> response) {
-                // LIFECYCLE GUARD: If Xiaomi OS destroyed the fragment/view context while network was in-flight, exit gracefully.
                 if (!isAdded() || getContext() == null || getView() == null) {
                     return;
                 }
@@ -82,8 +79,10 @@ public class RegularizeAppliedFragment extends Fragment {
 
                     if (items == null || items.isEmpty()) {
                         emptyStateContainer.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
                     } else {
                         emptyStateContainer.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
                         regularizeAppliedAdapter = new RegularizeAppliedAdapter(items);
                         recyclerView.setAdapter(regularizeAppliedAdapter);
 
@@ -91,6 +90,9 @@ public class RegularizeAppliedFragment extends Fragment {
                         filterLeaves(currentFilterStatus);
                     }
                 } else {
+                    emptyStateContainer.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    emptyStateText.setText("Failed to load data. Please try again.");
                     Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -98,8 +100,11 @@ public class RegularizeAppliedFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<RegularizeAppliedResponse> call, @NonNull Throwable t) {
                 if (!isAdded() || getContext() == null) return;
-                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
                 loadingProgress.setVisibility(View.GONE);
+                emptyStateContainer.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+                emptyStateText.setText("Failed to load data. Please try again.");
+                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -114,29 +119,12 @@ public class RegularizeAppliedFragment extends Fragment {
             else if (checkedIds.contains(R.id.chipCancelled)) currentFilterStatus = "Cancelled";
             else currentFilterStatus = "All";
 
-            // RACE CONDITION GUARD: Only execute filtering logic if the API response has successfully populated the adapter
             if (regularizeAppliedAdapter != null) {
                 filterLeaves(currentFilterStatus);
             }
         });
 
-        // Attach click listeners to chips
-        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-            View child = chipGroup.getChildAt(i);
-            if (child instanceof Chip) {
-                child.setOnClickListener(this::onChipClicked);
-            }
-        }
         return view;
-    }
-
-    public void onChipClicked(View view) {
-        if (getView() == null) return;
-        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
-        Chip clickedChip = (Chip) view;
-        if (chipGroup != null && clickedChip != null) {
-            chipGroup.check(clickedChip.getId());
-        }
     }
 
     private void filterLeaves(String status) {
@@ -162,5 +150,14 @@ public class RegularizeAppliedFragment extends Fragment {
             }
         }
         regularizeAppliedAdapter.updateList(filteredList);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        recyclerView = null;
+        loadingProgress = null;
+        emptyStateText = null;
+        emptyStateContainer = null;
     }
 }

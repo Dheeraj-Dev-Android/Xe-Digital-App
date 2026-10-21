@@ -12,10 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +32,7 @@ import retrofit2.Callback;
 
 public class DetailViewAddAttendanceFragment extends Fragment {
     private AddAttendanceRegularizeAppliedItem attendanceItem;
-    private MaterialCardView actionButtonsCard;
+    private Button cancelButton;
 
     public DetailViewAddAttendanceFragment() {
         // Required empty public constructor
@@ -71,7 +67,7 @@ public class DetailViewAddAttendanceFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_detail_view_add_attendance, container, false);
 
-        actionButtonsCard = view.findViewById(R.id.actionButtonsCard);
+        cancelButton = view.findViewById(R.id.cancel_button);
 
         if (getArguments() != null) {
             attendanceItem = (AddAttendanceRegularizeAppliedItem) getArguments().getSerializable(RegularizeViewFragment.ARG_REGULARIZE_APPLIED_ITEM);
@@ -171,9 +167,10 @@ public class DetailViewAddAttendanceFragment extends Fragment {
                     appliedStatusChip.setTextColor(getResources().getColor(R.color.status_pending));
                 }
 
+                // Hide cancel button if already cancelled
                 if (status.equalsIgnoreCase("Cancelled")) {
-                    if (actionButtonsCard != null) {
-                        actionButtonsCard.setVisibility(View.GONE);
+                    if (cancelButton != null) {
+                        cancelButton.setVisibility(View.GONE);
                     }
                 }
 
@@ -192,22 +189,11 @@ public class DetailViewAddAttendanceFragment extends Fragment {
             }
         }
 
-        Button cancelButton = view.findViewById(R.id.cancel_button);
         if (cancelButton != null) {
             cancelButton.setOnClickListener(v -> updateAttendanceStatus());
         }
 
         return view;
-    }
-
-    private void refreshFragment() {
-        if (isAdded()) {
-            FragmentManager fragmentManager = getParentFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.detach(this);
-            fragmentTransaction.attach(this);
-            fragmentTransaction.commit();
-        }
     }
 
     private void updateAttendanceStatus() {
@@ -237,19 +223,39 @@ public class DetailViewAddAttendanceFragment extends Fragment {
 
         APIInterface apiService = APIClient.getInstance().AddAttendance();
         Call<ResponseBody> call = apiService.AddedAttendanceStatus("jwt " + authToken, attendanceId, requestBody);
+        String finalApproverName = approverName;
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull retrofit2.Response<ResponseBody> response) {
                 if (!isAdded()) return;
 
                 if (response.isSuccessful()) {
-                    refreshFragment();
                     Toast.makeText(requireContext(), "Attendance status updated", Toast.LENGTH_SHORT).show();
-                    requireActivity().runOnUiThread(() -> {
-                        if (actionButtonsCard != null) {
-                            actionButtonsCard.setVisibility(View.GONE);
+
+                    // Update UI in-place — instant feedback
+                    if (cancelButton != null) {
+                        cancelButton.setVisibility(View.GONE);
+                    }
+
+                    View view = getView();
+                    if (view != null) {
+                        TextView appliedStatusChip = view.findViewById(R.id.appliedStatus);
+                        if (appliedStatusChip != null) {
+                            appliedStatusChip.setText("Cancelled");
+                            appliedStatusChip.setTextColor(getResources().getColor(R.color.status_rejected));
                         }
-                    });
+
+                        TextView appliedStatusUpdateBy = view.findViewById(R.id.appliedStatusUpdateBy);
+                        if (appliedStatusUpdateBy != null) {
+                            appliedStatusUpdateBy.setText(finalApproverName);
+                        }
+
+                        TextView appliedStatusUpdateDate = view.findViewById(R.id.appliedStatusUpdateDate);
+                        if (appliedStatusUpdateDate != null) {
+                            String formattedDate = DateTimeUtils.getDayOfWeekAndDate(getCurrentDateTimeInUTC());
+                            appliedStatusUpdateDate.setText(getSafeString(formattedDate));
+                        }
+                    }
                 } else {
                     Log.e("UpdateAttendance", "Error updating status: " + response.message());
                     Toast.makeText(requireContext(), "Error updating status", Toast.LENGTH_SHORT).show();

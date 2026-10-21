@@ -170,10 +170,6 @@
             android:theme="@style/Theme.XEDigital.NoActionBar" />
 
         <!-- ── Feature / Utility Activities ─────────────────────────────── -->
-        <activity
-            android:name=".ui.AttendanceByManager.AttendanceDetailActivity"
-            android:exported="false"
-            android:theme="@style/Theme.XEDigital" />
 
         <activity
             android:name=".activity.PDFViewActivity"

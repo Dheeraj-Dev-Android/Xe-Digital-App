@@ -68,7 +68,7 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         }
 
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.ENGLISH);
 
         try {
             Date date = inputFormat.parse(dateString);
@@ -101,21 +101,35 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         authToken = prefManager.getString("authToken", "");
         attendanceViewModel.storeLoginData(authToken);
 
-        if (currentStartDate.isEmpty() && currentEndDate.isEmpty()) {
-            attendanceViewModel.fetchAttendance("", "");
-        } else {
-            attendanceViewModel.fetchAttendance(currentStartDate, currentEndDate);
-        }
-
         recyclerViewAttendance = binding.recyclerViewAttendance;
         recyclerViewAttendance.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         loadingProgress = binding.loadingProgress;
         emptyStateText = binding.emptyStateText;
 
+        // Show loader immediately on fragment open
+        loadingProgress.setVisibility(View.VISIBLE);
+        recyclerViewAttendance.setVisibility(View.GONE);
+        emptyStateText.setVisibility(View.GONE);
+
+        if (currentStartDate.isEmpty() && currentEndDate.isEmpty()) {
+            attendanceViewModel.fetchAttendance("", "");
+        } else {
+            attendanceViewModel.fetchAttendance(currentStartDate, currentEndDate);
+        }
+
+        attendanceViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading) {
+                loadingProgress.setVisibility(View.VISIBLE);
+                recyclerViewAttendance.setVisibility(View.GONE);
+                emptyStateText.setVisibility(View.GONE);
+            } else {
+                loadingProgress.setVisibility(View.GONE);
+            }
+        });
+
         attendanceViewModel.attendance.observe(getViewLifecycleOwner(), attendanceList -> {
             if (attendanceList != null) {
-                loadingProgress.setVisibility(View.GONE);
                 List<EmployeePunchDataItem> attendance = parseAttendanceData(attendanceList);
                 if (attendance.isEmpty()) {
                     emptyStateText.setVisibility(View.VISIBLE);
@@ -128,7 +142,6 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
                 }
             } else {
                 Log.d(TAG, "Attendance List is null");
-                loadingProgress.setVisibility(View.VISIBLE);
                 emptyStateText.setVisibility(View.GONE);
                 recyclerViewAttendance.setVisibility(View.GONE);
             }
@@ -428,7 +441,6 @@ public class AttendanceFragment extends Fragment implements FilterAppliedListene
         if (!punchInTime.isEmpty() && punchOutTime.isEmpty()) {
             boolean hasBackgroundLoc = true;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                // ── CHANGED: Use central PermissionManager ──
                 hasBackgroundLoc = PermissionManager.getInstance(requireContext()).isGranted(PermissionManager.TAG_BACKGROUND_LOCATION);
                 // hasBackgroundLoc = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
             }

@@ -19,158 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ── STATS ROW ── -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingTop="16dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="8dp">
-
-                <!-- Direct stat -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/background_surface"
-                    app:cardCornerRadius="16dp"
-                    app:strokeColor="@color/divider"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <View
-                            android:layout_width="28dp"
-                            android:layout_height="3dp"
-                            android:layout_marginBottom="10dp"
-                            android:background="@color/colorPrimary" />
-
-                        <TextView
-                            android:id="@+id/stat_direct_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:text="0"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:letterSpacing="0.1"
-                            android:text="Direct"
-                            android:textColor="@color/text_tertiary"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Cross stat -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="6dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/background_surface"
-                    app:cardCornerRadius="16dp"
-                    app:strokeColor="@color/divider"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <View
-                            android:layout_width="28dp"
-                            android:layout_height="3dp"
-                            android:layout_marginBottom="10dp"
-                            android:background="@color/colorSecondary" />
-
-                        <TextView
-                            android:id="@+id/stat_cross_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:text="0"
-                            android:textColor="@color/colorSecondary"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:letterSpacing="0.1"
-                            android:text="Cross"
-                            android:textColor="@color/text_tertiary"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Total stat (filled) -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardCornerRadius="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <View
-                            android:layout_width="28dp"
-                            android:layout_height="3dp"
-                            android:layout_marginBottom="10dp"
-                            android:background="#40FFFFFF" />
-
-                        <TextView
-                            android:id="@+id/stat_total_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:text="0"
-                            android:textColor="@color/white"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:letterSpacing="0.1"
-                            android:text="Total"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-            <!-- ── "YOU" CARD ── -->
+            <!-- ── STATS + YOU CARD ── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/meCard"
                 android:layout_width="match_parent"
@@ -179,74 +28,203 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="4dp"
-                app:cardBackgroundColor="@color/background_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/colorPrimary"
-                app:strokeWidth="2dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/gradient_punch"
+                    android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Avatar -->
-                    <TextView
-                        android:id="@+id/me_avatar"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:background="@drawable/bg_avatar_me"
-                        android:fontFamily="@font/quicksand_font_family"
-                        android:gravity="center"
-                        android:textColor="@color/white"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        tools:text="XE" />
-
-                    <!-- Name + Role -->
+                    <!-- Stats Row -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:id="@+id/me_name"
-                            android:layout_width="wrap_content"
+                        <!-- Direct -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            tools:text="XeDigital.ai" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/me_role"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/stat_direct_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="0"
+                                android:textColor="@color/white"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:letterSpacing="0.1"
+                                android:text="Direct"
+                                android:textColor="#B3FFFFFF"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="40dp"
+                            android:background="#40FFFFFF" />
+
+                        <!-- Cross -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/quicksand_font_family"
-                            android:textColor="@color/text_tertiary"
-                            android:textSize="12sp"
-                            tools:text="Senior Manager" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/stat_cross_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="0"
+                                android:textColor="@color/white"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:letterSpacing="0.1"
+                                android:text="Cross"
+                                android:textColor="#B3FFFFFF"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="40dp"
+                            android:background="#40FFFFFF" />
+
+                        <!-- Total -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/stat_total_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="0"
+                                android:textColor="@color/white"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:letterSpacing="0.1"
+                                android:text="Total"
+                                android:textColor="#B3FFFFFF"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                    <!-- "You" badge -->
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Horizontal divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginBottom="14dp"
+                        android:background="#40FFFFFF" />
+
+                    <!-- "You" Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="@font/quicksand_font_family"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="4dp"
-                        android:text="You"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <!-- Avatar -->
+                        <TextView
+                            android:id="@+id/me_avatar"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_avatar_me"
+                            android:fontFamily="@font/quicksand_font_family"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="XE" />
+
+                        <!-- Name + Role -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/me_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:textColor="@color/white"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                tools:text="XeDigital.ai" />
+
+                            <TextView
+                                android:id="@+id/me_role"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:textColor="#B3FFFFFF"
+                                android:textSize="12sp"
+                                tools:text="Senior Manager" />
+
+                        </LinearLayout>
+
+                        <!-- "You" badge -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/quicksand_font_family"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="You"
+                            android:textColor="@color/white"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -264,7 +242,6 @@
                 android:orientation="horizontal"
                 android:visibility="gone">
 
-                <!-- Accent bar — no rounded corners on single-sided accent -->
                 <View
                     android:layout_width="4dp"
                     android:layout_height="16dp"
@@ -278,7 +255,7 @@
                     android:fontFamily="@font/quicksand_font_family"
                     android:letterSpacing="0.1"
                     android:text="DIRECT REPORTEES"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/white"
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
@@ -320,7 +297,7 @@
                     android:fontFamily="@font/quicksand_font_family"
                     android:letterSpacing="0.1"
                     android:text="CROSS REPORTEES"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/white"
                     android:textSize="11sp"
                     android:textStyle="bold" />
 

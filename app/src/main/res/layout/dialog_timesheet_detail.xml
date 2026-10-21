@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
     android:padding="12dp">
 
     <LinearLayout
@@ -30,6 +29,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/gradient_punch"
                     android:orientation="vertical"
                     android:paddingHorizontal="20dp"
                     android:paddingTop="20dp"
@@ -41,7 +41,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/quicksand_font_family"
                         android:text="Employee Full Timesheet"
-                        android:textColor="#212121"
+                        android:textColor="@color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -58,7 +58,7 @@
                             android:layout_marginEnd="4dp"
                             android:contentDescription="Date"
                             android:src="@drawable/ic_calendar"
-                            app:tint="#3F51B5" />
+                            app:tint="@color/white" />
 
                         <TextView
                             android:id="@+id/detailDate"
@@ -66,7 +66,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/quicksand_font_family"
                             android:text="Date: -"
-                            android:textColor="@color/avatar_text"
+                            android:textColor="@color/white"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 

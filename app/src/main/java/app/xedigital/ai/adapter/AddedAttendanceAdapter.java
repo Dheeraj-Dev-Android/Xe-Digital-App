@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 
@@ -97,7 +97,7 @@ public class AddedAttendanceAdapter extends RecyclerView.Adapter<AddedAttendance
     }
 
     static class AttendanceViewHolder extends RecyclerView.ViewHolder {
-        public MaterialButton btnAppliedAddAttendance;
+        public ImageButton btnAppliedAddAttendance;
         TextView empName, subLabel;
         TextView appliedDate;
         TextView empPunchDate;

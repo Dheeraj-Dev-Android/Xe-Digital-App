@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,16 +20,18 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.LeaveAdapter;
 import app.xedigital.ai.model.leaves.LeavesItem;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.SecurePrefManager;
 
 public class LeavesDataFragment extends Fragment {
@@ -41,8 +42,9 @@ public class LeavesDataFragment extends Fragment {
     private RecyclerView recyclerViewLeaves;
     private LinearLayout emptyStateContainer;
     private TextView emptyStateText;
-    private ProgressBar loadingProgress;
+    private CircularProgressIndicator loadingProgress;
     private PieChart leavePieChart;
+    private View chartCard;
 
     public LeavesDataFragment() {
         // Required empty public constructor
@@ -53,14 +55,10 @@ public class LeavesDataFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_leaves_data, container, false);
 
+        chartCard = view.findViewById(R.id.chartCard);
         recyclerViewLeaves = view.findViewById(R.id.recyclerViewLeaves);
         leavePieChart = view.findViewById(R.id.leavePieChart);
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
@@ -82,63 +80,59 @@ public class LeavesDataFragment extends Fragment {
         String authToken = prefManager.getString("authToken", "");
 
         leavesViewModel.setUserId(authToken);
+
+        loadingProgress.setVisibility(View.VISIBLE);
         leavesViewModel.fetchLeavesData();
 
         leavesViewModel.leavesData.observe(getViewLifecycleOwner(), leavesData -> {
+            if (!isAdded() || getView() == null) return;
             loadingProgress.setVisibility(View.GONE);
 
-            // ✅ FIX: Added (leaves == null || leaves.isEmpty()) null-safety check
             if (leavesData != null && leavesData.getData() != null) {
                 List<LeavesItem> leaves = leavesData.getData().getLeaves();
                 if (leaves == null || leaves.isEmpty()) {
-                    emptyStateContainer.setVisibility(View.VISIBLE);
-                    emptyStateText.setText("No leaves data available");
-                    recyclerViewLeaves.setVisibility(View.GONE);
-                    leavePieChart.setVisibility(View.GONE);
+                    showEmptyState("No leaves data available");
                 } else {
-                    emptyStateContainer.setVisibility(View.GONE);
-                    recyclerViewLeaves.setVisibility(View.VISIBLE);
-                    leavePieChart.setVisibility(View.VISIBLE);
-
+                    hideEmptyState();
                     leaveList.clear();
                     leaveList.addAll(leaves);
                     leaveAdapter.notifyDataSetChanged();
                     updatePieChartData(leaves);
                 }
             } else {
-                emptyStateContainer.setVisibility(View.VISIBLE);
-                emptyStateText.setText("Error loading data");
-                recyclerViewLeaves.setVisibility(View.GONE);
-                leavePieChart.setVisibility(View.GONE);
+                showEmptyState("No leaves data available");
+                if (isAdded()) {
+                    CustomDialogHelper.showErrorDialog(requireContext(), "Error", "Failed to load leave data. Please try again.");
+                }
             }
         });
+    }
 
-        loadingProgress.setVisibility(View.VISIBLE);
+    private void showEmptyState(String message) {
+        emptyStateContainer.setVisibility(View.VISIBLE);
+        emptyStateText.setText(message);
+        recyclerViewLeaves.setVisibility(View.GONE);
+        chartCard.setVisibility(View.GONE);
+    }
+
+    private void hideEmptyState() {
+        emptyStateContainer.setVisibility(View.GONE);
+        recyclerViewLeaves.setVisibility(View.VISIBLE);
+        chartCard.setVisibility(View.VISIBLE);
     }
 
     public void updatePieChartData(List<LeavesItem> leaves) {
-        if (leaves == null || leaves.isEmpty()) return;
+        if (leavePieChart == null || leaves == null || leaves.isEmpty()) return;
 
         Map<String, Float> leaveData = new HashMap<>();
-        float totalBalanceLeaves = 0;
-        float totalLeaves = 0;
 
         for (LeavesItem leave : leaves) {
-            if (leave != null) {
-                String leaveType = leave.getLeavetype();
-                if (leaveType != null) {
-                    float creditedLeaves = leave.getCreditLeave();
-                    float usedLeaves = leave.getUsedLeave();
-                    float debitedLeaves = leave.getDebitLeave();
+            if (leave == null) continue;
+            String leaveType = leave.getLeavetype();
+            if (leaveType == null) continue;
 
-                    // Calculate balance leaves
-                    float balanceLeaves = creditedLeaves - usedLeaves - debitedLeaves;
-
-                    leaveData.put(leaveType, balanceLeaves);
-                    totalBalanceLeaves += balanceLeaves;
-                    totalLeaves += creditedLeaves;
-                }
-            }
+            float balanceLeaves = leave.getCreditLeave() - leave.getUsedLeave() - leave.getDebitLeave();
+            leaveData.put(leaveType, balanceLeaves);
         }
 
         List<PieEntry> entries = new ArrayList<>();
@@ -149,42 +143,39 @@ public class LeavesDataFragment extends Fragment {
         }
 
         if (entries.isEmpty()) {
-            if (emptyStateText != null) {
-                emptyStateContainer.setVisibility(View.VISIBLE);
-                emptyStateText.setText("No balance leaves data available");
-            }
+            showEmptyState("No balance leaves data available");
             leavePieChart.setVisibility(View.GONE);
             return;
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "Leave Types");
-        if (entries.stream().allMatch(e -> e.getValue() == 0f)) {
-            entries.clear();
-            entries.add(new PieEntry(1f, "0 leaves"));
+        dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
 
-            dataSet.setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getFormattedValue(float value) {
-                    return "";
-                }
-            });
-        } else {
-            dataSet.setValueFormatter(new PercentFormatter(leavePieChart));
-        }
-
-        // Create a color map for leave types
+        // ── Predefined color map (case-insensitive) ──
         Map<String, Integer> leaveTypeColors = new HashMap<>();
-        leaveTypeColors.put("Casual Leave", Color.rgb(51, 206, 255));
-        leaveTypeColors.put("Sick Leave", Color.rgb(125, 206, 160));
-        leaveTypeColors.put("Privilege Leave", Color.rgb(255, 165, 0));
-        leaveTypeColors.put("Restricted Holidays", Color.rgb(199, 0, 57));
+        leaveTypeColors.put("casual leave", Color.rgb(51, 206, 255));
+        leaveTypeColors.put("sick leave", Color.rgb(125, 206, 160));
+        leaveTypeColors.put("privilege leave", Color.rgb(255, 165, 0));
+        leaveTypeColors.put("restricted holidays", Color.rgb(199, 0, 57));
+        leaveTypeColors.put("earned leave", Color.rgb(156, 39, 176));
+        leaveTypeColors.put("compensatory off", Color.rgb(0, 150, 136));
+        leaveTypeColors.put("maternity leave", Color.rgb(233, 30, 99));
+        leaveTypeColors.put("paternity leave", Color.rgb(63, 81, 181));
+        leaveTypeColors.put("cl", Color.rgb(51, 206, 255));
+        leaveTypeColors.put("sl", Color.rgb(125, 206, 160));
+        leaveTypeColors.put("pl", Color.rgb(255, 165, 0));
+        leaveTypeColors.put("rh", Color.rgb(199, 0, 57));
 
-        // Create a list of colors for the pie chart slices
+        // Deterministic random seeded by leave type name → same color every time for same label
         List<Integer> colors = new ArrayList<>();
         for (PieEntry entry : entries) {
-            String leaveType = entry.getLabel();
-            int color = leaveTypeColors.getOrDefault(leaveType, Color.GRAY);
-            colors.add(color);
+            String label = entry.getLabel() != null ? entry.getLabel().toLowerCase().trim() : "";
+            Integer predefined = leaveTypeColors.get(label);
+            if (predefined != null) {
+                colors.add(predefined);
+            } else {
+                colors.add(generateRandomColor(label));
+            }
         }
 
         dataSet.setColors(colors);
@@ -208,7 +199,32 @@ public class LeavesDataFragment extends Fragment {
         leavePieChart.setTransparentCircleRadius(45f);
         leavePieChart.animateXY(1000, 1000);
         leavePieChart.setDrawEntryLabels(false);
-
         leavePieChart.invalidate();
+    }
+
+    /**
+     * Generates a visually pleasant random color seeded by the leave type name.
+     * Same name → same color every time (deterministic), so the pie chart stays
+     * consistent across refreshes. Uses HSV with high saturation + brightness
+     * to avoid washed-out or dark colors.
+     */
+    private int generateRandomColor(String seed) {
+        Random random = new Random(seed.hashCode());
+        float hue = random.nextFloat() * 360f;
+        float saturation = 0.65f + random.nextFloat() * 0.25f;   // 0.65 – 0.90
+        float brightness = 0.75f + random.nextFloat() * 0.20f;   // 0.75 – 0.95
+        return Color.HSVToColor(new float[]{hue, saturation, brightness});
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        chartCard = null;
+        recyclerViewLeaves = null;
+        leavePieChart = null;
+        emptyStateContainer = null;
+        emptyStateText = null;
+        loadingProgress = null;
+        leaveAdapter = null;
     }
 }

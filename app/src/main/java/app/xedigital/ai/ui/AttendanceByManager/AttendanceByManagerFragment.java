@@ -2,6 +2,7 @@ package app.xedigital.ai.ui.AttendanceByManager;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,17 +35,21 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.AttendanceByManagerAdapter;
 import app.xedigital.ai.model.AttandanceByManager.EmployeePunchDataItem;
 import app.xedigital.ai.model.TeamUnderManagerResponse.EmployeesItem;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.DateTimeUtils;
-import app.xedigital.ai.utills.SecurePrefManager;
 
 public class AttendanceByManagerFragment extends Fragment {
+
+    private static final String TAG = "AttendanceByManager";
 
     private final List<String> employeeNames = new ArrayList<>();
     private final List<String> employeeIds = new ArrayList<>();
     private final Calendar calFrom = Calendar.getInstance();
     private final Calendar calTo = Calendar.getInstance();
-    private final SimpleDateFormat apiFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-    private final SimpleDateFormat displayFmt = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+    private final SimpleDateFormat apiFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    private final SimpleDateFormat displayFmt = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+    private final SimpleDateFormat displayDetailFmt = new SimpleDateFormat("dd MMM yyyy, EEEE", Locale.ENGLISH);
+
     private AttendanceByManagerAdapter managerAdapter;
     private AttendanceByManagerViewModel mViewModel;
     private TextView tvFromDate, tvToDate, tvSelectedEmployee;
@@ -53,6 +58,7 @@ public class AttendanceByManagerFragment extends Fragment {
     private View layoutEmptyState;
     private View layoutLoading;
     private String selectedEmployeeId = null;
+    private boolean isInitialLoad = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -82,8 +88,8 @@ public class AttendanceByManagerFragment extends Fragment {
         recyclerView.setAdapter(managerAdapter);
 
         swipeRefresh.setColorSchemeColors(
-                ContextCompat.getColor(requireContext(), android.R.color.holo_blue_bright),
-                ContextCompat.getColor(requireContext(), android.R.color.holo_green_light)
+                ContextCompat.getColor(requireContext(), R.color.colorPrimary),
+                ContextCompat.getColor(requireContext(), R.color.colorSecondary)
         );
         swipeRefresh.setOnRefreshListener(this::triggerSearch);
 
@@ -94,12 +100,15 @@ public class AttendanceByManagerFragment extends Fragment {
         view.findViewById(R.id.layoutToDate).setOnClickListener(v -> showDatePicker(false));
         layoutEmployeePicker.setOnClickListener(v -> showEmployeePopupMenu());
         btnSearch.setOnClickListener(v -> {
+            isInitialLoad = true;
             showLoading();
             triggerSearch();
         });
 
-        // Observers
+        // ── Observers ──
+
         mViewModel.getTeamMemberData().observe(getViewLifecycleOwner(), response -> {
+            if (!isAdded() || getView() == null) return;
             if (response != null && response.isSuccess() && response.getData() != null) {
                 List<EmployeesItem> employees = response.getData().getEmployees();
                 if (employees != null && !employees.isEmpty()) {
@@ -109,7 +118,10 @@ public class AttendanceByManagerFragment extends Fragment {
         });
 
         mViewModel.getAttendanceData().observe(getViewLifecycleOwner(), response -> {
+            if (!isAdded() || getView() == null) return;
             swipeRefresh.setRefreshing(false);
+            isInitialLoad = false;
+
             if (response != null && response.isSuccess() && response.getData() != null) {
                 List<EmployeePunchDataItem> data = response.getData().getEmployeePunchData();
                 if (data != null && !data.isEmpty()) {
@@ -123,16 +135,22 @@ public class AttendanceByManagerFragment extends Fragment {
         });
 
         mViewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (!isAdded() || getView() == null) return;
             swipeRefresh.setRefreshing(false);
-            showEmptyState();
+            layoutLoading.setVisibility(View.GONE);
+            isInitialLoad = false;
+
+            CustomDialogHelper.showErrorDialog(requireContext(), "Error",
+                    "Failed to load data. Please try again.");
+
+            if (managerAdapter == null || managerAdapter.getItemCount() == 0) {
+                showEmptyState();
+            }
         });
 
-        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
-        String token = prefManager.getString("authToken", null);
-        String managerId = prefManager.getString("userId", null);
-
+        // ── Initial fetch ──
         showLoading();
-        mViewModel.fetchEmployeesUnderManager(token, managerId);
+        mViewModel.fetchEmployeesUnderManager();
         triggerSearch();
     }
 
@@ -158,9 +176,6 @@ public class AttendanceByManagerFragment extends Fragment {
         layoutEmptyState.setVisibility(View.GONE);
         swipeRefresh.setVisibility(View.VISIBLE);
 
-        SimpleDateFormat apiFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        SimpleDateFormat displayFmt = new SimpleDateFormat("dd MMM yyyy, EEEE", Locale.getDefault());
-
         for (EmployeePunchDataItem punchData : data) {
             if (punchData == null) continue;
 
@@ -168,12 +183,10 @@ public class AttendanceByManagerFragment extends Fragment {
             boolean hasLeave = punchData.getLeaveName() != null && !punchData.getLeaveName().isEmpty();
 
             try {
-                // 1. Update Date to show Day Name
                 Date dateObj = apiFmt.parse(punchData.getPunchDate());
                 if (dateObj != null) {
-                    punchData.setPunchDateFormat(displayFmt.format(dateObj));
+                    punchData.setPunchDateFormat(displayDetailFmt.format(dateObj));
 
-                    // 2. Check for Weekend
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(dateObj);
                     int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
@@ -185,22 +198,21 @@ public class AttendanceByManagerFragment extends Fragment {
                     } else if (!hasPunchIn && !hasLeave) {
                         punchData.setLeaveName("❌ LOP / Absent ");
                         punchData.setFullDayLeave(true);
-                    } else punchData.setFullDayLeave(!hasPunchIn && hasLeave);
+                    } else {
+                        punchData.setFullDayLeave(!hasPunchIn && hasLeave);
+                    }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error parsing date for punch: " + punchData.getPunchDate(), e);
             }
 
-            // 3. Pre-calculate Times using Dynamic Shift Parameters
             if (!punchData.isFullDayLeave()) {
                 String rawPunchIn = punchData.getPunchIn();
                 String rawPunchOut = punchData.getPunchOut();
 
-                // Calculate Total Time
                 String total = DateTimeUtils.calculateTotalTime(rawPunchIn, rawPunchOut);
                 punchData.setTotalTime(total);
 
-                // Extract shift boundaries safely
                 String shiftStart = "09:00";
                 String shiftEnd = "18:00";
 
@@ -213,7 +225,6 @@ public class AttendanceByManagerFragment extends Fragment {
                     }
                 }
 
-                // Calculate Late Time & Overtime dynamically
                 punchData.setLateTime(DateTimeUtils.calculateLateTime(rawPunchIn, shiftStart));
                 punchData.setOvertime(DateTimeUtils.calculateOvertime(total, shiftStart, shiftEnd));
             }
@@ -288,5 +299,18 @@ public class AttendanceByManagerFragment extends Fragment {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        tvFromDate = null;
+        tvToDate = null;
+        tvSelectedEmployee = null;
+        layoutEmployeePicker = null;
+        swipeRefresh = null;
+        layoutEmptyState = null;
+        layoutLoading = null;
+        managerAdapter = null;
     }
 }

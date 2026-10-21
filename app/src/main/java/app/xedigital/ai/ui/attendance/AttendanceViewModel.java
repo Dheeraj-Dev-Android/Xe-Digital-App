@@ -28,12 +28,14 @@ public class AttendanceViewModel extends ViewModel {
     private static final String TAG = "AttendanceViewModel";
     private final MutableLiveData<EmployeeAttendanceResponse> _attendance = new MutableLiveData<>();
     private final MutableLiveData<String> _toastMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
     private final APIInterface apiInterface;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final MutableLiveData<Boolean> showNoDataAlert = new MutableLiveData<>(false);
     public LiveData<EmployeeAttendanceResponse> attendance = _attendance;
     public LiveData<String> toastMessage = _toastMessage;
+    public LiveData<Boolean> isLoading = _isLoading;
     private String authToken;
 
     public AttendanceViewModel() {
@@ -66,6 +68,7 @@ public class AttendanceViewModel extends ViewModel {
     }
 
     public void fetchEmployeeAttendance(String startDate, String endDate) {
+        _isLoading.setValue(true);
         if (authToken != null) {
             new Thread(() -> {
                 String authHeaderValue = "jwt " + authToken;
@@ -78,10 +81,11 @@ public class AttendanceViewModel extends ViewModel {
                                     + (responseBody.getData() != null && responseBody.getData().getEmployeePunchData() != null
                                     ? responseBody.getData().getEmployeePunchData().size() : "null"));
 
-                            // Post the response body to LiveData safely
-                            mainHandler.post(() -> _attendance.setValue(responseBody));
+                            mainHandler.post(() -> {
+                                _isLoading.setValue(false);
+                                _attendance.setValue(responseBody);
+                            });
 
-                            // Show the date range toast message
                             mainHandler.post(() -> {
                                 String message = "Attendance Showing from " + startDate + " to " + endDate;
                                 showToastMessage(message);
@@ -100,8 +104,8 @@ public class AttendanceViewModel extends ViewModel {
                         } else {
                             Log.e(TAG, "API Error Response: Code " + response.code());
 
-                            // ✅ : Post null so the observer fires and shimmer dismisses
                             mainHandler.post(() -> {
+                                _isLoading.setValue(false);
                                 _attendance.setValue(null);
                                 showNoDataAlert.setValue(true);
                             });
@@ -112,8 +116,8 @@ public class AttendanceViewModel extends ViewModel {
                     public void onFailure(@NonNull Call<EmployeeAttendanceResponse> call, @NonNull Throwable throwable) {
                         Log.e(TAG, "API Failure: " + throwable.getMessage(), throwable);
 
-                        // ✅ : Post null so the observer fires and shimmer dismisses
                         mainHandler.post(() -> {
+                            _isLoading.setValue(false);
                             _attendance.setValue(null);
                             showNoDataAlert.setValue(true);
                         });
@@ -123,8 +127,10 @@ public class AttendanceViewModel extends ViewModel {
         } else {
             Log.e(TAG, "Error: authToken is null");
 
-            // ✅ : Post null so the observer fires and shimmer dismisses
-            mainHandler.post(() -> _attendance.setValue(null));
+            mainHandler.post(() -> {
+                _isLoading.setValue(false);
+                _attendance.setValue(null);
+            });
         }
     }
 }

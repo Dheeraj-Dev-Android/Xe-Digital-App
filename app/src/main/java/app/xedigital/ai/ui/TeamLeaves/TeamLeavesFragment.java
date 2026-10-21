@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +16,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +25,7 @@ import java.util.Locale;
 import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.TeamLeavesAdapter;
 import app.xedigital.ai.model.TeamLeave.EmployeesItem;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.SecurePrefManager;
 
 public class TeamLeavesFragment extends Fragment {
@@ -32,11 +33,10 @@ public class TeamLeavesFragment extends Fragment {
     private TeamLeavesViewModel mViewModel;
 
     private RecyclerView rvEmployees;
-    private ProgressBar progressBar;
+    private CircularProgressIndicator progressBar;
     private LinearLayout layoutEmpty;
     private EditText etSearchName;
     private TeamLeavesAdapter adapter;
-    private SecurePrefManager prefManager;
 
     private List<EmployeesItem> fullEmployeeList = new ArrayList<>();
 
@@ -45,9 +45,7 @@ public class TeamLeavesFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_team_leaves, container, false);
     }
 
@@ -60,21 +58,19 @@ public class TeamLeavesFragment extends Fragment {
         layoutEmpty = view.findViewById(R.id.layout_empty);
         etSearchName = view.findViewById(R.id.etSearchName);
 
-        // Setup RecyclerView once with an empty list
         adapter = new TeamLeavesAdapter(requireContext(), new ArrayList<>());
         rvEmployees.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvEmployees.setAdapter(adapter);
 
         mViewModel = new ViewModelProvider(this).get(TeamLeavesViewModel.class);
 
-        prefManager = SecurePrefManager.getInstance(requireContext());
+        SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", null);
         String employeeId = prefManager.getString("userId", null);
 
         showLoading(true);
         mViewModel.fetchTeamLeaves("jwt " + authToken, employeeId);
 
-        // Search filter listener
         etSearchName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -90,8 +86,8 @@ public class TeamLeavesFragment extends Fragment {
             }
         });
 
-        // Observe successful data updates
         mViewModel.getEmployeesLiveData().observe(getViewLifecycleOwner(), employees -> {
+            if (!isAdded() || getView() == null) return;
             showLoading(false);
 
             if (employees == null || employees.isEmpty()) {
@@ -104,21 +100,19 @@ public class TeamLeavesFragment extends Fragment {
                 layoutEmpty.setVisibility(View.GONE);
                 rvEmployees.setVisibility(View.VISIBLE);
                 etSearchName.setVisibility(View.VISIBLE);
-
-                // Apply any existing search query
                 filterList(etSearchName.getText().toString());
             }
         });
 
-        // Observe errors to prevent infinite progress spinning
         mViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), errorMessage -> {
+            if (!isAdded() || getView() == null) return;
             showLoading(false);
             fullEmployeeList = new ArrayList<>();
             layoutEmpty.setVisibility(View.VISIBLE);
             rvEmployees.setVisibility(View.GONE);
             etSearchName.setVisibility(View.GONE);
 
-            Toast.makeText(requireContext(), "Failed to load team leaves", Toast.LENGTH_SHORT).show();
+            CustomDialogHelper.showErrorDialog(requireContext(), "Error", "Failed to load team leaves. Please try again.");
         });
     }
 
@@ -147,5 +141,15 @@ public class TeamLeavesFragment extends Fragment {
             layoutEmpty.setVisibility(View.GONE);
             etSearchName.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        rvEmployees = null;
+        progressBar = null;
+        layoutEmpty = null;
+        etSearchName = null;
+        adapter = null;
     }
 }

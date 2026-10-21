@@ -1,9 +1,8 @@
 package app.xedigital.ai.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -19,7 +19,6 @@ import java.util.List;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.model.AttandanceByManager.EmployeePunchDataItem;
-import app.xedigital.ai.ui.AttendanceByManager.AttendanceDetailActivity;
 import app.xedigital.ai.utills.DateTimeUtils;
 
 public class AttendanceByManagerAdapter extends RecyclerView.Adapter<AttendanceByManagerAdapter.ViewHolder> {
@@ -90,13 +89,13 @@ public class AttendanceByManagerAdapter extends RecyclerView.Adapter<AttendanceB
             holder.lateTimeTextView.setText(item.getLateTime());
         }
         holder.btn_viewAttendance.setOnClickListener(v -> {
-            Context context = v.getContext();
-            Intent intent = new Intent(context, AttendanceDetailActivity.class);
-
-            // Pass the item data
-            intent.putExtra("attendance_item", item);
-            context.startActivity(intent);
+            Bundle args = new Bundle();
+            args.putSerializable("attendance_item", item);
+            Navigation.findNavController(v).navigate(
+                    R.id.action_navManager_attendance_menu_to_nav_attendance_detail, args);
         });
+
+
     }
 
     @Override
