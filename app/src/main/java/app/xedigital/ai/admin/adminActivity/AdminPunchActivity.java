@@ -819,8 +819,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void showAttendanceFailedAlert(String message) {
         loadingPanel.setVisibility(View.GONE);
         runOnUiThread(() -> {
@@ -836,6 +834,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             }).show();
         });
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private void handleError(String message) {
         runOnUiThread(() -> {

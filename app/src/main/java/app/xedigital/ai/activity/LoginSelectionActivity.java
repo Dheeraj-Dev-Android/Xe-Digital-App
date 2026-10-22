@@ -3,7 +3,6 @@ package app.xedigital.ai.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 
@@ -11,9 +10,10 @@ import app.xedigital.ai.AdminMainActivity;
 import app.xedigital.ai.R;
 import app.xedigital.ai.utills.RoleAccessManager;
 import app.xedigital.ai.utills.RoleGroup;
+import app.xedigital.ai.utills.SecureBaseActivity;
 import app.xedigital.ai.utills.SecurePrefManager;
 
-public class LoginSelectionActivity extends AppCompatActivity {
+public class LoginSelectionActivity extends SecureBaseActivity {
 
     private CardView cvAdminLogin, cvEmployeeLogin;
 

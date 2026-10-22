@@ -17,7 +17,6 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 
@@ -36,12 +35,13 @@ import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.utills.BlurUtils;
 import app.xedigital.ai.utills.RoleAccessManager;
+import app.xedigital.ai.utills.SecureBaseActivity;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdminLoginActivity extends AppCompatActivity {
+public class AdminLoginActivity extends SecureBaseActivity {
 
     private static final String TAG = "AdminLogin";
     private static final int MAX_VERIFY_RETRIES = 3;

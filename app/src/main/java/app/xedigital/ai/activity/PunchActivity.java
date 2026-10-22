@@ -33,7 +33,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
@@ -84,6 +83,7 @@ import app.xedigital.ai.utills.BioMetric;
 import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.FaceOverlayView;
 import app.xedigital.ai.utills.PermissionManager;
+import app.xedigital.ai.utills.SecureBaseActivity;
 import app.xedigital.ai.utills.SecurePrefManager;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -92,7 +92,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PunchActivity extends AppCompatActivity implements BioMetric.BiometricAuthListener {
+public class PunchActivity extends SecureBaseActivity implements BioMetric.BiometricAuthListener {
 
     private static final String TAG = "PunchActivity";
     private static final int BIOMETRIC_PERMISSION_REQUEST_CODE = 100;

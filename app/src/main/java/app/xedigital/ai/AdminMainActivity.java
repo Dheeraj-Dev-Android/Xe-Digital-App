@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -38,13 +37,14 @@ import app.xedigital.ai.databinding.ActivityAdminMainBinding;
 import app.xedigital.ai.databinding.NoInternetConnectionBinding;
 import app.xedigital.ai.databinding.SlowInternetConnectionBinding;
 import app.xedigital.ai.utills.NetworkUtils;
+import app.xedigital.ai.utills.SecureBaseActivity;
 import app.xedigital.ai.utills.SecurePrefManager;
 import app.xedigital.ai.utills.UserViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdminMainActivity extends AppCompatActivity {
+public class AdminMainActivity extends SecureBaseActivity {
 
     private static final String TAG = "AdminMainActivity";
 

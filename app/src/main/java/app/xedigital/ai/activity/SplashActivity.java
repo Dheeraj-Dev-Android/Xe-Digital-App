@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -27,8 +26,9 @@ import com.bumptech.glide.request.RequestOptions;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.utills.NetworkUtils;
+import app.xedigital.ai.utills.SecureBaseActivity;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends SecureBaseActivity {
     private static final String TAG = "SplashActivity";
     private final Handler splashHandler = new Handler(Looper.getMainLooper());
     private Runnable splashRunnable;

@@ -12,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.bumptech.glide.Glide;
@@ -28,12 +27,13 @@ import app.xedigital.ai.model.user.UserModelResponse;
 import app.xedigital.ai.utills.PermissionManager;
 import app.xedigital.ai.utills.RoleAccessManager;
 import app.xedigital.ai.utills.RoleGroup;
+import app.xedigital.ai.utills.SecureBaseActivity;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends SecureBaseActivity {
 
     private static final String TAG = "LoginActivity";
     private ActivityLoginBinding binding;
@@ -345,4 +345,5 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 }
