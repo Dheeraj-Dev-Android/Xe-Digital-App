@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fragment_dashboard_bg"
-    android:padding="6dp"
     tools:context=".ui.leaves.PendingLeaveApproveFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -22,14 +21,10 @@
             android:orientation="vertical"
             android:padding="6dp">
 
-            <!-- =============================================== -->
-            <!-- HEADER BANNER                                   -->
-            <!-- =============================================== -->
             <LinearLayout
                 android:id="@+id/headerBanner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:background="@drawable/gradient_attendance_card"
                 android:elevation="8dp"
                 android:orientation="vertical"

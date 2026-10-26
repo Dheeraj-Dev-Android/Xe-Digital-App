@@ -26,6 +26,7 @@ import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
 import app.xedigital.ai.model.cfRegularizeApproval.CfRegularizeApprovalResponse;
 import app.xedigital.ai.model.claim.ExpenseRequest;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
+import app.xedigital.ai.model.claimLimit.ClaimDateLengthResponse;
 import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.claimSubmit.ClaimUpdateRequest;
@@ -154,6 +155,10 @@ public interface APIInterface {
 
     @GET("claims/employee/claimLength")
     retrofit2.Call<ClaimLengthResponse> getClaimLength(@Header("Authorization") String authToken);
+
+    //https://app.xedigital.ai/api/v1/employees/getClaimLimit
+    @GET("employees/getClaimLimit")
+    retrofit2.Call<ClaimDateLengthResponse> getClaimLimit(@Header("Authorization") String authToken);
 
     @GET("policies")
     retrofit2.Call<PolicyResponse> getPolicies(@Header("Authorization") String authToken);

@@ -835,8 +835,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         });
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void handleError(String message) {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
@@ -865,7 +863,7 @@ public class AdminPunchActivity extends AppCompatActivity {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && locationEnabled) {
 
-            LocationRequest req = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(false).setMaxUpdateDelayMillis(15000).build();
+            LocationRequest req = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setWaitForAccurateLocation(true).setMaxUpdateDelayMillis(15000).build();
 
             locationCallback = new LocationCallback() {
                 @Override
@@ -892,6 +890,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             }
         }
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private void getAddressFromLocation(double lat, double lng, AddressCallback callback) {
         new Thread(() -> {

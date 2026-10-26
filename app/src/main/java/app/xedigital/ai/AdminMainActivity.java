@@ -52,8 +52,9 @@ public class AdminMainActivity extends SecureBaseActivity {
     // Tracks which group menus are currently expanded
     private final Map<Integer, Boolean> expandedGroups = new HashMap<>();
     // Maps each parent menu header ID to its child sub-item IDs
+//    R.id.nav_employee_onboard,
     private final Map<Integer, int[]> groupChildMap = new HashMap<Integer, int[]>() {{
-        put(R.id.nav_digital_identity_menu, new int[]{R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_employee_onboard, R.id.nav_partners, R.id.nav_allUsers});
+        put(R.id.nav_digital_identity_menu, new int[]{R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers});
         put(R.id.nav_workforce_menu, new int[]{R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf});
         put(R.id.nav_talent_menu, new int[]{R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter});
         put(R.id.nav_bgv_menu, new int[]{R.id.nav_candidates_verification, R.id.nav_employment_verification});
@@ -94,8 +95,8 @@ public class AdminMainActivity extends SecureBaseActivity {
         // ── FIX: All drawer destinations are now top-level ──────────────
         // This ensures the hamburger icon stays visible on ALL screens
         // opened from the drawer, instead of showing a back arrow.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_employee_onboard, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf, R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter, R.id.nav_candidates_verification, R.id.nav_employment_verification, R.id.nav_payroll_employees, R.id.nav_salary_component, R.id.nav_upload_payroll, R.id.nav_generate_payroll, R.id.nav_payroll_config, R.id.nav_meeting_rooms, R.id.nav_book_meeting, R.id.nav_claim_managements, R.id.nav_travel_expenses, R.id.nav_food_expenses, R.id.nav_accommodation_expenses, R.id.nav_miscellaneous_expenses, R.id.nav_productivity, R.id.nav_access_management, R.id.nav_new_features, R.id.nav_visitor_categories, R.id.nav_leave_config, R.id.nav_notification, R.id.nav_visitorCheckInFragment).setOpenableLayout(drawer).build();
-
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf, R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter, R.id.nav_candidates_verification, R.id.nav_employment_verification, R.id.nav_payroll_employees, R.id.nav_salary_component, R.id.nav_upload_payroll, R.id.nav_generate_payroll, R.id.nav_payroll_config, R.id.nav_meeting_rooms, R.id.nav_book_meeting, R.id.nav_claim_managements, R.id.nav_travel_expenses, R.id.nav_food_expenses, R.id.nav_accommodation_expenses, R.id.nav_miscellaneous_expenses, R.id.nav_productivity, R.id.nav_access_management, R.id.nav_new_features, R.id.nav_visitor_categories, R.id.nav_leave_config, R.id.nav_notification, R.id.nav_visitorCheckInFragment).setOpenableLayout(drawer).build();
+//        R.id.nav_employee_onboard,
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
 
         // Custom drawer listener for expandable groups

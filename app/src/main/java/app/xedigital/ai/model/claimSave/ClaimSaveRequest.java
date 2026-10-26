@@ -4,23 +4,11 @@ import com.google.gson.annotations.SerializedName;
 
 public class ClaimSaveRequest {
 
-    @SerializedName("imageFour")
-    private String imageFour;
-
     @SerializedName("docFileURLTwo")
     private String docFileURLTwo;
 
-    @SerializedName("isMiscellaneous")
-    private boolean isMiscellaneous;
-
-    @SerializedName("docFileURLThree")
-    private String docFileURLThree;
-
     @SerializedName("imageNine")
     private String imageNine;
-
-    @SerializedName("project")
-    private String project;
 
     @SerializedName("perposeofmeet")
     private String perposeofmeet;
@@ -28,23 +16,17 @@ public class ClaimSaveRequest {
     @SerializedName("docFileURLSeven")
     private String docFileURLSeven;
 
-    @SerializedName("isFood")
-    private boolean isFood;
-
-    @SerializedName("employee")
-    private String employee;
-
-    @SerializedName("varients")
-    private String varients;
-
     @SerializedName("imageFive")
     private String imageFive;
 
-    @SerializedName("empTransport")
-    private String empTransport;
+    @SerializedName("parkingdate")
+    private String parkingdate;
 
-    @SerializedName("docFileURLKeyOne")
-    private String docFileURLKeyOne;
+    @SerializedName("checkin")
+    private String checkin;
+
+    @SerializedName("state")
+    private String state;
 
     @SerializedName("meeting")
     private String meeting;
@@ -52,17 +34,8 @@ public class ClaimSaveRequest {
     @SerializedName("docFileURLKeySix")
     private String docFileURLKeySix;
 
-    @SerializedName("isAccommodation")
-    private boolean isAccommodation;
-
-    @SerializedName("dedicated")
-    private String dedicated;
-
-    @SerializedName("image")
-    private String image;
-
-    @SerializedName("reportingManager")
-    private ReportingManager reportingManager;
+    @SerializedName("tolllocation")
+    private String tolllocation;
 
     @SerializedName("imageSeven")
     private String imageSeven;
@@ -70,17 +43,17 @@ public class ClaimSaveRequest {
     @SerializedName("toaddress")
     private String toaddress;
 
-    @SerializedName("modeoftransport")
-    private String modeoftransport;
-
-    @SerializedName("docFileURLKeyThree")
-    private String docFileURLKeyThree;
-
     @SerializedName("docFileURLKeySeven")
     private String docFileURLKeySeven;
 
     @SerializedName("confbutton")
     private boolean confbutton;
+
+    @SerializedName("billingperiod")
+    private String billingperiod;
+
+    @SerializedName("purposeofstay")
+    private String purposeofstay;
 
     @SerializedName("lastname")
     private String lastname;
@@ -91,32 +64,29 @@ public class ClaimSaveRequest {
     @SerializedName("reportingManagerEmail")
     private String reportingManagerEmail;
 
+    @SerializedName("persons")
+    private String persons;
+
     @SerializedName("imageTwo")
     private String imageTwo;
 
-    @SerializedName("docFileURLSix")
-    private String docFileURLSix;
+    @SerializedName("expancecategory")
+    private String expancecategory;
 
     @SerializedName("totalamount")
     private String totalamount;
 
-    @SerializedName("docFileURLKeyTwo")
-    private String docFileURLKeyTwo;
-
     @SerializedName("grade")
     private String grade;
 
-    @SerializedName("individually")
-    private String individually;
-
-    @SerializedName("designation")
-    private String designation;
-
-    @SerializedName("hrEmail")
-    private String hrEmail;
+    @SerializedName("guest")
+    private boolean guest;
 
     @SerializedName("totalClaim")
     private int totalClaim;
+
+    @SerializedName("status")
+    private String status;
 
     @SerializedName("docFileURLOne")
     private String docFileURLOne;
@@ -124,29 +94,26 @@ public class ClaimSaveRequest {
     @SerializedName("shared")
     private String shared;
 
-    @SerializedName("firstname")
-    private String firstname;
-
-    @SerializedName("distance")
-    private String distance;
-
     @SerializedName("imageSix")
     private String imageSix;
 
-    @SerializedName("imageOne")
-    private String imageOne;
-
     @SerializedName("docFileURL")
     private String docFileURL;
-
-    @SerializedName("remark")
-    private String remark;
 
     @SerializedName("docFileURLEight")
     private String docFileURLEight;
 
     @SerializedName("employeeCode")
     private String employeeCode;
+
+    @SerializedName("reqDepartment")
+    private ReqDepartment reqDepartment;
+
+    @SerializedName("vehiclenumber")
+    private String vehiclenumber;
+
+    @SerializedName("bu")
+    private String bu;
 
     @SerializedName("currency")
     private String currency;
@@ -157,29 +124,14 @@ public class ClaimSaveRequest {
     @SerializedName("imageThree")
     private String imageThree;
 
-    @SerializedName("docFileURLKeyEight")
-    private String docFileURLKeyEight;
+    @SerializedName("restaurant")
+    private String restaurant;
 
     @SerializedName("reportingManagerName")
     private String reportingManagerName;
 
     @SerializedName("docFileURLKeyFour")
     private String docFileURLKeyFour;
-
-    @SerializedName("docFileURLFour")
-    private String docFileURLFour;
-
-    @SerializedName("docFileURLKeyNine")
-    private String docFileURLKeyNine;
-
-    @SerializedName("claimDate")
-    private String claimDate;
-
-    @SerializedName("isTravel")
-    private boolean isTravel;
-
-    @SerializedName("docFileURLKeyFive")
-    private String docFileURLKeyFive;
 
     @SerializedName("Modeofcal")
     private String modeofcal;
@@ -190,8 +142,8 @@ public class ClaimSaveRequest {
     @SerializedName("docFileURLNine")
     private String docFileURLNine;
 
-    @SerializedName("fromaddress")
-    private String fromaddress;
+    @SerializedName("crossmanager")
+    private Crossmanager crossmanager;
 
     @SerializedName("travelCategory")
     private String travelCategory;
@@ -199,13 +151,159 @@ public class ClaimSaveRequest {
     @SerializedName("docFileURLFive")
     private String docFileURLFive;
 
-    public String getImageFour() {
-        return imageFour;
-    }
+    @SerializedName("fueltype")
+    private String fueltype;
 
-    public void setImageFour(String imageFour) {
-        this.imageFour = imageFour;
-    }
+    @SerializedName("imageFour")
+    private String imageFour;
+
+    @SerializedName("Accommodationtype")
+    private String accommodationtype;
+
+    @SerializedName("docFileURLThree")
+    private String docFileURLThree;
+
+    @SerializedName("project")
+    private String project;
+
+    @SerializedName("employee")
+    private String employee;
+
+    @SerializedName("varients")
+    private String varients;
+
+    @SerializedName("empTransport")
+    private String empTransport;
+
+
+    @SerializedName("tollvehiclenumber")
+    private String tollvehiclenumber;
+
+    @SerializedName("docFileURLKeyOne")
+    private String docFileURLKeyOne;
+
+    @SerializedName("dedicated")
+    private String dedicated;
+
+    @SerializedName("image")
+    private String image;
+
+    @SerializedName("reportingManager")
+    private ReportingManager reportingManager;
+
+    @SerializedName("modeoftransport")
+    private String modeoftransport;
+
+    @SerializedName("docFileURLKeyThree")
+    private String docFileURLKeyThree;
+
+    @SerializedName("buName")
+    private String buName;
+
+    @SerializedName("docFileURLSix")
+    private String docFileURLSix;
+
+    @SerializedName("docFileURLKeyTwo")
+    private String docFileURLKeyTwo;
+
+    @SerializedName("billnumber")
+    private String billnumber;
+
+    @SerializedName("parkinglocation")
+    private String parkinglocation;
+
+    @SerializedName("individually")
+    private String individually;
+
+    @SerializedName("designation")
+    private String designation;
+
+    @SerializedName("hrEmail")
+    private String hrEmail;
+
+    @SerializedName("tollplazaname")
+    private String tollplazaname;
+
+    @SerializedName("buEmail")
+    private String buEmail;
+
+    @SerializedName("empId")
+    private String empId;
+
+    @SerializedName("request")
+    private String request;
+
+    @SerializedName("firstname")
+    private String firstname;
+
+    @SerializedName("requestedlastname")
+    private String requestedlastname;
+
+    @SerializedName("distance")
+    private String distance;
+
+    @SerializedName("imageOne")
+    private String imageOne;
+
+    @SerializedName("description")
+    private String description;
+
+    @SerializedName("fuelstationname")
+    private String fuelstationname;
+
+    @SerializedName("remark")
+    private String remark;
+
+    @SerializedName("fuelquantity")
+    private String fuelquantity;
+
+    @SerializedName("duration")
+    private String duration;
+
+    @SerializedName("department")
+    private Department department;
+
+    @SerializedName("checkout")
+    private String checkout;
+
+    @SerializedName("expenseType")
+    private String expenseType;
+
+    @SerializedName("docFileURLKeyEight")
+    private String docFileURLKeyEight;
+
+    @SerializedName("requestedfirstname")
+    private String requestedfirstname;
+
+    @SerializedName("netprovider")
+    private String netprovider;
+
+    @SerializedName("docFileURLFour")
+    private String docFileURLFour;
+
+    @SerializedName("docFileURLKeyNine")
+    private String docFileURLKeyNine;
+
+    @SerializedName("claimDate")
+    private String claimDate;
+
+    @SerializedName("travelRefId")
+    private String travelRefId;
+
+    @SerializedName("docFileURLKeyFive")
+    private String docFileURLKeyFive;
+
+    @SerializedName("location")
+    private String location;
+
+    @SerializedName("accommodationname")
+    private String accommodationname;
+
+    @SerializedName("fromaddress")
+    private String fromaddress;
+
+    @SerializedName("meantype")
+    private String meantype;
 
     public String getDocFileURLTwo() {
         return docFileURLTwo;
@@ -215,36 +313,12 @@ public class ClaimSaveRequest {
         this.docFileURLTwo = docFileURLTwo;
     }
 
-    public boolean isIsMiscellaneous() {
-        return isMiscellaneous;
-    }
-
-    public void setIsMiscellaneous(boolean isMiscellaneous) {
-        this.isMiscellaneous = isMiscellaneous;
-    }
-
-    public String getDocFileURLThree() {
-        return docFileURLThree;
-    }
-
-    public void setDocFileURLThree(String docFileURLThree) {
-        this.docFileURLThree = docFileURLThree;
-    }
-
     public String getImageNine() {
         return imageNine;
     }
 
     public void setImageNine(String imageNine) {
         this.imageNine = imageNine;
-    }
-
-    public String getProject() {
-        return project;
-    }
-
-    public void setProject(String project) {
-        this.project = project;
     }
 
     public String getPerposeofmeet() {
@@ -263,30 +337,6 @@ public class ClaimSaveRequest {
         this.docFileURLSeven = docFileURLSeven;
     }
 
-    public boolean isIsFood() {
-        return isFood;
-    }
-
-    public void setIsFood(boolean isFood) {
-        this.isFood = isFood;
-    }
-
-    public String getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(String employee) {
-        this.employee = employee;
-    }
-
-    public String getVarients() {
-        return varients;
-    }
-
-    public void setVarients(String varients) {
-        this.varients = varients;
-    }
-
     public String getImageFive() {
         return imageFive;
     }
@@ -295,20 +345,28 @@ public class ClaimSaveRequest {
         this.imageFive = imageFive;
     }
 
-    public String getEmpTransport() {
-        return empTransport;
+    public String getParkingdate() {
+        return parkingdate;
     }
 
-    public void setEmpTransport(String empTransport) {
-        this.empTransport = empTransport;
+    public void setParkingdate(String parkingdate) {
+        this.parkingdate = parkingdate;
     }
 
-    public String getDocFileURLKeyOne() {
-        return docFileURLKeyOne;
+    public String getCheckin() {
+        return checkin;
     }
 
-    public void setDocFileURLKeyOne(String docFileURLKeyOne) {
-        this.docFileURLKeyOne = docFileURLKeyOne;
+    public void setCheckin(String checkin) {
+        this.checkin = checkin;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getMeeting() {
@@ -327,36 +385,12 @@ public class ClaimSaveRequest {
         this.docFileURLKeySix = docFileURLKeySix;
     }
 
-    public boolean isIsAccommodation() {
-        return isAccommodation;
+    public String getTolllocation() {
+        return tolllocation;
     }
 
-    public void setIsAccommodation(boolean isAccommodation) {
-        this.isAccommodation = isAccommodation;
-    }
-
-    public String getDedicated() {
-        return dedicated;
-    }
-
-    public void setDedicated(String dedicated) {
-        this.dedicated = dedicated;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public ReportingManager getReportingManager() {
-        return reportingManager;
-    }
-
-    public void setReportingManager(ReportingManager reportingManager) {
-        this.reportingManager = reportingManager;
+    public void setTolllocation(String tolllocation) {
+        this.tolllocation = tolllocation;
     }
 
     public String getImageSeven() {
@@ -375,22 +409,6 @@ public class ClaimSaveRequest {
         this.toaddress = toaddress;
     }
 
-    public String getModeoftransport() {
-        return modeoftransport;
-    }
-
-    public void setModeoftransport(String modeoftransport) {
-        this.modeoftransport = modeoftransport;
-    }
-
-    public String getDocFileURLKeyThree() {
-        return docFileURLKeyThree;
-    }
-
-    public void setDocFileURLKeyThree(String docFileURLKeyThree) {
-        this.docFileURLKeyThree = docFileURLKeyThree;
-    }
-
     public String getDocFileURLKeySeven() {
         return docFileURLKeySeven;
     }
@@ -405,6 +423,22 @@ public class ClaimSaveRequest {
 
     public void setConfbutton(boolean confbutton) {
         this.confbutton = confbutton;
+    }
+
+    public String getBillingperiod() {
+        return billingperiod;
+    }
+
+    public void setBillingperiod(String billingperiod) {
+        this.billingperiod = billingperiod;
+    }
+
+    public String getPurposeofstay() {
+        return purposeofstay;
+    }
+
+    public void setPurposeofstay(String purposeofstay) {
+        this.purposeofstay = purposeofstay;
     }
 
     public String getLastname() {
@@ -431,6 +465,14 @@ public class ClaimSaveRequest {
         this.reportingManagerEmail = reportingManagerEmail;
     }
 
+    public String getPersons() {
+        return persons;
+    }
+
+    public void setPersons(String persons) {
+        this.persons = persons;
+    }
+
     public String getImageTwo() {
         return imageTwo;
     }
@@ -439,12 +481,12 @@ public class ClaimSaveRequest {
         this.imageTwo = imageTwo;
     }
 
-    public String getDocFileURLSix() {
-        return docFileURLSix;
+    public String getExpancecategory() {
+        return expancecategory;
     }
 
-    public void setDocFileURLSix(String docFileURLSix) {
-        this.docFileURLSix = docFileURLSix;
+    public void setExpancecategory(String expancecategory) {
+        this.expancecategory = expancecategory;
     }
 
     public String getTotalamount() {
@@ -455,14 +497,6 @@ public class ClaimSaveRequest {
         this.totalamount = totalamount;
     }
 
-    public String getDocFileURLKeyTwo() {
-        return docFileURLKeyTwo;
-    }
-
-    public void setDocFileURLKeyTwo(String docFileURLKeyTwo) {
-        this.docFileURLKeyTwo = docFileURLKeyTwo;
-    }
-
     public String getGrade() {
         return grade;
     }
@@ -471,28 +505,12 @@ public class ClaimSaveRequest {
         this.grade = grade;
     }
 
-    public String getIndividually() {
-        return individually;
+    public boolean isGuest() {
+        return guest;
     }
 
-    public void setIndividually(String individually) {
-        this.individually = individually;
-    }
-
-    public String getDesignation() {
-        return designation;
-    }
-
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
-
-    public String getHrEmail() {
-        return hrEmail;
-    }
-
-    public void setHrEmail(String hrEmail) {
-        this.hrEmail = hrEmail;
+    public void setGuest(boolean guest) {
+        this.guest = guest;
     }
 
     public int getTotalClaim() {
@@ -501,6 +519,14 @@ public class ClaimSaveRequest {
 
     public void setTotalClaim(int totalClaim) {
         this.totalClaim = totalClaim;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDocFileURLOne() {
@@ -519,22 +545,6 @@ public class ClaimSaveRequest {
         this.shared = shared;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getDistance() {
-        return distance;
-    }
-
-    public void setDistance(String distance) {
-        this.distance = distance;
-    }
-
     public String getImageSix() {
         return imageSix;
     }
@@ -543,28 +553,12 @@ public class ClaimSaveRequest {
         this.imageSix = imageSix;
     }
 
-    public String getImageOne() {
-        return imageOne;
-    }
-
-    public void setImageOne(String imageOne) {
-        this.imageOne = imageOne;
-    }
-
     public String getDocFileURL() {
         return docFileURL;
     }
 
     public void setDocFileURL(String docFileURL) {
         this.docFileURL = docFileURL;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
     }
 
     public String getDocFileURLEight() {
@@ -581,6 +575,30 @@ public class ClaimSaveRequest {
 
     public void setEmployeeCode(String employeeCode) {
         this.employeeCode = employeeCode;
+    }
+
+    public ReqDepartment getReqDepartment() {
+        return reqDepartment;
+    }
+
+    public void setReqDepartment(ReqDepartment reqDepartment) {
+        this.reqDepartment = reqDepartment;
+    }
+
+    public String getVehiclenumber() {
+        return vehiclenumber;
+    }
+
+    public void setVehiclenumber(String vehiclenumber) {
+        this.vehiclenumber = vehiclenumber;
+    }
+
+    public String getBu() {
+        return bu;
+    }
+
+    public void setBu(String bu) {
+        this.bu = bu;
     }
 
     public String getCurrency() {
@@ -607,12 +625,12 @@ public class ClaimSaveRequest {
         this.imageThree = imageThree;
     }
 
-    public String getDocFileURLKeyEight() {
-        return docFileURLKeyEight;
+    public String getRestaurant() {
+        return restaurant;
     }
 
-    public void setDocFileURLKeyEight(String docFileURLKeyEight) {
-        this.docFileURLKeyEight = docFileURLKeyEight;
+    public void setRestaurant(String restaurant) {
+        this.restaurant = restaurant;
     }
 
     public String getReportingManagerName() {
@@ -629,6 +647,390 @@ public class ClaimSaveRequest {
 
     public void setDocFileURLKeyFour(String docFileURLKeyFour) {
         this.docFileURLKeyFour = docFileURLKeyFour;
+    }
+
+    public String getImageEight() {
+        return imageEight;
+    }
+
+    public void setImageEight(String imageEight) {
+        this.imageEight = imageEight;
+    }
+
+    public String getDocFileURLNine() {
+        return docFileURLNine;
+    }
+
+    public void setDocFileURLNine(String docFileURLNine) {
+        this.docFileURLNine = docFileURLNine;
+    }
+
+    public Crossmanager getCrossmanager() {
+        return crossmanager;
+    }
+
+    public void setCrossmanager(Crossmanager crossmanager) {
+        this.crossmanager = crossmanager;
+    }
+
+    public String getTravelCategory() {
+        return travelCategory;
+    }
+
+    public void setTravelCategory(String travelCategory) {
+        this.travelCategory = travelCategory;
+    }
+
+    public String getDocFileURLFive() {
+        return docFileURLFive;
+    }
+
+    public void setDocFileURLFive(String docFileURLFive) {
+        this.docFileURLFive = docFileURLFive;
+    }
+
+    public String getFueltype() {
+        return fueltype;
+    }
+
+    public void setFueltype(String fueltype) {
+        this.fueltype = fueltype;
+    }
+
+    public String getImageFour() {
+        return imageFour;
+    }
+
+    public void setImageFour(String imageFour) {
+        this.imageFour = imageFour;
+    }
+
+    public String getAccommodationtype() {
+        return accommodationtype;
+    }
+
+    public void setAccommodationtype(String accommodationtype) {
+        this.accommodationtype = accommodationtype;
+    }
+
+    public String getDocFileURLThree() {
+        return docFileURLThree;
+    }
+
+    public void setDocFileURLThree(String docFileURLThree) {
+        this.docFileURLThree = docFileURLThree;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public String getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(String employee) {
+        this.employee = employee;
+    }
+
+    public String getVarients() {
+        return varients;
+    }
+
+    public void setVarients(String varients) {
+        this.varients = varients;
+    }
+
+    public String getEmpTransport() {
+        return empTransport;
+    }
+
+    public void setEmpTransport(String empTransport) {
+        this.empTransport = empTransport;
+    }
+
+    public String getModeofcal() {
+        return modeofcal;
+    }
+
+    public void setModeofcal(String modeofcal) {
+        this.modeofcal = modeofcal;
+    }
+
+    public String getTollvehiclenumber() {
+        return tollvehiclenumber;
+    }
+
+    public void setTollvehiclenumber(String tollvehiclenumber) {
+        this.tollvehiclenumber = tollvehiclenumber;
+    }
+
+    public String getDocFileURLKeyOne() {
+        return docFileURLKeyOne;
+    }
+
+    public void setDocFileURLKeyOne(String docFileURLKeyOne) {
+        this.docFileURLKeyOne = docFileURLKeyOne;
+    }
+
+    public String getDedicated() {
+        return dedicated;
+    }
+
+    public void setDedicated(String dedicated) {
+        this.dedicated = dedicated;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public ReportingManager getReportingManager() {
+        return reportingManager;
+    }
+
+    public void setReportingManager(ReportingManager reportingManager) {
+        this.reportingManager = reportingManager;
+    }
+
+    public String getModeoftransport() {
+        return modeoftransport;
+    }
+
+    public void setModeoftransport(String modeoftransport) {
+        this.modeoftransport = modeoftransport;
+    }
+
+    public String getDocFileURLKeyThree() {
+        return docFileURLKeyThree;
+    }
+
+    public void setDocFileURLKeyThree(String docFileURLKeyThree) {
+        this.docFileURLKeyThree = docFileURLKeyThree;
+    }
+
+    public String getBuName() {
+        return buName;
+    }
+
+    public void setBuName(String buName) {
+        this.buName = buName;
+    }
+
+    public String getDocFileURLSix() {
+        return docFileURLSix;
+    }
+
+    public void setDocFileURLSix(String docFileURLSix) {
+        this.docFileURLSix = docFileURLSix;
+    }
+
+    public String getDocFileURLKeyTwo() {
+        return docFileURLKeyTwo;
+    }
+
+    public void setDocFileURLKeyTwo(String docFileURLKeyTwo) {
+        this.docFileURLKeyTwo = docFileURLKeyTwo;
+    }
+
+    public String getBillnumber() {
+        return billnumber;
+    }
+
+    public void setBillnumber(String billnumber) {
+        this.billnumber = billnumber;
+    }
+
+    public String getParkinglocation() {
+        return parkinglocation;
+    }
+
+    public void setParkinglocation(String parkinglocation) {
+        this.parkinglocation = parkinglocation;
+    }
+
+    public String getIndividually() {
+        return individually;
+    }
+
+    public void setIndividually(String individually) {
+        this.individually = individually;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getHrEmail() {
+        return hrEmail;
+    }
+
+    public void setHrEmail(String hrEmail) {
+        this.hrEmail = hrEmail;
+    }
+
+    public String getTollplazaname() {
+        return tollplazaname;
+    }
+
+    public void setTollplazaname(String tollplazaname) {
+        this.tollplazaname = tollplazaname;
+    }
+
+    public String getBuEmail() {
+        return buEmail;
+    }
+
+    public void setBuEmail(String buEmail) {
+        this.buEmail = buEmail;
+    }
+
+    public String getEmpId() {
+        return empId;
+    }
+
+    public void setEmpId(String empId) {
+        this.empId = empId;
+    }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public void setRequest(String request) {
+        this.request = request;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getRequestedlastname() {
+        return requestedlastname;
+    }
+
+    public void setRequestedlastname(String requestedlastname) {
+        this.requestedlastname = requestedlastname;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public String getImageOne() {
+        return imageOne;
+    }
+
+    public void setImageOne(String imageOne) {
+        this.imageOne = imageOne;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getFuelstationname() {
+        return fuelstationname;
+    }
+
+    public void setFuelstationname(String fuelstationname) {
+        this.fuelstationname = fuelstationname;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getFuelquantity() {
+        return fuelquantity;
+    }
+
+    public void setFuelquantity(String fuelquantity) {
+        this.fuelquantity = fuelquantity;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public String getCheckout() {
+        return checkout;
+    }
+
+    public void setCheckout(String checkout) {
+        this.checkout = checkout;
+    }
+
+    public String getExpenseType() {
+        return expenseType;
+    }
+
+    public void setExpenseType(String expenseType) {
+        this.expenseType = expenseType;
+    }
+
+    public String getDocFileURLKeyEight() {
+        return docFileURLKeyEight;
+    }
+
+    public void setDocFileURLKeyEight(String docFileURLKeyEight) {
+        this.docFileURLKeyEight = docFileURLKeyEight;
+    }
+
+    public String getRequestedfirstname() {
+        return requestedfirstname;
+    }
+
+    public void setRequestedfirstname(String requestedfirstname) {
+        this.requestedfirstname = requestedfirstname;
+    }
+
+    public String getNetprovider() {
+        return netprovider;
+    }
+
+    public void setNetprovider(String netprovider) {
+        this.netprovider = netprovider;
     }
 
     public String getDocFileURLFour() {
@@ -655,12 +1057,12 @@ public class ClaimSaveRequest {
         this.claimDate = claimDate;
     }
 
-    public boolean isIsTravel() {
-        return isTravel;
+    public String getTravelRefId() {
+        return travelRefId;
     }
 
-    public void setIsTravel(boolean isTravel) {
-        this.isTravel = isTravel;
+    public void setTravelRefId(String travelRefId) {
+        this.travelRefId = travelRefId;
     }
 
     public String getDocFileURLKeyFive() {
@@ -671,28 +1073,20 @@ public class ClaimSaveRequest {
         this.docFileURLKeyFive = docFileURLKeyFive;
     }
 
-    public String getModeofcal() {
-        return modeofcal;
+    public String getLocation() {
+        return location;
     }
 
-    public void setModeofcal(String modeofcal) {
-        this.modeofcal = modeofcal;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getImageEight() {
-        return imageEight;
+    public String getAccommodationname() {
+        return accommodationname;
     }
 
-    public void setImageEight(String imageEight) {
-        this.imageEight = imageEight;
-    }
-
-    public String getDocFileURLNine() {
-        return docFileURLNine;
-    }
-
-    public void setDocFileURLNine(String docFileURLNine) {
-        this.docFileURLNine = docFileURLNine;
+    public void setAccommodationname(String accommodationname) {
+        this.accommodationname = accommodationname;
     }
 
     public String getFromaddress() {
@@ -703,20 +1097,11 @@ public class ClaimSaveRequest {
         this.fromaddress = fromaddress;
     }
 
-    public String getTravelCategory() {
-        return travelCategory;
+    public String getMeantype() {
+        return meantype;
     }
 
-    public void setTravelCategory(String travelCategory) {
-        this.travelCategory = travelCategory;
+    public void setMeantype(String meantype) {
+        this.meantype = meantype;
     }
-
-    public String getDocFileURLFive() {
-        return docFileURLFive;
-    }
-
-    public void setDocFileURLFive(String docFileURLFive) {
-        this.docFileURLFive = docFileURLFive;
-    }
-
 }

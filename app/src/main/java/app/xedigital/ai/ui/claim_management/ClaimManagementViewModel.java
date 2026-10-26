@@ -31,7 +31,9 @@ import app.xedigital.ai.model.businessUnit.BusinessUnitResponse;
 import app.xedigital.ai.model.businessUnit.BusinessUnitSpinnerItem;
 import app.xedigital.ai.model.claim.ExpenseRequest;
 import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
+import app.xedigital.ai.model.claimLimit.ClaimDateLengthResponse;
 import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
+import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
 import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.user.UserModelResponse;
 import okhttp3.MediaType;
@@ -121,17 +123,26 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     // --- Miscellaneous Details: Fuel Expense ---
     public final MutableLiveData<String> fuelVehicleNumber = new MutableLiveData<>("");
     public final MutableLiveData<String> fuelStation = new MutableLiveData<>("");
+    public final MutableLiveData<Integer> claimBackDateLimit = new MutableLiveData<>(-1);
     private final APIInterface apiInterface;
     private final MutableLiveData<Boolean> _submissionSuccess = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> _saveSuccess = new MutableLiveData<>();
     public double claimLength;
     public String hrMail;
     private Employee employeeCache;
     private String bUemail;
     private String authTokenHeader;
-
     public ClaimManagementViewModel(@NonNull Application application) {
         super(application);
         apiInterface = APIClient.getInstance().getApi();
+    }
+
+    public LiveData<Boolean> getSaveSuccess() {
+        return _saveSuccess;
+    }
+
+    public void resetSaveSuccess() {
+        _saveSuccess.setValue(false);
     }
 
     public LiveData<Boolean> getSubmissionSuccess() {
@@ -145,6 +156,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public void initAuth(String authToken) {
         this.authTokenHeader = "jwt " + authToken;
         getClaimLength(authToken);
+        getClaimLimit(authToken);
     }
 
     private void getClaimLength(String authToken) {
@@ -160,6 +172,25 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             @Override
             public void onFailure(@NonNull Call<ClaimLengthResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimLength", "Error: " + t.getMessage());
+            }
+        });
+    }
+
+    private void getClaimLimit(String authToken) {
+        if (authToken == null) return;
+        apiInterface.getClaimLimit(authTokenHeader).enqueue(new Callback<ClaimDateLengthResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<ClaimDateLengthResponse> call, @NonNull Response<ClaimDateLengthResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    if (response.body().getData() != null) {
+                        claimBackDateLimit.postValue(response.body().getData().getClaimBackDateLimit());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ClaimDateLengthResponse> call, @NonNull Throwable t) {
+                Log.e("ClaimLimit", "Error: " + t.getMessage());
             }
         });
     }
@@ -432,7 +463,12 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 dept.setId(sanitize(employeeCache.getDepartment().getId()));
                 dept.setName(sanitize(employeeCache.getDepartment().getName()));
                 payload.setDepartment(dept);
+                app.xedigital.ai.model.claimSave.ReqDepartment reqDept = new app.xedigital.ai.model.claimSave.ReqDepartment();
+                reqDept.setId(sanitize(employeeCache.getDepartment().getId()));
+                reqDept.setName(sanitize(employeeCache.getDepartment().getName()));
+                payload.setReqDepartment(reqDept);
             }
+
 
             payload.setRequestedfirstname(sanitize(employeeCache.getFirstname()));
             payload.setRequestedlastname(sanitize(employeeCache.getLastname()));
@@ -444,7 +480,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setProject(sanitize(projectName.getValue()));
         payload.setMeeting(sanitize(meetingType != null ? meetingType.toLowerCase() : ""));
         payload.setPerposeofmeet(sanitize(purposeOfMeeting.getValue()));
-        payload.setTotalClaim((double) claimLength);
+        payload.setTotalClaim(claimLength);
         payload.setCurrency(sanitize(currency));
         payload.setTotalamount(sanitize(totalAmount.getValue()));
         payload.setRemark(sanitize(remarks.getValue()));
@@ -634,6 +670,173 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 Log.e("ExpenseSubmitAPI", label + " networking engine terminal exception", t);
                 toastMessage.setValue("Network transaction channel failed.");
+            }
+        });
+    }
+
+    private ClaimSaveRequest prepareSavePayload(String meetingType, String currency, String expenseType, String travelCategory, String transportMode, String sharedMode, String dedicatedMode) {
+        ClaimSaveRequest payload = new ClaimSaveRequest();
+
+        if (employeeCache != null) {
+            payload.setEmployee(sanitize(employeeCache.getId()));
+            payload.setEmpId(sanitize(employeeCache.getId()));
+            payload.setEmployeeCode(sanitize(employeeCache.getEmployeeCode()));
+            payload.setFirstname(sanitize(employeeCache.getFirstname()));
+            payload.setLastname(sanitize(employeeCache.getLastname()));
+            payload.setEmail(sanitize(employeeCache.getEmail()));
+            payload.setDesignation(sanitize(employeeCache.getDesignation()));
+            payload.setGrade(sanitize(employeeCache.getGrade()));
+            payload.setHrEmail(sanitize(hrMail));
+
+            if (employeeCache.getReportingManager() != null) {
+                app.xedigital.ai.model.claimSave.ReportingManager mgr = new app.xedigital.ai.model.claimSave.ReportingManager();
+                mgr.setId(sanitize(employeeCache.getReportingManager().getId()));
+                mgr.setFirstname(sanitize(employeeCache.getReportingManager().getFirstname()));
+                mgr.setLastname(sanitize(employeeCache.getReportingManager().getLastname()));
+                mgr.setEmail(sanitize(employeeCache.getReportingManager().getEmail()));
+                payload.setReportingManager(mgr);
+                payload.setReportingManagerName(sanitize(employeeCache.getReportingManager().getFirstname()));
+                payload.setReportingManagerEmail(sanitize(employeeCache.getReportingManager().getEmail()));
+            }
+
+            if (employeeCache.getDepartment() != null) {
+                app.xedigital.ai.model.claimSave.Department dept = new app.xedigital.ai.model.claimSave.Department();
+                dept.setId(sanitize(employeeCache.getDepartment().getId()));
+                dept.setName(sanitize(employeeCache.getDepartment().getName()));
+                payload.setDepartment(dept);
+            }
+
+            payload.setRequestedfirstname(sanitize(employeeCache.getFirstname()));
+            payload.setRequestedlastname(sanitize(employeeCache.getLastname()));
+        }
+
+        payload.setBu(sanitize(selectedBusinessUnitId.getValue()));
+        payload.setBuName(sanitize(selectedBusinessUnitName.getValue()));
+        payload.setBuEmail(bUemail);
+        payload.setClaimDate(sanitize(claimDate.getValue()));
+        payload.setProject(sanitize(projectName.getValue()));
+        payload.setMeeting(sanitize(meetingType != null ? meetingType.toLowerCase() : ""));
+        payload.setPerposeofmeet(sanitize(purposeOfMeeting.getValue()));
+        payload.setTotalClaim((int) claimLength);
+        payload.setCurrency(sanitize(currency));
+        payload.setTotalamount(sanitize(totalAmount.getValue()));
+        payload.setRemark(sanitize(remarks.getValue()));
+        payload.setConfbutton(false);
+        payload.setModeofcal("general");
+        payload.setRequest("");
+        payload.setStatus("");
+        payload.setVarients("");
+        payload.setIndividually("");
+        payload.setFromaddress(sanitize(startLocation.getValue()));
+        payload.setToaddress(sanitize(endLocation.getValue()));
+        payload.setDistance(sanitize(customTransportInput.getValue()));
+        payload.setEmpTransport(sanitize(customTransportInput.getValue()));
+        payload.setGuest(isGuestClaim.getValue() != null ? isGuestClaim.getValue() : false);
+
+        // Food fields
+        payload.setMeantype(sanitize(selectedMealType.getValue()));
+        payload.setRestaurant(sanitize(restaurantName.getValue()));
+        payload.setPersons(sanitize(numberOfPersons.getValue()));
+        payload.setDescription(sanitize(foodComment.getValue()));
+
+        // Travel fields
+        payload.setTravelCategory(sanitize(travelCategory));
+        payload.setModeoftransport(sanitize(transportMode));
+        payload.setShared(sanitize(sharedMode));
+        payload.setDedicated(sanitize(dedicatedMode));
+        payload.setTravelRefId(sanitize(accommodationTravelId.getValue()));
+
+        // Accommodation fields
+        payload.setAccommodationtype(sanitize(selectedAccommodationType.getValue()));
+        payload.setAccommodationname(sanitize(accommodationName.getValue()));
+        payload.setLocation(sanitize(accommodationAddress.getValue()));
+        payload.setState(sanitize(accommodationRegion.getValue()));
+        payload.setCheckin(sanitize(accommodationCheckIn.getValue()));
+        payload.setCheckout(sanitize(accommodationCheckOut.getValue()));
+        payload.setPurposeofstay(sanitize(purposeOfStay.getValue()));
+
+        // Miscellaneous fields
+        payload.setExpancecategory(sanitize(selectedMiscCategory.getValue()));
+        payload.setBillingperiod(sanitize(billingPeriod.getValue()));
+        payload.setNetprovider(sanitize(internetProvider.getValue()));
+        payload.setBillnumber(sanitize(internetBillNumber.getValue()));
+        payload.setVehiclenumber(sanitize(fuelVehicleNumber.getValue()));
+        payload.setFueltype(sanitize(selectedFuelType.getValue()));
+        payload.setFuelquantity(sanitize(fuelQuantity.getValue()));
+        payload.setFuelstationname(sanitize(fuelStation.getValue()));
+        payload.setParkinglocation(sanitize(parkingLocation.getValue()));
+        payload.setParkingdate(sanitize(parkingDate.getValue()));
+        payload.setDuration(sanitize(parkingDuration.getValue()));
+        payload.setTollvehiclenumber(sanitize(tollVehicleNumber.getValue()));
+        payload.setTollplazaname(sanitize(tollPlazaName.getValue()));
+        payload.setTolllocation(sanitize(tollLocation.getValue()));
+
+        // Expense type
+        payload.setExpenseType(sanitize(expenseType).toLowerCase());
+
+        // Document file attachments
+        payload.setImage(imageUrls[0] != null ? imageUrls[0] : "");
+        payload.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
+        payload.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
+
+        payload.setImageOne(imageUrls[1] != null ? imageUrls[1] : "");
+        payload.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
+        payload.setDocFileURLKeyOne(imageKeys[1] != null ? imageKeys[1] : "");
+
+        payload.setImageTwo(imageUrls[2] != null ? imageUrls[2] : "");
+        payload.setDocFileURLTwo(imageUrls[2] != null ? imageUrls[2] : "");
+        payload.setDocFileURLKeyTwo(imageKeys[2] != null ? imageKeys[2] : "");
+
+        payload.setImageThree(imageUrls[3] != null ? imageUrls[3] : "");
+        payload.setDocFileURLThree(imageUrls[3] != null ? imageUrls[3] : "");
+        payload.setDocFileURLKeyThree(imageKeys[3] != null ? imageKeys[3] : "");
+
+        payload.setImageFour(imageUrls[4] != null ? imageUrls[4] : "");
+        payload.setDocFileURLFour(imageUrls[4] != null ? imageUrls[4] : "");
+        payload.setDocFileURLKeyFour(imageKeys[4] != null ? imageKeys[4] : "");
+
+        payload.setImageFive(imageUrls[5] != null ? imageUrls[5] : "");
+        payload.setDocFileURLFive(imageUrls[5] != null ? imageUrls[5] : "");
+        payload.setDocFileURLKeyFive(imageKeys[5] != null ? imageKeys[5] : "");
+
+        payload.setImageSix(imageUrls[6] != null ? imageUrls[6] : "");
+        payload.setDocFileURLSix(imageUrls[6] != null ? imageUrls[6] : "");
+        payload.setDocFileURLKeySix(imageKeys[6] != null ? imageKeys[6] : "");
+
+        payload.setImageSeven(imageUrls[7] != null ? imageUrls[7] : "");
+        payload.setDocFileURLSeven(imageUrls[7] != null ? imageUrls[7] : "");
+        payload.setDocFileURLKeySeven(imageKeys[7] != null ? imageKeys[7] : "");
+
+        payload.setImageEight(imageUrls[8] != null ? imageUrls[8] : "");
+        payload.setDocFileURLEight(imageUrls[8] != null ? imageUrls[8] : "");
+        payload.setDocFileURLKeyEight(imageKeys[8] != null ? imageKeys[8] : "");
+
+        payload.setImageNine(imageUrls[9] != null ? imageUrls[9] : "");
+        payload.setDocFileURLNine(imageUrls[9] != null ? imageUrls[9] : "");
+        payload.setDocFileURLKeyNine(imageKeys[9] != null ? imageKeys[9] : "");
+
+        return payload;
+    }
+
+    public void executeSave(String expenseType, String meetingType, String currency, String travelCategory, String transportMode, String sharedMode, String dedicatedMode) {
+        ClaimSaveRequest request = prepareSavePayload(meetingType, currency, expenseType, travelCategory, transportMode, sharedMode, dedicatedMode);
+
+        apiInterface.claimSave(authTokenHeader, request).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    _saveSuccess.setValue(true);
+                    toastMessage.setValue("Claim saved as draft successfully");
+                } else {
+                    Log.e("ClaimSave", "Save error code: " + response.code());
+                    toastMessage.setValue("Failed to save claim draft.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.e("ClaimSave", "Save network error", t);
+                toastMessage.setValue("Network error while saving claim.");
             }
         });
     }

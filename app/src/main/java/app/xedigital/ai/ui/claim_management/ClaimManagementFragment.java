@@ -130,6 +130,12 @@ public class ClaimManagementFragment extends Fragment {
                 viewModel.resetSubmissionSuccess();
             }
         });
+        viewModel.getSaveSuccess().observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
+                viewModel.resetSaveSuccess();
+            }
+        });
 
         return binding.getRoot();
     }
@@ -159,7 +165,12 @@ public class ClaimManagementFragment extends Fragment {
     }
 
     private void showDatePicker(EditText targetEditText, int dateTypeKey) {
-        new DatePickerDialog(requireContext(), (view, year, month, day) -> {
+        Calendar now = Calendar.getInstance();
+        int currentYear = now.get(Calendar.YEAR);
+        int currentMonth = now.get(Calendar.MONTH);
+        int currentDay = now.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(requireContext(), (view, year, month, day) -> {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.DAY_OF_MONTH, day);
@@ -173,7 +184,52 @@ public class ClaimManagementFragment extends Fragment {
             else if (dateTypeKey == 4) viewModel.billingPeriod.setValue(formattedDate);
             else if (dateTypeKey == 5) viewModel.parkingDate.setValue(formattedDate);
 
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        }, currentYear, currentMonth, currentDay);
+
+        // Apply date restrictions only to the Claim Date picker
+        if (dateTypeKey == 1) {
+            Integer limit = viewModel.claimBackDateLimit.getValue();
+            if (limit != null && limit >= 0) {
+                if (limit == 0) {
+                    // Limit is 0: user can select any date within the current year
+                    Calendar minCal = Calendar.getInstance();
+                    minCal.set(currentYear, Calendar.JANUARY, 1, 0, 0, 0);
+                    minCal.set(Calendar.MILLISECOND, 0);
+
+                    Calendar maxCal = Calendar.getInstance();
+                    maxCal.set(currentYear, Calendar.DECEMBER, 31, 23, 59, 59);
+                    maxCal.set(Calendar.MILLISECOND, 999);
+
+                    dialog.getDatePicker().setMinDate(minCal.getTimeInMillis());
+                    dialog.getDatePicker().setMaxDate(maxCal.getTimeInMillis());
+                } else {
+                    Calendar minCal = Calendar.getInstance();
+                    Calendar maxCal = Calendar.getInstance();
+
+                    if (currentDay <= limit) {
+                        // Case A: 1st of previous month → limit-th day of current month
+                        minCal.set(currentYear, currentMonth - 1, 1, 0, 0, 0);
+                        minCal.set(Calendar.MILLISECOND, 0);
+
+                        maxCal.set(currentYear, currentMonth, limit, 23, 59, 59);
+                        maxCal.set(Calendar.MILLISECOND, 999);
+                    } else {
+                        // Case B: 1st of current month → limit-th day of next month
+                        minCal.set(currentYear, currentMonth, 1, 0, 0, 0);
+                        minCal.set(Calendar.MILLISECOND, 0);
+
+                        maxCal.set(currentYear, currentMonth + 1, limit, 23, 59, 59);
+                        maxCal.set(Calendar.MILLISECOND, 999);
+                    }
+
+                    dialog.getDatePicker().setMinDate(minCal.getTimeInMillis());
+                    dialog.getDatePicker().setMaxDate(maxCal.getTimeInMillis());
+                }
+            }
+            // If limit is -1 (API not yet loaded), no restriction is applied as a safe fallback
+        }
+
+        dialog.show();
     }
 
     private void performAction(boolean isSubmit) {
@@ -251,6 +307,14 @@ public class ClaimManagementFragment extends Fragment {
             Toast.makeText(requireContext(), "Please select an expense category", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (!isSubmit) {
+            String travelCat = binding.travelCategoryDropdown.getSelectedItem() != null ? binding.travelCategoryDropdown.getSelectedItem().toString() : "";
+            String transportMode = binding.transportModeDropdown.getSelectedItem() != null ? binding.transportModeDropdown.getSelectedItem().toString() : "";
+            String sharedMode = binding.transportModeShared.getSelectedItem() != null ? binding.transportModeShared.getSelectedItem().toString() : "";
+            String dedicatedMode = binding.transportModeDedicated.getSelectedItem() != null ? binding.transportModeDedicated.getSelectedItem().toString() : "";
+            viewModel.executeSave(activeExpenseType, meetingTypeVal, currencyVal, travelCat, transportMode, sharedMode, dedicatedMode);
+            return;
+        }
 
         // Route directly into explicit distinct target API submission methods
         switch (activeExpenseType) {
@@ -264,14 +328,7 @@ public class ClaimManagementFragment extends Fragment {
                 String sharedMode = binding.transportModeShared.getSelectedItem() != null ? binding.transportModeShared.getSelectedItem().toString() : "";
                 String dedicatedMode = binding.transportModeDedicated.getSelectedItem() != null ? binding.transportModeDedicated.getSelectedItem().toString() : "";
 
-                viewModel.executeTravelSubmit(
-                        meetingTypeVal,
-                        travelCat,
-                        transportMode,
-                        sharedMode,
-                        dedicatedMode,
-                        currencyVal
-                );
+                viewModel.executeTravelSubmit(meetingTypeVal, travelCat, transportMode, sharedMode, dedicatedMode, currencyVal);
                 break;
 
             case "Accommodation":

@@ -1936,7 +1936,6 @@
                 android:text="Save"
                 android:textColor="@color/white"
                 android:textSize="14sp"
-                android:visibility="invisible"
                 app:cornerRadius="10dp"
                 app:elevation="0dp" />
 

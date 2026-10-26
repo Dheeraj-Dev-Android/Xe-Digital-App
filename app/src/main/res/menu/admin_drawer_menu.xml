@@ -30,10 +30,10 @@
             android:id="@+id/nav_employees"
             android:title="Employees"
             android:visible="false" />
-        <item
-            android:id="@+id/nav_employee_onboard"
-            android:title="Employee Onboard Details"
-            android:visible="false" />
+        <!--        <item-->
+        <!--            android:id="@+id/nav_employee_onboard"-->
+        <!--            android:title="Employee Onboard Details"-->
+        <!--            android:visible="false" />-->
         <item
             android:id="@+id/nav_partners"
             android:title="Partners"
@@ -51,7 +51,8 @@
         <item
             android:id="@+id/nav_workforce_menu"
             android:icon="@drawable/ic_collections_bookmark"
-            android:title="Workforce Management" />
+            android:title="Workforce Management"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -104,7 +105,8 @@
         <item
             android:id="@+id/nav_talent_menu"
             android:icon="@drawable/ic_document"
-            android:title="Talent Acquisition" />
+            android:title="Talent Acquisition"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -141,7 +143,8 @@
         <item
             android:id="@+id/nav_bgv_menu"
             android:icon="@drawable/ic_policy"
-            android:title="Background Verification" />
+            android:title="Background Verification"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -162,7 +165,8 @@
         <item
             android:id="@+id/nav_payroll_menu"
             android:icon="@drawable/ic_payments"
-            android:title="Payroll Management" />
+            android:title="Payroll Management"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -195,7 +199,8 @@
         <item
             android:id="@+id/nav_meeting_menu"
             android:icon="@drawable/ic_calendar"
-            android:title="Meeting Management" />
+            android:title="Meeting Management"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -216,7 +221,8 @@
         <item
             android:id="@+id/nav_claim_menu"
             android:icon="@drawable/ic_payments"
-            android:title="Claim Management" />
+            android:title="Claim Management"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -248,7 +254,8 @@
     <item
         android:id="@+id/nav_productivity"
         android:icon="@drawable/ic_dcr"
-        android:title="Productivity Management" />
+        android:title="Productivity Management"
+        android:visible="false" />
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 10. ACCESS MANAGEMENT (Standalone)                     -->
@@ -256,7 +263,8 @@
     <item
         android:id="@+id/nav_access_management"
         android:icon="@drawable/ic_policy"
-        android:title="Access Management" />
+        android:title="Access Management"
+        android:visible="false" />
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 11. NEW FEATURES (Standalone)                          -->
@@ -264,7 +272,8 @@
     <item
         android:id="@+id/nav_new_features"
         android:icon="@drawable/ic_dashboard"
-        android:title="New Features" />
+        android:title="New Features"
+        android:visible="false" />
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 12. CONFIGURATION                                      -->
@@ -273,7 +282,8 @@
         <item
             android:id="@+id/nav_config_menu"
             android:icon="@drawable/ic_settings"
-            android:title="Configuration" />
+            android:title="Configuration"
+            android:visible="false" />
     </group>
 
     <group android:checkableBehavior="single">

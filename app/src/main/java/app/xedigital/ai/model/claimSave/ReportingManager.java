@@ -2,9 +2,8 @@ package app.xedigital.ai.model.claimSave;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
+public class ReportingManager {
 
-public class ReportingManager implements Serializable {
     @SerializedName("firstname")
     private String firstname;
 
