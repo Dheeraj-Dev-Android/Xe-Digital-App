@@ -34,6 +34,8 @@ import app.xedigital.ai.model.claimLength.ClaimLengthResponse;
 import app.xedigital.ai.model.claimLimit.ClaimDateLengthResponse;
 import app.xedigital.ai.model.claimPrice.ClaimPriceResponse;
 import app.xedigital.ai.model.claimSave.ClaimSaveRequest;
+import app.xedigital.ai.model.editClaim.EditClaimResponse;
+import app.xedigital.ai.model.employeeClaim.EmployeeClaimdataItem;
 import app.xedigital.ai.model.profile.Employee;
 import app.xedigital.ai.model.user.UserModelResponse;
 import okhttp3.MediaType;
@@ -74,7 +76,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<String> foodPersonsCount = new MutableLiveData<>("1");
     public final MutableLiveData<String> foodDescription = new MutableLiveData<>("");
 
-    // Accommodation Observables
     public final MutableLiveData<String> selectedAccommodationType = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationName = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationLocation = new MutableLiveData<>("");
@@ -83,7 +84,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<String> accommodationCheckOut = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationPurpose = new MutableLiveData<>("");
 
-    // Miscellaneous Observables
     public final MutableLiveData<String> selectedMiscCategory = new MutableLiveData<>("");
     public final MutableLiveData<String> billingPeriod = new MutableLiveData<>("");
     public final MutableLiveData<String> netProvider = new MutableLiveData<>("");
@@ -107,23 +107,30 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public final String[] imageUrls = new String[10];
     public final String[] imageKeys = new String[10];
-    // --- Food Details ---
+
     public final MutableLiveData<String> restaurantName = new MutableLiveData<>("");
     public final MutableLiveData<String> numberOfPersons = new MutableLiveData<>("");
     public final MutableLiveData<String> foodComment = new MutableLiveData<>("");
     public final MutableLiveData<String> foodTravelId = new MutableLiveData<>("");
-    // --- Accommodation Details ---
+
     public final MutableLiveData<String> accommodationAddress = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationRegion = new MutableLiveData<>("");
     public final MutableLiveData<String> purposeOfStay = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationTravelId = new MutableLiveData<>("");
-    // --- Miscellaneous Details: Internet Expense ---
+
     public final MutableLiveData<String> internetProvider = new MutableLiveData<>("");
     public final MutableLiveData<String> internetBillNumber = new MutableLiveData<>("");
-    // --- Miscellaneous Details: Fuel Expense ---
+
     public final MutableLiveData<String> fuelVehicleNumber = new MutableLiveData<>("");
     public final MutableLiveData<String> fuelStation = new MutableLiveData<>("");
     public final MutableLiveData<Integer> claimBackDateLimit = new MutableLiveData<>(-1);
+
+    private final MutableLiveData<EmployeeClaimdataItem> _editClaimData = new MutableLiveData<>();
+    // ══ NEW: Edit mode fields ══
+    public String editingClaimId = null;
+    public boolean isEditMode = false;
+    public LiveData<EmployeeClaimdataItem> editClaimData = _editClaimData;
+
     private final APIInterface apiInterface;
     private final MutableLiveData<Boolean> _submissionSuccess = new MutableLiveData<>();
     private final MutableLiveData<Boolean> _saveSuccess = new MutableLiveData<>();
@@ -132,6 +139,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     private Employee employeeCache;
     private String bUemail;
     private String authTokenHeader;
+
     public ClaimManagementViewModel(@NonNull Application application) {
         super(application);
         apiInterface = APIClient.getInstance().getApi();
@@ -159,6 +167,133 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         getClaimLimit(authToken);
     }
 
+    // ════════════════════════════════════════════════════════════════
+    //  NEW: Fetch claim by type for editing
+    // ════════════════════════════════════════════════════════════════
+    public void fetchClaimForEdit(String claimId, String expenseType) {
+        this.editingClaimId = claimId;
+        this.isEditMode = true;
+
+        Call<EditClaimResponse> call;
+        switch (expenseType != null ? expenseType.toLowerCase() : "") {
+            case "travel":
+                call = apiInterface.getTravelClaimById(authTokenHeader, claimId);
+                break;
+            case "food":
+                call = apiInterface.getFoodClaimById(authTokenHeader, claimId);
+                break;
+            case "accommodation":
+                call = apiInterface.getAccommodationClaimById(authTokenHeader, claimId);
+                break;
+            case "miscellaneous":
+                call = apiInterface.getMiscClaimById(authTokenHeader, claimId);
+                break;
+            default:
+                toastMessage.setValue("Unknown expense type: " + expenseType);
+                return;
+        }
+
+        call.enqueue(new Callback<EditClaimResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<EditClaimResponse> call, @NonNull Response<EditClaimResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    EmployeeClaimdataItem claim = response.body().getData().getClaim();
+                    if (claim != null) {
+                        _editClaimData.postValue(claim);
+                        populateFromClaim(claim);
+                    } else {
+                        toastMessage.postValue("Claim data is empty.");
+                    }
+                } else {
+                    Log.e("FetchEdit", "Error code: " + response.code());
+                    toastMessage.postValue("Failed to fetch claim for editing.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<EditClaimResponse> call, @NonNull Throwable t) {
+                Log.e("FetchEdit", "Network error", t);
+                toastMessage.postValue("Network error while fetching claim.");
+            }
+        });
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  NEW: Populate all LiveData fields from claim data (null-safe)
+    // ════════════════════════════════════════════════════════════════
+    public void populateFromClaim(EmployeeClaimdataItem c) {
+        // Common
+        claimDate.setValue(sliceDate(safe(c.getClaimDate())));
+        projectName.setValue(safe(c.getProject()));
+        purposeOfMeeting.setValue(safe(c.getPerposeofmeet()));
+        totalAmount.setValue(c.getTotalamount() != 0 ? String.valueOf(c.getTotalamount()) : "");
+        remarks.setValue(safe(c.getComment()));
+
+        // Travel
+        startLocation.setValue(safe(c.getFromaddress()));
+        endLocation.setValue(safe(c.getToaddress()));
+        customTransportInput.setValue(c.getDistance() != null ? String.valueOf(c.getDistance()) : safe(c.getEmpTransport()));
+
+        // Food (NEW field names that TextWatchers write to)
+        restaurantName.setValue(safe(c.getRestaurant()));
+        numberOfPersons.setValue(c.getPersons() != null ? String.valueOf(c.getPersons()) : "");
+        foodComment.setValue(safe(c.getDescription()));
+        selectedMealType.setValue(safe(c.getMeantype()));
+
+        // Accommodation (NEW field names)
+        accommodationName.setValue(safe(c.getAccommodationname()));
+        accommodationAddress.setValue(safe(c.getLocation()));
+        accommodationRegion.setValue(safe(c.getState()));
+        accommodationCheckIn.setValue(sliceDate(safe(c.getCheckin())));
+        accommodationCheckOut.setValue(sliceDate(safe(c.getCheckout())));
+        purposeOfStay.setValue(""); // Not available in EmployeeClaimdataItem
+        selectedAccommodationType.setValue(safe(c.getAccommodationtype()));
+
+        // Miscellaneous (NEW field names)
+        selectedMiscCategory.setValue(safe(c.getExpancecategory()));
+        billingPeriod.setValue(sliceDate(safe(c.getBillingperiod())));
+        internetProvider.setValue(safe(c.getNetprovider()));
+        internetBillNumber.setValue(safe(c.getBillnumber()));
+        fuelVehicleNumber.setValue(safe(c.getVehiclenumber()));
+        selectedFuelType.setValue(safe(c.getFueltype()));
+        fuelQuantity.setValue(safe(c.getFuelquantity()));
+        fuelStation.setValue(safe(c.getFuelstationname()));
+        parkingLocation.setValue(safe(c.getParkinglocation()));
+        parkingDate.setValue(sliceDate(safe(c.getParkingdate())));
+        parkingDuration.setValue(safe(c.getDuration()));
+        tollVehicleNumber.setValue(safe(c.getTollvehiclenumber()));
+        tollPlazaName.setValue(safe(c.getTollplazaname()));
+        tollLocation.setValue(safe(c.getTolllocation()));
+
+        // Also populate OLD fields so prepareBasePayload has values
+        // (belt-and-suspenders — the FIX below makes this redundant but safe)
+        foodRestaurant.setValue(safe(c.getRestaurant()));
+        foodPersonsCount.setValue(c.getPersons() != null ? String.valueOf(c.getPersons()) : "1");
+        foodDescription.setValue(safe(c.getDescription()));
+        accommodationLocation.setValue(safe(c.getLocation()));
+        accommodationState.setValue(safe(c.getState()));
+        accommodationPurpose.setValue("");
+        netProvider.setValue(safe(c.getNetprovider()));
+        billNumber.setValue(safe(c.getBillnumber()));
+        vehicleNumber.setValue(safe(c.getVehiclenumber()));
+        fuelStationName.setValue(safe(c.getFuelstationname()));
+    }
+
+    // ══ NEW: Helper methods ══
+    private String safe(String val) {
+        if (val == null || val.trim().isEmpty() || "null".equalsIgnoreCase(val.trim())) return "";
+        return val.trim();
+    }
+
+    private String sliceDate(String dateStr) {
+        if (dateStr != null && dateStr.length() >= 10) {
+            return dateStr.substring(0, 10);
+        }
+        return dateStr != null ? dateStr : "";
+    }
+
+    // ── Existing methods (unchanged) ──
+
     private void getClaimLength(String authToken) {
         if (authToken == null) return;
         apiInterface.getClaimLength(authTokenHeader).enqueue(new Callback<ClaimLengthResponse>() {
@@ -168,7 +303,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     claimLength = response.body().getData().getEmployeeCount();
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ClaimLengthResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimLength", "Error: " + t.getMessage());
@@ -187,7 +321,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     }
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ClaimDateLengthResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimLimit", "Error: " + t.getMessage());
@@ -206,11 +339,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     String branchId = response.body().getData().getBranch().getId();
                     getBranchData(branchId);
-                } else {
-                    Log.e("User", "Failed to fetch user data: " + response.code());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
                 Log.e("User", "Error: " + t.getMessage());
@@ -224,11 +354,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             public void onResponse(@NonNull Call<UserBranchResponse> call, @NonNull Response<UserBranchResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     hrMail = response.body().getData().getBranch().getNotificationEmail();
-                } else {
-                    Log.e("Branch", "Failed to fetch branch data: " + response.code());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<UserBranchResponse> call, @NonNull Throwable t) {
                 Log.e("Branch", "Error: " + t.getMessage());
@@ -243,11 +370,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             public void onResponse(@NonNull Call<ClaimPriceResponse> call, @NonNull Response<ClaimPriceResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d("ClaimPrices", "Claim Prices: " + response.body().getData().toString());
-                } else {
-                    Log.e("ClaimPrices", "Failed to fetch claim prices: " + response.code());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ClaimPriceResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimPrices", "Error: " + t.getMessage());
@@ -263,7 +387,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     List<BusinessUnitSpinnerItem> list = new ArrayList<>();
                     list.add(new BusinessUnitSpinnerItem("", "Please Select"));
-
                     if (response.body().getData() != null && response.body().getData().getBus() != null) {
                         for (BusItem busItem : response.body().getData().getBus()) {
                             list.add(new BusinessUnitSpinnerItem(busItem.getId(), busItem.getName()));
@@ -272,7 +395,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     businessUnitsSpinnerData.postValue(list);
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<BusinessUnitResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimViewModel", "Failed to fetch business units", t);
@@ -281,9 +403,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     }
 
     public void getEmployeesByBusinessUnit(String authTokenHeader, String businessUnitId) {
-        if (businessUnitId == null || businessUnitId.isEmpty()) {
-            return;
-        }
+        if (businessUnitId == null || businessUnitId.isEmpty()) return;
         String authToken = "jwt " + authTokenHeader;
         apiInterface.getEmployeesByBusinessUnit(authToken, businessUnitId).enqueue(new Callback<EmployeeByBusinessUnitResponse>() {
             @Override
@@ -291,28 +411,19 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     List<String> derivedEmployees = new ArrayList<>();
                     derivedEmployees.add("Please Select");
-
                     if (response.body().getData() != null && response.body().getData().getResult() != null) {
                         for (app.xedigital.ai.model.EmployeeByBusinessUnit.ResultItem emp : response.body().getData().getResult()) {
-                            String firstName = emp.getFirstname() != null ? emp.getFirstname() : "";
-                            String lastName = emp.getLastname() != null ? emp.getLastname() : "";
-                            String fullName = (firstName + " " + lastName).trim();
+                            String fullName = ((emp.getFirstname() != null ? emp.getFirstname() : "") + " " + (emp.getLastname() != null ? emp.getLastname() : "")).trim();
                             bUemail = emp.getEmail();
-
-                            if (!fullName.isEmpty()) {
-                                derivedEmployees.add(fullName);
-                            }
+                            if (!fullName.isEmpty()) derivedEmployees.add(fullName);
                         }
                     }
                     employeesList.postValue(derivedEmployees);
-                } else {
-                    Log.e("BusinessUnitEmployee", "Failed to fetch employees: " + response.code());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<EmployeeByBusinessUnitResponse> call, @NonNull Throwable t) {
-                Log.e("BusinessUnitEmployee", "Error fetching employees: " + t.getMessage());
+                Log.e("BusinessUnitEmployee", "Error: " + t.getMessage());
             }
         });
     }
@@ -327,25 +438,16 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     derivedEmployees.add("Please Select");
                     if (response.body().getData() != null && response.body().getData().getEmployees() != null) {
                         for (app.xedigital.ai.model.allEmployee.EmployeesItem emp : response.body().getData().getEmployees()) {
-                            String firstName = emp.getFirstname() != null ? emp.getFirstname() : "";
-                            String lastName = emp.getLastname() != null ? emp.getLastname() : "";
-                            String fullName = (firstName + " " + lastName).trim();
-
-                            if (!fullName.isEmpty()) {
-                                derivedEmployees.add(fullName);
-                            }
+                            String fullName = ((emp.getFirstname() != null ? emp.getFirstname() : "") + " " + (emp.getLastname() != null ? emp.getLastname() : "")).trim();
+                            if (!fullName.isEmpty()) derivedEmployees.add(fullName);
                         }
                     }
                     employeesList.postValue(derivedEmployees);
-                    Log.d("AllEmployees", "All employees successfully parsed.");
-                } else {
-                    Log.e("AllEmployees", "Failed to fetch all employees: " + response.code());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<AllEmployeeResponse> call, @NonNull Throwable t) {
-                Log.e("AllEmployees", "Error fetching all employees: " + t.getMessage());
+                Log.e("AllEmployees", "Error: " + t.getMessage());
             }
         });
     }
@@ -355,20 +457,15 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         try {
             InputStream inputStream = getApplication().getContentResolver().openInputStream(uri);
             if (inputStream == null) return;
-
             ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int len;
-            while ((len = inputStream.read(buffer)) != -1) {
-                byteBuffer.write(buffer, 0, len);
-            }
+            while ((len = inputStream.read(buffer)) != -1) byteBuffer.write(buffer, 0, len);
             String base64String = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-
             JSONObject jsonObject = new JSONObject();
             String keyPrefix = index == 0 ? "image" : "image" + getWordExtension(index);
             jsonObject.put(keyPrefix, "data:image/png;base64," + base64String);
             jsonObject.put("bucketName", "xe-digital-bucket/claims");
-
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
             Call<ResponseBody> uploadCall;
             if (index == 0)
@@ -391,7 +488,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 uploadCall = APIClient.getInstance().getUploadImage().uploadImage8(authTokenHeader, requestBody);
             else
                 uploadCall = APIClient.getInstance().getUploadImage().uploadImage9(authTokenHeader, requestBody);
-
             uploadCall.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -409,12 +505,10 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                         }
                     }
                 }
-
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 }
             });
-
         } catch (IOException | JSONException e) {
             Log.e("Upload", "File streaming error", e);
         }
@@ -426,14 +520,18 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     }
 
     private String sanitize(String val) {
-        if (val == null || val.trim().isEmpty() || "Please Select".equalsIgnoreCase(val.trim()) || "Select an option".equalsIgnoreCase(val.trim()) || "N/A".equalsIgnoreCase(val.trim())) {
+        if (val == null || val.trim().isEmpty() || "Please Select".equalsIgnoreCase(val.trim()) || "Select an option".equalsIgnoreCase(val.trim()) || "N/A".equalsIgnoreCase(val.trim()))
             return "";
-        }
         return val.trim();
     }
 
     private ExpenseRequest prepareBasePayload(String meetingType, String currency) {
         ExpenseRequest payload = new ExpenseRequest();
+
+        // ══ NEW: Set _id for edit mode ══
+        if (isEditMode && editingClaimId != null) {
+            payload.setId(editingClaimId);
+        }
 
         if (employeeCache != null) {
             payload.setEmployee(sanitize(employeeCache.getId()));
@@ -445,19 +543,16 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             payload.setDesignation(sanitize(employeeCache.getDesignation()));
             payload.setGrade(sanitize(employeeCache.getGrade()));
             payload.setHrEmail(sanitize(hrMail));
-
             if (employeeCache.getReportingManager() != null) {
                 ExpenseRequest.Manager mgr = new ExpenseRequest.Manager();
                 mgr.setId(sanitize(employeeCache.getReportingManager().getId()));
                 mgr.setFirstname(sanitize(employeeCache.getReportingManager().getFirstname()));
                 mgr.setLastname(sanitize(employeeCache.getReportingManager().getLastname()));
                 mgr.setEmail(sanitize(employeeCache.getReportingManager().getEmail()));
-
                 payload.setReportingManager(mgr);
                 payload.setReportingManagerName(sanitize(employeeCache.getReportingManager().getFirstname()));
                 payload.setReportingManagerEmail(sanitize(employeeCache.getReportingManager().getEmail()));
             }
-
             if (employeeCache.getDepartment() != null) {
                 ExpenseRequest.Department dept = new ExpenseRequest.Department();
                 dept.setId(sanitize(employeeCache.getDepartment().getId()));
@@ -468,8 +563,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 reqDept.setName(sanitize(employeeCache.getDepartment().getName()));
                 payload.setReqDepartment(reqDept);
             }
-
-
             payload.setRequestedfirstname(sanitize(employeeCache.getFirstname()));
             payload.setRequestedlastname(sanitize(employeeCache.getLastname()));
         }
@@ -493,25 +586,27 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setDistance(sanitize(customTransportInput.getValue()));
         payload.setEmpTransport(sanitize(customTransportInput.getValue()));
         payload.setGuest(isGuestClaim.getValue() != null ? isGuestClaim.getValue() : false);
+
+        // ══ FIX: Read from NEW LiveData fields (the ones TextWatchers actually write to) ══
         payload.setMeantype(sanitize(selectedMealType.getValue()));
-        payload.setRestaurant(sanitize(foodRestaurant.getValue()));
-        payload.setPersons(sanitize(foodPersonsCount.getValue()));
-        payload.setDescription(sanitize(foodDescription.getValue()));
+        payload.setRestaurant(sanitize(restaurantName.getValue()));          // was: foodRestaurant
+        payload.setPersons(sanitize(numberOfPersons.getValue()));            // was: foodPersonsCount
+        payload.setDescription(sanitize(foodComment.getValue()));            // was: foodDescription
         payload.setAccommodationtype(sanitize(selectedAccommodationType.getValue()));
         payload.setAccommodationname(sanitize(accommodationName.getValue()));
-        payload.setLocation(sanitize(accommodationLocation.getValue()));
-        payload.setState(sanitize(accommodationState.getValue()));
+        payload.setLocation(sanitize(accommodationAddress.getValue()));      // was: accommodationLocation
+        payload.setState(sanitize(accommodationRegion.getValue()));          // was: accommodationState
         payload.setCheckin(sanitize(accommodationCheckIn.getValue()));
         payload.setCheckout(sanitize(accommodationCheckOut.getValue()));
-        payload.setPurposeofstay(sanitize(accommodationPurpose.getValue()));
+        payload.setPurposeofstay(sanitize(purposeOfStay.getValue()));        // was: accommodationPurpose
         payload.setExpancecategory(sanitize(selectedMiscCategory.getValue()));
         payload.setBillingperiod(sanitize(billingPeriod.getValue()));
-        payload.setNetprovider(sanitize(netProvider.getValue()));
-        payload.setBillnumber(sanitize(billNumber.getValue()));
-        payload.setVehiclenumber(sanitize(vehicleNumber.getValue()));
+        payload.setNetprovider(sanitize(internetProvider.getValue()));       // was: netProvider
+        payload.setBillnumber(sanitize(internetBillNumber.getValue()));      // was: billNumber
+        payload.setVehiclenumber(sanitize(fuelVehicleNumber.getValue()));    // was: vehicleNumber
         payload.setFueltype(sanitize(selectedFuelType.getValue()));
         payload.setFuelquantity(sanitize(fuelQuantity.getValue()));
-        payload.setFuelstationname(sanitize(fuelStationName.getValue()));
+        payload.setFuelstationname(sanitize(fuelStation.getValue()));        // was: fuelStationName
         payload.setParkinglocation(sanitize(parkingLocation.getValue()));
         payload.setParkingdate(sanitize(parkingDate.getValue()));
         payload.setDuration(sanitize(parkingDuration.getValue()));
@@ -519,43 +614,33 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setTollplazaname(sanitize(tollPlazaName.getValue()));
         payload.setTolllocation(sanitize(tollLocation.getValue()));
 
-        // Document File Attachments
         payload.setImage(imageUrls[0] != null ? imageUrls[0] : "");
         payload.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
         payload.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
-
         payload.setImageOne(imageUrls[1] != null ? imageUrls[1] : "");
         payload.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
         payload.setDocFileURLKeyOne(imageKeys[1] != null ? imageKeys[1] : "");
-
         payload.setImageTwo(imageUrls[2] != null ? imageUrls[2] : "");
         payload.setDocFileURLTwo(imageUrls[2] != null ? imageUrls[2] : "");
         payload.setDocFileURLKeyTwo(imageKeys[2] != null ? imageKeys[2] : "");
-
         payload.setImageThree(imageUrls[3] != null ? imageUrls[3] : "");
         payload.setDocFileURLThree(imageUrls[3] != null ? imageUrls[3] : "");
         payload.setDocFileURLKeyThree(imageKeys[3] != null ? imageKeys[3] : "");
-
         payload.setImageFour(imageUrls[4] != null ? imageUrls[4] : "");
         payload.setDocFileURLFour(imageUrls[4] != null ? imageUrls[4] : "");
         payload.setDocFileURLKeyFour(imageKeys[4] != null ? imageKeys[4] : "");
-
         payload.setImageFive(imageUrls[5] != null ? imageUrls[5] : "");
         payload.setDocFileURLFive(imageUrls[5] != null ? imageUrls[5] : "");
         payload.setDocFileURLKeyFive(imageKeys[5] != null ? imageKeys[5] : "");
-
         payload.setImageSix(imageUrls[6] != null ? imageUrls[6] : "");
         payload.setDocFileURLSix(imageUrls[6] != null ? imageUrls[6] : "");
         payload.setDocFileURLKeySix(imageKeys[6] != null ? imageKeys[6] : "");
-
         payload.setImageSeven(imageUrls[7] != null ? imageUrls[7] : "");
         payload.setDocFileURLSeven(imageUrls[7] != null ? imageUrls[7] : "");
         payload.setDocFileURLKeySeven(imageKeys[7] != null ? imageKeys[7] : "");
-
         payload.setImageEight(imageUrls[8] != null ? imageUrls[8] : "");
         payload.setDocFileURLEight(imageUrls[8] != null ? imageUrls[8] : "");
         payload.setDocFileURLKeyEight(imageKeys[8] != null ? imageKeys[8] : "");
-
         payload.setImageNine(imageUrls[9] != null ? imageUrls[9] : "");
         payload.setDocFileURLNine(imageUrls[9] != null ? imageUrls[9] : "");
         payload.setDocFileURLKeyNine(imageKeys[9] != null ? imageKeys[9] : "");
@@ -563,25 +648,20 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         return payload;
     }
 
-    // --- EXPENSE SUBMIT API TARGET METHODS ---
-
     public void executeFoodSubmit(String meetingType, String currency) {
         ExpenseRequest request = prepareBasePayload(meetingType, currency);
         request.setExpenseType("food");
         request.setGuest(isGuestClaim.getValue() != null ? isGuestClaim.getValue() : false);
-
         request.setMeantype(sanitize(selectedMealType.getValue()));
-        request.setRestaurant(sanitize(foodRestaurant.getValue()));
-        request.setPersons(sanitize(foodPersonsCount.getValue()));
-        request.setDescription(sanitize(foodDescription.getValue()));
-
+        request.setRestaurant(sanitize(restaurantName.getValue()));
+        request.setPersons(sanitize(numberOfPersons.getValue()));
+        request.setDescription(sanitize(foodComment.getValue()));
         executeNetworkCall(request, "Food");
     }
 
     public void executeTravelSubmit(String meetingType, String travelCategory, String transportMode, String sharedMode, String dedicatedMode, String currency) {
         ExpenseRequest request = prepareBasePayload(meetingType, currency);
         request.setExpenseType("travel");
-
         request.setFromaddress(sanitize(startLocation.getValue()));
         request.setToaddress(sanitize(endLocation.getValue()));
         request.setTravelCategory(sanitize(travelCategory));
@@ -590,67 +670,86 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         request.setDedicated(sanitize(dedicatedMode));
         request.setDistance(sanitize(customTransportInput.getValue()));
         request.setEmpTransport(sanitize(customTransportInput.getValue()));
-
         executeNetworkCall(request, "Travel");
     }
 
     public void executeAccommodationSubmit(String meetingType, String currency) {
         ExpenseRequest request = prepareBasePayload(meetingType, currency);
         request.setExpenseType("accommodation");
-
         request.setAccommodationtype(sanitize(selectedAccommodationType.getValue()));
         request.setAccommodationname(sanitize(accommodationName.getValue()));
-        request.setLocation(sanitize(accommodationLocation.getValue()));
-        request.setState(sanitize(accommodationState.getValue()));
+        request.setLocation(sanitize(accommodationAddress.getValue()));
+        request.setState(sanitize(accommodationRegion.getValue()));
         request.setCheckin(sanitize(accommodationCheckIn.getValue()));
         request.setCheckout(sanitize(accommodationCheckOut.getValue()));
-        request.setPurposeofstay(sanitize(accommodationPurpose.getValue()));
-
+        request.setPurposeofstay(sanitize(purposeOfStay.getValue()));
         executeNetworkCall(request, "Accommodation");
     }
 
     public void executeMiscSubmit(String meetingType, String currency) {
         ExpenseRequest request = prepareBasePayload(meetingType, currency);
         request.setExpenseType("miscellaneous");
-
         request.setExpancecategory(sanitize(selectedMiscCategory.getValue()));
         request.setBillingperiod(sanitize(billingPeriod.getValue()));
-        request.setNetprovider(sanitize(netProvider.getValue()));
-        request.setBillnumber(sanitize(billNumber.getValue()));
-        request.setVehiclenumber(sanitize(vehicleNumber.getValue()));
+        request.setNetprovider(sanitize(internetProvider.getValue()));
+        request.setBillnumber(sanitize(internetBillNumber.getValue()));
+        request.setVehiclenumber(sanitize(fuelVehicleNumber.getValue()));
         request.setFueltype(sanitize(selectedFuelType.getValue()));
         request.setFuelquantity(sanitize(fuelQuantity.getValue()));
-        request.setFuelstationname(sanitize(fuelStationName.getValue()));
+        request.setFuelstationname(sanitize(fuelStation.getValue()));
         request.setParkinglocation(sanitize(parkingLocation.getValue()));
         request.setParkingdate(sanitize(parkingDate.getValue()));
         request.setDuration(sanitize(parkingDuration.getValue()));
         request.setTollvehiclenumber(sanitize(tollVehicleNumber.getValue()));
         request.setTollplazaname(sanitize(tollPlazaName.getValue()));
         request.setTolllocation(sanitize(tollLocation.getValue()));
-
         executeNetworkCall(request, "Miscellaneous");
     }
 
-    // --- DYNAMIC ENDPOINT ROUTING NETWORK EXECUTION BLOCK ---
+    // ════════════════════════════════════════════════════════════════
+    //  CHANGED: Route to PUT endpoints when in edit mode
+    // ════════════════════════════════════════════════════════════════
     private void executeNetworkCall(ExpenseRequest requestBody, final String label) {
         Call<ResponseBody> apiCall;
 
-        switch (label) {
-            case "Food":
-                apiCall = apiInterface.FoodClaimApi(authTokenHeader, requestBody);
-                break;
-            case "Travel":
-                apiCall = apiInterface.TravelClaimApi(authTokenHeader, requestBody);
-                break;
-            case "Accommodation":
-                apiCall = apiInterface.AccommodationClaimApi(authTokenHeader, requestBody);
-                break;
-            case "Miscellaneous":
-                apiCall = apiInterface.MiscellaneousClaimApi(authTokenHeader, requestBody);
-                break;
-            default:
-                toastMessage.setValue("Unsupported expense type routing.");
-                return;
+        if (isEditMode && editingClaimId != null) {
+            // ── EDIT MODE: Use PUT endpoints ──
+            switch (label) {
+                case "Food":
+                    apiCall = apiInterface.updateFoodClaim(authTokenHeader, editingClaimId, requestBody);
+                    break;
+                case "Travel":
+                    apiCall = apiInterface.updateTravelClaim(authTokenHeader, editingClaimId, requestBody);
+                    break;
+                case "Accommodation":
+                    apiCall = apiInterface.updateAccommodationClaim(authTokenHeader, editingClaimId, requestBody);
+                    break;
+                case "Miscellaneous":
+                    apiCall = apiInterface.updateMiscClaim(authTokenHeader, editingClaimId, requestBody);
+                    break;
+                default:
+                    toastMessage.setValue("Unsupported expense type routing.");
+                    return;
+            }
+        } else {
+            // ── CREATE MODE: Use POST endpoints (original behavior) ──
+            switch (label) {
+                case "Food":
+                    apiCall = apiInterface.FoodClaimApi(authTokenHeader, requestBody);
+                    break;
+                case "Travel":
+                    apiCall = apiInterface.TravelClaimApi(authTokenHeader, requestBody);
+                    break;
+                case "Accommodation":
+                    apiCall = apiInterface.AccommodationClaimApi(authTokenHeader, requestBody);
+                    break;
+                case "Miscellaneous":
+                    apiCall = apiInterface.MiscellaneousClaimApi(authTokenHeader, requestBody);
+                    break;
+                default:
+                    toastMessage.setValue("Unsupported expense type routing.");
+                    return;
+            }
         }
 
         apiCall.enqueue(new Callback<ResponseBody>() {
@@ -659,23 +758,27 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 if (response.isSuccessful()) {
                     operationSuccess.setValue(true);
                     _submissionSuccess.setValue(true);
-                    toastMessage.setValue(label + " claim submitted successfully");
+                    toastMessage.setValue(label + " claim " + (isEditMode ? "updated" : "submitted") + " successfully");
                 } else {
-                    Log.e("ExpenseSubmitAPI", label + " transaction error code: " + response.code());
-                    toastMessage.setValue("Failed to process " + label.toLowerCase() + " request parameters.");
+                    Log.e("ExpenseSubmitAPI", label + " error code: " + response.code());
+                    toastMessage.setValue("Failed to " + (isEditMode ? "update" : "submit") + " " + label.toLowerCase() + " claim.");
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Log.e("ExpenseSubmitAPI", label + " networking engine terminal exception", t);
-                toastMessage.setValue("Network transaction channel failed.");
+                Log.e("ExpenseSubmitAPI", label + " network error", t);
+                toastMessage.setValue("Network error.");
             }
         });
     }
 
     private ClaimSaveRequest prepareSavePayload(String meetingType, String currency, String expenseType, String travelCategory, String transportMode, String sharedMode, String dedicatedMode) {
         ClaimSaveRequest payload = new ClaimSaveRequest();
+
+        // ══ NEW: Set _id for edit mode ══
+        if (isEditMode && editingClaimId != null) {
+            payload.setId(editingClaimId);
+        }
 
         if (employeeCache != null) {
             payload.setEmployee(sanitize(employeeCache.getId()));
@@ -687,7 +790,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
             payload.setDesignation(sanitize(employeeCache.getDesignation()));
             payload.setGrade(sanitize(employeeCache.getGrade()));
             payload.setHrEmail(sanitize(hrMail));
-
             if (employeeCache.getReportingManager() != null) {
                 app.xedigital.ai.model.claimSave.ReportingManager mgr = new app.xedigital.ai.model.claimSave.ReportingManager();
                 mgr.setId(sanitize(employeeCache.getReportingManager().getId()));
@@ -698,18 +800,15 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                 payload.setReportingManagerName(sanitize(employeeCache.getReportingManager().getFirstname()));
                 payload.setReportingManagerEmail(sanitize(employeeCache.getReportingManager().getEmail()));
             }
-
             if (employeeCache.getDepartment() != null) {
                 app.xedigital.ai.model.claimSave.Department dept = new app.xedigital.ai.model.claimSave.Department();
                 dept.setId(sanitize(employeeCache.getDepartment().getId()));
                 dept.setName(sanitize(employeeCache.getDepartment().getName()));
                 payload.setDepartment(dept);
             }
-
             payload.setRequestedfirstname(sanitize(employeeCache.getFirstname()));
             payload.setRequestedlastname(sanitize(employeeCache.getLastname()));
         }
-
         payload.setBu(sanitize(selectedBusinessUnitId.getValue()));
         payload.setBuName(sanitize(selectedBusinessUnitName.getValue()));
         payload.setBuEmail(bUemail);
@@ -732,21 +831,15 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setDistance(sanitize(customTransportInput.getValue()));
         payload.setEmpTransport(sanitize(customTransportInput.getValue()));
         payload.setGuest(isGuestClaim.getValue() != null ? isGuestClaim.getValue() : false);
-
-        // Food fields
         payload.setMeantype(sanitize(selectedMealType.getValue()));
         payload.setRestaurant(sanitize(restaurantName.getValue()));
         payload.setPersons(sanitize(numberOfPersons.getValue()));
         payload.setDescription(sanitize(foodComment.getValue()));
-
-        // Travel fields
         payload.setTravelCategory(sanitize(travelCategory));
         payload.setModeoftransport(sanitize(transportMode));
         payload.setShared(sanitize(sharedMode));
         payload.setDedicated(sanitize(dedicatedMode));
         payload.setTravelRefId(sanitize(accommodationTravelId.getValue()));
-
-        // Accommodation fields
         payload.setAccommodationtype(sanitize(selectedAccommodationType.getValue()));
         payload.setAccommodationname(sanitize(accommodationName.getValue()));
         payload.setLocation(sanitize(accommodationAddress.getValue()));
@@ -754,8 +847,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setCheckin(sanitize(accommodationCheckIn.getValue()));
         payload.setCheckout(sanitize(accommodationCheckOut.getValue()));
         payload.setPurposeofstay(sanitize(purposeOfStay.getValue()));
-
-        // Miscellaneous fields
         payload.setExpancecategory(sanitize(selectedMiscCategory.getValue()));
         payload.setBillingperiod(sanitize(billingPeriod.getValue()));
         payload.setNetprovider(sanitize(internetProvider.getValue()));
@@ -770,47 +861,35 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         payload.setTollvehiclenumber(sanitize(tollVehicleNumber.getValue()));
         payload.setTollplazaname(sanitize(tollPlazaName.getValue()));
         payload.setTolllocation(sanitize(tollLocation.getValue()));
-
-        // Expense type
         payload.setExpenseType(sanitize(expenseType).toLowerCase());
 
-        // Document file attachments
         payload.setImage(imageUrls[0] != null ? imageUrls[0] : "");
         payload.setDocFileURL(imageUrls[0] != null ? imageUrls[0] : "");
         payload.setDocFileURLKey(imageKeys[0] != null ? imageKeys[0] : "");
-
         payload.setImageOne(imageUrls[1] != null ? imageUrls[1] : "");
         payload.setDocFileURLOne(imageUrls[1] != null ? imageUrls[1] : "");
         payload.setDocFileURLKeyOne(imageKeys[1] != null ? imageKeys[1] : "");
-
         payload.setImageTwo(imageUrls[2] != null ? imageUrls[2] : "");
         payload.setDocFileURLTwo(imageUrls[2] != null ? imageUrls[2] : "");
         payload.setDocFileURLKeyTwo(imageKeys[2] != null ? imageKeys[2] : "");
-
         payload.setImageThree(imageUrls[3] != null ? imageUrls[3] : "");
         payload.setDocFileURLThree(imageUrls[3] != null ? imageUrls[3] : "");
         payload.setDocFileURLKeyThree(imageKeys[3] != null ? imageKeys[3] : "");
-
         payload.setImageFour(imageUrls[4] != null ? imageUrls[4] : "");
         payload.setDocFileURLFour(imageUrls[4] != null ? imageUrls[4] : "");
         payload.setDocFileURLKeyFour(imageKeys[4] != null ? imageKeys[4] : "");
-
         payload.setImageFive(imageUrls[5] != null ? imageUrls[5] : "");
         payload.setDocFileURLFive(imageUrls[5] != null ? imageUrls[5] : "");
         payload.setDocFileURLKeyFive(imageKeys[5] != null ? imageKeys[5] : "");
-
         payload.setImageSix(imageUrls[6] != null ? imageUrls[6] : "");
         payload.setDocFileURLSix(imageUrls[6] != null ? imageUrls[6] : "");
         payload.setDocFileURLKeySix(imageKeys[6] != null ? imageKeys[6] : "");
-
         payload.setImageSeven(imageUrls[7] != null ? imageUrls[7] : "");
         payload.setDocFileURLSeven(imageUrls[7] != null ? imageUrls[7] : "");
         payload.setDocFileURLKeySeven(imageKeys[7] != null ? imageKeys[7] : "");
-
         payload.setImageEight(imageUrls[8] != null ? imageUrls[8] : "");
         payload.setDocFileURLEight(imageUrls[8] != null ? imageUrls[8] : "");
         payload.setDocFileURLKeyEight(imageKeys[8] != null ? imageKeys[8] : "");
-
         payload.setImageNine(imageUrls[9] != null ? imageUrls[9] : "");
         payload.setDocFileURLNine(imageUrls[9] != null ? imageUrls[9] : "");
         payload.setDocFileURLKeyNine(imageKeys[9] != null ? imageKeys[9] : "");
@@ -820,7 +899,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public void executeSave(String expenseType, String meetingType, String currency, String travelCategory, String transportMode, String sharedMode, String dedicatedMode) {
         ClaimSaveRequest request = prepareSavePayload(meetingType, currency, expenseType, travelCategory, transportMode, sharedMode, dedicatedMode);
-
         apiInterface.claimSave(authTokenHeader, request).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -832,7 +910,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     toastMessage.setValue("Failed to save claim draft.");
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 Log.e("ClaimSave", "Save network error", t);
@@ -853,13 +930,11 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         selectedBusinessUnitId.setValue("");
         selectedBusinessUnitName.setValue("");
         underProcessTextState.setValue("");
-
         selectedMealType.setValue("");
         isGuestClaim.setValue(false);
         foodRestaurant.setValue("");
         foodPersonsCount.setValue("1");
         foodDescription.setValue("");
-
         selectedAccommodationType.setValue("");
         accommodationName.setValue("");
         accommodationLocation.setValue("");
@@ -867,7 +942,6 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         accommodationCheckIn.setValue("");
         accommodationCheckOut.setValue("");
         accommodationPurpose.setValue("");
-
         selectedMiscCategory.setValue("");
         billingPeriod.setValue("");
         netProvider.setValue("");
@@ -882,12 +956,27 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         tollVehicleNumber.setValue("");
         tollPlazaName.setValue("");
         tollLocation.setValue("");
-
         isTravelSelected.setValue(false);
         transportLayoutType.setValue(0);
         showCustomTransportInput.setValue(false);
         Arrays.fill(imageUrls, null);
         Arrays.fill(imageKeys, null);
         employeesList.setValue(new ArrayList<>(Collections.singletonList("Please Select")));
+
+        // ══ NEW: Clear NEW fields too ══
+        restaurantName.setValue("");
+        numberOfPersons.setValue("");
+        foodComment.setValue("");
+        accommodationAddress.setValue("");
+        accommodationRegion.setValue("");
+        purposeOfStay.setValue("");
+        internetProvider.setValue("");
+        internetBillNumber.setValue("");
+        fuelVehicleNumber.setValue("");
+        fuelStation.setValue("");
+
+        // ══ NEW: Reset edit mode ══
+        isEditMode = false;
+        editingClaimId = null;
     }
 }

@@ -2,6 +2,8 @@ package app.xedigital.ai.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -154,10 +156,27 @@ public class LoginActivity extends SecureBaseActivity {
         callLoginApi(savedEmail, savedPassword, false);
     }
 
+    private int getAppVersionCode() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return Build.VERSION.SDK_INT >= 28 ? (int) info.getLongVersionCode() : info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
+
+    private String getAppVersionName() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
     private void callLoginApi(String email, String password, boolean isManualLogin) {
         if (isManualLogin) showLoading(true);
 
-        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password);
+        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(
+                email, password, true, getAppVersionCode(), getAppVersionName(), "android");
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {

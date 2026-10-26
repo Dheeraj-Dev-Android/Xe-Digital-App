@@ -1937,6 +1937,7 @@
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 app:cornerRadius="10dp"
+                android:visibility="gone"
                 app:elevation="0dp" />
 
             <com.google.android.material.button.MaterialButton

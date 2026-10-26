@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ import app.xedigital.ai.R;
 import app.xedigital.ai.adapter.CurrencyArrayAdapter;
 import app.xedigital.ai.databinding.FragmentClaimManagementBinding;
 import app.xedigital.ai.model.businessUnit.BusinessUnitSpinnerItem;
+import app.xedigital.ai.model.employeeClaim.EmployeeClaimdataItem;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
 import app.xedigital.ai.utills.SecurePrefManager;
 
@@ -55,6 +57,9 @@ public class ClaimManagementFragment extends Fragment {
     private FragmentClaimManagementBinding binding;
     private ClaimManagementViewModel viewModel;
     private ActivityResultLauncher<Intent> filePickerLauncher;
+
+    private boolean isEditMode = false;
+    private String editClaimId = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +95,14 @@ public class ClaimManagementFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentClaimManagementBinding.inflate(inflater, container, false);
 
+        // ══ NEW: Read edit mode arguments ══
+        if (getArguments() != null) {
+            isEditMode = getArguments().getBoolean("isEditMode", false);
+            editClaimId = getArguments().getString("claimId", "");
+            viewModel.isEditMode = isEditMode;
+            viewModel.editingClaimId = isEditMode ? editClaimId : null;
+        }
+
         setupPickersAndButtons();
         setupDropdownObservers();
         setupLayoutVisibilityLogic();
@@ -112,6 +125,7 @@ public class ClaimManagementFragment extends Fragment {
                 clearAllFieldErrors();
             }
         });
+
         viewModel.getSubmissionSuccess().observe(getViewLifecycleOwner(), isSuccess -> {
             if (isSuccess != null && isSuccess) {
                 binding.restaurantNameInput.setText("");
@@ -126,10 +140,16 @@ public class ClaimManagementFragment extends Fragment {
                 binding.forGuestEmployeesCheckbox.setChecked(false);
                 binding.businessUnitDropdown.setSelection(0);
                 NavController navController = NavHostFragment.findNavController(this);
-                navController.navigate(R.id.action_nav_claim_management_to_nav_view_claim);
+                if (isEditMode) {
+                    // ══ NEW: After successful edit, go back to claim list ══
+                    navController.popBackStack(R.id.nav_view_claim, false);
+                } else {
+                    navController.navigate(R.id.action_nav_claim_management_to_nav_view_claim);
+                }
                 viewModel.resetSubmissionSuccess();
             }
         });
+
         viewModel.getSaveSuccess().observe(getViewLifecycleOwner(), isSuccess -> {
             if (isSuccess != null && isSuccess) {
                 Toast.makeText(requireContext(), "Claim saved successfully", Toast.LENGTH_SHORT).show();
@@ -137,8 +157,155 @@ public class ClaimManagementFragment extends Fragment {
             }
         });
 
+        // ══ NEW: Observe edit claim data and pre-fill form ══
+        if (isEditMode && editClaimId != null && !editClaimId.isEmpty()) {
+            binding.submitButton.setText("Update Claim");
+            binding.saveButton.setVisibility(View.GONE);
+
+            viewModel.editClaimData.observe(getViewLifecycleOwner(), claim -> {
+                if (claim != null) {
+                    preFillForm(claim);
+                }
+            });
+
+            // ══ CHANGED: Actually trigger the GET API call to fetch claim data ══
+            String expenseType = getArguments() != null ? getArguments().getString("expenseType", "") : "";
+            viewModel.fetchClaimForEdit(editClaimId, expenseType);
+        }
+
         return binding.getRoot();
     }
+
+    // ════════════════════════════════════════════════════════════════
+    //  NEW: Pre-fill form from claim data (null-safe)
+    // ════════════════════════════════════════════════════════════════
+    private void preFillForm(EmployeeClaimdataItem c) {
+        if (c == null) return;
+
+        // ── Common fields ──
+        binding.claimDateInput.setText(safe(c.getClaimDate()));
+        binding.projectName.setText(safe(c.getProject()));
+        binding.purposeInput.setText(safe(c.getPerposeofmeet()));
+        binding.amountInput.setText(c.getTotalamount() != 0 ? String.valueOf(c.getTotalamount()) : "");
+        binding.remarksInput.setText(safe(c.getComment()));
+
+        // ── Travel fields ──
+        binding.startLocationInput.setText(safe(c.getFromaddress()));
+        binding.endLocationInput.setText(safe(c.getToaddress()));
+        if (c.getDistance() != null) {
+            binding.EnterTransportInput.setText(String.valueOf(c.getDistance()));
+        } else {
+            binding.EnterTransportInput.setText(safe(c.getEmpTransport()));
+        }
+
+        // ── Food fields ──
+        binding.restaurantNameInput.setText(safe(c.getRestaurant()));
+        binding.numberOfPersonsInput.setText(c.getPersons() != null ? String.valueOf(c.getPersons()) : "");
+        binding.foodCommentInput.setText(safe(c.getDescription()));
+
+        // ── Accommodation fields ──
+        binding.accommodationNameInput.setText(safe(c.getAccommodationname()));
+        binding.accommodationAddressInput.setText(safe(c.getLocation()));
+        binding.accommodationRegionInput.setText(safe(c.getState()));
+        binding.accommodationCheckInDate.setText(sliceDate(safe(c.getCheckin())));
+        binding.accommodationCheckOutDate.setText(sliceDate(safe(c.getCheckout())));
+        binding.purposeOfStayInput.setText("");
+
+        // ── Miscellaneous fields ──
+        binding.internetBillingPeriodInput.setText(sliceDate(safe(c.getBillingperiod())));
+        binding.internetProviderInput.setText(safe(c.getNetprovider()));
+        binding.internetBillNumberInput.setText(safe(c.getBillnumber()));
+        binding.fuelVehicleNumberInput.setText(safe(c.getVehiclenumber()));
+        binding.fuelQuantityInput.setText(safe(c.getFuelquantity()));
+        binding.fuelStationInput.setText(safe(c.getFuelstationname()));
+        binding.parkingLocationInput.setText(safe(c.getParkinglocation()));
+        binding.parkingDateInput.setText(sliceDate(safe(c.getParkingdate())));
+        binding.parkingDurationInput.setText(safe(c.getDuration()));
+        binding.tollVehicleNumberInput.setText(safe(c.getTollvehiclenumber()));
+        binding.tollPlazaNameInput.setText(safe(c.getTollplazaname()));
+        binding.tollLocationInput.setText(safe(c.getTolllocation()));
+
+        // ── Select expense type chip ──
+        String expenseType = safe(c.getExpenseType()).toLowerCase();
+        switch (expenseType) {
+            case "travel":
+                checkChipByText("Travel");
+                break;
+            case "food":
+                checkChipByText("Food");
+                break;
+            case "accommodation":
+                checkChipByText("Accommodation");
+                break;
+            case "miscellaneous":
+                checkChipByText("Miscellaneous");
+                break;
+        }
+
+        // ── Select spinner values (delayed to allow adapters to load) ──
+        binding.getRoot().post(() -> {
+            selectSpinnerValue(binding.mealTypeDropdown, safe(c.getMeantype()));
+            selectSpinnerValue(binding.travelCategoryDropdown, safe(c.getTravelCategory()));
+            selectSpinnerValue(binding.transportModeDropdown, safe(c.getModeoftransport()));
+            selectSpinnerValue(binding.accommodationTypeDropdown, safe(c.getAccommodationtype()));
+            selectSpinnerValue(binding.miscExpenseCategoryDropdown, safe(c.getExpancecategory()));
+            selectSpinnerValue(binding.fuelTypeDropdown, safe(c.getFueltype()));
+
+            // Handle shared/dedicated transport sub-selection
+            String shared = safe(c.getShared());
+            String dedicated = safe(c.getDedicated());
+            if (!shared.isEmpty()) {
+                selectSpinnerValue(binding.transportModeShared, shared);
+            }
+            if (!dedicated.isEmpty()) {
+                selectSpinnerValue(binding.transportModeDedicated, dedicated);
+            }
+        });
+    }
+
+    // ══ NEW: Helper to check a chip by its text ══
+    private void checkChipByText(String text) {
+        for (int i = 0; i < binding.expenseTypeChipGroup.getChildCount(); i++) {
+            View child = binding.expenseTypeChipGroup.getChildAt(i);
+            if (child instanceof Chip) {
+                Chip chip = (Chip) child;
+                if (chip.getText().toString().equalsIgnoreCase(text)) {
+                    chip.setChecked(true);
+                    break;
+                }
+            }
+        }
+    }
+
+    // ══ NEW: Helper to select a spinner value by string match ══
+    private void selectSpinnerValue(Spinner spinner, String value) {
+        if (spinner == null || value == null || value.isEmpty()) return;
+        if (spinner.getAdapter() == null) return;
+        for (int i = 0; i < spinner.getAdapter().getCount(); i++) {
+            Object item = spinner.getAdapter().getItem(i);
+            if (item != null && item.toString().equalsIgnoreCase(value)) {
+                spinner.setSelection(i);
+                return;
+            }
+        }
+    }
+
+    // ══ NEW: Null-safe helpers ══
+    private String safe(String val) {
+        if (val == null || val.trim().isEmpty() || "null".equalsIgnoreCase(val.trim())) return "";
+        return val.trim();
+    }
+
+    private String sliceDate(String dateStr) {
+        if (dateStr != null && dateStr.length() >= 10) {
+            return dateStr.substring(0, 10);
+        }
+        return dateStr != null ? dateStr : "";
+    }
+
+    // ================================================================
+    //  EXISTING METHODS (unchanged)
+    // ================================================================
 
     private void setupPickersAndButtons() {
         binding.claimDateInput.setOnClickListener(v -> showDatePicker(binding.claimDateInput, 1));
@@ -186,47 +353,36 @@ public class ClaimManagementFragment extends Fragment {
 
         }, currentYear, currentMonth, currentDay);
 
-        // Apply date restrictions only to the Claim Date picker
         if (dateTypeKey == 1) {
             Integer limit = viewModel.claimBackDateLimit.getValue();
             if (limit != null && limit >= 0) {
                 if (limit == 0) {
-                    // Limit is 0: user can select any date within the current year
                     Calendar minCal = Calendar.getInstance();
                     minCal.set(currentYear, Calendar.JANUARY, 1, 0, 0, 0);
                     minCal.set(Calendar.MILLISECOND, 0);
-
                     Calendar maxCal = Calendar.getInstance();
                     maxCal.set(currentYear, Calendar.DECEMBER, 31, 23, 59, 59);
                     maxCal.set(Calendar.MILLISECOND, 999);
-
                     dialog.getDatePicker().setMinDate(minCal.getTimeInMillis());
                     dialog.getDatePicker().setMaxDate(maxCal.getTimeInMillis());
                 } else {
                     Calendar minCal = Calendar.getInstance();
                     Calendar maxCal = Calendar.getInstance();
-
                     if (currentDay <= limit) {
-                        // Case A: 1st of previous month → limit-th day of current month
                         minCal.set(currentYear, currentMonth - 1, 1, 0, 0, 0);
                         minCal.set(Calendar.MILLISECOND, 0);
-
                         maxCal.set(currentYear, currentMonth, limit, 23, 59, 59);
                         maxCal.set(Calendar.MILLISECOND, 999);
                     } else {
-                        // Case B: 1st of current month → limit-th day of next month
                         minCal.set(currentYear, currentMonth, 1, 0, 0, 0);
                         minCal.set(Calendar.MILLISECOND, 0);
-
                         maxCal.set(currentYear, currentMonth + 1, limit, 23, 59, 59);
                         maxCal.set(Calendar.MILLISECOND, 999);
                     }
-
                     dialog.getDatePicker().setMinDate(minCal.getTimeInMillis());
                     dialog.getDatePicker().setMaxDate(maxCal.getTimeInMillis());
                 }
             }
-            // If limit is -1 (API not yet loaded), no restriction is applied as a safe fallback
         }
 
         dialog.show();
@@ -256,31 +412,26 @@ public class ClaimManagementFragment extends Fragment {
             isValid = false;
             if (focusView == null) focusView = binding.claimDateInput;
         }
-
         if (projectNameVal.isEmpty()) {
             binding.projectNameLayout.setError("Project Name is required");
             isValid = false;
             if (focusView == null) focusView = binding.projectName;
         }
-
         if (purposeVal.isEmpty()) {
             binding.purposeInputLayout.setError("Purpose of meeting is required");
             isValid = false;
             if (focusView == null) focusView = binding.purposeInput;
         }
-
         if (meetingTypeVal.isEmpty() || meetingTypeVal.equalsIgnoreCase("Select an option")) {
             binding.meetingTypeDropdownLayout.setError("Please select a meeting type");
             isValid = false;
             if (focusView == null) focusView = binding.meetingTypeDropdown;
         }
-
         if (amountVal.isEmpty()) {
             binding.amountInputLayout.setError("Total Amount is required");
             isValid = false;
             if (focusView == null) focusView = binding.amountInput;
         }
-
         if (currencyVal.isEmpty() || currencyVal.equalsIgnoreCase("Select Currency")) {
             binding.currencyDropdownLayout.setError("Currency selection is required");
             isValid = false;
@@ -293,7 +444,6 @@ public class ClaimManagementFragment extends Fragment {
             return;
         }
 
-        // Determine Active Selection Chip State String
         String activeExpenseType = "";
         int checkedId = binding.expenseTypeChipGroup.getCheckedChipId();
         if (checkedId != View.NO_ID) {
@@ -307,6 +457,7 @@ public class ClaimManagementFragment extends Fragment {
             Toast.makeText(requireContext(), "Please select an expense category", Toast.LENGTH_SHORT).show();
             return;
         }
+
         if (!isSubmit) {
             String travelCat = binding.travelCategoryDropdown.getSelectedItem() != null ? binding.travelCategoryDropdown.getSelectedItem().toString() : "";
             String transportMode = binding.transportModeDropdown.getSelectedItem() != null ? binding.transportModeDropdown.getSelectedItem().toString() : "";
@@ -316,29 +467,23 @@ public class ClaimManagementFragment extends Fragment {
             return;
         }
 
-        // Route directly into explicit distinct target API submission methods
         switch (activeExpenseType) {
             case "Food":
                 viewModel.executeFoodSubmit(meetingTypeVal, currencyVal);
                 break;
-
             case "Travel":
                 String travelCat = binding.travelCategoryDropdown.getSelectedItem() != null ? binding.travelCategoryDropdown.getSelectedItem().toString() : "";
                 String transportMode = binding.transportModeDropdown.getSelectedItem() != null ? binding.transportModeDropdown.getSelectedItem().toString() : "";
                 String sharedMode = binding.transportModeShared.getSelectedItem() != null ? binding.transportModeShared.getSelectedItem().toString() : "";
                 String dedicatedMode = binding.transportModeDedicated.getSelectedItem() != null ? binding.transportModeDedicated.getSelectedItem().toString() : "";
-
                 viewModel.executeTravelSubmit(meetingTypeVal, travelCat, transportMode, sharedMode, dedicatedMode, currencyVal);
                 break;
-
             case "Accommodation":
                 viewModel.executeAccommodationSubmit(meetingTypeVal, currencyVal);
                 break;
-
             case "Miscellaneous":
                 viewModel.executeMiscSubmit(meetingTypeVal, currencyVal);
                 break;
-
             default:
                 Toast.makeText(requireContext(), "Unsupported expense type: " + activeExpenseType, Toast.LENGTH_SHORT).show();
                 break;
@@ -346,54 +491,41 @@ public class ClaimManagementFragment extends Fragment {
     }
 
     private void setupTextSyncWatchers() {
-        // --- 1. Claim Details ---
         binding.projectName.addTextChangedListener(new SimpleTextWatcher(viewModel.projectName));
         binding.purposeInput.addTextChangedListener(new SimpleTextWatcher(viewModel.purposeOfMeeting));
 
-        // --- 2. Travel Details ---
         binding.EnterTransportInput.addTextChangedListener(new SimpleTextWatcher(viewModel.customTransportInput));
         binding.startLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.startLocation));
         binding.endLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.endLocation));
 
-        // --- 3. Food Details ---
         binding.restaurantNameInput.addTextChangedListener(new SimpleTextWatcher(viewModel.restaurantName));
         binding.numberOfPersonsInput.addTextChangedListener(new SimpleTextWatcher(viewModel.numberOfPersons));
         binding.foodCommentInput.addTextChangedListener(new SimpleTextWatcher(viewModel.foodComment));
         binding.foodTravelIdInput.addTextChangedListener(new SimpleTextWatcher(viewModel.foodTravelId));
 
-        // --- 4. Accommodation Details ---
         binding.accommodationNameInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationName));
         binding.accommodationAddressInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationAddress));
         binding.accommodationRegionInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationRegion));
         binding.purposeOfStayInput.addTextChangedListener(new SimpleTextWatcher(viewModel.purposeOfStay));
         binding.accommodationTravelIdInput.addTextChangedListener(new SimpleTextWatcher(viewModel.accommodationTravelId));
 
-        // --- 5. Miscellaneous Details (Internet, Fuel, Parking, Toll) ---
-        // Internet
         binding.internetProviderInput.addTextChangedListener(new SimpleTextWatcher(viewModel.internetProvider));
         binding.internetBillNumberInput.addTextChangedListener(new SimpleTextWatcher(viewModel.internetBillNumber));
 
-        // Fuel
         binding.fuelVehicleNumberInput.addTextChangedListener(new SimpleTextWatcher(viewModel.fuelVehicleNumber));
         binding.fuelStationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.fuelStation));
         binding.fuelQuantityInput.addTextChangedListener(new SimpleTextWatcher(viewModel.fuelQuantity));
 
-        // Parking
         binding.parkingLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.parkingLocation));
         binding.parkingDurationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.parkingDuration));
 
-        // Toll Charges
         binding.tollVehicleNumberInput.addTextChangedListener(new SimpleTextWatcher(viewModel.tollVehicleNumber));
         binding.tollPlazaNameInput.addTextChangedListener(new SimpleTextWatcher(viewModel.tollPlazaName));
         binding.tollLocationInput.addTextChangedListener(new SimpleTextWatcher(viewModel.tollLocation));
 
-        // --- 6. Category & Amount ---
         binding.amountInput.addTextChangedListener(new SimpleTextWatcher(viewModel.totalAmount));
-
-        // --- 7. Remarks ---
         binding.remarksInput.addTextChangedListener(new SimpleTextWatcher(viewModel.remarks));
     }
-
 
     private void setupValidationClearListeners() {
         binding.claimDateInput.addTextChangedListener(new SimpleTextWatcher(null) {
@@ -598,7 +730,6 @@ public class ClaimManagementFragment extends Fragment {
                     viewModel.selectedBusinessUnitName.setValue(selectedItem.getName());
                     SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
                     String authToken = prefManager.getString("authToken", null);
-
                     if (buId != null && !buId.isEmpty()) {
                         viewModel.getEmployeesByBusinessUnit(authToken, buId);
                     } else {
@@ -626,7 +757,6 @@ public class ClaimManagementFragment extends Fragment {
             Toast.makeText(requireContext(), "Maximum limit of 10 files reached.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (data.getClipData() != null) {
             ClipData clipData = data.getClipData();
             for (int i = 0; i < clipData.getItemCount() && selectedFileUris.size() < 10; i++) {
@@ -637,14 +767,12 @@ public class ClaimManagementFragment extends Fragment {
             Uri uri = data.getData();
             validateAndProcessFile(uri);
         }
-
         updateFileCountHeader();
     }
 
     private void validateAndProcessFile(Uri uri) {
         long fileSize = 0;
         String name = "Unknown File";
-
         try (Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(OpenableColumns.SIZE));
@@ -657,10 +785,8 @@ public class ClaimManagementFragment extends Fragment {
             new AlertDialog.Builder(requireContext()).setTitle("File Too Large").setMessage("The file \"" + name + "\" exceeds the 1MB limit and will not be uploaded.").setPositiveButton(android.R.string.ok, null).show();
             return;
         }
-
         selectedFileUris.add(uri);
         int listIndex = selectedFileUris.size() - 1;
-
         viewModel.uploadFileAtIndex(uri, listIndex);
         addFileViewToContainer(uri, name);
     }

@@ -3,6 +3,8 @@ package app.xedigital.ai.model.claimSave;
 import com.google.gson.annotations.SerializedName;
 
 public class ClaimSaveRequest {
+    @SerializedName("_id")
+    private String id;
 
     @SerializedName("docFileURLTwo")
     private String docFileURLTwo;
@@ -304,6 +306,15 @@ public class ClaimSaveRequest {
 
     @SerializedName("meantype")
     private String meantype;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
 
     public String getDocFileURLTwo() {
         return docFileURLTwo;

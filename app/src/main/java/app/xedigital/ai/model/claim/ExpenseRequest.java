@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 public class ExpenseRequest {
 
     // --- Core Employee & Profile Metadata ---
+    @SerializedName("_id")
+    private String id;
     @SerializedName("employee")
     private String employee;
     @SerializedName("empId")
@@ -225,6 +227,13 @@ public class ExpenseRequest {
         return (value == null || value.trim().isEmpty() || "Please Select".equalsIgnoreCase(value)) ? "N/A" : value.trim();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
     // --- Setters and Validated Getters ---
     public String getEmployee() {
         return validateField(employee);

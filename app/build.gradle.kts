@@ -13,8 +13,8 @@ android {
         applicationId = "app.xedigital.ai"
         minSdk = 28
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.1"
+        versionCode = 5
+        versionName = "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -55,6 +55,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -69,7 +70,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.activity)
     implementation(libs.tracing.perfetto.handshake)
-    implementation(libs.firebase.crashlytics.buildtools)
+//    implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.protolite.well.known.types)
     implementation(libs.media3.common)
     implementation(libs.play.services.location)

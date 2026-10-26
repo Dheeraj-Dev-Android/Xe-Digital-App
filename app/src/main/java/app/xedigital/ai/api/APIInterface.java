@@ -36,6 +36,7 @@ import app.xedigital.ai.model.dcrSubmit.DcrFormRequest;
 import app.xedigital.ai.model.debitLeave.DebitLeaveRequest;
 import app.xedigital.ai.model.deviceRegistration.DeviceDetailsResponse;
 import app.xedigital.ai.model.deviceRegistration.DeviceRegistrationRequest;
+import app.xedigital.ai.model.editClaim.EditClaimResponse;
 import app.xedigital.ai.model.employeeClaim.EmployeeClaimResponse;
 import app.xedigital.ai.model.employeeLeaveType.EmployeeLeaveTypeResponse;
 import app.xedigital.ai.model.employeeOnboarding.EmployeeOnboardingResponse;
@@ -88,8 +89,10 @@ public interface APIInterface {
 
     @FormUrlEncoded
     @POST("authentication/login")
-    retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
-
+//    retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
+    Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password,
+                                       @Field("isEmployee") boolean isEmployee, @Field("versionCode") int versionCode,
+                                       @Field("versionName") String versionName, @Field("platform") String platform);
     //GET APIs
     @GET("users/profile/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
@@ -221,7 +224,33 @@ public interface APIInterface {
 
     //    https://app.xedigital.ai/api/v1/claims/claim/6a7974c784d68811d00b9af9
     @GET("claims/claim/{claimId}")
-    Call<ResponseBody> getClaimById(@Header("Authorization") String authToken, @Path("claimId") String claimId);
+    Call<EditClaimResponse> getClaimById(@Header("Authorization") String authToken, @Path("claimId") String claimId);
+
+    // ── GET: Fetch claim by type for editing ──
+    @GET("claims/travelById/{claimId}")
+    Call<EditClaimResponse> getTravelClaimById(@Header("Authorization") String token, @Path("claimId") String claimId);
+
+    @GET("claims/foodById/{claimId}")
+    Call<EditClaimResponse> getFoodClaimById(@Header("Authorization") String token, @Path("claimId") String claimId);
+
+    @GET("claims/accoById/{claimId}")
+    Call<EditClaimResponse> getAccommodationClaimById(@Header("Authorization") String token, @Path("claimId") String claimId);
+
+    @GET("claims/miscById/{claimId}")
+    Call<EditClaimResponse> getMiscClaimById(@Header("Authorization") String token, @Path("claimId") String claimId);
+
+    // ── PUT: Update claim by type ──
+    @PUT("claims/update/travel/{claimId}")
+    Call<ResponseBody> updateTravelClaim(@Header("Authorization") String token, @Path("claimId") String claimId, @Body ExpenseRequest request);
+
+    @PUT("claims/update/food/{claimId}")
+    Call<ResponseBody> updateFoodClaim(@Header("Authorization") String token, @Path("claimId") String claimId, @Body ExpenseRequest request);
+
+    @PUT("claims/update/acc/{claimId}")
+    Call<ResponseBody> updateAccommodationClaim(@Header("Authorization") String token, @Path("claimId") String claimId, @Body ExpenseRequest request);
+
+    @PUT("claims/update/mis/{claimId}")
+    Call<ResponseBody> updateMiscClaim(@Header("Authorization") String token, @Path("claimId") String claimId, @Body ExpenseRequest request);
 
     @GET("bus/getAll?active=true")
     Call<BusinessUnitResponse> getBusinessUnit(@Header("Authorization") String authToken);

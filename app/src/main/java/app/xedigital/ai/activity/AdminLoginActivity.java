@@ -1,8 +1,11 @@
 package app.xedigital.ai.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +35,7 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.UserDetails.Role;
 import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
+import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.utills.BlurUtils;
 import app.xedigital.ai.utills.RoleAccessManager;
@@ -94,6 +98,23 @@ public class AdminLoginActivity extends SecureBaseActivity {
         });
     }
 
+    private int getAppVersionCode() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return Build.VERSION.SDK_INT >= 28 ? (int) info.getLongVersionCode() : info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
+
+    private String getAppVersionName() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
+
     private void performLogin() {
         String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
         String password = Objects.requireNonNull(passwordEditText.getText()).toString().trim();
@@ -106,7 +127,7 @@ public class AdminLoginActivity extends SecureBaseActivity {
         verifyRetryCount = 0; // reset retry counter for a fresh login attempt
         showLoading(true);
 
-        Call<LoginModelResponse> call = AdminAPIClient.getInstance().getBase2().loginApi1(email, password);
+        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password, true, getAppVersionCode(), getAppVersionName(), "android");
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {
@@ -221,8 +242,7 @@ public class AdminLoginActivity extends SecureBaseActivity {
         verifyRetryCount++;
 
         if (verifyRetryCount > MAX_VERIFY_RETRIES) {
-            showStyledDialog("Verification Failed", "We're unable to verify your account after multiple attempts. Please try logging in again later.", R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true, null
-            );
+            showStyledDialog("Verification Failed", "We're unable to verify your account after multiple attempts. Please try logging in again later.", R.drawable.ic_error_outline, R.color.error_bg, R.color.error_tint, true, null);
             return;
         }
 

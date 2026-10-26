@@ -393,6 +393,22 @@
         android:name="app.xedigital.ai.ui.claim_management.ClaimManagementFragment"
         android:label="@string/menu_claim_management"
         tools:layout="@layout/fragment_claim_management">
+
+        <!-- ── NEW: Arguments for edit mode ── -->
+        <argument
+            android:name="claimId"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="isEditMode"
+            android:defaultValue="false"
+            app:argType="boolean" />
+
+        <argument
+            android:name="expenseType"
+            android:defaultValue=""
+            app:argType="string" />
+
         <action
             android:id="@+id/action_nav_claim_management_to_nav_shifts"
             app:destination="@id/nav_shifts" />
@@ -418,7 +434,14 @@
         android:id="@+id/nav_claim_details"
         android:name="app.xedigital.ai.ui.claim_management.ClaimDetailsFragment"
         android:label="Claim Details"
-        tools:layout="@layout/fragment_claim_details" />
+        tools:layout="@layout/fragment_claim_details">
+
+        <!-- ── NEW: Action to navigate to edit form ── -->
+        <action
+            android:id="@+id/action_nav_claim_details_to_nav_claim_management"
+            app:destination="@id/nav_claim_management" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/nav_approve_claim"
