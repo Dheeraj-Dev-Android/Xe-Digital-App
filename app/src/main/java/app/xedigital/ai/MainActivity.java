@@ -372,6 +372,9 @@ public class MainActivity extends SecureBaseActivity {
 
         // Also clear admin creds for safety
         getSharedPreferences("AdminCred", MODE_PRIVATE).edit().clear().apply();
+        if (APIClient.getSharedCookieJar() != null) {
+            APIClient.getSharedCookieJar().clearAll();
+        }
 
         Intent intent = new Intent(MainActivity.this, app.xedigital.ai.activity.LoginSelectionActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

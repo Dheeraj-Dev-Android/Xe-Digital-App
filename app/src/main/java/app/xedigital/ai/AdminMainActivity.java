@@ -33,6 +33,7 @@ import app.xedigital.ai.activity.LoginSelectionActivity;
 import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
+import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityAdminMainBinding;
 import app.xedigital.ai.databinding.NoInternetConnectionBinding;
 import app.xedigital.ai.databinding.SlowInternetConnectionBinding;
@@ -222,7 +223,9 @@ public class AdminMainActivity extends SecureBaseActivity {
 
     private void handleLogout() {
         SecurePrefManager.getInstance(this).clearAll();
-
+        if (APIClient.getSharedCookieJar() != null) {
+            APIClient.getSharedCookieJar().clearAll();
+        }
         Intent intent = new Intent(this, LoginSelectionActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

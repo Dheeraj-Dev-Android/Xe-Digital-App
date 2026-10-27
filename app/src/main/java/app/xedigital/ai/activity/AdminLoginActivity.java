@@ -71,8 +71,16 @@ public class AdminLoginActivity extends SecureBaseActivity {
         loginButton = findViewById(R.id.btn_signin);
         loadingOverlay = findViewById(R.id.loadingOverlay);
         rememberMeCheckBox = findViewById(R.id.cb_remember_me);
-
         SecurePrefManager pref = SecurePrefManager.getInstance(this);
+        String authToken = pref.getString("authToken", null);
+        if (authToken != null && !authToken.isEmpty()) {
+            Intent intent = new Intent(AdminLoginActivity.this, AdminMainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         boolean isRemembered = pref.getBoolean("remember_me", false);
 
         if (isRemembered) {

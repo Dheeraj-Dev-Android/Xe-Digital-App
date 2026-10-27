@@ -1,7 +1,11 @@
 package app.xedigital.ai.api;
 
+import android.content.Context;
+
 import java.util.concurrent.TimeUnit;
 
+import app.xedigital.ai.utills.PersistentCookieJar;
+import app.xedigital.ai.utills.TokenAuthenticator;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -9,33 +13,61 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-    //    private static final String BASE_URL = "http://10.172.6.33:4000/";
-//    private static final String BASE_URL_2 = "http://10.172.6.33:4000/api/v1/";
-//    private static final String BASE_URL_3 = "http://10.172.6.33:4000/api/v1/";
     private static final String BASE_URL = "https://app.xedigital.ai/";
     private static final String BASE_URL_2 = "https://app.xedigital.ai/api/v1/";
+//    private static final String BASE_URL = "http://10.172.6.33:4000/";
+//    private static final String BASE_URL_2 = "http://10.172.6.33:4000/api/v1/";
 
     private static APIClient instance;
+    private static Context appContext;
+
+    // Shared across APIClient and AdminAPIClient
+    private static PersistentCookieJar sharedCookieJar;
+    private static TokenAuthenticator sharedAuthenticator;
+
     private final Retrofit retrofit1;
     private final Retrofit retrofit2;
-//    private final Retrofit retrofit3;
-
 
     private APIClient() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-
-//        if (BuildConfig.DEBUG) {
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//        } else {
-//            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
-//        }
 
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(loggingInterceptor).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(loggingInterceptor).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS);
+
+        // Attach CookieJar + Authenticator if Context is available
+        if (appContext != null) {
+            if (sharedCookieJar == null) {
+                sharedCookieJar = new PersistentCookieJar(appContext);
+            }
+            if (sharedAuthenticator == null) {
+                sharedAuthenticator = new TokenAuthenticator(appContext, sharedCookieJar);
+            }
+            builder.cookieJar(sharedCookieJar);
+            builder.authenticator(sharedAuthenticator);
+        }
+
+        OkHttpClient okHttpClient = builder.build();
 
         retrofit1 = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
 
         retrofit2 = new Retrofit.Builder().baseUrl(BASE_URL_2).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
-//        retrofit3 = new Retrofit.Builder().baseUrl(BASE_URL_3).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
+    }
+
+    /**
+     * Must be called once before getInstance(), ideally from SecureBaseActivity.onCreate().
+     */
+    public static void init(Context context) {
+        if (appContext == null) {
+            appContext = context.getApplicationContext();
+        }
+    }
+
+    public static PersistentCookieJar getSharedCookieJar() {
+        return sharedCookieJar;
+    }
+
+    public static TokenAuthenticator getSharedAuthenticator() {
+        return sharedAuthenticator;
     }
 
     public static synchronized APIClient getInstance() {
@@ -45,14 +77,9 @@ public class APIClient {
         return instance;
     }
 
-
     public APIInterface getApi() {
         return retrofit2.create(APIInterface.class);
     }
-
-//    public APIInterface getDevice() {
-//        return retrofit3.create(APIInterface.class);
-//    }
 
     public APIInterface getRecognize() {
         return retrofit1.create(APIInterface.class);

@@ -99,7 +99,6 @@ public class LoginActivity extends SecureBaseActivity {
                 callLoginApi(email, password, true);
             }
         });
-        // ✅ Back button → go to LoginSelectionActivity instead of exiting the app
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -135,25 +134,15 @@ public class LoginActivity extends SecureBaseActivity {
         }
 
         if (authToken != null) {
-            silentlyRefreshToken();
+            // Token exists — proceed directly.
+            // If the JWT is expired, the TokenAuthenticator will transparently
+            // refresh it on the first API call. If the refresh token is also
+            // dead, the Authenticator will broadcast ACTION_SESSION_EXPIRED
+            // and SecureBaseActivity will redirect to login.
+            checkPermissionsAndNavigate(authToken);
         } else {
             showLoginScreen();
         }
-    }
-
-    private void silentlyRefreshToken() {
-        SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
-        String savedEmail = prefManager.getString("emailId", null);
-        String savedPassword = prefManager.getString("userPassword", null);
-
-        if (savedEmail == null || savedPassword == null) {
-            clearSessionAndShowLogin();
-            return;
-        }
-
-        Log.d(TAG, "Silently refreshing token...");
-        showLoading(true);
-        callLoginApi(savedEmail, savedPassword, false);
     }
 
     private int getAppVersionCode() {
@@ -172,11 +161,9 @@ public class LoginActivity extends SecureBaseActivity {
             return "";
         }
     }
+
     private void callLoginApi(String email, String password, boolean isManualLogin) {
         if (isManualLogin) showLoading(true);
-//
-//        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(
-//                email, password, true, getAppVersionCode(), getAppVersionName(), "android");
 
         Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(
                 email, password, true, 4, "android");
@@ -194,7 +181,7 @@ public class LoginActivity extends SecureBaseActivity {
                         String token = loginResponse.getData().getToken();
                         String emailId = loginResponse.getData().getUser().getEmail();
 
-                        storeInSecurePrefs(userId, emailId, password, token);
+                        storeInSecurePrefs(userId, emailId, token);
 
                         if (isManualLogin) {
                             fetchAndSaveUserData(userId, token);
@@ -248,7 +235,6 @@ public class LoginActivity extends SecureBaseActivity {
 
                     app.xedigital.ai.model.user.Data data = response.body().getData();
 
-                    // ✅ Cache role + permissions + branch toggles
                     RoleAccessManager.getInstance(LoginActivity.this).applyUserData(data);
 
                     if (data.getCompany() != null) {
@@ -271,11 +257,10 @@ public class LoginActivity extends SecureBaseActivity {
         });
     }
 
-    private void storeInSecurePrefs(String userId, String emailId, String password, String authToken) {
+    private void storeInSecurePrefs(String userId, String emailId, String authToken) {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         prefManager.putString("userId", userId);
         prefManager.putString("emailId", emailId);
-        prefManager.putString("userPassword", password);
         prefManager.putString("authToken", authToken);
     }
 
@@ -295,7 +280,6 @@ public class LoginActivity extends SecureBaseActivity {
     private void checkPermissionsAndNavigate(String token) {
         SecurePrefManager.getInstance(this).putString("cachedTokenPermission", token);
 
-        // ✅ Admin tier should NEVER have landed here, but safety-guard
         String role = RoleAccessManager.getInstance(this).getRoleName();
         if (RoleGroup.isAdminTier(role)) {
             Intent intent = new Intent(this, AdminMainActivity.class);
@@ -305,7 +289,6 @@ public class LoginActivity extends SecureBaseActivity {
             return;
         }
 
-        // Employee requires location permission
         if (!permissionManager.isGranted(PermissionManager.TAG_LOCATION)) {
             foregroundPermissionLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
             return;
@@ -367,5 +350,4 @@ public class LoginActivity extends SecureBaseActivity {
         startActivity(intent);
         finish();
     }
-
 }

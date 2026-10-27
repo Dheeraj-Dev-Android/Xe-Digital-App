@@ -1,6 +1,9 @@
 package app.xedigital.ai.utills;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.provider.Settings;
 import android.util.Log;
@@ -17,16 +20,64 @@ import com.google.android.material.button.MaterialButton;
 import java.util.List;
 
 import app.xedigital.ai.R;
+import app.xedigital.ai.activity.LoginSelectionActivity;
+import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
+import app.xedigital.ai.api.APIClient;
 
 public abstract class SecureBaseActivity extends AppCompatActivity {
 
     private static final String TAG = "SecureBaseActivity";
     private AlertDialog securityDialog;
 
+    private BroadcastReceiver sessionExpiredReceiver;
+
+    @Override
+    protected void onCreate(android.os.Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Initialize API clients with application context for CookieJar + Authenticator
+        APIClient.init(this);
+        AdminAPIClient.init(this);
+
+        // Receiver for session-expired broadcasts from TokenAuthenticator
+        sessionExpiredReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if ("ACTION_SESSION_EXPIRED".equals(intent.getAction())) {
+                    handleSessionExpired();
+                }
+            }
+        };
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         enforceSecurityChecks();
+
+        // Register session-expired receiver while activity is visible
+        if (sessionExpiredReceiver != null) {
+            try {
+                IntentFilter filter = new IntentFilter("ACTION_SESSION_EXPIRED");
+                registerReceiver(sessionExpiredReceiver, filter);
+            } catch (Exception e) {
+                Log.e(TAG, "Error registering session receiver: " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Unregister to avoid leaks and background handling
+        if (sessionExpiredReceiver != null) {
+            try {
+                unregisterReceiver(sessionExpiredReceiver);
+            } catch (IllegalArgumentException e) {
+                // Receiver was not registered — safe to ignore
+            }
+        }
     }
 
     @Override
@@ -35,19 +86,31 @@ public abstract class SecureBaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    /**
+     * Called when TokenAuthenticator determines the session is dead
+     * (refresh token expired, revoked, or reuse detected).
+     */
+    private void handleSessionExpired() {
+        if (isFinishing() || isDestroyed()) return;
+
+        Log.w(TAG, "Session expired — redirecting to login");
+
+        // Prevent the receiver from firing again during navigation
+        try {
+            unregisterReceiver(sessionExpiredReceiver);
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        Intent intent = new Intent(this, LoginSelectionActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
     protected boolean shouldEnforceSecurityChecks() {
         return true;
     }
 
-    /**
-     * Checks if the currently installed APK is debuggable.
-     * This is true when:
-     * - Running from Android Studio (USB or WiFi ADB)
-     * - Build type has debuggable = true
-     * <p>
-     * This is MORE reliable than BuildConfig.DEBUG because it checks
-     * the actual installed APK manifest, not just the build type name.
-     */
     private boolean isAppDebuggable() {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }

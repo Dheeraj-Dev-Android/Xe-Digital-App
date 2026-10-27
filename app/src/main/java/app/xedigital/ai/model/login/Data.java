@@ -4,17 +4,24 @@ import com.google.gson.annotations.SerializedName;
 
 public class Data {
 
-    @SerializedName("user")
-    private User user;
+	@SerializedName("appVersion")
+	private AppVersion appVersion;
 
-    @SerializedName("token")
-    private String token;
+	@SerializedName("user")
+	private User user;
 
-    public User getUser() {
-        return user;
-    }
+	@SerializedName("token")
+	private String token;
 
-    public String getToken() {
-        return token;
-    }
+	public AppVersion getAppVersion() {
+		return appVersion;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public String getToken() {
+		return token;
+	}
 }
