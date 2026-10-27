@@ -49,9 +49,7 @@ public interface AdminAPIInterface {
     @FormUrlEncoded
     @POST("authentication/login")
 //    Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
-    Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password,
-                                       @Field("isEmployee") boolean isEmployee, @Field("versionCode") int versionCode,
-                                       @Field("versionName") String versionName, @Field("platform") String platform);
+    Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password, @Field("isEmployee") boolean isEmployee, @Field("versionCode") int versionCode, @Field("platform") String platform);
 
     //GET APIs
 

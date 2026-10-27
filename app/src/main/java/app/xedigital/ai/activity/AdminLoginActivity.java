@@ -35,7 +35,6 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.admin.adminModal.UserDetails.Role;
 import app.xedigital.ai.admin.adminModal.UserDetails.UserDetailsResponse;
-import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import app.xedigital.ai.utills.BlurUtils;
 import app.xedigital.ai.utills.RoleAccessManager;
@@ -127,7 +126,7 @@ public class AdminLoginActivity extends SecureBaseActivity {
         verifyRetryCount = 0; // reset retry counter for a fresh login attempt
         showLoading(true);
 
-        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(email, password, true, getAppVersionCode(), getAppVersionName(), "android");
+        Call<LoginModelResponse> call = AdminAPIClient.getInstance().getBase2().loginApi1(email, password, true, getAppVersionCode(), "android");
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {

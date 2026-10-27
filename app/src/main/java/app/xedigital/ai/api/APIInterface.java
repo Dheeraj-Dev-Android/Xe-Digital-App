@@ -91,8 +91,7 @@ public interface APIInterface {
     @POST("authentication/login")
 //    retrofit2.Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
     Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password,
-                                       @Field("isEmployee") boolean isEmployee, @Field("versionCode") int versionCode,
-                                       @Field("versionName") String versionName, @Field("platform") String platform);
+                                       @Field("isEmployee") boolean isEmployee, @Field("versionCode") int versionCode, @Field("platform") String platform);
     //GET APIs
     @GET("users/profile/{userId}")
     @Headers({"Content-Type: application/json", "Accept: application/json"})

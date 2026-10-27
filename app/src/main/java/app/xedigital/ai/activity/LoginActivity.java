@@ -174,9 +174,12 @@ public class LoginActivity extends SecureBaseActivity {
     }
     private void callLoginApi(String email, String password, boolean isManualLogin) {
         if (isManualLogin) showLoading(true);
+//
+//        Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(
+//                email, password, true, getAppVersionCode(), getAppVersionName(), "android");
 
         Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(
-                email, password, true, getAppVersionCode(), getAppVersionName(), "android");
+                email, password, true, 4, "android");
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {

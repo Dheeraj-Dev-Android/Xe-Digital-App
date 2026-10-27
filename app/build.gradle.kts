@@ -13,7 +13,7 @@ android {
         applicationId = "app.xedigital.ai"
         minSdk = 28
         targetSdk = 36
-        versionCode = 5
+        versionCode = 4
         versionName = "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
