@@ -143,7 +143,7 @@ public class LeavesDataFragment extends Fragment {
         }
 
         if (entries.isEmpty()) {
-            showEmptyState("No balance leaves data available");
+//            showEmptyState("No balance leaves data available");
             leavePieChart.setVisibility(View.GONE);
             return;
         }

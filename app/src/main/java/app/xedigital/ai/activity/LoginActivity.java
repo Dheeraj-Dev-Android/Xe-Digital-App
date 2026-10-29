@@ -43,11 +43,6 @@ public class LoginActivity extends SecureBaseActivity {
     private boolean isRedirectInProgress = false;
     private boolean isCheckingPermissions = false;
     private PermissionManager permissionManager;
-    private final ActivityResultLauncher<String> notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        permissionManager.syncAllPermissions();
-        isCheckingPermissions = false;
-        proceedToAuthCheck();
-    });
     private AlertDialog batteryDialog;
     private AlertDialog infoDialog;
     private final ActivityResultLauncher<String[]> foregroundPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
@@ -65,6 +60,11 @@ public class LoginActivity extends SecureBaseActivity {
             showLoginScreen();
             showAlertDialog("Foreground location permission is required for shift tracking.");
         }
+    });
+    private final ActivityResultLauncher<String> notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        permissionManager.syncAllPermissions();
+        isCheckingPermissions = false;
+        proceedToAuthCheck();
     });
 
     @Override
@@ -166,7 +166,7 @@ public class LoginActivity extends SecureBaseActivity {
         if (isManualLogin) showLoading(true);
 
         Call<LoginModelResponse> call = APIClient.getInstance().getLogin().loginApi1(
-                email, password, true, 4, "android");
+                email, password, true, getAppVersionCode(), getAppVersionName(), "android");
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {

@@ -1,21 +1,20 @@
 package app.xedigital.ai.ui.leaves;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +32,13 @@ import retrofit2.Response;
 
 
 public class AppliedLeaveFragment extends Fragment {
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    private static final String TAG = "AppliedLeaveFragment";
+
     private ProgressBar loadingProgress;
     private TextView emptyStateText;
     private AppliedLeavesResponse appliedLeavesResponse;
-    private AppliedLeaveAdapter AppliedLeaveAdapter;
+    private AppliedLeaveAdapter appliedLeaveAdapter;
 
     public AppliedLeaveFragment() {
         // Required empty public constructor
@@ -56,47 +57,14 @@ public class AppliedLeaveFragment extends Fragment {
         loadingProgress = view.findViewById(R.id.loadingProgress);
         emptyStateText = view.findViewById(R.id.emptyStateText);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        loadingProgress.setVisibility(View.VISIBLE);
 
-        APIInterface apiInterface = APIClient.getInstance().AppliedLeave();
-//        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
 
-        retrofit2.Call<AppliedLeavesResponse> appliedLeaves = apiInterface.getAppliedLeaves("jwt " + authToken);
-        appliedLeaves.enqueue(new Callback<AppliedLeavesResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<AppliedLeavesResponse> call, @NonNull Response<AppliedLeavesResponse> response) {
-                loadingProgress.setVisibility(View.GONE);
-                if (response.isSuccessful() && response.body() != null) {
-                    appliedLeavesResponse = response.body();
-//                    Log.d("AppliedLeavesResponse", gson.toJson(appliedLeavesResponse));
-                    List<AppliedLeavesItem> leavesList = appliedLeavesResponse.getData().getAppliedLeaves();
-//                    AppliedLeaveAdapter adapter = new AppliedLeaveAdapter(leavesList);
-//                    recyclerView.setAdapter(adapter);
-
-                    if (leavesList.isEmpty()) {
-                        emptyStateText.setVisibility(View.VISIBLE);
-                    } else {
-                        emptyStateText.setVisibility(View.GONE);
-                        AppliedLeaveAdapter = new AppliedLeaveAdapter(leavesList);
-                        recyclerView.setAdapter(AppliedLeaveAdapter);
-                    }
-                } else {
-//                    Log.e("API Error", "Response not successful or body is null");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<AppliedLeavesResponse> call, @NonNull Throwable throwable) {
-                loadingProgress.setVisibility(View.GONE);
-            }
-        });
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
         chipGroup.setSingleSelection(true);
 
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            // Handle chip selection
             if (checkedIds.contains(R.id.chipAll)) {
                 filterLeaves("All");
             } else if (checkedIds.contains(R.id.chipApproved)) {
@@ -111,40 +79,102 @@ public class AppliedLeaveFragment extends Fragment {
                 filterLeaves("All");
             }
         });
-        // Attach click listeners to chips
-        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-            View child = chipGroup.getChildAt(i);
-            if (child instanceof Chip) {
-                child.setOnClickListener(this::onChipClicked);
-            }
-        }
+
+        fetchAppliedLeaves(recyclerView, authToken);
+
         return view;
     }
 
-    public void onChipClicked(View view) {
-        // Get the ChipGroup and the clicked chip
-        ChipGroup chipGroup = requireView().findViewById(R.id.statusChipGroup);
-        Chip clickedChip = (Chip) view;
+    // ======================== FETCH DATA ========================
 
-        // Check the clicked chip
-        chipGroup.check(clickedChip.getId());
-    }
+    private void fetchAppliedLeaves(RecyclerView recyclerView, String authToken) {
+        loadingProgress.setVisibility(View.VISIBLE);
+        emptyStateText.setVisibility(View.GONE);
 
-    private void filterLeaves(String status) {
-        if (appliedLeavesResponse != null && appliedLeavesResponse.getData() != null && appliedLeavesResponse.getData().getAppliedLeaves() != null) {
-            List<AppliedLeavesItem> originalList = appliedLeavesResponse.getData().getAppliedLeaves();
-            List<AppliedLeavesItem> filteredList = new ArrayList<>();
+        APIInterface apiInterface = APIClient.getInstance().AppliedLeave();
+        Call<AppliedLeavesResponse> call = apiInterface.getAppliedLeaves("jwt " + authToken);
 
-            if (status.equals("All")) {
-                filteredList.addAll(originalList);
-            } else {
-                for (AppliedLeavesItem item : originalList) {
-                    if (item.getStatus().equalsIgnoreCase(status)) {
-                        filteredList.add(item);
+        call.enqueue(new Callback<AppliedLeavesResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<AppliedLeavesResponse> call,
+                                   @NonNull Response<AppliedLeavesResponse> response) {
+                if (!isAdded()) return;
+
+                loadingProgress.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    appliedLeavesResponse = response.body();
+
+                    List<AppliedLeavesItem> leavesList = null;
+                    if (appliedLeavesResponse.getData() != null) {
+                        leavesList = appliedLeavesResponse.getData().getAppliedLeaves();
                     }
+
+                    if (leavesList != null && !leavesList.isEmpty()) {
+                        emptyStateText.setVisibility(View.GONE);
+                        appliedLeaveAdapter = new AppliedLeaveAdapter(leavesList);
+                        recyclerView.setAdapter(appliedLeaveAdapter);
+                    } else {
+                        showEmptyState();
+                    }
+                } else {
+                    showEmptyState();
+                    Toast.makeText(requireContext(),
+                            "Failed to retrieve applied leaves", Toast.LENGTH_SHORT).show();
                 }
             }
-            AppliedLeaveAdapter.updateList(filteredList);
+
+            @Override
+            public void onFailure(@NonNull Call<AppliedLeavesResponse> call,
+                                  @NonNull Throwable throwable) {
+                if (!isAdded()) return;
+
+                loadingProgress.setVisibility(View.GONE);
+                Log.e(TAG, "Fetch failed: " + throwable.getMessage());
+                showEmptyState();
+                Toast.makeText(requireContext(),
+                        "Network Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // ======================== FILTER ========================
+
+    private void filterLeaves(String status) {
+        if (appliedLeavesResponse == null
+                || appliedLeavesResponse.getData() == null
+                || appliedLeavesResponse.getData().getAppliedLeaves() == null) {
+            return;
         }
+
+        List<AppliedLeavesItem> originalList = appliedLeavesResponse.getData().getAppliedLeaves();
+        List<AppliedLeavesItem> filteredList = new ArrayList<>();
+
+        if ("All".equals(status)) {
+            filteredList.addAll(originalList);
+        } else {
+            for (AppliedLeavesItem item : originalList) {
+                if (item != null && item.getStatus() != null
+                        && item.getStatus().equalsIgnoreCase(status)) {
+                    filteredList.add(item);
+                }
+            }
+        }
+
+        if (appliedLeaveAdapter != null) {
+            appliedLeaveAdapter.updateList(filteredList);
+
+            if (filteredList.isEmpty()) {
+                emptyStateText.setVisibility(View.VISIBLE);
+            } else {
+                emptyStateText.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    // ======================== HELPERS ========================
+
+    private void showEmptyState() {
+        emptyStateText.setVisibility(View.VISIBLE);
     }
 }

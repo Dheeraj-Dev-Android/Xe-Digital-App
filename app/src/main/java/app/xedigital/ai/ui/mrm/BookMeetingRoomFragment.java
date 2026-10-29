@@ -213,7 +213,7 @@ public class BookMeetingRoomFragment extends Fragment {
         mViewModel.getBookedSlotsLiveData().observe(getViewLifecycleOwner(), response -> {
             processBookedSlots(response == null ? null
                     : (response.getData() == null ? null
-                    : response.getData().getDataById()));
+                       : response.getData().getDataById()));
         });
 
         mViewModel.getBookedSlotsErrorLiveData().observe(getViewLifecycleOwner(), err -> {

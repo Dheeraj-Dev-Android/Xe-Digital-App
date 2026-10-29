@@ -39,16 +39,18 @@ public class TokenAuthenticator implements Authenticator {
     @Override
     public Request authenticate(Route route, Response response) throws IOException {
 
+        Log.w(TAG, "🚨 [TOKEN_AUTH] 401 Unauthorized intercepted on request: " + response.request().url());
+
         // 1. Prevent infinite retry loops
         if (responseCount(response) >= MAX_RETRY_COUNT) {
-            Log.w(TAG, "Max retry count reached, giving up");
+            Log.e(TAG, "❌ [TOKEN_AUTH] Max retry count (" + MAX_RETRY_COUNT + ") reached for request. Giving up.");
             handleSessionExpired();
             return null;
         }
 
         // 2. If the refresh endpoint itself returned 401, the session is dead
         if (response.request().url().toString().contains("/authentication/refresh")) {
-            Log.w(TAG, "Refresh endpoint returned 401 — session expired or revoked");
+            Log.e(TAG, "❌ [TOKEN_AUTH] Refresh endpoint returned 401 — session is revoked or dead.");
             handleSessionExpired();
             return null;
         }
@@ -62,7 +64,7 @@ public class TokenAuthenticator implements Authenticator {
             String failedToken = extractTokenFromRequest(response.request());
 
             if (currentToken != null && !currentToken.equals(failedToken)) {
-                Log.d(TAG, "Token already refreshed by another thread, retrying");
+                Log.d(TAG, "🔄 [TOKEN_AUTH] Token already refreshed by another thread. Retrying original request with updated JWT.");
                 return response.request().newBuilder()
                         .header("Authorization", "jwt " + currentToken)
                         .build();
@@ -74,16 +76,18 @@ public class TokenAuthenticator implements Authenticator {
                     .query(null)
                     .build();
 
+            Log.d(TAG, "🔄 [TOKEN_AUTH] Starting synchronous token refresh against endpoint: " + refreshUrl);
+
             // 5. Attempt synchronous refresh
             String newToken = performRefresh(refreshUrl);
 
             if (newToken != null) {
-                Log.d(TAG, "Token refreshed successfully, retrying original request");
+                Log.d(TAG, "✅ [TOKEN_AUTH] Token refreshed successfully! Retrying original request (" + response.request().url().encodedPath() + ") with new JWT.");
                 return response.request().newBuilder()
                         .header("Authorization", "jwt " + newToken)
                         .build();
             } else {
-                Log.w(TAG, "Token refresh failed — session expired");
+                Log.e(TAG, "❌ [TOKEN_AUTH] Token refresh failed (null token returned) — Triggering session expiration flow.");
                 handleSessionExpired();
                 return null;
             }
@@ -100,7 +104,10 @@ public class TokenAuthenticator implements Authenticator {
                     .post(emptyBody)
                     .build();
 
+            Log.d(TAG, "📡 [TOKEN_AUTH] Sending POST request to " + refreshUrl);
             Response refreshResponse = refreshClient.newCall(refreshRequest).execute();
+
+            Log.d(TAG, "📡 [TOKEN_AUTH] Refresh HTTP response status code: " + refreshResponse.code());
 
             if (refreshResponse.isSuccessful() && refreshResponse.body() != null) {
                 String responseBody = refreshResponse.body().string();
@@ -111,22 +118,29 @@ public class TokenAuthenticator implements Authenticator {
                     String newToken = data.optString("token", null);
 
                     if (newToken != null && !newToken.isEmpty()) {
+                        Log.d(TAG, "🔑 [TOKEN_AUTH] New JWT token received successfully: " + (newToken.length() > 20 ? newToken.substring(0, 20) + "..." : newToken));
                         SecurePrefManager.getInstance(context).putString("authToken", newToken);
                         return newToken;
+                    } else {
+                        Log.e(TAG, "❌ [TOKEN_AUTH] Response success was true, but 'token' field was missing or empty.");
                     }
+                } else {
+                    Log.e(TAG, "❌ [TOKEN_AUTH] Refresh payload indicated failure: " + json.optString("message", "No message"));
                 }
+            } else {
+                Log.e(TAG, "❌ [TOKEN_AUTH] Refresh call failed with HTTP status code: " + refreshResponse.code());
             }
 
-            Log.e(TAG, "Refresh failed with HTTP " + refreshResponse.code());
             return null;
 
         } catch (Exception e) {
-            Log.e(TAG, "Refresh call exception: " + e.getMessage());
+            Log.e(TAG, "💥 [TOKEN_AUTH] Exception occurred during refresh network call: " + e.getMessage(), e);
             return null;
         }
     }
 
     private void handleSessionExpired() {
+        Log.w(TAG, "📢 [TOKEN_AUTH] Handling session expiration: Wiping tokens, clearing cookies, broadcasting ACTION_SESSION_EXPIRED.");
         SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
         prefManager.clearSession();
         cookieJar.clearAll();

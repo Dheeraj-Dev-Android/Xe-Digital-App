@@ -4,603 +4,973 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.leaves.PendingCMLeaveApprovalFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:fillViewport="true"
+        android:background="@android:color/transparent"
+        android:clipToPadding="false"
+        android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="6dp">
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- =============================================== -->
+            <!-- HEADER BANNER                                   -->
+            <!-- =============================================== -->
+            <LinearLayout
+                android:id="@+id/headerBanner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                android:background="@drawable/gradient_attendance_card"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@color/white" />
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Employee Details"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/empName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Test Emp"
-                        android:textColor="@color/primary_text"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/empEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="abed.e@consultedge.global"
-                        android:textColor="@color/secondary_text"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/empDesignation"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Software Analyst"
-                        android:textColor="@color/secondary_text"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/titleLeaveDetails"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Leave Details"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/dividerLeave"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:layout_constraintTop_toBottomOf="@id/titleLeaveDetails" />
-
-                    <TextView
-                        android:id="@+id/lblLeaveType"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Leave Name:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empLeaveType"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/dividerLeave" />
-
-                    <TextView
-                        android:id="@+id/empLeaveType"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="Casual Leave"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblLeaveType"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblLeaveType" />
-
-                    <TextView
-                        android:id="@+id/lblFromDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="From Date:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empFromDate"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empLeaveType" />
-
-                    <TextView
-                        android:id="@+id/empFromDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="21 Nov 2024"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblFromDate"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblFromDate" />
-
-                    <TextView
-                        android:id="@+id/lblTypeFrom"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Select Type From:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empSelectTypeFrom"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empFromDate" />
-
-                    <TextView
-                        android:id="@+id/empSelectTypeFrom"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="Full Day / Half Day"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblTypeFrom"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblTypeFrom" />
-
-                    <TextView
-                        android:id="@+id/lblToDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="To Date:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empToDate"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empSelectTypeFrom" />
-
-                    <TextView
-                        android:id="@+id/empToDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="21 Nov 2024"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblToDate"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblToDate" />
-
-                    <TextView
-                        android:id="@+id/lblTypeTo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Select Type To:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empSelectTypeTo"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empToDate" />
-
-                    <TextView
-                        android:id="@+id/empSelectTypeTo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="Full Day / Half Day"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblTypeTo"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblTypeTo" />
-
-                    <TextView
-                        android:id="@+id/lblAppliedDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Applied Date:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empAppliedDate"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empSelectTypeTo" />
-
-                    <TextView
-                        android:id="@+id/empAppliedDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="21 Nov 2024"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblAppliedDate"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblAppliedDate" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Reason for Leave"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <TextView
-                        android:id="@+id/empReason"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Testing"
-                        android:textColor="@color/primary_text"
-                        android:textSize="15sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Contact Details"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <TextView
-                        android:id="@+id/empContactNumber"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_phone"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:text="Contact: 2523552561"
-                        android:textColor="@color/primary_text"
-                        android:textSize="15sp"
-                        app:drawableTint="@color/secondary_text" />
-
-                    <TextView
-                        android:id="@+id/empAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:drawableStart="@drawable/ic_location"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:text="Address: Testing"
-                        android:textColor="@color/primary_text"
-                        android:textSize="15sp"
-                        app:drawableTint="@color/secondary_text" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Leaving Station"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <TextView
-                        android:id="@+id/empLeavingStation"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Yes / No"
-                        android:textColor="@color/primary_text"
-                        android:textSize="15sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vacation Address"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <TextView
-                        android:id="@+id/empVacationAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Street 123, City, State"
-                        android:textColor="@color/primary_text"
-                        android:textSize="15sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/titleStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Status Details"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/dividerStatus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:layout_constraintTop_toBottomOf="@id/titleStatus" />
-
-                    <TextView
-                        android:id="@+id/lblStatus"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Status:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/empStatusChip"
-                        app:layout_constraintEnd_toStartOf="@id/empStatusChip"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/dividerStatus" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/empStatusChip"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pending"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Leave Request"
                         android:textColor="@color/white"
-                        android:textStyle="bold|italic"
-                        app:chipBackgroundColor="@color/error_color"
-                        app:layout_constraintStart_toEndOf="@id/lblStatus"
-                        app:layout_constraintTop_toBottomOf="@id/dividerStatus" />
-
-                    <TextView
-                        android:id="@+id/lblStatusUpdatedBy"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Status Updated By:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empStatusUpdatedBy"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/empStatusChip" />
-
-                    <TextView
-                        android:id="@+id/empStatusUpdatedBy"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="HR Manager"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblStatusUpdatedBy"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblStatusUpdatedBy" />
-
-                    <TextView
-                        android:id="@+id/lblStatusUpdatedDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Status Updated Date:"
-                        android:textColor="@color/secondary_text"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/empStatusUpdatedDate"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/lblStatusUpdatedBy" />
-
-                    <TextView
-                        android:id="@+id/empStatusUpdatedDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="22 Nov 2024"
-                        android:textColor="@color/primary_text"
-                        app:layout_constraintBaseline_toBaselineOf="@id/lblStatusUpdatedDate"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1.2"
-                        app:layout_constraintStart_toEndOf="@id/lblStatusUpdatedDate" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/surface_color"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Comments"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp"
+                        android:textSize="24sp"
                         android:textStyle="bold" />
 
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <TextView
-                        android:id="@+id/empComments"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="No additional comments"
-                        android:textColor="@color/primary_text"
-                        android:textSize="15sp" />
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:contentDescription="Leave icon"
+                        android:src="@drawable/ic_event"
+                        app:tint="@color/white" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="6dp"
+                    android:alpha="0.9"
+                    android:fontFamily="@font/quicksand_font_family"
+                    android:text="Review and manage leave applications"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                android:orientation="vertical"
+                android:padding="8dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/leaveBtnReject"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
+                <!-- =============================================== -->
+                <!-- EMPLOYEE DETAILS CARD                           -->
+                <!-- =============================================== -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/RestrictedHoliday"
-                    android:text="Reject"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/background_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/leaveBtnApprove"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/success_color"
-                    android:text="Approve"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/leaveBtnCancel"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="22dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@color/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Employee Details"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/empLeaveType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Casual Leave"
+                                android:textColor="@color/white"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                app:chipBackgroundColor="@color/colorSecondaryVariant"
+                                app:chipIcon="@drawable/ic_event"
+                                app:chipIconSize="14dp"
+                                app:chipIconTint="@color/white"
+                                app:chipMinHeight="28dp"
+                                app:chipStrokeWidth="0dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_background_light"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginEnd="14dp"
+                                app:cardBackgroundColor="@color/colorPrimaryVariant"
+                                app:cardCornerRadius="28dp"
+                                app:cardElevation="2dp">
+
+                                <TextView
+                                    android:id="@+id/empAvatarInitials"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:gravity="center"
+                                    android:text="TE"
+                                    android:textColor="@color/white"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/empName"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="CEG Test"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/empEmail"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="testemp@cloudfencedemo.ai"
+                                    android:textColor="@color/colorPrimaryVariant"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/empDesignation"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="Software Analyst"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- =============================================== -->
+                <!-- LEAVE DETAILS CARD                              -->
+                <!-- =============================================== -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/_000000"
-                    android:text="Cancel"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/background_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="22dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@color/colorSecondaryVariant" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Leave Details"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <!-- From Date -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/icon_background"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="@color/colorPrimaryVariant"
+                                app:strokeWidth="1dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="14dp">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="14dp"
+                                            android:layout_height="14dp"
+                                            android:layout_marginEnd="6dp"
+                                            android:contentDescription="From"
+                                            android:src="@drawable/ic_calendar"
+                                            app:tint="@color/colorPrimaryVariant" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/quicksand_font_family"
+                                            android:text="FROM DATE"
+                                            android:textColor="@color/text_tertiary"
+                                            android:textSize="11sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <TextView
+                                        android:id="@+id/empFromDate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="Jul 31, 2026"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/empSelectTypeFrom"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="Firsthalf"
+                                        android:textColor="@color/colorPrimaryVariant"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- To Date -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/icon_background"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="@color/colorPrimaryVariant"
+                                app:strokeWidth="1dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="14dp">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="14dp"
+                                            android:layout_height="14dp"
+                                            android:layout_marginEnd="6dp"
+                                            android:contentDescription="To"
+                                            android:src="@drawable/ic_calendar"
+                                            app:tint="@color/colorPrimaryVariant" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/quicksand_font_family"
+                                            android:text="TO DATE"
+                                            android:textColor="@color/text_tertiary"
+                                            android:textSize="11sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <TextView
+                                        android:id="@+id/empToDate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="Jul 31, 2026"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/empSelectTypeTo"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="Fullday"
+                                        android:textColor="@color/colorPrimaryVariant"
+                                        android:textSize="11sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <!-- Total Days Badge -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            app:cardBackgroundColor="@color/colorPrimaryVariant"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="3dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="12dp">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:contentDescription="Total days"
+                                    android:src="@drawable/ic_calendar"
+                                    app:tint="@color/white" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="Total Days: "
+                                    android:textColor="@color/white"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/empTotalDays"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="1"
+                                    android:textColor="@color/white"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Applied Date Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_background_light"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="8dp"
+                                android:contentDescription="Applied date"
+                                android:src="@drawable/ic_schedule"
+                                app:tint="@color/accent_cross" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Applied Date"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empAppliedDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Jul 30, 2026"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- =============================================== -->
+                <!-- REASON CARD                                     -->
+                <!-- =============================================== -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/background_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="6dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginEnd="10dp"
+                                android:contentDescription="Reason"
+                                android:src="@drawable/ic_note"
+                                app:tint="@color/colorAccent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Reason"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/empReason"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_background_light"
+                            android:fontFamily="@font/quicksand_font_family"
+                            android:lineSpacingMultiplier="1.4"
+                            android:padding="14dp"
+                            android:text="Test"
+                            android:textColor="@color/badge_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- =============================================== -->
+                <!-- CONTACT & LOCATION CARD                         -->
+                <!-- =============================================== -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/background_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="22dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@color/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Contact &amp; Location"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Contact Number Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/rounded_background_light"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_marginEnd="12dp"
+                                app:cardBackgroundColor="@color/colorPrimary"
+                                app:cardCornerRadius="18dp"
+                                app:cardElevation="0dp">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="Phone"
+                                    android:src="@drawable/ic_phone"
+                                    app:tint="@color/white" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="Contact Number"
+                                    android:textColor="@color/badge_text"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/empContactNumber"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="9087654321"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Address Row (kept per request) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/rounded_background_light"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_marginEnd="12dp"
+                                app:cardBackgroundColor="@color/colorPrimary"
+                                app:cardCornerRadius="18dp"
+                                app:cardElevation="0dp">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="Address"
+                                    android:src="@drawable/ic_location"
+                                    app:tint="@color/white" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="Address"
+                                    android:textColor="@color/badge_text"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/empAddress"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/quicksand_font_family"
+                                    android:text="-"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@color/divider" />
+
+                        <!-- Leaving Station + Vacation Address -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/background_page"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="@color/divider"
+                                app:strokeWidth="1dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="LEAVING STATION"
+                                        android:textColor="@color/text_tertiary"
+                                        android:textSize="10sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/empLeavingStation"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="No"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/background_page"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="@color/divider"
+                                app:strokeWidth="1dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="VACATION ADDRESS"
+                                        android:textColor="@color/text_tertiary"
+                                        android:textSize="10sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/empVacationAddress"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:fontFamily="@font/quicksand_font_family"
+                                        android:text="Na"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- =============================================== -->
+                <!-- STATUS CARD                                     -->
+                <!-- =============================================== -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/background_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="6dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginEnd="10dp"
+                                android:contentDescription="Status"
+                                android:src="@drawable/ic_info"
+                                app:tint="@color/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Status"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/empStatusChip"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Unapproved"
+                                android:textColor="@color/white"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                app:chipBackgroundColor="@color/pending_status_color"
+                                app:chipMinHeight="32dp"
+                                app:chipStrokeWidth="0dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="6dp"
+                            android:background="@drawable/rounded_background_light"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Status Updated By"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/empStatusUpdatedBy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="-"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="6dp"
+                            android:background="@drawable/rounded_background_light"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Status Updated Date"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/empStatusUpdatedDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="-"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_background_light"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="Comment"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/empComments"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/quicksand_font_family"
+                                android:text="-"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- =============================================== -->
+                <!-- ACTION BUTTONS                                  -->
+                <!-- =============================================== -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/leaveBtnReject"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/rejected_status_color"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Reject"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/leaveBtnApprove"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/approved_status_color"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Approve"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp"
+                        app:elevation="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/leaveBtnCancel"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/_000000"
+                        android:fontFamily="@font/quicksand_font_family"
+                        android:text="Cancel"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

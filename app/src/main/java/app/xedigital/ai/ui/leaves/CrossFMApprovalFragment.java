@@ -16,12 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import app.xedigital.ai.R;
@@ -38,6 +36,8 @@ import retrofit2.Response;
 
 public class CrossFMApprovalFragment extends Fragment {
 
+    private static final String TAG = "CrossFMApproval";
+
     private String authToken;
     private String userId;
     private RecyclerView recyclerView;
@@ -47,6 +47,9 @@ public class CrossFMApprovalFragment extends Fragment {
     private CMLeavePendingResponse cmLeavePendingApprovalResponse;
     private LinearLayout emptyStateView;
     private Button retryButton;
+
+    // Track current chip filter so it survives swipe-refresh
+    private String currentFilter = "All";
 
 
     public CrossFMApprovalFragment() {
@@ -60,131 +63,160 @@ public class CrossFMApprovalFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cross_f_m_approval, container, false);
+
         recyclerView = view.findViewById(R.id.recyclerView);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         progressBar = view.findViewById(R.id.progressBar);
         emptyStateView = view.findViewById(R.id.emptyStateView);
         retryButton = view.findViewById(R.id.retryButton);
 
-//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         authToken = prefManager.getString("authToken", "");
         userId = prefManager.getString("userId", "");
+
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         swipeRefreshLayout.setOnRefreshListener(this::fetchPendingLeaves);
         retryButton.setOnClickListener(v -> fetchPendingLeaves());
-        fetchPendingLeaves();
 
         ChipGroup chipGroup = view.findViewById(R.id.statusChipGroup);
         chipGroup.setSingleSelection(true);
 
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.contains(R.id.chipAll)) {
-                filterLeaves("All");
+                currentFilter = "All";
             } else if (checkedIds.contains(R.id.chipApproved)) {
-                filterLeaves("Approved");
+                currentFilter = "Approved";
             } else if (checkedIds.contains(R.id.chipUnapproved)) {
-                filterLeaves("Unapproved");
+                currentFilter = "Unapproved";
             } else if (checkedIds.contains(R.id.chipRejected)) {
-                filterLeaves("Rejected");
+                currentFilter = "Rejected";
             } else if (checkedIds.contains(R.id.chipCancelled)) {
-                filterLeaves("Cancelled");
+                currentFilter = "Cancelled";
             } else {
-                filterLeaves("All");
+                currentFilter = "All";
             }
+            filterLeaves(currentFilter);
         });
-        // Attach click listeners to chips
-//        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-//            View child = chipGroup.getChildAt(i);
-//            if (child instanceof Chip) {
-//                child.setOnClickListener(this::onChipClicked);
-//            }
-//        }
+
+        fetchPendingLeaves();
 
         return view;
     }
 
-    public void onChipClicked(View view) {
-        // Get the ChipGroup and the clicked chip
-        ChipGroup chipGroup = getView().findViewById(R.id.statusChipGroup);
-        Chip clickedChip = (Chip) view;
-
-        chipGroup.check(clickedChip.getId());
-    }
+    // ======================== FILTER ========================
 
     private void filterLeaves(String status) {
-        if (cmLeavePendingApprovalResponse != null && cmLeavePendingApprovalResponse.getData() != null && cmLeavePendingApprovalResponse.getData().getAppliedLeaves() != null) {
-            List<AppliedLeavesItem> originalList = cmLeavePendingApprovalResponse.getData().getAppliedLeaves();
-            List<AppliedLeavesItem> filteredList;
+        if (cmLeavePendingApprovalResponse == null
+                || cmLeavePendingApprovalResponse.getData() == null
+                || cmLeavePendingApprovalResponse.getData().getAppliedLeaves() == null) {
+            return;
+        }
 
-            if (status.equals("All")) {
-                filteredList = new ArrayList<>(originalList);
-            } else {
-                filteredList = originalList.stream()
-                        .filter(item -> item.getStatus().equalsIgnoreCase(status))
-                        .collect(Collectors.toList());
-            }
+        List<AppliedLeavesItem> originalList = cmLeavePendingApprovalResponse.getData().getAppliedLeaves();
+        List<AppliedLeavesItem> filteredList;
 
-            if (crossManagerLeaveApprovalAdapter != null) {
-                crossManagerLeaveApprovalAdapter.updateList(filteredList);
+        if ("All".equals(status)) {
+            filteredList = new ArrayList<>(originalList);
+        } else {
+            filteredList = originalList.stream()
+                    .filter(item -> item.getStatus() != null
+                            && item.getStatus().equalsIgnoreCase(status))
+                    .collect(Collectors.toList());
+        }
 
-                if (filteredList.isEmpty()) {
-                    emptyStateView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                } else {
-                    emptyStateView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
-
-            } else {
-                Log.e("CrossManagerLeaveApprovalAdapter", "Adapter is null");
-            }
+        if (crossManagerLeaveApprovalAdapter != null) {
+            crossManagerLeaveApprovalAdapter.updateList(filteredList);
+            toggleEmptyState(filteredList.isEmpty());
+        } else {
+            Log.e(TAG, "Adapter is null during filter");
         }
     }
+
+    // ======================== FETCH DATA ========================
 
     private void fetchPendingLeaves() {
         progressBar.setVisibility(View.VISIBLE);
         emptyStateView.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
-        String authHeader = "jwt " + authToken;
 
+        String authHeader = "jwt " + authToken;
         APIInterface apiService = APIClient.getInstance().getPendingApprovalLeaves();
 
         Call<CMLeavePendingResponse> call = apiService.getPendingApprovalLeavesCR(authHeader, userId);
         call.enqueue(new Callback<CMLeavePendingResponse>() {
             @Override
-            public void onResponse(@NonNull Call<CMLeavePendingResponse> call, @NonNull Response<CMLeavePendingResponse> response) {
+            public void onResponse(@NonNull Call<CMLeavePendingResponse> call,
+                                   @NonNull Response<CMLeavePendingResponse> response) {
+                if (!isAdded()) return;
+
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
 
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     cmLeavePendingApprovalResponse = response.body();
-                    if (cmLeavePendingApprovalResponse != null && !cmLeavePendingApprovalResponse.getData().getAppliedLeaves().isEmpty()) {
-                        crossManagerLeaveApprovalAdapter = new CrossManagerLeaveApprovalAdapter(cmLeavePendingApprovalResponse.getData().getAppliedLeaves(), requireContext());
-                        recyclerView.setAdapter(crossManagerLeaveApprovalAdapter);
+
+                    List<AppliedLeavesItem> appliedLeaves = null;
+                    if (cmLeavePendingApprovalResponse.getData() != null) {
+                        appliedLeaves = cmLeavePendingApprovalResponse.getData().getAppliedLeaves();
+                    }
+
+                    if (appliedLeaves != null && !appliedLeaves.isEmpty()) {
+                        // Reuse existing adapter if possible; create new only on first load
+                        if (crossManagerLeaveApprovalAdapter == null) {
+                            crossManagerLeaveApprovalAdapter =
+                                    new CrossManagerLeaveApprovalAdapter(appliedLeaves, requireContext());
+                            recyclerView.setAdapter(crossManagerLeaveApprovalAdapter);
+                        } else {
+                            crossManagerLeaveApprovalAdapter.updateList(appliedLeaves);
+                        }
+
+                        // Re-apply the current chip filter after refresh
+                        filterLeaves(currentFilter);
                         recyclerView.setVisibility(View.VISIBLE);
                     } else {
-                        emptyStateView.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.GONE);
+                        toggleEmptyState(true);
                     }
                 } else {
-                    emptyStateView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
+                    toggleEmptyState(true);
+                    String errorMsg = "Failed to load leaves";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMsg = response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error parsing error body", e);
+                    }
+                    Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<CMLeavePendingResponse> call, @NonNull Throwable throwable) {
+            public void onFailure(@NonNull Call<CMLeavePendingResponse> call,
+                                  @NonNull Throwable throwable) {
+                if (!isAdded()) return;
+
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
-                Log.e("Pending Approval Error", Objects.requireNonNull(throwable.getMessage()));
-                emptyStateView.setVisibility(View.VISIBLE);
-                Toast.makeText(requireContext(), "Network Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
+                String message = throwable.getMessage() != null ? throwable.getMessage() : "Unknown error";
+                Log.e(TAG, "Fetch failed: " + message);
+                toggleEmptyState(true);
+                Toast.makeText(requireContext(), "Network Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // ======================== HELPERS ========================
+
+    private void toggleEmptyState(boolean isEmpty) {
+        if (isEmpty) {
+            emptyStateView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyStateView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 }

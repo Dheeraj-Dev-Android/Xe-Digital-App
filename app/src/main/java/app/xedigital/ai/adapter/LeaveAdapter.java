@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.mikephil.charting.charts.PieChart;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.util.List;
@@ -81,7 +80,6 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
         TextView totalDaysText;
         TextView progressText;
         LinearProgressIndicator leaveProgress;
-        PieChart pieChart;
 
         public LeaveViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,7 +91,7 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.LeaveViewHol
             totalDaysText = itemView.findViewById(R.id.totalDaysText);
             progressText = itemView.findViewById(R.id.progressText);
             leaveProgress = itemView.findViewById(R.id.leaveProgress);
-            pieChart = itemView.findViewById(R.id.leavePieChart);
+//            pieChart = itemView.findViewById(R.id.leavePieChart);
         }
     }
 }

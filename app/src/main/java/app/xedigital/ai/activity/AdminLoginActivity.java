@@ -134,7 +134,7 @@ public class AdminLoginActivity extends SecureBaseActivity {
         verifyRetryCount = 0; // reset retry counter for a fresh login attempt
         showLoading(true);
 
-        Call<LoginModelResponse> call = AdminAPIClient.getInstance().getBase2().loginApi1(email, password, true, getAppVersionCode(), "android");
+        Call<LoginModelResponse> call = AdminAPIClient.getInstance().getBase2().loginApi1(email, password, true, getAppVersionCode(), getAppVersionName(), "android");
         call.enqueue(new Callback<LoginModelResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginModelResponse> call, @NonNull Response<LoginModelResponse> response) {

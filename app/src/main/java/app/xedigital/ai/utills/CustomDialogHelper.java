@@ -221,6 +221,7 @@ public class CustomDialogHelper {
         builder.setCancelable(false);
 
         AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
         setupDialogWindow(dialog);
 
         TextView titleView = view.findViewById(R.id.dialogTitle);

@@ -1,6 +1,5 @@
 package app.xedigital.ai.ui.leaves;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +32,6 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.leaveApprovalPending.AppliedLeavesItem;
 import app.xedigital.ai.model.leaveApprovalPending.LeavePendingApprovalResponse;
-import app.xedigital.ai.model.regularizeList.AttendanceRegularizeAppliedItem;
 import app.xedigital.ai.utills.FilterBottomSheetDialogFragment;
 import app.xedigital.ai.utills.SecurePrefManager;
 import retrofit2.Call;
@@ -49,11 +47,9 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     private String authTokenHeader;
     private String userId;
     private LeaveApprovalAdapter approvalAdapter;
-    private PendingLeaveApproveFragment pendingLeaveApproveFragment;
     private APIInterface apiInterface;
     private ProgressBar loadingProgress;
     private LinearLayout emptyStateContainer;
-    private View view;
     private ChipGroup chipGroup;
     private ApproveLeaveViewModal approveLeaveViewModal;
 
@@ -73,7 +69,7 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
+        View view = inflater.inflate(R.layout.fragment_approve_leave, container, false);
         setHasOptionsMenu(true);
 
         RecyclerView approvalRecyclerView = view.findViewById(R.id.leaveApprovalRecyclerView);
@@ -81,14 +77,14 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         chipGroup = view.findViewById(R.id.statusChipGroup);
 
-        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        approvalRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", "");
         userId = prefManager.getString("userId", "");
         authTokenHeader = "jwt " + authToken;
 
-        approvalAdapter = new LeaveApprovalAdapter(new ArrayList<>(), authTokenHeader, userId, ApproveLeaveFragment.this, getContext());
+        approvalAdapter = new LeaveApprovalAdapter(new ArrayList<>(), authTokenHeader, userId, this, requireContext());
         approvalRecyclerView.setAdapter(approvalAdapter);
 
         apiInterface = APIClient.getInstance().getPendingApprovalLeaves();
@@ -96,7 +92,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         chipGroup.setSingleSelection(true);
         setupChipListeners();
 
-        loadingProgress.setVisibility(View.VISIBLE);
         getLeaveApproval();
 
         return view;
@@ -120,14 +115,14 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     }
 
     private void getLeaveApproval() {
+        loadingProgress.setVisibility(View.VISIBLE);
+        emptyStateContainer.setVisibility(View.GONE);
+
         Call<LeavePendingApprovalResponse> call = apiInterface.getPendingApprovalLeaves(authTokenHeader, userId);
         call.enqueue(new Callback<LeavePendingApprovalResponse>() {
             @Override
             public void onResponse(@NonNull Call<LeavePendingApprovalResponse> call, @NonNull Response<LeavePendingApprovalResponse> response) {
-                if (!isAdded()) {
-                    Log.w(TAG, "onResponse: Fragment not attached to host context.");
-                    return;
-                }
+                if (!isAdded()) return;
 
                 loadingProgress.setVisibility(View.GONE);
 
@@ -144,17 +139,14 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
                             masterLeaveList.clear();
                             masterLeaveList.addAll(items);
                             approveLeaveViewModal.leaveList.setValue(items);
-
                             applyFilters();
                         }
                     } else {
-
                         showEmptyState();
                     }
                 } else {
-
                     showEmptyState();
-                    Toast.makeText(getContext(), "Failed to retrieve leave records", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Failed to retrieve leave records", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -164,7 +156,8 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
 
                 loadingProgress.setVisibility(View.GONE);
                 Log.e(TAG, "Network failure in getLeaveApproval: " + t.getMessage(), t);
-                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                showEmptyState();
+                Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -174,9 +167,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         emptyStateContainer.setVisibility(View.VISIBLE);
         if (approvalAdapter != null) {
             approvalAdapter.updateList(new ArrayList<>());
-        }
-        if (isAdded() && getContext() != null) {
-            new AlertDialog.Builder(getContext()).setTitle("Approve Leaves").setMessage("No Records Found").setPositiveButton("OK", null).show();
         }
     }
 
@@ -189,7 +179,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
 
     private void applyFilters() {
         List<AppliedLeavesItem> dateFilteredList = filterByDate(masterLeaveList, currentStartDate, currentEndDate);
-
         List<AppliedLeavesItem> finalFilteredList = filterByStatus(dateFilteredList, currentStatusFilter);
 
         if (finalFilteredList.isEmpty()) {
@@ -254,12 +243,6 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        view = null;
-    }
-
-    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_approve_leave_fragment, menu);
@@ -273,8 +256,9 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
             filterDialogFragment.show(getParentFragmentManager(), filterDialogFragment.getTag());
             return true;
         } else if (item.getItemId() == R.id.action_cross_manager) {
-            if (view != null) {
-                NavController navController = Navigation.findNavController(view);
+            View currentView = getView();
+            if (currentView != null) {
+                NavController navController = Navigation.findNavController(currentView);
                 navController.navigate(R.id.action_nav_approve_leaves_to_nav_cross_approval_leave);
             }
             return true;
@@ -282,18 +266,17 @@ public class ApproveLeaveFragment extends Fragment implements FilterLeaveApprova
         return super.onOptionsItemSelected(item);
     }
 
-    public void onApprove(AttendanceRegularizeAppliedItem item) {
-        if (pendingLeaveApproveFragment != null) {
-            pendingLeaveApproveFragment.handleApprove(item.getId());
-        }
+    // ======================== LEAVE ACTION CALLBACKS ========================
+
+    public void onApprove(AppliedLeavesItem item) {
         getLeaveApproval();
     }
 
-    public void onReject(AttendanceRegularizeAppliedItem item) {
+    public void onReject(AppliedLeavesItem item) {
         getLeaveApproval();
     }
 
-    public void onCancel(AttendanceRegularizeAppliedItem item) {
+    public void onCancel(AppliedLeavesItem item) {
         getLeaveApproval();
     }
 }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -59,7 +60,7 @@ public abstract class SecureBaseActivity extends AppCompatActivity {
         if (sessionExpiredReceiver != null) {
             try {
                 IntentFilter filter = new IntentFilter("ACTION_SESSION_EXPIRED");
-                registerReceiver(sessionExpiredReceiver, filter);
+                ContextCompat.registerReceiver(this, sessionExpiredReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
             } catch (Exception e) {
                 Log.e(TAG, "Error registering session receiver: " + e.getMessage());
             }

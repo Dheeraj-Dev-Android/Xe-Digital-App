@@ -139,8 +139,11 @@ public class ClaimManagementFragment extends Fragment {
                 binding.selectedFileText.setVisibility(View.GONE);
                 binding.forGuestEmployeesCheckbox.setChecked(false);
                 binding.businessUnitDropdown.setSelection(0);
+                boolean wasEditMode = isEditMode;  // [M5 FIX] Capture before reset
+                isEditMode = false;                // [M5 FIX]
+                editClaimId = "";                  // [M5 FIX]
                 NavController navController = NavHostFragment.findNavController(this);
-                if (isEditMode) {
+                if (wasEditMode) {                 // [M5 FIX] Use captured value
                     // ══ NEW: After successful edit, go back to claim list ══
                     navController.popBackStack(R.id.nav_view_claim, false);
                 } else {
@@ -242,8 +245,15 @@ public class ClaimManagementFragment extends Fragment {
                 break;
         }
 
+        // ── [H1 FIX] Ensure field containers are visible (chip setChecked may not trigger listener) ──
+        binding.travelFieldsContainer.setVisibility("travel".equals(expenseType) ? View.VISIBLE : View.GONE);
+        binding.foodFieldsContainer.setVisibility("food".equals(expenseType) ? View.VISIBLE : View.GONE);
+        binding.accommodationFieldsContainer.setVisibility("accommodation".equals(expenseType) ? View.VISIBLE : View.GONE);
+        binding.miscellaneousFieldsContainer.setVisibility("miscellaneous".equals(expenseType) ? View.VISIBLE : View.GONE);
+
         // ── Select spinner values (delayed to allow adapters to load) ──
         binding.getRoot().post(() -> {
+            if (binding == null) return;
             selectSpinnerValue(binding.mealTypeDropdown, safe(c.getMeantype()));
             selectSpinnerValue(binding.travelCategoryDropdown, safe(c.getTravelCategory()));
             selectSpinnerValue(binding.transportModeDropdown, safe(c.getModeoftransport()));
@@ -750,9 +760,23 @@ public class ClaimManagementFragment extends Fragment {
 
         viewModel.showCustomTransportInput.observe(getViewLifecycleOwner(), show -> binding.EnterTransportInputLayout.setVisibility(show ? View.VISIBLE : View.GONE));
         viewModel.underProcessTextState.observe(getViewLifecycleOwner(), text -> binding.underProcessText.setText(text));
+
+        // [M3 FIX] Track selected employee email for claim payload
+        binding.requestedEmployeeDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedName = parent.getItemAtPosition(position).toString();
+                viewModel.bUemail = viewModel.getEmployeeEmail(selectedName);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     private void processPickedFiles(Intent data) {
+        if (binding == null) return;
         if (selectedFileUris.size() >= 10) {
             Toast.makeText(requireContext(), "Maximum limit of 10 files reached.", Toast.LENGTH_SHORT).show();
             return;
@@ -833,6 +857,7 @@ public class ClaimManagementFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        selectedFileUris.clear();  // [M4 FIX] Sync with destroyed UI
     }
 
     private static class SimpleTextWatcher implements TextWatcher {

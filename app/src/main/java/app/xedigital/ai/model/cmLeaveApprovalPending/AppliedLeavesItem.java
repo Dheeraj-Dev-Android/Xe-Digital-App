@@ -54,6 +54,9 @@ public class AppliedLeavesItem implements Serializable {
     @SerializedName("department")
     private String department;
 
+    @SerializedName("shortLeaveEndTime")
+    private String shortLeaveEndTime;
+
     @SerializedName("updatedAt")
     private String updatedAt;
 
@@ -75,6 +78,9 @@ public class AppliedLeavesItem implements Serializable {
     @SerializedName("toDate")
     private String toDate;
 
+    @SerializedName("leavePlanned")
+    private String leavePlanned;
+
     @SerializedName("appliedDate")
     private String appliedDate;
 
@@ -83,6 +89,9 @@ public class AppliedLeavesItem implements Serializable {
 
     @SerializedName("selectTypeTo")
     private String selectTypeTo;
+
+    @SerializedName("shortLeaveStartTime")
+    private String shortLeaveStartTime;
 
     @SerializedName("fromDate")
     private String fromDate;
@@ -169,6 +178,10 @@ public class AppliedLeavesItem implements Serializable {
         return department;
     }
 
+    public String getShortLeaveEndTime() {
+        return shortLeaveEndTime;
+    }
+
     public String getUpdatedAt() {
         return updatedAt;
     }
@@ -197,6 +210,10 @@ public class AppliedLeavesItem implements Serializable {
         return toDate;
     }
 
+    public String getLeavePlanned() {
+        return leavePlanned;
+    }
+
     public String getAppliedDate() {
         return appliedDate;
     }
@@ -207,6 +224,10 @@ public class AppliedLeavesItem implements Serializable {
 
     public String getSelectTypeTo() {
         return selectTypeTo;
+    }
+
+    public String getShortLeaveStartTime() {
+        return shortLeaveStartTime;
     }
 
     public String getFromDate() {
@@ -235,5 +256,9 @@ public class AppliedLeavesItem implements Serializable {
 
     public String getStatus() {
         return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

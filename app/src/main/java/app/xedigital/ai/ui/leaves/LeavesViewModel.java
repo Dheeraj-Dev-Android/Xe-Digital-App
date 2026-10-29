@@ -63,10 +63,12 @@ public class LeavesViewModel extends ViewModel {
                 @Override
                 public void onFailure(@NonNull Call<LeavesResponse> call, @NonNull Throwable throwable) {
                     Log.e("LeavesViewModel", "Error fetching leaves data: " + throwable.getMessage());
+                    mainHandler.post(() -> _leavesData.setValue(null));
                 }
             });
         } else {
             Log.e("LeavesViewModel", "Auth Token is null");
+            mainHandler.post(() -> _leavesData.setValue(null));
         }
     }
 
@@ -82,11 +84,13 @@ public class LeavesViewModel extends ViewModel {
                         String responseJson = gson.toJson(response.body());
                         // Extract Restricted holiday ID
                         List<LeavetypesItem> leaveTypes = response.body().getData().getLeavetypes();
-                        for (LeavetypesItem leaveType : leaveTypes) {
-                            if ("Restricted Holidays".equals(leaveType.getLeavetypeName())) {
-                                restrictedHolidayId = leaveType.getId();
+                        if (leaveTypes != null) {
+                            for (LeavetypesItem leaveType : leaveTypes) {
+                                if ("Restricted Holidays".equals(leaveType.getLeavetypeName())) {
+                                    restrictedHolidayId = leaveType.getId();
 //                                Log.e("fetchLeavesType", "Restricted holiday ID: " + restrictedHolidayId);
-                                break;
+                                    break;
+                                }
                             }
                         }
 //                        Log.d("fetchLeavesType", "Leave Response: " + responseJson);

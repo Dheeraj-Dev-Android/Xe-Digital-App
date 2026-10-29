@@ -19,7 +19,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
@@ -104,45 +106,43 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public final MutableLiveData<Boolean> showCustomTransportInput = new MutableLiveData<>(false);
     public final MutableLiveData<String> toastMessage = new MutableLiveData<>();
     public final MutableLiveData<Boolean> operationSuccess = new MutableLiveData<>();
-
-    public final String[] imageUrls = new String[10];
-    public final String[] imageKeys = new String[10];
-
     public final MutableLiveData<String> restaurantName = new MutableLiveData<>("");
     public final MutableLiveData<String> numberOfPersons = new MutableLiveData<>("");
     public final MutableLiveData<String> foodComment = new MutableLiveData<>("");
     public final MutableLiveData<String> foodTravelId = new MutableLiveData<>("");
-
     public final MutableLiveData<String> accommodationAddress = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationRegion = new MutableLiveData<>("");
     public final MutableLiveData<String> purposeOfStay = new MutableLiveData<>("");
     public final MutableLiveData<String> accommodationTravelId = new MutableLiveData<>("");
-
     public final MutableLiveData<String> internetProvider = new MutableLiveData<>("");
     public final MutableLiveData<String> internetBillNumber = new MutableLiveData<>("");
-
     public final MutableLiveData<String> fuelVehicleNumber = new MutableLiveData<>("");
     public final MutableLiveData<String> fuelStation = new MutableLiveData<>("");
     public final MutableLiveData<Integer> claimBackDateLimit = new MutableLiveData<>(-1);
-
+    private final String[] imageUrls = new String[10];  // [L3 FIX]
+    private final String[] imageKeys = new String[10];  // [L3 FIX]
+    private final Map<String, String> employeeEmailMap = new HashMap<>();  // [M3 FIX]
     private final MutableLiveData<EmployeeClaimdataItem> _editClaimData = new MutableLiveData<>();
+    private final APIInterface apiInterface;
+    private final MutableLiveData<Boolean> _submissionSuccess = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> _saveSuccess = new MutableLiveData<>();
     // ══ NEW: Edit mode fields ══
     public String editingClaimId = null;
     public boolean isEditMode = false;
     public LiveData<EmployeeClaimdataItem> editClaimData = _editClaimData;
-
-    private final APIInterface apiInterface;
-    private final MutableLiveData<Boolean> _submissionSuccess = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> _saveSuccess = new MutableLiveData<>();
     public double claimLength;
     public String hrMail;
+    public String bUemail;
     private Employee employeeCache;
-    private String bUemail;
     private String authTokenHeader;
-
     public ClaimManagementViewModel(@NonNull Application application) {
         super(application);
         apiInterface = APIClient.getInstance().getApi();
+    }
+
+    public String getEmployeeEmail(String name) {  // [M3 FIX]
+        String email = employeeEmailMap.get(name);
+        return email != null ? email : "";
     }
 
     public LiveData<Boolean> getSaveSuccess() {
@@ -303,6 +303,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     claimLength = response.body().getData().getEmployeeCount();
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ClaimLengthResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimLength", "Error: " + t.getMessage());
@@ -321,6 +322,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     }
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ClaimDateLengthResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimLimit", "Error: " + t.getMessage());
@@ -341,6 +343,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     getBranchData(branchId);
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<UserModelResponse> call, @NonNull Throwable t) {
                 Log.e("User", "Error: " + t.getMessage());
@@ -356,6 +359,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     hrMail = response.body().getData().getBranch().getNotificationEmail();
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<UserBranchResponse> call, @NonNull Throwable t) {
                 Log.e("Branch", "Error: " + t.getMessage());
@@ -363,8 +367,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         });
     }
 
-    public void getClaimPrices(String authTokenHeader) {
-        String authToken = "jwt " + authTokenHeader;
+    public void getClaimPrices(String rawAuthToken) {  // [L1 FIX]
+        String authToken = "jwt " + rawAuthToken;      // [L1 FIX]
         apiInterface.getClaimPrices(authToken).enqueue(new Callback<ClaimPriceResponse>() {
             @Override
             public void onResponse(@NonNull Call<ClaimPriceResponse> call, @NonNull Response<ClaimPriceResponse> response) {
@@ -372,6 +376,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     Log.d("ClaimPrices", "Claim Prices: " + response.body().getData().toString());
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ClaimPriceResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimPrices", "Error: " + t.getMessage());
@@ -379,8 +384,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         });
     }
 
-    public void getBusinessUnit(String authTokenHeader) {
-        String authToken = "jwt " + authTokenHeader;
+    public void getBusinessUnit(String rawAuthToken) {  // [L1 FIX]
+        String authToken = "jwt " + rawAuthToken;       // [L1 FIX]
         apiInterface.getBusinessUnit(authToken).enqueue(new Callback<BusinessUnitResponse>() {
             @Override
             public void onResponse(@NonNull Call<BusinessUnitResponse> call, @NonNull Response<BusinessUnitResponse> response) {
@@ -395,6 +400,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     businessUnitsSpinnerData.postValue(list);
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<BusinessUnitResponse> call, @NonNull Throwable t) {
                 Log.e("ClaimViewModel", "Failed to fetch business units", t);
@@ -402,9 +408,9 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         });
     }
 
-    public void getEmployeesByBusinessUnit(String authTokenHeader, String businessUnitId) {
+    public void getEmployeesByBusinessUnit(String rawAuthToken, String businessUnitId) {  // [L1 FIX]
         if (businessUnitId == null || businessUnitId.isEmpty()) return;
-        String authToken = "jwt " + authTokenHeader;
+        String authToken = "jwt " + rawAuthToken;  // [L1 FIX]
         apiInterface.getEmployeesByBusinessUnit(authToken, businessUnitId).enqueue(new Callback<EmployeeByBusinessUnitResponse>() {
             @Override
             public void onResponse(@NonNull Call<EmployeeByBusinessUnitResponse> call, @NonNull Response<EmployeeByBusinessUnitResponse> response) {
@@ -414,13 +420,16 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     if (response.body().getData() != null && response.body().getData().getResult() != null) {
                         for (app.xedigital.ai.model.EmployeeByBusinessUnit.ResultItem emp : response.body().getData().getResult()) {
                             String fullName = ((emp.getFirstname() != null ? emp.getFirstname() : "") + " " + (emp.getLastname() != null ? emp.getLastname() : "")).trim();
-                            bUemail = emp.getEmail();
-                            if (!fullName.isEmpty()) derivedEmployees.add(fullName);
+                            if (!fullName.isEmpty()) {
+                                derivedEmployees.add(fullName);
+                                employeeEmailMap.put(fullName, emp.getEmail());  // [M3 FIX]
+                            }
                         }
                     }
                     employeesList.postValue(derivedEmployees);
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<EmployeeByBusinessUnitResponse> call, @NonNull Throwable t) {
                 Log.e("BusinessUnitEmployee", "Error: " + t.getMessage());
@@ -428,8 +437,8 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         });
     }
 
-    public void getAllEmployees(String authTokenHeader) {
-        String authToken = "jwt " + authTokenHeader;
+    public void getAllEmployees(String rawAuthToken) {  // [L1 FIX]
+        String authToken = "jwt " + rawAuthToken;       // [L1 FIX]
         apiInterface.getAllEmployees(authToken).enqueue(new Callback<AllEmployeeResponse>() {
             @Override
             public void onResponse(@NonNull Call<AllEmployeeResponse> call, @NonNull Response<AllEmployeeResponse> response) {
@@ -439,12 +448,16 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     if (response.body().getData() != null && response.body().getData().getEmployees() != null) {
                         for (app.xedigital.ai.model.allEmployee.EmployeesItem emp : response.body().getData().getEmployees()) {
                             String fullName = ((emp.getFirstname() != null ? emp.getFirstname() : "") + " " + (emp.getLastname() != null ? emp.getLastname() : "")).trim();
-                            if (!fullName.isEmpty()) derivedEmployees.add(fullName);
+                            if (!fullName.isEmpty()) {
+                                derivedEmployees.add(fullName);
+                                employeeEmailMap.put(fullName, emp.getEmail());  // [M3 FIX]
+                            }
                         }
                     }
                     employeesList.postValue(derivedEmployees);
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<AllEmployeeResponse> call, @NonNull Throwable t) {
                 Log.e("AllEmployees", "Error: " + t.getMessage());
@@ -454,64 +467,66 @@ public class ClaimManagementViewModel extends AndroidViewModel {
 
     public void uploadFileAtIndex(Uri uri, int index) {
         if (index > 9) return;
-        try {
-            InputStream inputStream = getApplication().getContentResolver().openInputStream(uri);
-            if (inputStream == null) return;
-            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buffer)) != -1) byteBuffer.write(buffer, 0, len);
-            String base64String = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-            JSONObject jsonObject = new JSONObject();
-            String keyPrefix = index == 0 ? "image" : "image" + getWordExtension(index);
-            jsonObject.put(keyPrefix, "data:image/png;base64," + base64String);
-            jsonObject.put("bucketName", "xe-digital-bucket/claims");
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-            Call<ResponseBody> uploadCall;
-            if (index == 0)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage(authTokenHeader, requestBody);
-            else if (index == 1)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage1(authTokenHeader, requestBody);
-            else if (index == 2)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage2(authTokenHeader, requestBody);
-            else if (index == 3)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage3(authTokenHeader, requestBody);
-            else if (index == 4)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage4(authTokenHeader, requestBody);
-            else if (index == 5)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage5(authTokenHeader, requestBody);
-            else if (index == 6)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage6(authTokenHeader, requestBody);
-            else if (index == 7)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage7(authTokenHeader, requestBody);
-            else if (index == 8)
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage8(authTokenHeader, requestBody);
-            else
-                uploadCall = APIClient.getInstance().getUploadImage().uploadImage9(authTokenHeader, requestBody);
-            uploadCall.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response.body().string());
-                            JSONObject data = jsonResponse.getJSONObject("data");
-                            String urlSuffix = index == 0 ? "imageUrl" : "imageUrl" + getWordExtension(index);
-                            String keySuffix = index == 0 ? "imageKey" : "imageKey" + getWordExtension(index);
-                            imageUrls[index] = data.getString(urlSuffix);
-                            imageKeys[index] = data.getString(keySuffix);
-                            toastMessage.setValue("File " + (index + 1) + " uploaded successfully");
-                        } catch (Exception e) {
-                            Log.e("Upload", "Parsing Error", e);
+        new Thread(() -> {  // [M2 FIX] Move file I/O off main thread
+            try (InputStream inputStream = getApplication().getContentResolver().openInputStream(uri)) {  // [M1 FIX] try-with-resources
+                if (inputStream == null) return;
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = inputStream.read(buffer)) != -1) byteBuffer.write(buffer, 0, len);
+                String base64String = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+                JSONObject jsonObject = new JSONObject();
+                String keyPrefix = index == 0 ? "image" : "image" + getWordExtension(index);
+                jsonObject.put(keyPrefix, "data:image/png;base64," + base64String);
+                jsonObject.put("bucketName", "xe-digital-bucket/claims");
+                RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+                Call<ResponseBody> uploadCall;
+                if (index == 0)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage(authTokenHeader, requestBody);
+                else if (index == 1)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage1(authTokenHeader, requestBody);
+                else if (index == 2)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage2(authTokenHeader, requestBody);
+                else if (index == 3)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage3(authTokenHeader, requestBody);
+                else if (index == 4)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage4(authTokenHeader, requestBody);
+                else if (index == 5)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage5(authTokenHeader, requestBody);
+                else if (index == 6)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage6(authTokenHeader, requestBody);
+                else if (index == 7)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage7(authTokenHeader, requestBody);
+                else if (index == 8)
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage8(authTokenHeader, requestBody);
+                else
+                    uploadCall = APIClient.getInstance().getUploadImage().uploadImage9(authTokenHeader, requestBody);
+                uploadCall.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response.body().string());
+                                JSONObject data = jsonResponse.getJSONObject("data");
+                                String urlSuffix = index == 0 ? "imageUrl" : "imageUrl" + getWordExtension(index);
+                                String keySuffix = index == 0 ? "imageKey" : "imageKey" + getWordExtension(index);
+                                imageUrls[index] = data.getString(urlSuffix);
+                                imageKeys[index] = data.getString(keySuffix);
+                                toastMessage.postValue("File " + (index + 1) + " uploaded successfully");  // [M2 FIX] postValue from bg thread
+                            } catch (Exception e) {
+                                Log.e("Upload", "Parsing Error", e);
+                            }
                         }
                     }
-                }
-                @Override
-                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                }
-            });
-        } catch (IOException | JSONException e) {
-            Log.e("Upload", "File streaming error", e);
-        }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                    }
+                });
+            } catch (IOException | JSONException e) {
+                Log.e("Upload", "File streaming error", e);
+            }
+        }).start();
     }
 
     private String getWordExtension(int index) {
@@ -764,6 +779,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     toastMessage.setValue("Failed to " + (isEditMode ? "update" : "submit") + " " + label.toLowerCase() + " claim.");
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 Log.e("ExpenseSubmitAPI", label + " network error", t);
@@ -910,6 +926,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
                     toastMessage.setValue("Failed to save claim draft.");
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 Log.e("ClaimSave", "Save network error", t);
@@ -974,6 +991,9 @@ public class ClaimManagementViewModel extends AndroidViewModel {
         internetBillNumber.setValue("");
         fuelVehicleNumber.setValue("");
         fuelStation.setValue("");
+
+        operationSuccess.setValue(false);  // [L2 FIX]
+        employeeEmailMap.clear();          // [M3 FIX]
 
         // ══ NEW: Reset edit mode ══
         isEditMode = false;

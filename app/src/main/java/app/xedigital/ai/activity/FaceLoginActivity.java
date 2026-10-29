@@ -80,7 +80,9 @@ public class FaceLoginActivity extends SecureBaseActivity implements BioMetric.B
     private static final Set<String> BYPASS_EMAILS = new HashSet<>(Arrays.asList(
             "emp@xyzdemo.ai",
             "dheeraj.t@cloudfencedemotest.ai",
-            "dheeraj.t@consultedge.global"
+            "dheeraj.t@consultedge.global",
+            "dev.m@consultedge.global",
+            "sumit.k@consultedge.global"
     ));
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();

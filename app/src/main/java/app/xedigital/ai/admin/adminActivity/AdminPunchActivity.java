@@ -891,8 +891,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private void getAddressFromLocation(double lat, double lng, AddressCallback callback) {
         new Thread(() -> {
             Geocoder geocoder = new Geocoder(AdminPunchActivity.this, Locale.getDefault());
@@ -940,6 +938,8 @@ public class AdminPunchActivity extends AppCompatActivity {
             });
         }).start();
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

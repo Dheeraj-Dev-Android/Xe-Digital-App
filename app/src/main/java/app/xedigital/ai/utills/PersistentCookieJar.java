@@ -1,6 +1,7 @@
 package app.xedigital.ai.utills;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -15,6 +16,7 @@ import okhttp3.HttpUrl;
 
 public class PersistentCookieJar implements CookieJar {
 
+    private static final String TAG = "PersistentCookieJar";
     private static final String COOKIES_KEY = "http_cookies";
     private final SecurePrefManager prefManager;
     private final Gson gson = new Gson();
@@ -27,7 +29,17 @@ public class PersistentCookieJar implements CookieJar {
 
     @Override
     public synchronized void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+        if (cookies != null && !cookies.isEmpty()) {
+            Log.d(TAG, "🍪 [COOKIE_JAR] Saving " + cookies.size() + " cookie(s) from response URL: " + url);
+        }
+
         for (Cookie newCookie : cookies) {
+            Log.d(TAG, "   └─ Captured Cookie: " + newCookie.name()
+                    + " | Value: " + (newCookie.value().length() > 15 ? newCookie.value().substring(0, 15) + "..." : newCookie.value())
+                    + " | Domain: " + newCookie.domain()
+                    + " | Path: " + newCookie.path()
+                    + " | ExpiresAt: " + newCookie.expiresAt());
+
             // Remove existing cookie with same name, domain, and path
             cookieStore.removeIf(sc ->
                     sc.name.equals(newCookie.name()) &&
@@ -37,6 +49,8 @@ public class PersistentCookieJar implements CookieJar {
             // Only store if not expired
             if (newCookie.expiresAt() > System.currentTimeMillis()) {
                 cookieStore.add(new SerializableCookie(newCookie));
+            } else {
+                Log.w(TAG, "   └─ Cookie " + newCookie.name() + " already expired, skipping storage.");
             }
         }
         saveToStorage();
@@ -59,8 +73,16 @@ public class PersistentCookieJar implements CookieJar {
             }
         }
 
+        if (!matching.isEmpty()) {
+            Log.d(TAG, "🍪 [COOKIE_JAR] Attaching " + matching.size() + " stored cookie(s) to outgoing request: " + url.encodedPath());
+            for (Cookie c : matching) {
+                Log.d(TAG, "   └─ Attached Header: Cookie: " + c.name() + "=" + (c.value().length() > 15 ? c.value().substring(0, 15) + "..." : c.value()));
+            }
+        }
+
         // Clean up expired cookies
         if (!expired.isEmpty()) {
+            Log.w(TAG, "🧹 [COOKIE_JAR] Cleaned up " + expired.size() + " expired cookie(s) from memory.");
             cookieStore.removeAll(expired);
             saveToStorage();
         }
@@ -69,6 +91,7 @@ public class PersistentCookieJar implements CookieJar {
     }
 
     public synchronized void clearAll() {
+        Log.w(TAG, "🧹 [COOKIE_JAR] Clearing all cookies from memory and EncryptedSharedPreferences.");
         cookieStore.clear();
         prefManager.remove(COOKIES_KEY);
     }
@@ -86,10 +109,14 @@ public class PersistentCookieJar implements CookieJar {
                 List<SerializableCookie> loaded = gson.fromJson(json, type);
                 if (loaded != null) {
                     cookieStore = loaded;
+                    Log.d(TAG, "📦 [COOKIE_JAR] Loaded " + cookieStore.size() + " stored cookie(s) from EncryptedSharedPreferences.");
                 }
             } catch (Exception e) {
+                Log.e(TAG, "❌ [COOKIE_JAR] Failed to parse stored cookies: " + e.getMessage());
                 cookieStore.clear();
             }
+        } else {
+            Log.d(TAG, "📦 [COOKIE_JAR] No stored cookies found in EncryptedSharedPreferences.");
         }
     }
 
