@@ -2,7 +2,6 @@ package app.xedigital.ai.ui.claim_management;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
+import com.google.android.material.chip.ChipGroup;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,6 +52,8 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
     private LinearLayout emptyStateContainer;
     private EditText fromDateEditText;
     private EditText toDateEditText;
+    private ChipGroup statusChipGroup;
+    private String selectedStatusFilter = "all";
     private APIInterface apiInterface;
     private List<EmployeeClaimdataItem> claimList = new ArrayList<>();
 
@@ -67,7 +69,6 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiInterface = APIClient.getInstance().ApproveClaim();
-
     }
 
     @Override
@@ -85,6 +86,7 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
         fromDateEditText = view.findViewById(R.id.fromDateEditText);
         toDateEditText = view.findViewById(R.id.toDateEditText);
+        statusChipGroup = view.findViewById(R.id.statusChipGroup);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         approveClaimAdapter = new ApproveClaimAdapter(claimList);
@@ -92,7 +94,6 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         recyclerView.setAdapter(approveClaimAdapter);
 
         fromDateEditText.setOnClickListener(v -> showDatePickerDialog(fromDateEditText));
-
         toDateEditText.setOnClickListener(v -> showDatePickerDialog(toDateEditText));
 
         filterButton.setOnClickListener(v -> {
@@ -105,27 +106,41 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
                     Date fromDateObj = dateFormat.parse(fromDate);
                     Date toDateObj = dateFormat.parse(toDate);
 
-                    assert toDateObj != null;
-                    if (toDateObj.before(fromDateObj)) {
+                    if (fromDateObj == null || toDateObj == null) {
+                        Toast.makeText(requireContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
+                    if (toDateObj.before(fromDateObj)) {
                         Toast.makeText(requireContext(), "To date cannot be before from date", Toast.LENGTH_SHORT).show();
                     } else {
-                        // Filter claims by date range
-//                        filterClaimsByDateRange(fromDate, toDate);
-                        new Handler().postDelayed(() -> {
-                            loadingProgress.setVisibility(View.VISIBLE);
-                            filterClaimsByDateRange(fromDate, toDate);
-                        }, 300);
+                        applyFilters();
                     }
-                } catch (androidx.core.net.ParseException e) {
-                    e.printStackTrace();
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             } else {
                 Toast.makeText(requireContext(), "Please select both dates", Toast.LENGTH_SHORT).show();
             }
         });
+
+        statusChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            int checkedId = checkedIds.get(0);
+            if (checkedId == R.id.chipAll) {
+                selectedStatusFilter = "all";
+            } else if (checkedId == R.id.chipUnapproved) {
+                selectedStatusFilter = "unapproved";
+            } else if (checkedId == R.id.chipApproved) {
+                selectedStatusFilter = "approved";
+            } else if (checkedId == R.id.chipRejected) {
+                selectedStatusFilter = "rejected";
+            } else if (checkedId == R.id.chipCancelled) {
+                selectedStatusFilter = "cancelled";
+            }
+            applyFilters();
+        });
+
         getClaimsForApproval();
     }
 
@@ -147,91 +162,107 @@ public class ApproveClaimFragment extends Fragment implements ApproveClaimAdapte
         loadingProgress.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
 
-//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SecurePrefManager prefManager = SecurePrefManager.getInstance(requireContext());
         String authToken = prefManager.getString("authToken", null);
 
-        Call<ApproveClaimResponse> call = apiInterface.getClaimsForApproval("jwt " + authToken);
+        Call<ApproveClaimResponse> call = apiInterface.getClaimsForApproval(
+                "jwt " + authToken,
+                null, null, null, null, null, null, null, true
+        );
         call.enqueue(new Callback<ApproveClaimResponse>() {
             @Override
             public void onResponse(@NonNull Call<ApproveClaimResponse> call, @NonNull Response<ApproveClaimResponse> response) {
                 loadingProgress.setVisibility(View.GONE);
                 if (response.isSuccessful()) {
                     ApproveClaimResponse approveClaimResponse = response.body();
-                    assert approveClaimResponse != null;
+                    if (approveClaimResponse == null) {
+                        emptyStateContainer.setVisibility(View.VISIBLE);
+                        Log.e("ApproveClaimFragment", "Response body is null");
+                        return;
+                    }
                     Data data = approveClaimResponse.getData();
                     if (data != null && data.getEmployeeClaimdata() != null) {
                         claimList = data.getEmployeeClaimdata();
                         originalClaimList.clear();
                         originalClaimList.addAll(claimList);
-                        if (claimList.isEmpty()) {
-                            emptyStateContainer.setVisibility(View.VISIBLE);
-                            Log.d("API Response", "No data available");
-                        } else {
-                            approveClaimAdapter.updateData(claimList);
-                            emptyStateContainer.setVisibility(View.GONE);
-//                            Log.d("API Response", "Data fetched successfully");
-                        }
-                        approveClaimAdapter = new ApproveClaimAdapter(approveClaimResponse.getData().getEmployeeClaimdata());
-                        approveClaimAdapter.setOnClaimClickListener(ApproveClaimFragment.this);
-                        recyclerView.setAdapter(approveClaimAdapter);
-//                        Log.d("ApproveClaimFragment", "Response: " + approveClaimResponse);
+                        applyFilters();
                     } else {
                         emptyStateContainer.setVisibility(View.VISIBLE);
                         Log.e("ApproveClaimFragment", "Data is null or empty in response");
                     }
-
                 } else {
-                    // Handle API error
                     Log.e("ApproveClaimFragment", "API Error: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ApproveClaimResponse> call, @NonNull Throwable t) {
-                // Handle network or other exceptions
                 loadingProgress.setVisibility(View.GONE);
                 Log.e("ApproveClaimFragment", "Error: " + t.getMessage());
             }
         });
     }
 
-    private void filterClaimsByDateRange(String fromDate, String toDate) {
+    private void applyFilters() {
         List<EmployeeClaimdataItem> filteredList = new ArrayList<>();
+        String fromDate = fromDateEditText.getText().toString();
+        String toDate = toDateEditText.getText().toString();
+        boolean hasDateFilter = !fromDate.isEmpty() && !toDate.isEmpty();
+        boolean hasStatusFilter = !selectedStatusFilter.equals("all");
+
         for (EmployeeClaimdataItem claim : originalClaimList) {
-            String claimDateString = claim.getClaimDate();
-
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                Date claimDate = dateFormat.parse(claimDateString);
-                SimpleDateFormat filterDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                String formattedClaimDate = filterDateFormat.format(claimDate);
-
-                // Check if the claim date is within the selected range
-                if (formattedClaimDate.compareTo(fromDate) >= 0 && formattedClaimDate.compareTo(toDate) <= 0) {
-                    filteredList.add(claim);
+            // Status filter
+            if (hasStatusFilter) {
+                String status = claim.getStatusRm() != null ? claim.getStatusRm()
+                        : (claim.getStatusHr() != null ? claim.getStatusHr() : "pending");
+                if (!status.equalsIgnoreCase(selectedStatusFilter)) {
+                    continue;
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
+
+            // Date filter
+            if (hasDateFilter) {
+                String claimDateString = claim.getClaimDate();
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                    Date claimDate = dateFormat.parse(claimDateString);
+                    SimpleDateFormat filterDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    String formattedClaimDate = filterDateFormat.format(claimDate);
+
+                    if (formattedClaimDate.compareTo(fromDate) < 0 || formattedClaimDate.compareTo(toDate) > 0) {
+                        continue;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    continue;
+                }
+            }
+
+            filteredList.add(claim);
         }
-//        claimsAdapter.updateData(filteredList);
-        requireActivity().runOnUiThread(() -> {
-            approveClaimAdapter.updateData(filteredList);
-            loadingProgress.setVisibility(View.GONE);
-        });
+
+        claimList = filteredList;
+        approveClaimAdapter.updateData(claimList);
+
+        if (claimList.isEmpty()) {
+            emptyStateContainer.setVisibility(View.VISIBLE);
+        } else {
+            emptyStateContainer.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onClaimClick(EmployeeClaimdataItem currentClaim) {
-        // Create a bundle to pass data to the new fragment
         Bundle bundle = new Bundle();
         bundle.putSerializable("claimData", currentClaim);
 
-        ApproveClaimDetailsFragment fragment = new ApproveClaimDetailsFragment();
-        fragment.setArguments(bundle);
-
         NavController navController = NavHostFragment.findNavController(this);
         navController.navigate(R.id.action_nav_approve_claim_to_nav_approve_claim_details, bundle);
+    }
+
+    @Override
+    public void onClaimStatusUpdated() {
+        applyFilters();
+        getClaimsForApproval();
     }
 }

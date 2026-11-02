@@ -1,7 +1,6 @@
 package app.xedigital.ai.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
@@ -11,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,26 +20,31 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewTreeLifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.api.APIInterface;
 import app.xedigital.ai.model.approveClaim.EmployeeClaimdataItem;
+import app.xedigital.ai.model.updateAccommodationClaim.UpdateAccommodationRequest;
+import app.xedigital.ai.model.updateFoodClaim.UpdateFoodRequest;
+import app.xedigital.ai.model.updateMiscClaim.UpdateMiscRequest;
+import app.xedigital.ai.model.updateTravelClaim.UpdateTravelRequest;
 import app.xedigital.ai.ui.profile.ProfileViewModel;
+import app.xedigital.ai.utills.CustomDialogHelper;
+import app.xedigital.ai.utills.DateTimeUtils;
 import app.xedigital.ai.utills.SecurePrefManager;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -87,13 +89,15 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
 
     public interface OnClaimClickListener {
         void onClaimClick(EmployeeClaimdataItem currentClaim);
+
+        void onClaimStatusUpdated();
     }
 
     public class ClaimViewHolder extends RecyclerView.ViewHolder {
         private final Context context;
         private final OnClaimClickListener listener;
         private final List<EmployeeClaimdataItem> claimList;
-        TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
+        TextView txtClaimId, expenseTypeText, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
         TextView viewDetailsButton, actionButton;
 
         public ClaimViewHolder(@NonNull View itemView, Context context, OnClaimClickListener listener, List<EmployeeClaimdataItem> claimList) {
@@ -102,7 +106,7 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             this.listener = listener;
             this.claimList = claimList;
             txtClaimId = itemView.findViewById(R.id.claimIdText);
-            txtProjectName = itemView.findViewById(R.id.projectNameText);
+            expenseTypeText = itemView.findViewById(R.id.expenseTypeText);
             txtMeetingType = itemView.findViewById(R.id.meetingTypeText);
             txtPurposeOfMeeting = itemView.findViewById(R.id.purposeText);
             txtTotalAmount = itemView.findViewById(R.id.amountText);
@@ -110,115 +114,111 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             viewDetailsButton = itemView.findViewById(R.id.viewDetailsButton);
             actionButton = itemView.findViewById(R.id.actionButton);
 
-            viewDetailsButton.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && claimList != null && position < claimList.size() && listener != null) {
-                    listener.onClaimClick(claimList.get(position));
-                }
-            });
-
             actionButton.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && claimList != null && position < claimList.size()) {
                     EmployeeClaimdataItem claim = claimList.get(position);
                     if (claim == null) return;
-
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog);
-                    builder.setTitle("Claim Action");
-                    String claimIdText = claim.getClaimId() != null ? claim.getClaimId() : "N/A";
-                    String message = "Choose an action for this claim:\nClaim ID: " + claimIdText;
-                    builder.setMessage(message);
-
-                    builder.setPositiveButton("approve", (dialog, which) -> updateClaimStatus(claim, "approved", ""));
-                    builder.setNeutralButton("cancel", null);
-                    builder.setNegativeButton("reject", null);
-
-                    final EditText commentInput = new EditText(context);
-                    commentInput.setHint("Enter comment");
-                    builder.setView(commentInput);
-
-                    AlertDialog dialog = builder.create();
-
-                    dialog.setOnShowListener(dialogInterface -> {
-                        TextView errorTextView = new TextView(context);
-                        errorTextView.setTextColor(Color.RED);
-                        errorTextView.setVisibility(View.GONE);
-                        ViewGroup layout = (ViewGroup) commentInput.getParent();
-                        if (layout != null) {
-                            layout.addView(errorTextView, layout.indexOfChild(commentInput) + 1);
-                        }
-
-                        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        if (positiveButton != null) {
-                            positiveButton.setTextColor(ContextCompat.getColor(context, R.color.status_approved));
-                        }
-
-                        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                        if (negativeButton != null) {
-                            negativeButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
-                            negativeButton.setEnabled(false);
-                            negativeButton.setOnClickListener(view -> {
-                                String comment = commentInput.getText() != null ? commentInput.getText().toString().trim() : "";
-                                if (comment.isEmpty()) {
-                                    errorTextView.setText("Fill the comment");
-                                    errorTextView.setVisibility(View.VISIBLE);
-                                } else {
-                                    errorTextView.setVisibility(View.GONE);
-                                    updateClaimStatus(claim, "rejected", comment);
-                                    dialog.dismiss();
-                                }
-                            });
-                        }
-
-                        Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-                        if (neutralButton != null) {
-                            neutralButton.setTextColor(ContextCompat.getColor(context, R.color.status_rejected));
-                            neutralButton.setEnabled(false);
-                            neutralButton.setOnClickListener(view -> {
-                                String comment = commentInput.getText() != null ? commentInput.getText().toString().trim() : "";
-                                if (comment.isEmpty()) {
-                                    errorTextView.setText("Fill the comment");
-                                    errorTextView.setVisibility(View.VISIBLE);
-                                } else {
-                                    errorTextView.setVisibility(View.GONE);
-                                    updateClaimStatus(claim, "cancelled", comment);
-                                    dialog.dismiss();
-                                }
-                            });
-                        }
-
-                        commentInput.addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                boolean hasComment = s != null && !s.toString().trim().isEmpty();
-                                if (negativeButton != null) negativeButton.setEnabled(hasComment);
-                                if (neutralButton != null) neutralButton.setEnabled(hasComment);
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable s) {
-                            }
-                        });
-                    });
-
-                    dialog.show();
+                    showActionDialog(claim);
                 }
             });
         }
 
+        // ════════════════════════════════════════════════════════
+        //  ACTION DIALOG (Upgraded UI)
+        // ════════════════════════════════════════════════════════
+
+        private void showActionDialog(EmployeeClaimdataItem claim) {
+            View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_claim_action, null);
+
+            // Header
+            TextView txtDialogClaimId = dialogView.findViewById(R.id.txtDialogClaimId);
+            String claimIdText = claim.getClaimId() != null ? claim.getClaimId() : "N/A";
+            txtDialogClaimId.setText("Claim ID: " + claimIdText);
+
+            // Comment input
+            TextInputLayout tilComment = dialogView.findViewById(R.id.tilComment);
+            TextInputEditText etComment = dialogView.findViewById(R.id.etComment);
+
+            // Buttons
+            MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
+            MaterialButton btnReject = dialogView.findViewById(R.id.btnReject);
+            MaterialButton btnApprove = dialogView.findViewById(R.id.btnApprove);
+
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog);
+            builder.setView(dialogView);
+            builder.setCancelable(true);
+
+            AlertDialog dialog = builder.create();
+            dialogView.findViewById(R.id.btnCloseDialog).setOnClickListener(v -> dialog.dismiss());
+
+            // ── Approve: no comment required ──
+            btnApprove.setOnClickListener(v -> {
+                tilComment.setError(null);
+                String comment = etComment.getText() != null ? etComment.getText().toString().trim() : "";
+                dialog.dismiss();
+                updateClaimStatus(claim, "approved", comment);
+            });
+
+            // ── Reject: comment required ──
+            btnReject.setOnClickListener(v -> {
+                String comment = etComment.getText() != null ? etComment.getText().toString().trim() : "";
+                if (comment.isEmpty()) {
+                    tilComment.setError("Comment is required to reject");
+                    etComment.requestFocus();
+                    return;
+                }
+                tilComment.setError(null);
+                dialog.dismiss();
+                updateClaimStatus(claim, "rejected", comment);
+            });
+
+            // ── Cancel action: comment required ──
+            btnCancel.setOnClickListener(v -> {
+                String comment = etComment.getText() != null ? etComment.getText().toString().trim() : "";
+                if (comment.isEmpty()) {
+                    tilComment.setError("Comment is required to cancel");
+                    etComment.requestFocus();
+                    return;
+                }
+                tilComment.setError(null);
+                dialog.dismiss();
+                updateClaimStatus(claim, "cancelled", comment);
+            });
+
+            // ── Clear error when user starts typing ──
+            etComment.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    boolean hasText = s != null && !s.toString().trim().isEmpty();
+                    if (hasText) {
+                        tilComment.setError(null);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+
+            dialog.show();
+        }
+        // ════════════════════════════════════════════════════════
+        //  BIND
+        // ════════════════════════════════════════════════════════
+
         public void bind(EmployeeClaimdataItem currentClaim, OnClaimClickListener listener) {
             if (currentClaim == null) return;
 
-            // Display "N/A" for null/empty values
             String claimId = currentClaim.getClaimId();
             txtClaimId.setText("Claim ID : " + (!TextUtils.isEmpty(claimId) ? claimId : "N/A"));
 
-            String projectName = currentClaim.getProject();
-            txtProjectName.setText(!TextUtils.isEmpty(projectName) ? projectName : "N/A");
+            String expenseType = currentClaim.getExpenseType();
+            expenseTypeText.setText(!TextUtils.isEmpty(expenseType) ? expenseType : "N/A");
 
             String meetingType = currentClaim.getMeeting();
             txtMeetingType.setText(!TextUtils.isEmpty(meetingType) ? meetingType : "N/A");
@@ -236,21 +236,11 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
                 txtTotalAmount.setText("N/A");
             }
 
-            // Date formatting with safety check
+            // Date formatting using DateTimeUtils
             String claimDateStr = currentClaim.getClaimDate();
             if (!TextUtils.isEmpty(claimDateStr)) {
-                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-                try {
-                    Date date = inputFormat.parse(claimDateStr);
-                    if (date != null) {
-                        txtAppliedDate.setText(outputFormat.format(date));
-                    } else {
-                        txtAppliedDate.setText(claimDateStr);
-                    }
-                } catch (Exception e) {
-                    txtAppliedDate.setText(claimDateStr);
-                }
+                String formatted = DateTimeUtils.formatToReadableDate(claimDateStr);
+                txtAppliedDate.setText(!TextUtils.isEmpty(formatted) ? formatted : claimDateStr);
             } else {
                 txtAppliedDate.setText("N/A");
             }
@@ -291,58 +281,108 @@ public class ApproveClaimAdapter extends RecyclerView.Adapter<ApproveClaimAdapte
             });
         }
 
+        // ════════════════════════════════════════════════════════
+        //  API CALL
+        // ════════════════════════════════════════════════════════
+
         private void updateClaimStatus(EmployeeClaimdataItem claim, String status, String comment) {
             SecurePrefManager prefManager = SecurePrefManager.getInstance(context);
-            prefManager.putBoolean("instructionsSeenAttendance", true);
             String authToken = prefManager.getString("authToken", "");
             String userId = prefManager.getString("userId", "");
             String claimId = claim.getId();
+
             ProfileViewModel profileViewModel = new ViewModelProvider((FragmentActivity) context).get(ProfileViewModel.class);
             profileViewModel.storeLoginData(userId, authToken);
             profileViewModel.fetchUserProfile();
+
+            final boolean[] processed = {false};
             profileViewModel.userProfile.observe(Objects.requireNonNull(ViewTreeLifecycleOwner.get(itemView)), userProfile -> {
-                if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null && userProfile.getData().getEmployee() != null) {
+                if (processed[0]) return;
+                if (userProfile != null && userProfile.getData() != null && userProfile.getData().getEmployee() != null) {
+                    processed[0] = true;
                     String reportingManagerFirstName = userProfile.getData().getEmployee().getFirstname();
                     String reportingManagerLastName = userProfile.getData().getEmployee().getLastname();
                     String reportingManagerId = userProfile.getData().getEmployee().getId();
                     if (reportingManagerFirstName != null && reportingManagerLastName != null && reportingManagerId != null) {
                         String reportingManager = reportingManagerFirstName + " " + reportingManagerLastName;
-                        String reportingManagerEmail = userProfile.getData().getEmployee().getEmail();
-                        try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        String currentDate = dateFormat.format(new Date());
 
-                            JSONObject requestBody = new JSONObject(new Gson().toJson(claim));
-                            requestBody.put("status", status);
-                            requestBody.put("comment", comment);
-                            requestBody.put("approvedBy", reportingManagerId);
-                            requestBody.put("email", reportingManagerEmail);
-                            requestBody.put("approvedByName", reportingManager);
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                            String currentDate = dateFormat.format(new Date());
-                            requestBody.put("approvedDate", currentDate);
-                            RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), requestBody.toString());
-                            APIInterface apiInterface = APIClient.getInstance().ClaimUpdateStatus();
-                            retrofit2.Call<ResponseBody> call = apiInterface.claimStatus("jwt " + authToken, claimId, body);
-                            call.enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull retrofit2.Response<ResponseBody> response) {
-                                    if (response.isSuccessful()) {
-// Handle success
-                                        claim.setStatusRm(status);
-                                        notifyItemChanged(getAdapterPosition());
-                                    } else {
-// Handle error
-                                        Log.e("ClaimViewHolder", "Error updating claim status: " + response.message());
-                                    }
-                                }
+                        String expenseType = claim.getExpenseType();
+                        Gson gson = new Gson();
+                        String claimJson = gson.toJson(claim);
 
-                                @Override
-                                public void onFailure(@NonNull retrofit2.Call<ResponseBody> call, @NonNull Throwable t) {
-                                    Log.e("ClaimViewHolder", "Error updating claim status: " + t.getMessage());
-                                }
-                            });
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
+                        APIInterface apiInterface = APIClient.getInstance().ClaimUpdateStatus();
+                        Call<ResponseBody> call = null;
+
+                        if ("travel".equals(expenseType)) {
+                            UpdateTravelRequest request = gson.fromJson(claimJson, UpdateTravelRequest.class);
+                            request.setStatus(status);
+                            request.setStatusRm(status);
+                            request.setComment(comment);
+                            request.setApprovedByName(reportingManager);
+                            request.setApprovedDate(currentDate);
+                            call = apiInterface.updateTravelClaimStatus("jwt " + authToken, claimId, request);
+
+                        } else if ("accommodation".equals(expenseType)) {
+                            UpdateAccommodationRequest request = gson.fromJson(claimJson, UpdateAccommodationRequest.class);
+                            request.setStatus(status);
+                            request.setStatusRm(status);
+                            request.setComment(comment);
+                            request.setApprovedByName(reportingManager);
+                            request.setApprovedDate(currentDate);
+                            call = apiInterface.updateAccommodationClaimStatus("jwt " + authToken, claimId, request);
+
+                        } else if ("food".equals(expenseType)) {
+                            UpdateFoodRequest request = gson.fromJson(claimJson, UpdateFoodRequest.class);
+                            request.setStatus(status);
+                            request.setStatusRm(status);
+                            request.setComment(comment);
+                            request.setApprovedByName(reportingManager);
+                            request.setApprovedDate(currentDate);
+                            call = apiInterface.updateFoodClaimStatus("jwt " + authToken, claimId, request);
+
+                        } else if ("miscellaneous".equals(expenseType)) {
+                            UpdateMiscRequest request = gson.fromJson(claimJson, UpdateMiscRequest.class);
+                            request.setStatus(status);
+                            request.setStatusRm(status);
+                            request.setComment(comment);
+                            request.setApprovedByName(reportingManager);
+                            request.setApprovedDate(currentDate);
+                            call = apiInterface.updateMiscClaimStatus("jwt " + authToken, claimId, request);
+
+                        } else {
+                            Log.e("ClaimViewHolder", "Unknown expense type: " + expenseType);
+                            CustomDialogHelper.showErrorDialog(context, "Error", "Unknown expense type: " + expenseType);
+                            return;
                         }
+
+                        call.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull retrofit2.Response<ResponseBody> response) {
+                                if (response.isSuccessful()) {
+                                    claim.setStatusRm(status);
+                                    int pos = getAdapterPosition();
+                                    if (pos != RecyclerView.NO_POSITION) {
+                                        notifyItemChanged(pos);
+                                    }
+                                    CustomDialogHelper.showSuccessDialog(context, "Success", "Claim " + status + " successfully");
+                                    if (listener != null) {
+                                        listener.onClaimStatusUpdated();
+                                    }
+                                } else {
+                                    Log.e("ClaimViewHolder", "Error updating claim status: " + response.message());
+                                    CustomDialogHelper.showErrorDialog(context, "Error", "Failed to update claim status");
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                                Log.e("ClaimViewHolder", "Error updating claim status: " + t.getMessage());
+                                CustomDialogHelper.showErrorDialog(context, "Network Error", t.getMessage());
+                            }
+                        });
                     } else {
                         Log.w("ClaimViewHolder", "Reporting manager information not available");
                     }

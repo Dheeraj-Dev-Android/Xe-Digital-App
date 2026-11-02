@@ -247,7 +247,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="10dp"
                 android:text="No Attendance Records"
-                android:textColor="#1A2340"
+                android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -259,7 +259,7 @@
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.5"
                 android:text="Try adjusting the date range or employee filter, then tap Search."
-                android:textColor="#8A94A6"
+                android:textColor="@color/surface_white"
                 android:textSize="14sp" />
 
         </LinearLayout>

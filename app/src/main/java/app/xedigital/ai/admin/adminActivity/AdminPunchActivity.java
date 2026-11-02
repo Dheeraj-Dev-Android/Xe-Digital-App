@@ -939,14 +939,14 @@ public class AdminPunchActivity extends AppCompatActivity {
         }).start();
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private String convertImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // CHANGED: JPEG quality from 70 → 92 (industry standard for face recognition)
         bitmap.compress(Bitmap.CompressFormat.JPEG, 92, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     private File getOutputDirectory() {
         File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "AdminPunch");

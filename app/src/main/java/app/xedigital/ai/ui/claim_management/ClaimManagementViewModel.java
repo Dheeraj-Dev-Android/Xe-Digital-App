@@ -135,6 +135,7 @@ public class ClaimManagementViewModel extends AndroidViewModel {
     public String bUemail;
     private Employee employeeCache;
     private String authTokenHeader;
+
     public ClaimManagementViewModel(@NonNull Application application) {
         super(application);
         apiInterface = APIClient.getInstance().getApi();

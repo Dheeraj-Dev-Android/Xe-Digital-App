@@ -1,149 +1,59 @@
 package app.xedigital.ai.model.employeeClaim;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 import java.util.List;
 
 public class Employee implements Serializable {
-
-    @SerializedName("joiningType")
     private String joiningType;
-
-    @SerializedName("fatherName")
-    private Object fatherName;
-
-    @SerializedName("firstname")
+    private String fatherName;
     private String firstname;
-
-    @SerializedName("components")
     private List<ComponentsItem> components;
-
-    @SerializedName("isVerified")
     private boolean isVerified;
-
-    @SerializedName("shift")
     private String shift;
-
-    @SerializedName("addpayroll")
     private boolean addpayroll;
-
-    @SerializedName("totalMonthlySalary")
-    private double totalMonthlySalary;
-
-    @SerializedName("joiningDate")
+    private int totalMonthlySalary;
     private String joiningDate;
-
-    @SerializedName("employeeCode")
     private String employeeCode;
-
-    @SerializedName("createdAt")
     private String createdAt;
-
-    @SerializedName("ctc")
-    private double ctc;
-
-    @SerializedName("bu")
+    private int ctc;
     private String bu;
-
-    @SerializedName("contact")
     private String contact;
-
-    @SerializedName("__v")
     private int v;
-
-    @SerializedName("isHROrAdmin")
     private boolean isHROrAdmin;
-
-    @SerializedName("company")
     private String company;
-
-    @SerializedName("epf")
     private boolean epf;
-
-    @SerializedName("state")
-    private Object state;
-
-    @SerializedName("department")
+    private String state;
     private String department;
-
-    @SerializedName("profileImageUrl")
     private String profileImageUrl;
-
-    @SerializedName("email")
     private String email;
-
-    @SerializedName("updatedAt")
     private String updatedAt;
-
-    @SerializedName("pincode")
-    private Object pincode;
-
-    @SerializedName("reportingManager")
+    private String pincode;
     private String reportingManager;
-
-    @SerializedName("address")
-    private Object address;
-
-    @SerializedName("totalYearlySalary")
-    private Object totalYearlySalary;
-
-    @SerializedName("level")
+    private String address;
+    private double totalYearlySalary;
     private String level;
-
-    @SerializedName("differentlyAbled")
-    private Object differentlyAbled;
-
-    @SerializedName("pfAccountNo")
-    private Object pfAccountNo;
-
-    @SerializedName("panNo")
-    private Object panNo;
-
-    @SerializedName("active")
+    private String differentlyAbled;
+    private String pfAccountNo;
+    private String panNo;
     private boolean active;
-
-    @SerializedName("dateOfBirth")
     private String dateOfBirth;
-
-    @SerializedName("lastname")
     private String lastname;
-
-    @SerializedName("employeeType")
     private String employeeType;
-
-    @SerializedName("partner")
     private String partner;
-
-    @SerializedName("grade")
     private String grade;
-
-    @SerializedName("esi")
     private boolean esi;
-
-    @SerializedName("_id")
     private String id;
-
-    @SerializedName("designation")
     private String designation;
-
-    @SerializedName("fullname")
     private String fullname;
-
-    @SerializedName("crossmanager")
     private String crossmanager;
-
-    @SerializedName("uanno")
-    private Object uanno;
-
-    @SerializedName("adharNo")
-    private Object adharNo;
+    private String uanno;
+    private String adharNo;
 
     public String getJoiningType() {
         return joiningType;
     }
 
-    public Object getFatherName() {
+    public String getFatherName() {
         return fatherName;
     }
 
@@ -167,7 +77,7 @@ public class Employee implements Serializable {
         return addpayroll;
     }
 
-    public double getTotalMonthlySalary() {
+    public int getTotalMonthlySalary() {
         return totalMonthlySalary;
     }
 
@@ -183,7 +93,7 @@ public class Employee implements Serializable {
         return createdAt;
     }
 
-    public double getCtc() {
+    public int getCtc() {
         return ctc;
     }
 
@@ -211,7 +121,7 @@ public class Employee implements Serializable {
         return epf;
     }
 
-    public Object getState() {
+    public String getState() {
         return state;
     }
 
@@ -231,7 +141,7 @@ public class Employee implements Serializable {
         return updatedAt;
     }
 
-    public Object getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
@@ -239,11 +149,11 @@ public class Employee implements Serializable {
         return reportingManager;
     }
 
-    public Object getAddress() {
+    public String getAddress() {
         return address;
     }
 
-    public Object getTotalYearlySalary() {
+    public double getTotalYearlySalary() {
         return totalYearlySalary;
     }
 
@@ -251,15 +161,15 @@ public class Employee implements Serializable {
         return level;
     }
 
-    public Object getDifferentlyAbled() {
+    public String getDifferentlyAbled() {
         return differentlyAbled;
     }
 
-    public Object getPfAccountNo() {
+    public String getPfAccountNo() {
         return pfAccountNo;
     }
 
-    public Object getPanNo() {
+    public String getPanNo() {
         return panNo;
     }
 
@@ -307,11 +217,11 @@ public class Employee implements Serializable {
         return crossmanager;
     }
 
-    public Object getUanno() {
+    public String getUanno() {
         return uanno;
     }
 
-    public Object getAdharNo() {
+    public String getAdharNo() {
         return adharNo;
     }
 }

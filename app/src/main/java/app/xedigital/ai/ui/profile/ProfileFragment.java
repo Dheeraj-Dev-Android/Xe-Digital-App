@@ -1,5 +1,13 @@
 package app.xedigital.ai.ui.profile;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -25,6 +34,23 @@ import app.xedigital.ai.utills.SecurePrefManager;
 
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
+
+    // Palette used for the initials-circle background color (deterministic per user).
+    private static final int[] INITIALS_COLOR_PALETTE = new int[]{
+            Color.rgb(51, 206, 255),
+            Color.rgb(125, 206, 160),
+            Color.rgb(255, 165, 0),
+            Color.rgb(199, 0, 57),
+            Color.rgb(161, 16, 76),
+            Color.rgb(102, 0, 102),
+            Color.rgb(16, 89, 178),
+            Color.rgb(76, 175, 80),
+            Color.rgb(255, 87, 82),
+            Color.rgb(255, 183, 77),
+            Color.rgb(159, 168, 218),
+            Color.rgb(38, 166, 154)
+    };
+
     private FragmentProfileBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,13 +84,24 @@ public class ProfileFragment extends Fragment {
                 binding.profileCard.setVisibility(View.VISIBLE);
                 binding.emptyStateText.setVisibility(View.GONE);
 
-                Object profileImageUrl = employee.getProfileImageUrl();
+                // ---- INITIALS-BASED PROFILE IMAGE ----
+                String firstName = employee.getFirstname() != null ? employee.getFirstname() : "";
+                String lastName = employee.getLastname() != null ? employee.getLastname() : "";
+                Object profileImageUrlObj = employee.getProfileImageUrl();
+                String profileImageUrl = profileImageUrlObj != null ? String.valueOf(profileImageUrlObj) : null;
                 ImageView profileImage = binding.profileImage;
+                Drawable initialsDrawable = getInitialsDrawable(firstName, lastName);
 
-                if (profileImageUrl != null) {
-                    Glide.with(requireContext()).load(profileImageUrl).into(profileImage);
+                if (profileImageUrl != null
+                        && !profileImageUrl.trim().isEmpty()
+                        && !"null".equalsIgnoreCase(profileImageUrl.trim())) {
+                    Glide.with(requireContext())
+                            .load(profileImageUrl)
+                            .placeholder(initialsDrawable)
+                            .error(initialsDrawable)
+                            .into(profileImage);
                 } else {
-                    profileImage.setImageResource(R.mipmap.ic_default_profile);
+                    profileImage.setImageDrawable(initialsDrawable);
                 }
 
                 binding.employeeCodeTitle.setText("Emp Code ");
@@ -158,5 +195,107 @@ public class ProfileFragment extends Fragment {
             return true;
         }
         return false;
+    }
+
+    // =========================================================================
+    //  INITIALS AVATAR HELPERS
+    // =========================================================================
+
+    /**
+     * Builds a self-scaling Drawable that renders a colored circle with the
+     * user's initials in white. Used as the fallback whenever a profile image
+     * is missing OR fails to load.
+     */
+    private Drawable getInitialsDrawable(String firstName, String lastName) {
+        final String initials = getInitials(firstName, lastName);
+        final int bgColor = getInitialsColor(firstName, lastName);
+
+        return new Drawable() {
+            private final Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            private final Rect textBounds = new Rect();
+
+            {
+                bgPaint.setColor(bgColor);
+                bgPaint.setStyle(Paint.Style.FILL);
+
+                textPaint.setColor(Color.WHITE);
+                textPaint.setTextAlign(Paint.Align.CENTER);
+                textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            }
+
+            @Override
+            public void draw(@NonNull Canvas canvas) {
+                Rect b = getBounds();
+                if (b.width() <= 0 || b.height() <= 0) return;
+
+                float cx = b.exactCenterX();
+                float cy = b.exactCenterY();
+                float radius = Math.min(b.width(), b.height()) / 2f;
+
+                canvas.drawCircle(cx, cy, radius, bgPaint);
+
+                // Scale text to roughly 40% of the circle diameter.
+                textPaint.setTextSize(radius * 0.8f);
+                textPaint.getTextBounds(initials, 0, initials.length(), textBounds);
+                float textY = cy - textBounds.exactCenterY();
+                canvas.drawText(initials, cx, textY, textPaint);
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+                bgPaint.setAlpha(alpha);
+                textPaint.setAlpha(alpha);
+                invalidateSelf();
+            }
+
+            @Override
+            public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                bgPaint.setColorFilter(colorFilter);
+                textPaint.setColorFilter(colorFilter);
+                invalidateSelf();
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.TRANSLUCENT;
+            }
+        };
+    }
+
+    /**
+     * Extracts up to 2 uppercase initials from the given first/last name.
+     * Falls back to "?" if nothing usable is available.
+     */
+    private String getInitials(String firstName, String lastName) {
+        String first = firstName != null ? firstName.trim() : "";
+        String last = lastName != null ? lastName.trim() : "";
+
+        StringBuilder sb = new StringBuilder();
+        if (!first.isEmpty()) {
+            sb.append(Character.toUpperCase(first.charAt(0)));
+        }
+        if (!last.isEmpty()) {
+            sb.append(Character.toUpperCase(last.charAt(0)));
+        }
+
+        if (sb.length() == 0) {
+            return "?";
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Deterministically picks a palette color for the given name so the
+     * same user always sees the same background color.
+     */
+    private int getInitialsColor(String firstName, String lastName) {
+        String key = ((firstName != null ? firstName : "") + "|" + (lastName != null ? lastName : "")).trim();
+        if (key.isEmpty() || "|".equals(key)) {
+            return INITIALS_COLOR_PALETTE[0];
+        }
+        int hash = key.hashCode();
+        int index = Math.abs(hash) % INITIALS_COLOR_PALETTE.length;
+        return INITIALS_COLOR_PALETTE[index];
     }
 }

@@ -7,69 +7,39 @@
     android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.vms.VmsFragment">
 
-    <!-- Top surface holding chip navigation -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/chipSurfaceCard"
-        android:layout_width="0dp"
+    <!-- Chip navigation group — modern, Material 3 style, centered -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/navigationChipGroup"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/gradient_attendance_card"
-        app:cardBackgroundColor="@android:color/transparent"
+        android:paddingTop="4dp"
+        app:chipSpacingHorizontal="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:singleSelection="false">
 
-        <!-- Chip navigation group — modern, Material 3 style, centered -->
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/navigationChipGroup"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/preApprovedVisitorChip"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:padding="12dp"
-            app:chipSpacingHorizontal="10dp"
-            app:singleSelection="false">
+            android:layout_height="48dp"
+            android:text="@string/add_pre_approved"
+            android:textColor="@color/avatar_text"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:chipBackgroundColor="@color/chip_background"
+            app:chipCornerRadius="12dp"
+            app:chipEndPadding="14dp"
+            app:chipIcon="@drawable/ic_add_person"
+            app:chipIconSize="18dp"
+            app:chipStartPadding="10dp"
+            app:closeIconEnabled="false"
+            app:ensureMinTouchTargetSize="false"
+            app:rippleColor="@color/colorPrimary" />
 
-            <!-- Add Pre-Approved Visitors chip -->
-            <com.google.android.material.chip.Chip
-                android:id="@+id/preApprovedVisitorChip"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="@string/add_pre_approved"
-                android:textColor="@color/avatar_text"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:chipBackgroundColor="@color/chip_background"
-                app:chipCornerRadius="12dp"
-                app:chipEndPadding="14dp"
-                app:chipIcon="@drawable/ic_add_person"
-                app:chipIconSize="18dp"
-                app:chipStartPadding="10dp"
-                app:closeIconEnabled="false"
-                app:ensureMinTouchTargetSize="false"
-                app:rippleColor="@color/colorPrimary" />
+    </com.google.android.material.chip.ChipGroup>
 
-            <!-- Check In Visitors chip -->
-            <com.google.android.material.chip.Chip
-                android:id="@+id/checkVisitorsChip"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="@string/check_in_visitors"
-                android:textColor="@color/avatar_text"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:chipBackgroundColor="@color/chip_background"
-                app:chipCornerRadius="12dp"
-                app:chipEndPadding="14dp"
-                app:chipIcon="@drawable/ic_check_in"
-                app:chipIconSize="18dp"
-                app:closeIconEnabled="false"
-                app:ensureMinTouchTargetSize="false"
-                app:rippleColor="@color/colorPrimary" />
-
-        </com.google.android.material.chip.ChipGroup>
-
-    </com.google.android.material.card.MaterialCardView>
-    <!-- Subtle hairline divider under the elevated surface -->
+    <!-- Subtle hairline divider under the chip row -->
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
@@ -78,7 +48,7 @@
         android:background="@color/chip_year_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chipSurfaceCard" />
+        app:layout_constraintTop_toBottomOf="@id/navigationChipGroup" />
 
     <!-- FrameLayout for loading/empty/content overlay -->
     <FrameLayout
@@ -143,7 +113,6 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <!-- Icon card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="112dp"
                 android:layout_height="112dp"
@@ -162,7 +131,6 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Empty state title -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/emptyStateText"
                 android:layout_width="wrap_content"
@@ -174,7 +142,6 @@
                 android:textSize="19sp"
                 android:textStyle="bold" />
 
-            <!-- Empty state subtitle -->
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

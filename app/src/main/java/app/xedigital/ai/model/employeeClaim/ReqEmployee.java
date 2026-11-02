@@ -1,139 +1,51 @@
 package app.xedigital.ai.model.employeeClaim;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 import java.util.List;
 
 public class ReqEmployee implements Serializable {
-
-    @SerializedName("joiningType")
     private String joiningType;
-
-    @SerializedName("fatherName")
     private String fatherName;
-
-    @SerializedName("firstname")
-    private String firstname;
-
-    @SerializedName("components")
     private List<ComponentsItem> components;
-
-    @SerializedName("isVerified")
+    private String firstname;
     private boolean isVerified;
-
-    @SerializedName("shift")
-    private String shift;
-
-    @SerializedName("addpayroll")
     private boolean addpayroll;
-
-    @SerializedName("totalMonthlySalary")
-    private Object totalMonthlySalary;
-
-    @SerializedName("joiningDate")
+    private double totalMonthlySalary;
+    private String shift;
     private String joiningDate;
-
-    @SerializedName("employeeCode")
     private String employeeCode;
-
-    @SerializedName("createdAt")
     private String createdAt;
-
-    @SerializedName("ctc")
     private int ctc;
-
-    @SerializedName("bu")
     private String bu;
-
-    @SerializedName("contact")
     private String contact;
-
-    @SerializedName("__v")
     private int v;
-
-    @SerializedName("isHROrAdmin")
     private boolean isHROrAdmin;
-
-    @SerializedName("company")
-    private String company;
-
-    @SerializedName("epf")
     private boolean epf;
-
-    @SerializedName("state")
+    private String company;
     private String state;
-
-    @SerializedName("department")
     private String department;
-
-    @SerializedName("profileImageUrl")
     private String profileImageUrl;
-
-    @SerializedName("email")
     private String email;
-
-    @SerializedName("updatedAt")
     private String updatedAt;
-
-    @SerializedName("pincode")
     private String pincode;
-
-    @SerializedName("reportingManager")
     private String reportingManager;
-
-    @SerializedName("address")
+    private double totalYearlySalary;
     private String address;
-
-    @SerializedName("totalYearlySalary")
-    private Object totalYearlySalary;
-
-    @SerializedName("level")
     private String level;
-
-    @SerializedName("differentlyAbled")
     private String differentlyAbled;
-
-    @SerializedName("pfAccountNo")
     private String pfAccountNo;
-
-    @SerializedName("panNo")
     private String panNo;
-
-    @SerializedName("active")
     private boolean active;
-
-    @SerializedName("dateOfBirth")
     private String dateOfBirth;
-
-    @SerializedName("lastname")
     private String lastname;
-
-    @SerializedName("employeeType")
     private String employeeType;
-
-    @SerializedName("partner")
     private String partner;
-
-    @SerializedName("grade")
     private String grade;
-
-    @SerializedName("esi")
     private boolean esi;
-
-    @SerializedName("_id")
     private String id;
-
-    @SerializedName("designation")
     private String designation;
-
-    @SerializedName("crossmanager")
     private String crossmanager;
-
-    @SerializedName("uanno")
     private String uanno;
-
-    @SerializedName("adharNo")
     private String adharNo;
 
     public String getJoiningType() {
@@ -144,28 +56,28 @@ public class ReqEmployee implements Serializable {
         return fatherName;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
     public List<ComponentsItem> getComponents() {
         return components;
+    }
+
+    public String getFirstname() {
+        return firstname;
     }
 
     public boolean isIsVerified() {
         return isVerified;
     }
 
-    public String getShift() {
-        return shift;
-    }
-
     public boolean isAddpayroll() {
         return addpayroll;
     }
 
-    public Object getTotalMonthlySalary() {
+    public double getTotalMonthlySalary() {
         return totalMonthlySalary;
+    }
+
+    public String getShift() {
+        return shift;
     }
 
     public String getJoiningDate() {
@@ -200,12 +112,12 @@ public class ReqEmployee implements Serializable {
         return isHROrAdmin;
     }
 
-    public String getCompany() {
-        return company;
-    }
-
     public boolean isEpf() {
         return epf;
+    }
+
+    public String getCompany() {
+        return company;
     }
 
     public String getState() {
@@ -236,12 +148,12 @@ public class ReqEmployee implements Serializable {
         return reportingManager;
     }
 
-    public String getAddress() {
-        return address;
+    public double getTotalYearlySalary() {
+        return totalYearlySalary;
     }
 
-    public Object getTotalYearlySalary() {
-        return totalYearlySalary;
+    public String getAddress() {
+        return address;
     }
 
     public String getLevel() {

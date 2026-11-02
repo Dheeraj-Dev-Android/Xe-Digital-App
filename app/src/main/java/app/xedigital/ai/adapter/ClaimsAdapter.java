@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -70,8 +70,8 @@ public class ClaimsAdapter extends RecyclerView.Adapter<ClaimsAdapter.ClaimViewH
         private final Context context;
         private final TextView txtClaimId, txtProjectName, txtMeetingType, txtPurposeOfMeeting, txtTotalAmount, txtAppliedDate;
         private final TextView statusText, expenseTypeText;
-        private final ShapeableImageView viewDetailsButton;
-        private MaterialCardView claimCardView;
+        private final MaterialButton viewDetailsButton;
+        private final MaterialCardView claimCardView;
 
         public ClaimViewHolder(@NonNull View itemView, Context context) {
             super(itemView);

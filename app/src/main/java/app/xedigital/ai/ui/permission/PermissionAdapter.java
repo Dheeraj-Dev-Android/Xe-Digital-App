@@ -63,7 +63,6 @@ public class PermissionAdapter extends RecyclerView.Adapter<PermissionAdapter.Vi
         boolean isSystemInfo = (item.getManifestPermission() == null
                 && !PermissionManager.TAG_BIOMETRIC.equals(item.getTag()));
         holder.switchPermission.setVisibility(isSystemInfo ? View.INVISIBLE : View.VISIBLE);
-        holder.switchPermission.setClickable(false); // Let itemView handle all clicks
 
         // ── Click → Delegate to Fragment ──
         holder.itemView.setOnClickListener(v -> listener.onItemClick(item));

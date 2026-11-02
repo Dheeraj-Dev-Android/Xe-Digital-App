@@ -1,39 +1,17 @@
 package app.xedigital.ai.model.employeeClaim;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 
 public class Department implements Serializable {
-
-    @SerializedName("createdAt")
     private String createdAt;
-
-    @SerializedName("default")
     private boolean jsonMemberDefault;
-
-    @SerializedName("createdBy")
     private String createdBy;
-
-    @SerializedName("__v")
     private int v;
-
-    @SerializedName("name")
     private String name;
-
-    @SerializedName("description")
     private String description;
-
-    @SerializedName("active")
     private boolean active;
-
-    @SerializedName("company")
     private String company;
-
-    @SerializedName("_id")
     private String id;
-
-    @SerializedName("updatedAt")
     private String updatedAt;
 
     public String getCreatedAt() {

@@ -2,21 +2,33 @@ package app.xedigital.ai.model.approveClaim;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class Employee implements Serializable {
+public class Employee {
 
     @SerializedName("joiningType")
     private String joiningType;
 
+    @SerializedName("fatherName")
+    private String fatherName;
+
     @SerializedName("firstname")
     private String firstname;
+
+    @SerializedName("components")
+    private List<ComponentsItem> components;
 
     @SerializedName("isVerified")
     private boolean isVerified;
 
     @SerializedName("shift")
     private String shift;
+
+    @SerializedName("addpayroll")
+    private boolean addpayroll;
+
+    @SerializedName("totalMonthlySalary")
+    private double totalMonthlySalary;
 
     @SerializedName("joiningDate")
     private String joiningDate;
@@ -26,6 +38,12 @@ public class Employee implements Serializable {
 
     @SerializedName("createdAt")
     private String createdAt;
+
+    @SerializedName("ctc")
+    private int ctc;
+
+    @SerializedName("bu")
+    private String bu;
 
     @SerializedName("contact")
     private String contact;
@@ -39,6 +57,12 @@ public class Employee implements Serializable {
     @SerializedName("company")
     private String company;
 
+    @SerializedName("epf")
+    private boolean epf;
+
+    @SerializedName("state")
+    private String state;
+
     @SerializedName("department")
     private String department;
 
@@ -51,11 +75,29 @@ public class Employee implements Serializable {
     @SerializedName("updatedAt")
     private String updatedAt;
 
+    @SerializedName("pincode")
+    private String pincode;
+
     @SerializedName("reportingManager")
     private String reportingManager;
 
+    @SerializedName("address")
+    private String address;
+
+    @SerializedName("totalYearlySalary")
+    private int totalYearlySalary;
+
     @SerializedName("level")
     private String level;
+
+    @SerializedName("differentlyAbled")
+    private String differentlyAbled;
+
+    @SerializedName("pfAccountNo")
+    private String pfAccountNo;
+
+    @SerializedName("panNo")
+    private String panNo;
 
     @SerializedName("active")
     private boolean active;
@@ -75,6 +117,9 @@ public class Employee implements Serializable {
     @SerializedName("grade")
     private String grade;
 
+    @SerializedName("esi")
+    private boolean esi;
+
     @SerializedName("_id")
     private String id;
 
@@ -84,6 +129,15 @@ public class Employee implements Serializable {
     @SerializedName("fullname")
     private String fullname;
 
+    @SerializedName("crossmanager")
+    private String crossmanager;
+
+    @SerializedName("uanno")
+    private String uanno;
+
+    @SerializedName("adharNo")
+    private String adharNo;
+
     public String getJoiningType() {
         return joiningType;
     }
@@ -92,12 +146,28 @@ public class Employee implements Serializable {
         this.joiningType = joiningType;
     }
 
+    public String getFatherName() {
+        return fatherName;
+    }
+
+    public void setFatherName(String fatherName) {
+        this.fatherName = fatherName;
+    }
+
     public String getFirstname() {
         return firstname;
     }
 
     public void setFirstname(String firstname) {
         this.firstname = firstname;
+    }
+
+    public List<ComponentsItem> getComponents() {
+        return components;
+    }
+
+    public void setComponents(List<ComponentsItem> components) {
+        this.components = components;
     }
 
     public boolean isIsVerified() {
@@ -114,6 +184,22 @@ public class Employee implements Serializable {
 
     public void setShift(String shift) {
         this.shift = shift;
+    }
+
+    public boolean isAddpayroll() {
+        return addpayroll;
+    }
+
+    public void setAddpayroll(boolean addpayroll) {
+        this.addpayroll = addpayroll;
+    }
+
+    public double getTotalMonthlySalary() {
+        return totalMonthlySalary;
+    }
+
+    public void setTotalMonthlySalary(double totalMonthlySalary) {
+        this.totalMonthlySalary = totalMonthlySalary;
     }
 
     public String getJoiningDate() {
@@ -138,6 +224,22 @@ public class Employee implements Serializable {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getCtc() {
+        return ctc;
+    }
+
+    public void setCtc(int ctc) {
+        this.ctc = ctc;
+    }
+
+    public String getBu() {
+        return bu;
+    }
+
+    public void setBu(String bu) {
+        this.bu = bu;
     }
 
     public String getContact() {
@@ -172,6 +274,22 @@ public class Employee implements Serializable {
         this.company = company;
     }
 
+    public boolean isEpf() {
+        return epf;
+    }
+
+    public void setEpf(boolean epf) {
+        this.epf = epf;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     public String getDepartment() {
         return department;
     }
@@ -204,6 +322,14 @@ public class Employee implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public String getPincode() {
+        return pincode;
+    }
+
+    public void setPincode(String pincode) {
+        this.pincode = pincode;
+    }
+
     public String getReportingManager() {
         return reportingManager;
     }
@@ -212,12 +338,52 @@ public class Employee implements Serializable {
         this.reportingManager = reportingManager;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getTotalYearlySalary() {
+        return totalYearlySalary;
+    }
+
+    public void setTotalYearlySalary(int totalYearlySalary) {
+        this.totalYearlySalary = totalYearlySalary;
+    }
+
     public String getLevel() {
         return level;
     }
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public String getDifferentlyAbled() {
+        return differentlyAbled;
+    }
+
+    public void setDifferentlyAbled(String differentlyAbled) {
+        this.differentlyAbled = differentlyAbled;
+    }
+
+    public String getPfAccountNo() {
+        return pfAccountNo;
+    }
+
+    public void setPfAccountNo(String pfAccountNo) {
+        this.pfAccountNo = pfAccountNo;
+    }
+
+    public String getPanNo() {
+        return panNo;
+    }
+
+    public void setPanNo(String panNo) {
+        this.panNo = panNo;
     }
 
     public boolean isActive() {
@@ -268,6 +434,14 @@ public class Employee implements Serializable {
         this.grade = grade;
     }
 
+    public boolean isEsi() {
+        return esi;
+    }
+
+    public void setEsi(boolean esi) {
+        this.esi = esi;
+    }
+
     public String getId() {
         return id;
     }
@@ -290,5 +464,29 @@ public class Employee implements Serializable {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public String getCrossmanager() {
+        return crossmanager;
+    }
+
+    public void setCrossmanager(String crossmanager) {
+        this.crossmanager = crossmanager;
+    }
+
+    public String getUanno() {
+        return uanno;
+    }
+
+    public void setUanno(String uanno) {
+        this.uanno = uanno;
+    }
+
+    public String getAdharNo() {
+        return adharNo;
+    }
+
+    public void setAdharNo(String adharNo) {
+        this.adharNo = adharNo;
     }
 }

@@ -5,79 +5,100 @@
     android:layout_height="match_parent"
     android:background="@drawable/welcome_background">
 
+    <!-- ─────────────── CENTER CONTENT ─────────────── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="#00EDEDF2"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingHorizontal="32dp">
 
-        <!-- App Icon with MaterialCardView Background -->
+        <!-- App Logo Card -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_marginBottom="26dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginBottom="32dp"
+            app:cardBackgroundColor="@color/surface_white"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="12dp"
             app:strokeWidth="0dp">
 
             <ImageView
                 android:id="@+id/iv_app_logo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop" />
+                android:contentDescription="@string/app_name"
+                android:padding="16dp"
+                android:src="@drawable/xedigital_logo_svg" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Welcome Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:fontFamily="@font/quicksand_font_family"
+            android:letterSpacing="0.02"
             android:text="@string/welcome_title"
-            android:textColor="@color/primary_text"
-            android:textSize="24sp"
+            android:textColor="@color/white"
+            android:textSize="26sp"
             android:textStyle="bold" />
 
+        <!-- Accent Divider -->
+        <View
+            android:layout_width="56dp"
+            android:layout_height="3dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/white_60" />
+
+        <!-- Welcome Message -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             android:fontFamily="@font/quicksand_regular"
             android:gravity="center"
+            android:lineSpacingExtra="4dp"
             android:text="@string/welcome_message"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white_70"
             android:textSize="14sp" />
 
     </LinearLayout>
 
+    <!-- ─────────────── BOTTOM BAR ─────────────── -->
+
+    <!-- App Version -->
     <TextView
         android:id="@+id/tv_app_version"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="28dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="32dp"
         android:fontFamily="@font/quicksand_regular"
-        android:gravity="center"
         android:text="v : "
-        android:textColor="#FFFFFF"
-        android:textSize="10sp"
-        android:textStyle="italic" />
+        android:textColor="@color/white_60"
+        android:textSize="11sp" />
 
-
-    <ImageButton
+    <!-- Get Started FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_get_started"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="35dp"
-        android:background="@drawable/button_primary_background"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         android:contentDescription="@string/get_started"
-        android:elevation="5dp"
-        android:src="@drawable/ic_arrow_forward" />
+        android:src="@drawable/ic_arrow_forward"
+        app:backgroundTint="@color/surface_white"
+        app:elevation="8dp"
+        app:fabSize="normal"
+        app:tint="@color/colorPrimary" />
+
+    <!-- ─────────────── OVERLAY INCLUDES ─────────────── -->
 
     <include
         android:id="@+id/noInternetLayout"
@@ -91,12 +112,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone">
-        <!-- Add additional UI elements here, if needed -->
-        <include
+
+    <include
             android:id="@+id/slowInternetLayout"
             layout="@layout/slow_internet_connection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone" />
     </FrameLayout>
+
 </RelativeLayout>

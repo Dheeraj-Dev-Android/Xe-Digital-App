@@ -82,7 +82,9 @@ public class FaceLoginActivity extends SecureBaseActivity implements BioMetric.B
             "dheeraj.t@cloudfencedemotest.ai",
             "dheeraj.t@consultedge.global",
             "dev.m@consultedge.global",
-            "sumit.k@consultedge.global"
+            "sumit.k@consultedge.global",
+            "dheeraj@xyzdemo.ai",
+            "ios@xyzdemo.ai"
     ));
     private final AtomicBoolean isAnalyzing = new AtomicBoolean(false);
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();

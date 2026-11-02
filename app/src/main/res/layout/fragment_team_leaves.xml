@@ -79,8 +79,7 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_empty_state"
-                app:tint="@color/icon_background" />
+                android:src="@drawable/ic_empty_state" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -89,7 +88,7 @@
                 android:fontFamily="@font/quicksand_font_family"
                 android:gravity="center"
                 android:text="No team data found"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
 
         </LinearLayout>

@@ -1,10 +1,17 @@
 package app.xedigital.ai;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.SpannableString;
@@ -21,6 +28,7 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -57,6 +65,22 @@ public class MainActivity extends SecureBaseActivity {
     private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
     private static final String TAG = "MainActivity";
 
+    // Palette used for the initials-circle background color (deterministic per user).
+    private static final int[] INITIALS_COLOR_PALETTE = new int[]{
+            Color.rgb(51, 206, 255),
+            Color.rgb(125, 206, 160),
+            Color.rgb(255, 165, 0),
+            Color.rgb(199, 0, 57),
+            Color.rgb(161, 16, 76),
+            Color.rgb(102, 0, 102),
+            Color.rgb(16, 89, 178),
+            Color.rgb(76, 175, 80),
+            Color.rgb(255, 87, 82),
+            Color.rgb(255, 183, 77),
+            Color.rgb(159, 168, 218),
+            Color.rgb(38, 166, 154)
+    };
+
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
 
     private ActivityMainBinding binding;
@@ -85,6 +109,9 @@ public class MainActivity extends SecureBaseActivity {
     private boolean isNoInternetDialogShowing = false;
     private DeviceRegistrationViewModel deviceRegistrationViewModel;
     private PermissionManager permissionManager;
+
+    private int profileFetchAttempt = 0;
+    private AlertDialog profileLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,13 +149,7 @@ public class MainActivity extends SecureBaseActivity {
 
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_dashboard, R.id.nav_profile, R.id.nav_vms, R.id.nav_holidays, R.id.nav_policy, R.id.nav_settings, R.id.nav_payroll, R.id.nav_documents, R.id.nav_claim_management, R.id.nav_meeting_room, R.id.nav_shifts,
-                R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_pendingApprovalFragment,
-                R.id.nav_leaves, R.id.nav_leaves_data, R.id.nav_applied_leaves, R.id.nav_approve_leaves,
-                R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member_leave, R.id.nav_team_member_timesheet,
-                R.id.nav_dcr, R.id.nav_dcr_form
-        ).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_vms, R.id.nav_holidays, R.id.nav_policy, R.id.nav_settings, R.id.nav_payroll, R.id.nav_documents, R.id.nav_claim_management, R.id.nav_meeting_room, R.id.nav_shifts, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_pendingApprovalFragment, R.id.nav_leaves, R.id.nav_leaves_data, R.id.nav_applied_leaves, R.id.nav_approve_leaves, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member_leave, R.id.nav_team_member_timesheet, R.id.nav_dcr, R.id.nav_dcr_form).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -182,8 +203,13 @@ public class MainActivity extends SecureBaseActivity {
             navigationView.setCheckedItem(destId);
             if (destId == R.id.nav_dashboard) {
                 collapseAllSubmenus();
+            } else {
+                syncSubmenuVisibilityForDestination(destId);
             }
         });
+        if (navController.getCurrentDestination() != null) {
+            syncSubmenuVisibilityForDestination(navController.getCurrentDestination().getId());
+        }
 
         // ✅ Handle Back Press using modern OnBackPressedDispatcher (Fixes WindowLeaked crash)
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -194,32 +220,24 @@ public class MainActivity extends SecureBaseActivity {
                     return;
                 }
 
-                if (navController.getCurrentDestination() != null
-                        && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
+                if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() != R.id.nav_dashboard) {
                     navigateToDashboard();
                     return;
                 }
 
                 // On Dashboard: Show Exit confirmation dialog
                 if (!isFinishing() && !isDestroyed()) {
-                    CustomDialogHelper.showWarningDialog(
-                            MainActivity.this,
-                            "Exit App",
-                            "Are you sure you want to exit the app?",
-                            "Yes, Exit",
-                            "Cancel",
-                            new CustomDialogHelper.OnWarningActionListener() {
-                                @Override
-                                public void onConfirm() {
-                                    finish();
-                                }
+                    CustomDialogHelper.showWarningDialog(MainActivity.this, "Exit App", "Are you sure you want to exit the app?", "Yes, Exit", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
+                        @Override
+                        public void onConfirm() {
+                            finish();
+                        }
 
-                                @Override
-                                public void onCancel() {
-                                    // Stay in app - do nothing
-                                }
-                            }
-                    );
+                        @Override
+                        public void onCancel() {
+                            // Stay in app - do nothing
+                        }
+                    });
                 }
             }
         });
@@ -294,6 +312,20 @@ public class MainActivity extends SecureBaseActivity {
         } catch (Exception e) {
             Log.e(TAG, "Navigation failed for id: " + destinationId + " -> " + e.getMessage());
             return false;
+        }
+    }
+
+    private void syncSubmenuVisibilityForDestination(int destId) {
+        if (destId == R.id.nav_attendance || destId == R.id.nav_addAttendanceFragment || destId == R.id.nav_regularizeAppliedFragment || destId == R.id.nav_pendingApprovalFragment) {
+            if (!isAttendanceSubmenuVisible) toggleAttendanceVisibility(navigationView.getMenu());
+        } else if (destId == R.id.nav_leaves || destId == R.id.nav_leaves_data || destId == R.id.nav_applied_leaves || destId == R.id.nav_approve_leaves) {
+            if (!isLeavesSubmenuVisible) toggleLeavesVisibility(navigationView.getMenu());
+        } else if (destId == R.id.navTeam_member || destId == R.id.navManager_attendance_menu || destId == R.id.nav_team_member_leave || destId == R.id.nav_team_member_timesheet) {
+            if (!isTeamSubVisible) toggleTeamMemberVisibility(navigationView.getMenu());
+        } else if (destId == R.id.nav_dcr || destId == R.id.nav_dcr_form) {
+            if (!isDcrSubmenuVisible) toggleDcrVisibility(navigationView.getMenu());
+        } else if (destId == R.id.nav_onboarding || destId == R.id.nav_onboarding_details) {
+            if (!isOnboardingVisible) toggleOnboardingVisibility(navigationView.getMenu());
         }
     }
 
@@ -483,7 +515,7 @@ public class MainActivity extends SecureBaseActivity {
         String authToken = prefManager.getString("authToken", null);
 
         if (userId == null || authToken == null) {
-            handleProfileFetchFailure("User not found", profileImage, profileName, profileEmail, clientLogo);
+            handleProfileFetchError();
             return;
         }
 
@@ -499,13 +531,13 @@ public class MainActivity extends SecureBaseActivity {
             @Override
             public void onResponse(@NonNull Call<UserProfileResponse> call, @NonNull Response<UserProfileResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) {
-                    handleProfileFetchFailure("Profile fetch failed", profileImage, profileName, profileEmail, clientLogo);
+                    handleProfileFetchError();
                     return;
                 }
 
                 UserProfileResponse userProfileResponse = response.body();
                 if (!userProfileResponse.isSuccess() || userProfileResponse.getData() == null || userProfileResponse.getData().getEmployee() == null) {
-                    handleProfileFetchFailure("Profile fetch failed: " + userProfileResponse.getMessage(), profileImage, profileName, profileEmail, clientLogo);
+                    handleProfileFetchError();
                     return;
                 }
 
@@ -535,19 +567,32 @@ public class MainActivity extends SecureBaseActivity {
                 if (profileName != null) profileName.setText(spannableString);
                 if (profileEmail != null) profileEmail.setText(email);
 
+                // ---- INITIALS-BASED PROFILE IMAGE ----
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && profileImage != null) {
-                    if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).into(profileImage);
+                    Drawable initialsDrawable = getInitialsDrawable(firstName, lastName);
+
+                    if (profileImageUrl != null
+                            && !profileImageUrl.trim().isEmpty()
+                            && !"null".equalsIgnoreCase(profileImageUrl.trim())) {
+                        Glide.with(MainActivity.this)
+                                .load(profileImageUrl)
+                                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                                .placeholder(initialsDrawable)
+                                .error(initialsDrawable)
+                                .into(profileImage);
                     } else {
-                        Glide.with(MainActivity.this).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+                        profileImage.setImageDrawable(initialsDrawable);
                     }
                 }
+
+                dismissProfileLoadingDialog();
+                profileFetchAttempt = 0;
             }
 
             @Override
             public void onFailure(@NonNull Call<UserProfileResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "Profile fetch failure: " + t.getMessage());
-                handleProfileFetchFailure("Profile fetch failed: " + t.getMessage(), profileImage, profileName, profileEmail, clientLogo);
+                handleProfileFetchError();
             }
         });
     }
@@ -596,11 +641,38 @@ public class MainActivity extends SecureBaseActivity {
         if (profileEmail != null) profileEmail.setText(getString(R.string.guest_email));
 
         if (profileImage != null) {
-            Glide.with(getApplicationContext()).load(R.drawable.ic_profile_placeholder).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(profileImage);
+            profileImage.setImageDrawable(getInitialsDrawable(null, null));
         }
 
         if (clientLogo != null) {
             Glide.with(getApplicationContext()).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(clientLogo);
+        }
+    }
+
+    private void handleProfileFetchError() {
+        if (isFinishing() || isDestroyed()) return;
+
+        dismissProfileLoadingDialog();
+
+        // Set guest fallback behind the dialog so UI is not blank
+        handleProfileFetchFailure("Profile fetch failed", profileImage, profileName, profileEmail, clientLogo);
+
+        profileFetchAttempt++;
+
+        if (profileFetchAttempt == 1) {
+            CustomDialogHelper.showErrorDialog(this, "Heads Up", "We couldn't load your profile details right now. Please try again.", "Retry", () -> {
+                profileLoadingDialog = CustomDialogHelper.showLoadingDialog(this, "Loading your profile...");
+                fetchUserProfileData();
+            });
+        } else {
+            CustomDialogHelper.showErrorDialog(this, "Unable to Load Profile", "We're still unable to load your details. Please log in again to continue.", "Go to Login", () -> handleLogout());
+        }
+    }
+
+    private void dismissProfileLoadingDialog() {
+        if (profileLoadingDialog != null && profileLoadingDialog.isShowing()) {
+            CustomDialogHelper.dismissWithAnimation(this, profileLoadingDialog);
+            profileLoadingDialog = null;
         }
     }
 
@@ -652,5 +724,107 @@ public class MainActivity extends SecureBaseActivity {
                 Log.e(TAG, "Error unregistering receiver: " + e.getMessage());
             }
         }
+    }
+
+    // =========================================================================
+    //  INITIALS AVATAR HELPERS
+    // =========================================================================
+
+    /**
+     * Builds a self-scaling Drawable that renders a colored circle with the
+     * user's initials in white. Used as the fallback whenever a profile image
+     * is missing OR fails to load.
+     */
+    private Drawable getInitialsDrawable(String firstName, String lastName) {
+        final String initials = getInitials(firstName, lastName);
+        final int bgColor = getInitialsColor(firstName, lastName);
+
+        return new Drawable() {
+            private final Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            private final Rect textBounds = new Rect();
+
+            {
+                bgPaint.setColor(bgColor);
+                bgPaint.setStyle(Paint.Style.FILL);
+
+                textPaint.setColor(Color.WHITE);
+                textPaint.setTextAlign(Paint.Align.CENTER);
+                textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            }
+
+            @Override
+            public void draw(@NonNull Canvas canvas) {
+                Rect b = getBounds();
+                if (b.width() <= 0 || b.height() <= 0) return;
+
+                float cx = b.exactCenterX();
+                float cy = b.exactCenterY();
+                float radius = Math.min(b.width(), b.height()) / 2f;
+
+                canvas.drawCircle(cx, cy, radius, bgPaint);
+
+                // Scale text to roughly 40% of the circle diameter.
+                textPaint.setTextSize(radius * 0.8f);
+                textPaint.getTextBounds(initials, 0, initials.length(), textBounds);
+                float textY = cy - textBounds.exactCenterY();
+                canvas.drawText(initials, cx, textY, textPaint);
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+                bgPaint.setAlpha(alpha);
+                textPaint.setAlpha(alpha);
+                invalidateSelf();
+            }
+
+            @Override
+            public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                bgPaint.setColorFilter(colorFilter);
+                textPaint.setColorFilter(colorFilter);
+                invalidateSelf();
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.TRANSLUCENT;
+            }
+        };
+    }
+
+    /**
+     * Extracts up to 2 uppercase initials from the given first/last name.
+     * Falls back to "?" if nothing usable is available.
+     */
+    private String getInitials(String firstName, String lastName) {
+        String first = firstName != null ? firstName.trim() : "";
+        String last = lastName != null ? lastName.trim() : "";
+
+        StringBuilder sb = new StringBuilder();
+        if (!first.isEmpty()) {
+            sb.append(Character.toUpperCase(first.charAt(0)));
+        }
+        if (!last.isEmpty()) {
+            sb.append(Character.toUpperCase(last.charAt(0)));
+        }
+
+        if (sb.length() == 0) {
+            return "?";
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Deterministically picks a palette color for the given name so the
+     * same user always sees the same background color.
+     */
+    private int getInitialsColor(String firstName, String lastName) {
+        String key = ((firstName != null ? firstName : "") + "|" + (lastName != null ? lastName : "")).trim();
+        if (key.isEmpty() || "|".equals(key)) {
+            return INITIALS_COLOR_PALETTE[0];
+        }
+        int hash = key.hashCode();
+        int index = Math.abs(hash) % INITIALS_COLOR_PALETTE.length;
+        return INITIALS_COLOR_PALETTE[index];
     }
 }

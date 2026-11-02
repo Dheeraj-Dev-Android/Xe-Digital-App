@@ -8,7 +8,7 @@ public class ClaimUpdateStatusRequest {
     private String shared;
 
     @SerializedName("distance")
-    private int distance;
+    private Integer distance;
 
     @SerializedName("statusHr")
     private String statusHr;
@@ -110,7 +110,7 @@ public class ClaimUpdateStatusRequest {
     private String docFileURLKeyNine;
 
     @SerializedName("totalamount")
-    private int totalamount;
+    private double totalamount;
 
     @SerializedName("claimDate")
     private String claimDate;
@@ -156,11 +156,11 @@ public class ClaimUpdateStatusRequest {
         this.shared = shared;
     }
 
-    public int getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(Integer distance) {
         this.distance = distance;
     }
 
@@ -428,11 +428,11 @@ public class ClaimUpdateStatusRequest {
         this.docFileURLKeyNine = docFileURLKeyNine;
     }
 
-    public int getTotalamount() {
+    public double getTotalamount() {
         return totalamount;
     }
 
-    public void setTotalamount(int totalamount) {
+    public void setTotalamount(double totalamount) {
         this.totalamount = totalamount;
     }
 

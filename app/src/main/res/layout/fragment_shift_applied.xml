@@ -50,21 +50,14 @@
         tools:ignore="UseCompoundDrawables"
         tools:visibility="visible">
 
-        <!-- Icon inside a soft circular badge -->
-        <FrameLayout
+
+        <ImageView
+            android:id="@+id/emptyStateImage"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:background="@drawable/bg_empty_state_circle">
-
-            <ImageView
-                android:id="@+id/emptyStateImage"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/no_shift_change_applied"
-                android:src="@drawable/ic_empty_state"
-                app:tint="@color/accent_employee" />
-        </FrameLayout>
+            android:layout_gravity="center"
+            android:contentDescription="@string/no_shift_change_applied"
+            android:src="@drawable/ic_empty_state" />
 
         <!-- Title -->
         <TextView
@@ -88,7 +81,7 @@
             android:fontFamily="@font/quicksand_font_family"
             android:gravity="center"
             android:text="@string/no_shift_change_applied_subtitle"
-            android:textColor="@color/white_60"
+            android:textColor="@color/white"
             android:textSize="13sp" />
 
     </LinearLayout>

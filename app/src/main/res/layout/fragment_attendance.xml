@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:padding="15dp"
         android:text="No Attendance data available For this Month use Filter to get previous months attendance"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

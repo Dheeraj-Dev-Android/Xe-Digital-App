@@ -4,13 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16.dp"
+    android:background="@drawable/fragment_dashboard_bg"
     tools:context=".ui.permission.PermissionFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/permissionRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

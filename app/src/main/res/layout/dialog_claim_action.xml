@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icon_square"
+            android:backgroundTint="#EEF2FF">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="📋"
+                android:textSize="20sp" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Take Action"
+                android:textColor="#1C1E29"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDialogClaimId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Claim ID: N/A"
+                android:textColor="#6B7280"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Close Button -->
+        <TextView
+            android:id="@+id/btnCloseDialog"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="✕"
+            android:textColor="#6B7280"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        android:background="#F0F1F5" />
+
+    <!-- Comment Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilComment"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your comment"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusTopStart="14dp"
+        app:boxStrokeColor="#4F46E5"
+        app:counterEnabled="true"
+        app:counterMaxLength="500"
+        app:errorEnabled="true"
+        app:errorTextColor="#EF4444"
+        app:hintTextColor="#4F46E5">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLength="500"
+            android:maxLines="4"
+            android:minLines="3"
+            android:textColor="#1C1E29"
+            android:textSize="14sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="12dp"
+        android:text="* Comment is required for Reject / Cancel"
+        android:textColor="#9CA3AF"
+        android:textSize="11.5sp" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="vertical">
+
+        <!-- Row 1: Approve (full-width, centered) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApprove"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:backgroundTint="#16A34A"
+            android:text="Approve"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="12dp" />
+
+        <!-- Row 2: Cancel + Reject (side by side) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:textColor="#6B7280"
+                app:cornerRadius="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReject"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="#EF4444"
+                android:text="Reject"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -20,9 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 
 import app.xedigital.ai.R;
 import app.xedigital.ai.utills.NetworkUtils;
@@ -48,7 +45,6 @@ public class SplashActivity extends SecureBaseActivity {
         setContentView(R.layout.activity_splash);
 
         noInternetAnimation = findViewById(R.id.noInternetAnimation);
-        Glide.with(this).load(R.mipmap.ic_launcher).apply(RequestOptions.bitmapTransform(new CircleCrop())).into((android.widget.ImageView) findViewById(R.id.iv_app_logo));
 
         tvSpeed = findViewById(R.id.tvSpeed);
         slowInternetContainer = findViewById(R.id.slowInternetContainer);
@@ -89,7 +85,6 @@ public class SplashActivity extends SecureBaseActivity {
                 public void onAvailable(@NonNull Network network) {
                     runOnUiThread(() -> {
                         hideNoInternetLayout();
-                        // Clear slow internet banners if full network health changes
                         if (NetworkUtils.isNetworkSpeedGood(SplashActivity.this, 80)) {
                             hideSlowInternetLayout();
                         }
@@ -149,7 +144,6 @@ public class SplashActivity extends SecureBaseActivity {
         });
     }
 
-    // Fix: Re-implemented method to clear target error across receiver bindings safely
     public void hideSlowInternetLayout() {
         runOnUiThread(() -> {
             if (slowInternetContainer != null) {

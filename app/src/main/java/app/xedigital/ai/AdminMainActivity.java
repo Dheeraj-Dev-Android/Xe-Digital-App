@@ -1,5 +1,6 @@
 package app.xedigital.ai;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import app.xedigital.ai.api.APIClient;
 import app.xedigital.ai.databinding.ActivityAdminMainBinding;
 import app.xedigital.ai.databinding.NoInternetConnectionBinding;
 import app.xedigital.ai.databinding.SlowInternetConnectionBinding;
+import app.xedigital.ai.utills.CustomDialogHelper;
 import app.xedigital.ai.utills.NetworkUtils;
 import app.xedigital.ai.utills.SecureBaseActivity;
 import app.xedigital.ai.utills.SecurePrefManager;
@@ -72,6 +74,9 @@ public class AdminMainActivity extends SecureBaseActivity {
     private boolean isNetworkChangeReceiverRegistered = false;
     private SlowInternetConnectionBinding slowInternetBinding;
     private NoInternetConnectionBinding noInternetBinding;
+
+    private int profileFetchAttempt = 0;
+    private AlertDialog profileLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +117,10 @@ public class AdminMainActivity extends SecureBaseActivity {
         }
 
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-
+// Sync submenu state for the initial destination (handles activity recreation)
+        if (navController.getCurrentDestination() != null) {
+            syncSubmenuVisibilityForDestination(navController.getCurrentDestination().getId());
+        }
         setupBackPressedHandling(drawer);
     }
 
@@ -201,6 +209,20 @@ public class AdminMainActivity extends SecureBaseActivity {
         });
     }
 
+    private void syncSubmenuVisibilityForDestination(int destId) {
+        NavigationView navigationView = binding.adminNavView;
+        for (Map.Entry<Integer, int[]> entry : groupChildMap.entrySet()) {
+            for (int childId : entry.getValue()) {
+                if (childId == destId) {
+                    if (!Boolean.TRUE.equals(expandedGroups.get(entry.getKey()))) {
+                        toggleSubMenu(navigationView, entry.getKey());
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
     // ── Internet UI Handlers ─────────────────────────────────────────
 
     public void showNoInternetLayout() {
@@ -232,6 +254,30 @@ public class AdminMainActivity extends SecureBaseActivity {
         finish();
     }
 
+    private void handleProfileFetchError() {
+        if (isFinishing() || isDestroyed()) return;
+
+        dismissProfileLoadingDialog();
+
+        profileFetchAttempt++;
+
+        if (profileFetchAttempt == 1) {
+            CustomDialogHelper.showErrorDialog(this, "Heads Up", "We couldn't load your profile details right now. Please try again.", "Retry", () -> {
+                profileLoadingDialog = CustomDialogHelper.showLoadingDialog(this, "Loading your profile...");
+                fetchUserProfileData();
+            });
+        } else {
+            CustomDialogHelper.showErrorDialog(this, "Unable to Load Profile", "We're still unable to load your details. Please log in again to continue.", "Go to Login", () -> handleLogout());
+        }
+    }
+
+    private void dismissProfileLoadingDialog() {
+        if (profileLoadingDialog != null && profileLoadingDialog.isShowing()) {
+            CustomDialogHelper.dismissWithAnimation(this, profileLoadingDialog);
+            profileLoadingDialog = null;
+        }
+    }
+
     private void fetchUserProfileData() {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         String authToken = prefManager.getString("authToken", "");
@@ -239,6 +285,7 @@ public class AdminMainActivity extends SecureBaseActivity {
 
         if (authToken.isEmpty() || userId.isEmpty()) {
             Log.e(TAG, "Missing auth token or user ID");
+            handleProfileFetchError();
             return;
         }
 
@@ -248,18 +295,22 @@ public class AdminMainActivity extends SecureBaseActivity {
         call.enqueue(new Callback<UserDetailsResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && response.body().getData().getUser() != null) {
                     UserDetailsResponse userDetails = response.body();
                     userViewModel.setUserDetails(userDetails);
                     bindUserToDrawer(userDetails);
+                    dismissProfileLoadingDialog();
+                    profileFetchAttempt = 0;
                 } else {
                     Log.e(TAG, "Failed to fetch profile: " + response.message());
+                    handleProfileFetchError();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserDetailsResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "API failure: " + t.getMessage());
+                handleProfileFetchError();
             }
         });
     }

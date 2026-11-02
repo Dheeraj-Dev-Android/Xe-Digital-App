@@ -65,6 +65,10 @@ import app.xedigital.ai.model.shiftApprove.ShiftApproveRequest;
 import app.xedigital.ai.model.shiftTime.ShiftTimeResponse;
 import app.xedigital.ai.model.shiftUpdate.ShiftUpdateRequest;
 import app.xedigital.ai.model.shifts.ShiftTypeResponse;
+import app.xedigital.ai.model.updateAccommodationClaim.UpdateAccommodationRequest;
+import app.xedigital.ai.model.updateFoodClaim.UpdateFoodRequest;
+import app.xedigital.ai.model.updateMiscClaim.UpdateMiscRequest;
+import app.xedigital.ai.model.updateTravelClaim.UpdateTravelRequest;
 import app.xedigital.ai.model.uploadDocument.UploadDocumentRequest;
 import app.xedigital.ai.model.usedLeave.UsedLeaveRequest;
 import app.xedigital.ai.model.user.UserModelResponse;
@@ -171,8 +175,20 @@ public interface APIInterface {
     @GET("claims/getAll/claim")
     retrofit2.Call<EmployeeClaimResponse> getClaims(@Header("Authorization") String authToken);
 
-    @GET("claims/employee/claim?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true")
-    retrofit2.Call<ApproveClaimResponse> getClaimsForApproval(@Header("Authorization") String authToken);
+    //    @GET("claims/getAll/claim?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true")
+//    retrofit2.Call<ApproveClaimResponse> getClaimsForApproval(@Header("Authorization") String authToken);
+    @GET("claims/getAll/claim")
+    retrofit2.Call<ApproveClaimResponse> getClaimsForApproval(
+            @Header("Authorization") String authToken,
+            @Query("start") String start,
+            @Query("end") String end,
+            @Query("employee") String employee,
+            @Query("page") Integer page,
+            @Query("limit") Integer limit,
+            @Query("branch") String branch,
+            @Query("prefix") String prefix,
+            @Query("rm") Boolean rm
+    );
 
     @GET("shifts/shift/shiftTypes")
     retrofit2.Call<ShiftTypeResponse> getShiftTypes(@Header("Authorization") String authToken);
@@ -251,6 +267,23 @@ public interface APIInterface {
 
     @PUT("claims/update/mis/{claimId}")
     Call<ResponseBody> updateMiscClaim(@Header("Authorization") String token, @Path("claimId") String claimId, @Body ExpenseRequest request);
+//Update Claim
+
+    //    https://app.xedigital.ai/api/v1/claims/travelStatus/6ae47f882004cd46bc127a60
+    @PUT("claims/travelStatus/{claimId}")
+    Call<ResponseBody> updateTravelClaimStatus(@Header("Authorization") String token, @Path("claimId") String claimId, @Body UpdateTravelRequest request);
+
+    //    https://app.xedigital.ai/api/v1/claims/accStatus/6ae47e39f734860f602ac967
+    @PUT("claims/accStatus/{claimId}")
+    Call<ResponseBody> updateAccommodationClaimStatus(@Header("Authorization") String token, @Path("claimId") String claimId, @Body UpdateAccommodationRequest request);
+
+    //    https://app.xedigital.ai/api/v1/claims/foodStatus/6ae45f5bdf479010483fc0f9
+    @PUT("claims/foodStatus/{claimId}")
+    Call<ResponseBody> updateFoodClaimStatus(@Header("Authorization") String token, @Path("claimId") String claimId, @Body UpdateFoodRequest request);
+
+    //    https://app.xedigital.ai/api/v1/claims/misStatus/6ae47e7bf734860f602ac968
+    @PUT("claims/misStatus/{claimId}")
+    Call<ResponseBody> updateMiscClaimStatus(@Header("Authorization") String token, @Path("claimId") String claimId, @Body UpdateMiscRequest request);
 
     @GET("bus/getAll?active=true")
     Call<BusinessUnitResponse> getBusinessUnit(@Header("Authorization") String authToken);

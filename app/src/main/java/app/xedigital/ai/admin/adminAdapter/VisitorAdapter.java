@@ -28,12 +28,14 @@ import app.xedigital.ai.utills.SecurePrefManager;
 
 public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorViewHolder> {
 
-    private static final int[] AVATAR_COLORS = {0xFF1E88E5, 0xFF43A047, 0xFFE53935, 0xFF8E24AA, 0xFFFB8C00, 0xFF00ACC1, 0xFF3949AB, 0xFFD81B60, 0xFF00897B, 0xFF6D4C41};
+    private static final int[] AVATAR_COLORS = {
+            0xFF1E88E5, 0xFF43A047, 0xFFE53935, 0xFF8E24AA, 0xFFFB8C00,
+            0xFF00ACC1, 0xFF3949AB, 0xFFD81B60, 0xFF00897B, 0xFF6D4C41
+    };
 
     private final List<VisitorsItem> visitorList;
     private final Context context;
     private final OnVisitorActionListener listener;
-    ProgressBar progressLoader;
 
     public VisitorAdapter(Context context, List<VisitorsItem> visitorList, OnVisitorActionListener listener) {
         this.context = context;
@@ -44,12 +46,14 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
     @NonNull
     @Override
     public VisitorViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_visitors_card, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_visitors_card, parent, false);
         return new VisitorViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VisitorViewHolder holder, int position) {
+        // ── Use `position` IMMEDIATELY for binding only ──────────────
         VisitorsItem visitor = visitorList.get(position);
 
         // Safe Name Resolution
@@ -131,26 +135,40 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
         if (profileImage != null && !profileImage.trim().isEmpty()) {
             holder.visProfile.setVisibility(View.VISIBLE);
             holder.tvProfileInitials.setVisibility(View.GONE);
-            Glide.with(context).load(profileImage).placeholder(R.drawable.ic_profile_placeholder).error(R.drawable.ic_profile_placeholder).listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
-                @Override
-                public boolean onLoadFailed(@androidx.annotation.Nullable com.bumptech.glide.load.engine.GlideException e, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, boolean isFirstResource) {
-                    holder.visProfile.setVisibility(View.GONE);
-                    holder.tvProfileInitials.setVisibility(View.VISIBLE);
-                    String initials = getInitials(displayName);
-                    int avatarColor = getAvatarColor(displayName);
-                    holder.tvProfileInitials.setText(initials);
-                    GradientDrawable circularBg = new GradientDrawable();
-                    circularBg.setShape(GradientDrawable.OVAL);
-                    circularBg.setColor(avatarColor);
-                    holder.tvProfileInitials.setBackground(circularBg);
-                    return true;
-                }
+            Glide.with(context)
+                    .load(profileImage)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(
+                                @androidx.annotation.Nullable com.bumptech.glide.load.engine.GlideException e,
+                                Object model,
+                                com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target,
+                                boolean isFirstResource) {
+                            holder.visProfile.setVisibility(View.GONE);
+                            holder.tvProfileInitials.setVisibility(View.VISIBLE);
+                            String initials = getInitials(displayName);
+                            int avatarColor = getAvatarColor(displayName);
+                            holder.tvProfileInitials.setText(initials);
+                            GradientDrawable circularBg = new GradientDrawable();
+                            circularBg.setShape(GradientDrawable.OVAL);
+                            circularBg.setColor(avatarColor);
+                            holder.tvProfileInitials.setBackground(circularBg);
+                            return true;
+                        }
 
-                @Override
-                public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
-                    return false;
-                }
-            }).into(holder.visProfile);
+                        @Override
+                        public boolean onResourceReady(
+                                android.graphics.drawable.Drawable resource,
+                                Object model,
+                                com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target,
+                                com.bumptech.glide.load.DataSource dataSource,
+                                boolean isFirstResource) {
+                            return false;
+                        }
+                    })
+                    .into(holder.visProfile);
         } else {
             holder.visProfile.setVisibility(View.GONE);
             holder.tvProfileInitials.setVisibility(View.VISIBLE);
@@ -166,17 +184,26 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             holder.tvProfileInitials.setBackground(circularBg);
         }
 
-        // Print Button Listener — delegates to fragment
+        // ── From here on, NEVER use the `position` parameter ─────────
+        // ── Always call holder.getAdapterPosition() inside lambdas ───
+
+        // Print Button Listener
         holder.btnPrintVisitor.setOnClickListener(v -> {
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
             if (listener != null) {
-                listener.onPrintClick(visitor, position);
+                listener.onPrintClick(visitorList.get(pos), pos);
             }
         });
 
         // View Details Dialog Listener
-        final String resolvedWhomToMeet = whomToMeetText;
         holder.btnViewMoreVisitor.setOnClickListener(v -> {
-            View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_visitor_details, null);
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
+            VisitorsItem currentVisitor = visitorList.get(pos);
+
+            View dialogView = LayoutInflater.from(context)
+                    .inflate(R.layout.dialog_visitor_details, null);
 
             ShapeableImageView imgProfile = dialogView.findViewById(R.id.imgProfile);
             TextView tvFullName = dialogView.findViewById(R.id.tvFullName);
@@ -190,19 +217,35 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             TextView tvCompanyFrom = dialogView.findViewById(R.id.tvCompanyFrom);
             TextView tvLaptopSerial = dialogView.findViewById(R.id.tvLaptopSerial);
 
-            String dName = visitor.getName();
-            String dialogDisplayName = (dName != null && !dName.trim().isEmpty()) ? dName.trim() : "N/A";
+            String dName = currentVisitor.getName();
+            String dialogDisplayName = (dName != null && !dName.trim().isEmpty())
+                    ? dName.trim() : "N/A";
             tvFullName.setText(dialogDisplayName);
 
-            String dContact = visitor.getContact();
-            tvContact.setText((dContact != null && !dContact.trim().isEmpty()) ? dContact : "N/A");
+            String dContact = currentVisitor.getContact();
+            tvContact.setText((dContact != null && !dContact.trim().isEmpty())
+                    ? dContact : "N/A");
 
-            String dEmail = visitor.getEmail();
-            tvEmail.setText((dEmail != null && !dEmail.trim().isEmpty()) ? dEmail : "N/A");
+            String dEmail = currentVisitor.getEmail();
+            tvEmail.setText((dEmail != null && !dEmail.trim().isEmpty())
+                    ? dEmail : "N/A");
 
-            tvWhomToMeet.setText(resolvedWhomToMeet);
+            // Re-resolve whomToMeet from the live item
+            String dialogWhom = "N/A";
+            if (currentVisitor.getWhomToMeet() != null) {
+                String fn = currentVisitor.getWhomToMeet().getFirstname();
+                String ln = currentVisitor.getWhomToMeet().getLastname();
+                StringBuilder sb2 = new StringBuilder();
+                if (fn != null && !fn.trim().isEmpty()) sb2.append(fn.trim());
+                if (ln != null && !ln.trim().isEmpty()) {
+                    if (sb2.length() > 0) sb2.append(" ");
+                    sb2.append(ln.trim());
+                }
+                if (sb2.length() > 0) dialogWhom = sb2.toString();
+            }
+            tvWhomToMeet.setText(dialogWhom);
 
-            String dSignIn = visitor.getSignIn();
+            String dSignIn = currentVisitor.getSignIn();
             if (dSignIn != null && !dSignIn.trim().isEmpty()) {
                 tvCheckInDate.setText(DateTimeUtils.getDayOfWeekAndDate(dSignIn));
                 tvCheckInTime.setText(DateTimeUtils.extractTime(dSignIn));
@@ -211,7 +254,7 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
                 tvCheckInTime.setText("N/A");
             }
 
-            String dSignOut = visitor.getSignOut();
+            String dSignOut = currentVisitor.getSignOut();
             if (dSignOut != null && !dSignOut.trim().isEmpty()) {
                 tvCheckOutDate.setText(DateTimeUtils.getDayOfWeekAndDate(dSignOut));
                 tvCheckOutTime.setText(DateTimeUtils.extractTime(dSignOut));
@@ -220,14 +263,20 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
                 tvCheckOutTime.setText("N/A");
             }
 
-            String companyFrom = visitor.getCompanyFrom();
-            tvCompanyFrom.setText((companyFrom != null && !companyFrom.trim().isEmpty()) ? companyFrom : "N/A");
+            String companyFrom = currentVisitor.getCompanyFrom();
+            tvCompanyFrom.setText((companyFrom != null && !companyFrom.trim().isEmpty())
+                    ? companyFrom : "N/A");
 
-            String serialNumber = visitor.getSerialNumber();
-            tvLaptopSerial.setText((serialNumber != null && !serialNumber.trim().isEmpty()) ? serialNumber : "N/A");
+            String serialNumber = currentVisitor.getSerialNumber();
+            tvLaptopSerial.setText((serialNumber != null && !serialNumber.trim().isEmpty())
+                    ? serialNumber : "N/A");
 
-            if (profileImage != null && !profileImage.trim().isEmpty()) {
-                Glide.with(context).load(profileImage).placeholder(R.drawable.ic_person).into(imgProfile);
+            String dialogProfileImage = currentVisitor.getProfileImagePath();
+            if (dialogProfileImage != null && !dialogProfileImage.trim().isEmpty()) {
+                Glide.with(context)
+                        .load(dialogProfileImage)
+                        .placeholder(R.drawable.ic_person)
+                        .into(imgProfile);
             } else {
                 String initials = getInitials(dialogDisplayName);
                 int avatarColor = getAvatarColor(dialogDisplayName);
@@ -235,13 +284,16 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setView(dialogView).setCancelable(true).setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+            builder.setView(dialogView)
+                    .setCancelable(true)
+                    .setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
 
             AlertDialog dialog = builder.create();
             dialog.show();
         });
 
-        // Container Visibility Logic
+        // Container Visibility Logic (immediate binding — `position` is fine here
+        // because we already resolved `visitor` above)
         String meetingStatus = visitor.getMeetingOverStatus();
 
         if (approvalStatus != null && approvalStatus.equalsIgnoreCase("Approved")) {
@@ -256,18 +308,23 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
             holder.CheckOutContainer.setVisibility(View.VISIBLE);
         }
 
-        // Action Listeners
+        // Check-In Button Listener
         holder.btnCheckInVisitor.setOnClickListener(view -> {
-            if (listener != null) {
-                listener.onCheckInClick(visitor, position);
-            }
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
             Toast.makeText(context, "Check In", Toast.LENGTH_SHORT).show();
+            if (listener != null) {
+                listener.onCheckInClick(visitorList.get(pos), pos);
+            }
         });
 
+        // Check-Out Button Listener
         holder.btnCheckOutVisitor.setOnClickListener(view -> {
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
             Toast.makeText(context, "Check Out", Toast.LENGTH_SHORT).show();
             if (listener != null) {
-                listener.onCheckOutClick(visitor, position);
+                listener.onCheckOutClick(visitorList.get(pos), pos);
             }
         });
     }
@@ -310,7 +367,8 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
     }
 
     private android.graphics.Bitmap createInitialsBitmap(String initials, int backgroundColor, int size) {
-        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
+                size, size, android.graphics.Bitmap.Config.ARGB_8888);
         android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
 
         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
@@ -343,8 +401,10 @@ public class VisitorAdapter extends RecyclerView.Adapter<VisitorAdapter.VisitorV
     public class VisitorViewHolder extends RecyclerView.ViewHolder {
         TextView visName, visWhomToMeet, visContact, visEmail, visCheckInDate, tvProfileInitials;
         Chip visApprovalStatus;
-        ShapeableImageView visProfile, btnViewMoreVisitor, btnPrintVisitor, btnCheckInVisitor, btnCheckOutVisitor;
+        ShapeableImageView visProfile, btnViewMoreVisitor, btnPrintVisitor,
+                btnCheckInVisitor, btnCheckOutVisitor;
         LinearLayout CheckOutContainer, CheckInContainer;
+        ProgressBar progressLoader;          // ← moved into ViewHolder (was adapter-level bug)
 
         public VisitorViewHolder(@NonNull View itemView) {
             super(itemView);

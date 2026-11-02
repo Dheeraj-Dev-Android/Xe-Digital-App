@@ -3,153 +3,185 @@ package app.xedigital.ai.model.approveClaim;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EmployeeClaimdataItem implements Serializable {
 
+    @SerializedName("distance")
+    private Integer distance;
+
+    @SerializedName("statusHr")
+    private String statusHr;
+
+    @SerializedName("docFileURL")
+    private String docFileURL;
+
+    @SerializedName("project")
+    private String project;
+
+    @SerializedName("perposeofmeet")
+    private String perposeofmeet;
+
+    @SerializedName("employee")
+    private Employee employee;
+
+    @SerializedName("docFileURLKey")
+    private String docFileURLKey;
+
+    @SerializedName("totalamount")
+    private double totalamount;
+
+    @SerializedName("statusRm")
+    private String statusRm;
+
+    @SerializedName("claimDate")
+    private String claimDate;
+
+    @SerializedName("currency")
+    private String currency;
+
+    @SerializedName("_id")
+    private String id;
+
+    @SerializedName("docFileURLKeyOne")
+    private String docFileURLKeyOne;
+
+    @SerializedName("department")
+    private Department department;
+
+    @SerializedName("meeting")
+    private String meeting;
+
+    @SerializedName("email")
+    private String email;
+
+    @SerializedName("docFileURLOne")
+    private String docFileURLOne;
+
+    @SerializedName("empId")
+    private String empId;
+
+    @SerializedName("Accommodationtype")
+    private String accommodationtype;
+
+    @SerializedName("checkin")
+    private String checkin;
+
+    @SerializedName("state")
+    private String state;
+
+    @SerializedName("checkout")
+    private String checkout;
+
+    @SerializedName("expenseType")
+    private String expenseType;
+
+    @SerializedName("travelRefId")
+    private String travelRefId;
+
+    @SerializedName("location")
+    private String location;
+
+    @SerializedName("Id")
+    private String claimId;
+
+    @SerializedName("accommodationname")
+    private String accommodationname;
+
+    @SerializedName("status")
+    private String status;
+
+    @SerializedName("description")
+    private String description;
+
+    @SerializedName("restaurant")
+    private String restaurant;
+
+    @SerializedName("reqEmployee")
+    private ReqEmployee reqEmployee;
+
+    @SerializedName("persons")
+    private int persons;
+
+    @SerializedName("meantype")
+    private String meantype;
 
     @SerializedName("shared")
     private String shared;
-    @SerializedName("distance")
-    private int distance;
-    @SerializedName("statusHr")
-    private String statusHr;
-    @SerializedName("docFileURLTwo")
-    private String docFileURLTwo;
-    @SerializedName("docFileURLThree")
-    private String docFileURLThree;
-    @SerializedName("docFileURL")
-    private String docFileURL;
-    @SerializedName("docFileURLSeven")
-    private String docFileURLSeven;
-    @SerializedName("project")
-    private String project;
-    @SerializedName("perposeofmeet")
-    private String perposeofmeet;
-    @SerializedName("remark")
-    private String remark;
-    @SerializedName("docFileURLEight")
-    private String docFileURLEight;
-    @SerializedName("employee")
-    private Employee employee;
+
     @SerializedName("empTransport")
     private String empTransport;
-    @SerializedName("createdAt")
-    private String createdAt;
-    @SerializedName("statusRm")
-    private String statusRm;
-    @SerializedName("currency")
-    private String currency;
-    @SerializedName("docFileURLKeyOne")
-    private String docFileURLKeyOne;
-    @SerializedName("meeting")
-    private String meeting;
-    @SerializedName("docFileURLKeySix")
-    private String docFileURLKeySix;
+
     @SerializedName("dedicated")
     private String dedicated;
+
     @SerializedName("reportingManager")
     private String reportingManager;
+
     @SerializedName("toaddress")
     private String toaddress;
-    @SerializedName("docFileURLKeyThree")
-    private String docFileURLKeyThree;
+
     @SerializedName("modeoftransport")
     private String modeoftransport;
-    @SerializedName("docFileURLKeySeven")
-    private String docFileURLKeySeven;
-    @SerializedName("docFileURLKeyEight")
-    private String docFileURLKeyEight;
-    @SerializedName("confbutton")
-    private boolean confbutton;
-    @SerializedName("claimId")
-    private String claimId;
-    @SerializedName("docFileURLKeyFour")
-    private String docFileURLKeyFour;
-    @SerializedName("approvedDate")
-    private String approvedDate;
-    @SerializedName("docFileURLKey")
-    private String docFileURLKey;
-    @SerializedName("docFileURLFour")
-    private String docFileURLFour;
-    @SerializedName("docFileURLSix")
-    private String docFileURLSix;
-    @SerializedName("docFileURLKeyNine")
-    private String docFileURLKeyNine;
-    @SerializedName("totalamount")
-    private int totalamount;
-    @SerializedName("claimDate")
-    private String claimDate;
-    @SerializedName("docFileURLKeyTwo")
-    private String docFileURLKeyTwo;
-    @SerializedName("docFileURLKeyFive")
-    private String docFileURLKeyFive;
+
     @SerializedName("individually")
     private String individually;
+
     @SerializedName("comment")
     private String comment;
-    @SerializedName("_id")
-    private String id;
-    @SerializedName("docFileURLNine")
-    private String docFileURLNine;
+
     @SerializedName("fromaddress")
     private String fromaddress;
-    @SerializedName("docFileURLOne")
-    private String docFileURLOne;
-    @SerializedName("docFileURLFive")
-    private String docFileURLFive;
+
     @SerializedName("travelCategory")
     private String travelCategory;
 
-    public List<String> getDocumentUrls() {
-        List<String> documentUrls = new ArrayList<>();
-        if (docFileURL != null && !docFileURL.isEmpty()) {
-            documentUrls.add(docFileURL);
-        }
-        if (docFileURLOne != null && !docFileURLOne.isEmpty()) {
-            documentUrls.add(docFileURLOne);
-        }
-        if (docFileURLTwo != null && !docFileURLTwo.isEmpty()) {
-            documentUrls.add(docFileURLTwo);
-        }
-        if (docFileURLThree != null && !docFileURLThree.isEmpty()) {
-            documentUrls.add(docFileURLThree);
-        }
-        if (docFileURLFour != null && !docFileURLFour.isEmpty()) {
-            documentUrls.add(docFileURLFour);
-        }
-        if (docFileURLFive != null && !docFileURLFive.isEmpty()) {
-            documentUrls.add(docFileURLFive);
-        }
-        if (docFileURLSix != null && !docFileURLSix.isEmpty()) {
-            documentUrls.add(docFileURLSix);
-        }
-        if (docFileURLSeven != null && !docFileURLSeven.isEmpty()) {
-            documentUrls.add(docFileURLSeven);
-        }
-        if (docFileURLEight != null && !docFileURLEight.isEmpty()) {
-            documentUrls.add(docFileURLEight);
-        }
-        if (docFileURLNine != null && !docFileURLNine.isEmpty()) {
-            documentUrls.add(docFileURLNine);
-        }
-        return documentUrls;
-    }
+    @SerializedName("fueltype")
+    private String fueltype;
 
-    public String getShared() {
-        return shared;
-    }
+    @SerializedName("fuelstationname")
+    private String fuelstationname;
 
-    public void setShared(String shared) {
-        this.shared = shared;
-    }
+    @SerializedName("fuelquantity")
+    private String fuelquantity;
 
-    public int getDistance() {
+    @SerializedName("duration")
+    private String duration;
+
+    @SerializedName("parkingdate")
+    private String parkingdate;
+
+    @SerializedName("vehiclenumber")
+    private String vehiclenumber;
+
+    @SerializedName("tollvehiclenumber")
+    private String tollvehiclenumber;
+
+    @SerializedName("tolllocation")
+    private String tolllocation;
+
+    @SerializedName("billingperiod")
+    private String billingperiod;
+
+    @SerializedName("netprovider")
+    private String netprovider;
+
+    @SerializedName("expancecategory")
+    private String expancecategory;
+
+    @SerializedName("billnumber")
+    private String billnumber;
+
+    @SerializedName("parkinglocation")
+    private String parkinglocation;
+
+    @SerializedName("tollplazaname")
+    private String tollplazaname;
+
+    public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(Integer distance) {
         this.distance = distance;
     }
 
@@ -161,36 +193,12 @@ public class EmployeeClaimdataItem implements Serializable {
         this.statusHr = statusHr;
     }
 
-    public String getDocFileURLTwo() {
-        return docFileURLTwo;
-    }
-
-    public void setDocFileURLTwo(String docFileURLTwo) {
-        this.docFileURLTwo = docFileURLTwo;
-    }
-
-    public String getDocFileURLThree() {
-        return docFileURLThree;
-    }
-
-    public void setDocFileURLThree(String docFileURLThree) {
-        this.docFileURLThree = docFileURLThree;
-    }
-
     public String getDocFileURL() {
         return docFileURL;
     }
 
     public void setDocFileURL(String docFileURL) {
         this.docFileURL = docFileURL;
-    }
-
-    public String getDocFileURLSeven() {
-        return docFileURLSeven;
-    }
-
-    public void setDocFileURLSeven(String docFileURLSeven) {
-        this.docFileURLSeven = docFileURLSeven;
     }
 
     public String getProject() {
@@ -209,22 +217,6 @@ public class EmployeeClaimdataItem implements Serializable {
         this.perposeofmeet = perposeofmeet;
     }
 
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getDocFileURLEight() {
-        return docFileURLEight;
-    }
-
-    public void setDocFileURLEight(String docFileURLEight) {
-        this.docFileURLEight = docFileURLEight;
-    }
-
     public Employee getEmployee() {
         return employee;
     }
@@ -233,20 +225,20 @@ public class EmployeeClaimdataItem implements Serializable {
         this.employee = employee;
     }
 
-    public String getEmpTransport() {
-        return empTransport;
+    public String getDocFileURLKey() {
+        return docFileURLKey;
     }
 
-    public void setEmpTransport(String empTransport) {
-        this.empTransport = empTransport;
+    public void setDocFileURLKey(String docFileURLKey) {
+        this.docFileURLKey = docFileURLKey;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public Double getTotalamount() {
+        return totalamount;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setTotalamount(Double totalamount) {
+        this.totalamount = totalamount;
     }
 
     public String getStatusRm() {
@@ -257,12 +249,28 @@ public class EmployeeClaimdataItem implements Serializable {
         this.statusRm = statusRm;
     }
 
+    public String getClaimDate() {
+        return claimDate;
+    }
+
+    public void setClaimDate(String claimDate) {
+        this.claimDate = claimDate;
+    }
+
     public String getCurrency() {
         return currency;
     }
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDocFileURLKeyOne() {
@@ -273,6 +281,14 @@ public class EmployeeClaimdataItem implements Serializable {
         this.docFileURLKeyOne = docFileURLKeyOne;
     }
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     public String getMeeting() {
         return meeting;
     }
@@ -281,12 +297,164 @@ public class EmployeeClaimdataItem implements Serializable {
         this.meeting = meeting;
     }
 
-    public String getDocFileURLKeySix() {
-        return docFileURLKeySix;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDocFileURLKeySix(String docFileURLKeySix) {
-        this.docFileURLKeySix = docFileURLKeySix;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDocFileURLOne() {
+        return docFileURLOne;
+    }
+
+    public void setDocFileURLOne(String docFileURLOne) {
+        this.docFileURLOne = docFileURLOne;
+    }
+
+    public String getEmpId() {
+        return empId;
+    }
+
+    public void setEmpId(String empId) {
+        this.empId = empId;
+    }
+
+    public String getAccommodationtype() {
+        return accommodationtype;
+    }
+
+    public void setAccommodationtype(String accommodationtype) {
+        this.accommodationtype = accommodationtype;
+    }
+
+    public String getCheckin() {
+        return checkin;
+    }
+
+    public void setCheckin(String checkin) {
+        this.checkin = checkin;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCheckout() {
+        return checkout;
+    }
+
+    public void setCheckout(String checkout) {
+        this.checkout = checkout;
+    }
+
+    public String getExpenseType() {
+        return expenseType;
+    }
+
+    public void setExpenseType(String expenseType) {
+        this.expenseType = expenseType;
+    }
+
+    public String getTravelRefId() {
+        return travelRefId;
+    }
+
+    public void setTravelRefId(String travelRefId) {
+        this.travelRefId = travelRefId;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getClaimId() {
+        return claimId;
+    }
+
+    public void setClaimId(String claimId) {
+        this.claimId = claimId;
+    }
+
+    public String getAccommodationname() {
+        return accommodationname;
+    }
+
+    public void setAccommodationname(String accommodationname) {
+        this.accommodationname = accommodationname;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(String restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public ReqEmployee getReqEmployee() {
+        return reqEmployee;
+    }
+
+    public void setReqEmployee(ReqEmployee reqEmployee) {
+        this.reqEmployee = reqEmployee;
+    }
+
+    public Integer getPersons() {
+        return persons;
+    }
+
+    public void setPersons(Integer persons) {
+        this.persons = persons;
+    }
+
+    public String getMeantype() {
+        return meantype;
+    }
+
+    public void setMeantype(String meantype) {
+        this.meantype = meantype;
+    }
+
+    public String getShared() {
+        return shared;
+    }
+
+    public void setShared(String shared) {
+        this.shared = shared;
+    }
+
+    public String getEmpTransport() {
+        return empTransport;
+    }
+
+    public void setEmpTransport(String empTransport) {
+        this.empTransport = empTransport;
     }
 
     public String getDedicated() {
@@ -313,132 +481,12 @@ public class EmployeeClaimdataItem implements Serializable {
         this.toaddress = toaddress;
     }
 
-    public String getDocFileURLKeyThree() {
-        return docFileURLKeyThree;
-    }
-
-    public void setDocFileURLKeyThree(String docFileURLKeyThree) {
-        this.docFileURLKeyThree = docFileURLKeyThree;
-    }
-
     public String getModeoftransport() {
         return modeoftransport;
     }
 
     public void setModeoftransport(String modeoftransport) {
         this.modeoftransport = modeoftransport;
-    }
-
-    public String getDocFileURLKeySeven() {
-        return docFileURLKeySeven;
-    }
-
-    public void setDocFileURLKeySeven(String docFileURLKeySeven) {
-        this.docFileURLKeySeven = docFileURLKeySeven;
-    }
-
-    public String getDocFileURLKeyEight() {
-        return docFileURLKeyEight;
-    }
-
-    public void setDocFileURLKeyEight(String docFileURLKeyEight) {
-        this.docFileURLKeyEight = docFileURLKeyEight;
-    }
-
-    public boolean isConfbutton() {
-        return confbutton;
-    }
-
-    public void setConfbutton(boolean confbutton) {
-        this.confbutton = confbutton;
-    }
-
-    public String getClaimId() {
-        return claimId;
-    }
-
-    public void setClaimId(String claimId) {
-        this.claimId = claimId;
-    }
-
-    public String getDocFileURLKeyFour() {
-        return docFileURLKeyFour;
-    }
-
-    public void setDocFileURLKeyFour(String docFileURLKeyFour) {
-        this.docFileURLKeyFour = docFileURLKeyFour;
-    }
-
-    public String getApprovedDate() {
-        return approvedDate;
-    }
-
-    public void setApprovedDate(String approvedDate) {
-        this.approvedDate = approvedDate;
-    }
-
-    public String getDocFileURLKey() {
-        return docFileURLKey;
-    }
-
-    public void setDocFileURLKey(String docFileURLKey) {
-        this.docFileURLKey = docFileURLKey;
-    }
-
-    public String getDocFileURLFour() {
-        return docFileURLFour;
-    }
-
-    public void setDocFileURLFour(String docFileURLFour) {
-        this.docFileURLFour = docFileURLFour;
-    }
-
-    public String getDocFileURLSix() {
-        return docFileURLSix;
-    }
-
-    public void setDocFileURLSix(String docFileURLSix) {
-        this.docFileURLSix = docFileURLSix;
-    }
-
-    public String getDocFileURLKeyNine() {
-        return docFileURLKeyNine;
-    }
-
-    public void setDocFileURLKeyNine(String docFileURLKeyNine) {
-        this.docFileURLKeyNine = docFileURLKeyNine;
-    }
-
-    public int getTotalamount() {
-        return totalamount;
-    }
-
-    public void setTotalamount(int totalamount) {
-        this.totalamount = totalamount;
-    }
-
-    public String getClaimDate() {
-        return claimDate;
-    }
-
-    public void setClaimDate(String claimDate) {
-        this.claimDate = claimDate;
-    }
-
-    public String getDocFileURLKeyTwo() {
-        return docFileURLKeyTwo;
-    }
-
-    public void setDocFileURLKeyTwo(String docFileURLKeyTwo) {
-        this.docFileURLKeyTwo = docFileURLKeyTwo;
-    }
-
-    public String getDocFileURLKeyFive() {
-        return docFileURLKeyFive;
-    }
-
-    public void setDocFileURLKeyFive(String docFileURLKeyFive) {
-        this.docFileURLKeyFive = docFileURLKeyFive;
     }
 
     public String getIndividually() {
@@ -457,22 +505,6 @@ public class EmployeeClaimdataItem implements Serializable {
         this.comment = comment;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getDocFileURLNine() {
-        return docFileURLNine;
-    }
-
-    public void setDocFileURLNine(String docFileURLNine) {
-        this.docFileURLNine = docFileURLNine;
-    }
-
     public String getFromaddress() {
         return fromaddress;
     }
@@ -481,27 +513,123 @@ public class EmployeeClaimdataItem implements Serializable {
         this.fromaddress = fromaddress;
     }
 
-    public String getDocFileURLOne() {
-        return docFileURLOne;
-    }
-
-    public void setDocFileURLOne(String docFileURLOne) {
-        this.docFileURLOne = docFileURLOne;
-    }
-
-    public String getDocFileURLFive() {
-        return docFileURLFive;
-    }
-
-    public void setDocFileURLFive(String docFileURLFive) {
-        this.docFileURLFive = docFileURLFive;
-    }
-
     public String getTravelCategory() {
         return travelCategory;
     }
 
     public void setTravelCategory(String travelCategory) {
         this.travelCategory = travelCategory;
+    }
+
+    public String getFueltype() {
+        return fueltype;
+    }
+
+    public void setFueltype(String fueltype) {
+        this.fueltype = fueltype;
+    }
+
+    public String getFuelstationname() {
+        return fuelstationname;
+    }
+
+    public void setFuelstationname(String fuelstationname) {
+        this.fuelstationname = fuelstationname;
+    }
+
+    public String getFuelquantity() {
+        return fuelquantity;
+    }
+
+    public void setFuelquantity(String fuelquantity) {
+        this.fuelquantity = fuelquantity;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getParkingdate() {
+        return parkingdate;
+    }
+
+    public void setParkingdate(String parkingdate) {
+        this.parkingdate = parkingdate;
+    }
+
+    public String getVehiclenumber() {
+        return vehiclenumber;
+    }
+
+    public void setVehiclenumber(String vehiclenumber) {
+        this.vehiclenumber = vehiclenumber;
+    }
+
+    public String getTollvehiclenumber() {
+        return tollvehiclenumber;
+    }
+
+    public void setTollvehiclenumber(String tollvehiclenumber) {
+        this.tollvehiclenumber = tollvehiclenumber;
+    }
+
+    public String getTolllocation() {
+        return tolllocation;
+    }
+
+    public void setTolllocation(String tolllocation) {
+        this.tolllocation = tolllocation;
+    }
+
+    public String getBillingperiod() {
+        return billingperiod;
+    }
+
+    public void setBillingperiod(String billingperiod) {
+        this.billingperiod = billingperiod;
+    }
+
+    public String getNetprovider() {
+        return netprovider;
+    }
+
+    public void setNetprovider(String netprovider) {
+        this.netprovider = netprovider;
+    }
+
+    public String getExpancecategory() {
+        return expancecategory;
+    }
+
+    public void setExpancecategory(String expancecategory) {
+        this.expancecategory = expancecategory;
+    }
+
+    public String getBillnumber() {
+        return billnumber;
+    }
+
+    public void setBillnumber(String billnumber) {
+        this.billnumber = billnumber;
+    }
+
+    public String getParkinglocation() {
+        return parkinglocation;
+    }
+
+    public void setParkinglocation(String parkinglocation) {
+        this.parkinglocation = parkinglocation;
+    }
+
+    public String getTollplazaname() {
+        return tollplazaname;
+    }
+
+    public void setTollplazaname(String tollplazaname) {
+        this.tollplazaname = tollplazaname;
     }
 }

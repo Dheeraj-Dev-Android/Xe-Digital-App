@@ -85,7 +85,7 @@ public class ClaimSaveRequest {
     private boolean guest;
 
     @SerializedName("totalClaim")
-    private int totalClaim;
+    private double totalClaim;
 
     @SerializedName("status")
     private String status;
@@ -524,7 +524,7 @@ public class ClaimSaveRequest {
         this.guest = guest;
     }
 
-    public int getTotalClaim() {
+    public double getTotalClaim() {
         return totalClaim;
     }
 

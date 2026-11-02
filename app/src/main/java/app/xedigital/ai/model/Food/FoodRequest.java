@@ -83,7 +83,7 @@ public class FoodRequest {
     private boolean guest;
 
     @SerializedName("totalClaim")
-    private int totalClaim;
+    private double totalClaim;
 
     @SerializedName("status")
     private String status;
@@ -515,11 +515,11 @@ public class FoodRequest {
         this.guest = guest;
     }
 
-    public int getTotalClaim() {
+    public double getTotalClaim() {
         return totalClaim;
     }
 
-    public void setTotalClaim(int totalClaim) {
+    public void setTotalClaim(double totalClaim) {
         this.totalClaim = totalClaim;
     }
 

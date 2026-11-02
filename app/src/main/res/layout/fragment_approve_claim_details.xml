@@ -7,11 +7,9 @@
     android:background="#F3F5F9"
     tools:context=".ui.claim_management.ApproveClaimDetailsFragment">
 
-    <!-- Main Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
         android:background="@drawable/fragment_dashboard_bg"
         android:fillViewport="true"
         android:scrollbars="none"
@@ -23,7 +21,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ================= 1. HERO: CLAIM INFORMATION ================= -->
+            <!-- ================= 1. HERO: CLAIM OVERVIEW ================= -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/claimDetailsCard"
                 android:layout_width="match_parent"
@@ -39,24 +37,57 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Claim ID Label + Value -->
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Row: Claim ID + Status Badge -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.08"
-                        android:text="CLAIM ID"
-                        android:textColor="#CBD0FF"
-                        android:textSize="11sp" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/txtClaimId"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="#FFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        tools:text="CL-2024-001" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:letterSpacing="0.08"
+                                android:text="CLAIM ID"
+                                android:textColor="#CBD0FF"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/txtClaimId"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                tools:text="CLM-2024-001" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_translucent"
+                            android:paddingStart="14dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="6dp">
+
+                            <TextView
+                                android:id="@+id/txtStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#FFFFFF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                tools:text="Pending" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
@@ -65,95 +96,156 @@
                         android:layout_marginBottom="16dp"
                         android:background="#33FFFFFF" />
 
-                    <!-- Project Name -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Project Name"
-                        android:textColor="#CBD0FF"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:id="@+id/txtProjectName"
+                    <!-- Row: Applied Date | Travel Ref ID -->
+                    <LinearLayout
+                        android:id="@+id/rowDateTravelRef"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        tools:text="Marketing Campaign" />
+                        android:orientation="horizontal">
 
-                    <!-- Meeting Type -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Meeting Type"
-                        android:textColor="#CBD0FF"
-                        android:textSize="11.5sp" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/txtMeetingType"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Claim Date"
+                                android:textColor="#CBD0FF"
+                                android:textSize="11.5sp" />
+
+                            <TextView
+                                android:id="@+id/txtAppliedDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="12 Jan 2025" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Travel Ref ID"
+                                android:textColor="#CBD0FF"
+                                android:textSize="11.5sp" />
+
+                            <TextView
+                                android:id="@+id/txtTravelRefId"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="TRV-2025-045" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Row: Status RM | Status HR -->
+                    <LinearLayout
+                        android:id="@+id/rowStatusRmHr"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        tools:text="Client Meeting" />
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
 
-                    <!-- Purpose -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Purpose"
-                        android:textColor="#CBD0FF"
-                        android:textSize="11.5sp" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/txtPurposeOfMeeting"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        tools:text="Quarterly Review" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Status (RM)"
+                                android:textColor="#CBD0FF"
+                                android:textSize="11.5sp" />
 
-                    <!-- Comment in translucent note box -->
+                            <TextView
+                                android:id="@+id/txtStatusRm"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="Approved" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Status (HR)"
+                                android:textColor="#CBD0FF"
+                                android:textSize="11.5sp" />
+
+                            <TextView
+                                android:id="@+id/txtStatusHr"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="Pending" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Total Amount Highlight -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="18dp"
                         android:background="@drawable/bg_chip_translucent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="12dp">
 
                         <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="💰 Total Claim Amount"
+                            android:textColor="#EDEBFF"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/txtTotalAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📝 Comment"
-                            android:textColor="#CBD0FF"
-                            android:textSize="11.5sp" />
-
-                        <TextView
-                            android:id="@+id/txtComment"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textColor="#EDEBFF"
-                            android:textSize="14sp"
-                            android:textStyle="italic"
-                            tools:text="Travel for client meeting" />
+                            android:textColor="#FFFFFF"
+                            android:textSize="19sp"
+                            android:textStyle="bold"
+                            tools:text="INR 4500" />
                     </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ================= 2. TRAVEL DETAILS ================= -->
+            <!-- ================= 2. MEETING DETAILS ================= -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/travelDetailsCard"
+                android:id="@+id/cardMeetingDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
@@ -169,7 +261,169 @@
                     android:orientation="vertical"
                     android:padding="18dp">
 
-                    <!-- Section Header with Icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_square"
+                            android:backgroundTint="#E7F9EF">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="🤝"
+                                android:textSize="18sp" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Meeting Details"
+                            android:textColor="#1C1E29"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:background="#F0F1F5" />
+
+                    <LinearLayout
+                        android:id="@+id/rowProjectMeeting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Project Name"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtProjectName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Xe Digital App" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Meeting Type"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtMeetingType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Client Meeting" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Purpose"
+                            android:textColor="@color/badge_text"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtPurposeOfMeeting"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="#1C1E29"
+                            android:textSize="14.5sp"
+                            android:textStyle="bold"
+                            tools:text="Project discussion" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_note"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📝 Comment"
+                            android:textColor="@color/badge_text"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtComment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#3A3D46"
+                            android:textSize="14sp"
+                            android:textStyle="italic"
+                            tools:text="Urgent meeting with client" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ================= 3. TRAVEL DETAILS ================= -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardTravelDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#ECEFF3"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -206,177 +460,180 @@
                         android:layout_marginTop="14dp"
                         android:background="#F0F1F5" />
 
-                    <!-- Travel Category -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Travel Category"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtTravelCategory"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="#1C1E29"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="Business" />
-
-                    <!-- Mode of Transport -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Mode of Transport"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtModeOfTransport"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="#1C1E29"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="Flight" />
-
-                    <!-- Route -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Route"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtFromTo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="#1C1E29"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="Mumbai to Delhi" />
-
-                    <!-- Distance -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Distance"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtDistance"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="#1C1E29"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="1200 Km" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ================= 3. FINANCIAL DETAILS ================= -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/financialDetailsCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#ECEFF3"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="18dp">
-
-                    <!-- Section Header with Icon -->
                     <LinearLayout
+                        android:id="@+id/rowTravelCategoryMode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
+                        android:layout_marginTop="14dp"
                         android:orientation="horizontal">
 
-                        <FrameLayout
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_icon_square"
-                            android:backgroundTint="#E7F9EF">
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:text="💰"
-                                android:textSize="18sp" />
-                        </FrameLayout>
+                                android:text="Travel Category"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="Financial Details"
-                            android:textColor="#1C1E29"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/txtTravelCategory"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Domestic" />
+                        </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="14dp"
-                        android:background="#F0F1F5" />
-
-                    <!-- Total Amount Highlight Bar -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:background="@drawable/bg_chip_translucent"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="12dp">
-
-                        <TextView
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="💰 Total Claim Amount"
-                            android:textColor="#6B7280"
-                            android:textSize="13sp" />
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/txtTotalAmount"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mode of Transport"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtModeOfTransport"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Car" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowRouteDistance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:textColor="#1C1E29"
-                            android:textSize="19sp"
-                            android:textStyle="bold"
-                            tools:text="₹15,000" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Route"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtFromTo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Delhi to Noida" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Distance"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtDistance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="25 Km" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowRestaurantPersons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Restaurant"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtRestaurant"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="N/A" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Persons Count"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtPersons"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="3" />
+                        </LinearLayout>
                     </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ================= 4. STATUS DETAILS ================= -->
+            <!-- ================= 4. PARKING & ACCOMMODATION ================= -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/statusDetailsCard"
+                android:id="@+id/cardParkingAccommodation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
@@ -392,7 +649,6 @@
                     android:orientation="vertical"
                     android:padding="18dp">
 
-                    <!-- Section Header with Icon -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -409,7 +665,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:text="📋"
+                                android:text="🏨"
                                 android:textSize="18sp" />
                         </FrameLayout>
 
@@ -417,7 +673,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:text="Status Details"
+                            android:text="Parking &amp; Accommodation"
                             android:textColor="#1C1E29"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -429,62 +685,603 @@
                         android:layout_marginTop="14dp"
                         android:background="#F0F1F5" />
 
-                    <!-- Applied Date -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Applied Date"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtAppliedDate"
+                    <LinearLayout
+                        android:id="@+id/rowParkingLocationDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="#1C1E29"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="15 Jan 2024" />
-
-                    <!-- Status -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
-                        android:text="Status"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/txtStatus"
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Parking Location"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtParkingLocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Cyber City" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Parking Date"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtParkingDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="12 Jan 2025" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowAccommodationTypeName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="@color/approved_color"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="Approved" />
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
 
-                    <!-- Status Details (RM / HR) -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:text="Approval Status"
-                        android:textColor="@color/badge_text"
-                        android:textSize="12sp" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/txtStatusDetails"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Accommodation Type"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtAccommodationType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Hotel" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Accommodation Name"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtAccommodationName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Taj Vivanta" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/boxCheckInOut"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textColor="#1C1E29"
-                        android:textSize="14.5sp"
-                        android:textStyle="bold"
-                        tools:text="Status RM: Approved | Status HR: Processed" />
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_note"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Check-In"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtCheckIn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="12 Jan 2025" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="➜"
+                            android:textColor="@color/badge_text"
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Check-Out"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtCheckOut"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="14 Jan 2025" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ================= 5. FUEL & TOLL DETAILS ================= -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardFuelToll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#ECEFF3"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_square"
+                            android:backgroundTint="#E6F4FF">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="⛽"
+                                android:textSize="18sp" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Fuel &amp; Toll Details"
+                            android:textColor="#1C1E29"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:background="#F0F1F5" />
+
+                    <LinearLayout
+                        android:id="@+id/rowFuelTypeStation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fuel Type"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtFuelType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Petrol" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fuel Station"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtFuelStation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="IOCL Station" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowFuelQuantityVehicle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fuel Quantity"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtFuelQuantity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="10 Litres" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Vehicle Number"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtVehicleNumber"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="HR26X1234" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowTollPlazaLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Toll Plaza Name"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtTollPlaza"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Kherki Daula" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Toll Location"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtTollLocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="NH-48" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ================= 6. EXPENSE & BILLING DETAILS ================= -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardExpenseBilling"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#ECEFF3"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_square"
+                            android:backgroundTint="#FFF1E6">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="💳"
+                                android:textSize="18sp" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Expense &amp; Billing Details"
+                            android:textColor="#1C1E29"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:background="#F0F1F5" />
+
+                    <LinearLayout
+                        android:id="@+id/rowExpenseTypeCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expense Type"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtExpenseType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Fuel" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expense Category"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtExpenseCategory"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Travel Expense" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowBillNumberPeriod"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Bill Number"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtBillNumber"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="BILL-9988" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Billing Period"
+                                android:textColor="@color/badge_text"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/txtBillingPeriod"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="#1C1E29"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold"
+                                tools:text="Monthly" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="State"
+                            android:textColor="@color/badge_text"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtClaimState"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="#1C1E29"
+                            android:textSize="14.5sp"
+                            android:textStyle="bold"
+                            tools:text="Delhi" />
+                    </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

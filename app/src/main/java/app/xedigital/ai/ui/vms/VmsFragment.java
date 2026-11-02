@@ -1,7 +1,5 @@
 package app.xedigital.ai.ui.vms;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -94,14 +92,14 @@ public class VmsFragment extends Fragment implements VisitorClickListener {
         });
 
         // Check In Visitors chip — opens external URL
-        binding.checkVisitorsChip.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Check Visitors", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://app.xedigital.ai/checkin/home")
-            );
-            startActivity(intent);
-        });
+//        binding.checkVisitorsChip.setOnClickListener(v -> {
+//            Toast.makeText(requireContext(), "Check Visitors", Toast.LENGTH_SHORT).show();
+//            Intent intent = new Intent(
+//                    Intent.ACTION_VIEW,
+//                    Uri.parse("https://app.xedigital.ai/checkin/home")
+//            );
+//            startActivity(intent);
+//        });
     }
 
     private void setupSwipeRefresh() {

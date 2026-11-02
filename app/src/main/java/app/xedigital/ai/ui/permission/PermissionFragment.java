@@ -31,8 +31,8 @@ public class PermissionFragment extends Fragment {
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 // After ANY system permission dialog, re-sync everything
-                permissionManager.syncAllPermissions();
-                mViewModel.refreshAll();
+                if (permissionManager != null) permissionManager.syncAllPermissions();
+                if (mViewModel != null && isAdded()) mViewModel.refreshAll();
             });
 
     @Override
@@ -41,7 +41,7 @@ public class PermissionFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_permission, container, false);
         recyclerView = view.findViewById(R.id.permissionRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         permissionManager = PermissionManager.getInstance(requireContext());
         return view;
     }
