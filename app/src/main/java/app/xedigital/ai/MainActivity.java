@@ -65,20 +65,11 @@ public class MainActivity extends SecureBaseActivity {
     private static final int REQUEST_CODE_PUNCH_ACTIVITY = 1;
     private static final String TAG = "MainActivity";
 
-    // Palette used for the initials-circle background color (deterministic per user).
     private static final int[] INITIALS_COLOR_PALETTE = new int[]{
-            Color.rgb(51, 206, 255),
-            Color.rgb(125, 206, 160),
-            Color.rgb(255, 165, 0),
-            Color.rgb(199, 0, 57),
-            Color.rgb(161, 16, 76),
-            Color.rgb(102, 0, 102),
-            Color.rgb(16, 89, 178),
-            Color.rgb(76, 175, 80),
-            Color.rgb(255, 87, 82),
-            Color.rgb(255, 183, 77),
-            Color.rgb(159, 168, 218),
-            Color.rgb(38, 166, 154)
+            Color.rgb(51, 206, 255), Color.rgb(125, 206, 160), Color.rgb(255, 165, 0),
+            Color.rgb(199, 0, 57), Color.rgb(161, 16, 76), Color.rgb(102, 0, 102),
+            Color.rgb(16, 89, 178), Color.rgb(76, 175, 80), Color.rgb(255, 87, 82),
+            Color.rgb(255, 183, 77), Color.rgb(159, 168, 218), Color.rgb(38, 166, 154)
     };
 
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
@@ -135,7 +126,7 @@ public class MainActivity extends SecureBaseActivity {
                 }
             });
         }
-        // ✅ Safety guard — if admin user somehow lands here
+
         String role = RoleAccessManager.getInstance(this).getRoleName();
         if (app.xedigital.ai.utills.RoleGroup.isAdminTier(role)) {
             Intent intent = new Intent(this, AdminMainActivity.class);
@@ -149,7 +140,16 @@ public class MainActivity extends SecureBaseActivity {
 
         DrawerLayout drawer = binding.drawerLayout;
         navigationView = binding.navView;
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_dashboard, R.id.nav_profile, R.id.nav_vms, R.id.nav_holidays, R.id.nav_policy, R.id.nav_settings, R.id.nav_payroll, R.id.nav_documents, R.id.nav_claim_management, R.id.nav_meeting_room, R.id.nav_shifts, R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment, R.id.nav_pendingApprovalFragment, R.id.nav_leaves, R.id.nav_leaves_data, R.id.nav_applied_leaves, R.id.nav_approve_leaves, R.id.navTeam_member, R.id.navManager_attendance_menu, R.id.nav_team_member_leave, R.id.nav_team_member_timesheet, R.id.nav_dcr, R.id.nav_dcr_form).setOpenableLayout(drawer).build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_dashboard, R.id.nav_profile, R.id.nav_vms, R.id.nav_holidays,
+                R.id.nav_policy, R.id.nav_settings, R.id.nav_payroll, R.id.nav_documents,
+                R.id.nav_claim_management, R.id.nav_meeting_room, R.id.nav_shifts,
+                R.id.nav_attendance, R.id.nav_addAttendanceFragment, R.id.nav_regularizeAppliedFragment,
+                R.id.nav_pendingApprovalFragment, R.id.nav_leaves, R.id.nav_leaves_data,
+                R.id.nav_applied_leaves, R.id.nav_approve_leaves, R.id.navTeam_member,
+                R.id.navManager_attendance_menu, R.id.nav_team_member_leave,
+                R.id.nav_team_member_timesheet, R.id.nav_dcr, R.id.nav_dcr_form
+        ).setOpenableLayout(drawer).build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -211,7 +211,6 @@ public class MainActivity extends SecureBaseActivity {
             syncSubmenuVisibilityForDestination(navController.getCurrentDestination().getId());
         }
 
-        // ✅ Handle Back Press using modern OnBackPressedDispatcher (Fixes WindowLeaked crash)
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -225,7 +224,6 @@ public class MainActivity extends SecureBaseActivity {
                     return;
                 }
 
-                // On Dashboard: Show Exit confirmation dialog
                 if (!isFinishing() && !isDestroyed()) {
                     CustomDialogHelper.showWarningDialog(MainActivity.this, "Exit App", "Are you sure you want to exit the app?", "Yes, Exit", "Cancel", new CustomDialogHelper.OnWarningActionListener() {
                         @Override
@@ -235,7 +233,7 @@ public class MainActivity extends SecureBaseActivity {
 
                         @Override
                         public void onCancel() {
-                            // Stay in app - do nothing
+                            // Stay in app
                         }
                     });
                 }
@@ -243,56 +241,6 @@ public class MainActivity extends SecureBaseActivity {
         });
 
         fetchUserProfileData();
-
-        // ── Security Device Binding and Lockout Verification ──
-//        Log.d(TAG, "🔌 [MainActivity] Initializing Device Binding Protection Gate...");
-//        deviceRegistrationViewModel = new ViewModelProvider(this).get(DeviceRegistrationViewModel.class);
-//
-//        deviceRegistrationViewModel.getIsLoading().observe(this, loading -> {
-//            Log.d(TAG, "🔌 [MainActivity] Validation checking in progress: " + loading);
-//        });
-//
-//        deviceRegistrationViewModel.getIsDeviceBlocked().observe(this, isBlocked -> {
-//            if (Boolean.TRUE.equals(isBlocked)) {
-//                String reasonMessage = deviceRegistrationViewModel.getBlockedReason().getValue();
-//
-//                Log.e(TAG, "🚨 [MainActivity] DEVICE LOCKOUT TRIGGERED: " + reasonMessage);
-//
-//                CustomDialogHelper.showWarningDialog(
-//                        this,
-//                        "Device Access Denied",
-//                        reasonMessage != null ? reasonMessage : "Access denied due to device binding policy.",
-//                        "Logout",
-//                        "Exit App",
-//                        new CustomDialogHelper.OnWarningActionListener() {
-//                            @Override
-//                            public void onConfirm() {
-//                                handleLogout();
-//                            }
-//
-//                            @Override
-//                            public void onCancel() {
-//                                finishAffinity();
-//                                System.exit(0);
-//                            }
-//                        }
-//                );
-//            }
-//        });
-//
-//        deviceRegistrationViewModel.getSuccessMessage().observe(this, message -> {
-//            if (message != null) {
-//                Log.i(TAG, "🔌 [MainActivity] Binding Gate cleared: " + message);
-//            }
-//        });
-//
-//        deviceRegistrationViewModel.getErrorMessage().observe(this, message -> {
-//            if (message != null) {
-//                Log.e(TAG, "🔌 [MainActivity] Binding Gate Connection Error: " + message);
-//            }
-//        });
-//
-//        deviceRegistrationViewModel.validateAndRegisterDevice();
     }
 
     private void navigateToDashboard() {
@@ -398,11 +346,9 @@ public class MainActivity extends SecureBaseActivity {
     }
 
     private void handleLogout() {
-        // Clear employee session
         SecurePrefManager.getInstance(MainActivity.this).clearSession();
         RoleAccessManager.getInstance(this).clear();
 
-        // Also clear admin creds for safety
         getSharedPreferences("AdminCred", MODE_PRIVATE).edit().clear().apply();
         if (APIClient.getSharedCookieJar() != null) {
             APIClient.getSharedCookieJar().clearAll();
@@ -412,6 +358,19 @@ public class MainActivity extends SecureBaseActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void refreshNavigationMenu() {
+        if (navigationView == null) return;
+        navigationView.post(() -> {
+            for (int i = 0; i < navigationView.getChildCount(); i++) {
+                View child = navigationView.getChildAt(i);
+                child.requestLayout();
+                child.invalidate();
+            }
+            navigationView.requestLayout();
+            navigationView.invalidate();
+        });
     }
 
     private void toggleAttendanceVisibility(Menu menu) {
@@ -425,6 +384,7 @@ public class MainActivity extends SecureBaseActivity {
         if (menu.findItem(R.id.nav_pendingApprovalFragment) != null)
             menu.findItem(R.id.nav_pendingApprovalFragment).setVisible(newVisibility);
         isAttendanceSubmenuVisible = newVisibility;
+        refreshNavigationMenu();
     }
 
     private void toggleLeavesVisibility(Menu menu) {
@@ -438,6 +398,7 @@ public class MainActivity extends SecureBaseActivity {
         if (menu.findItem(R.id.nav_approve_leaves) != null)
             menu.findItem(R.id.nav_approve_leaves).setVisible(newVisibility);
         isLeavesSubmenuVisible = newVisibility;
+        refreshNavigationMenu();
     }
 
     private void toggleTeamMemberVisibility(Menu menu) {
@@ -451,6 +412,7 @@ public class MainActivity extends SecureBaseActivity {
         if (menu.findItem(R.id.nav_team_member_timesheet) != null)
             menu.findItem(R.id.nav_team_member_timesheet).setVisible(newVisibility);
         isTeamSubVisible = newVisibility;
+        refreshNavigationMenu();
     }
 
     private void toggleDcrVisibility(Menu menu) {
@@ -460,6 +422,7 @@ public class MainActivity extends SecureBaseActivity {
         if (menu.findItem(R.id.nav_dcr_form) != null)
             menu.findItem(R.id.nav_dcr_form).setVisible(newVisibility);
         isDcrSubmenuVisible = newVisibility;
+        refreshNavigationMenu();
     }
 
     private void toggleOnboardingVisibility(Menu menu) {
@@ -469,6 +432,7 @@ public class MainActivity extends SecureBaseActivity {
         if (menu.findItem(R.id.nav_onboarding_details) != null)
             menu.findItem(R.id.nav_onboarding_details).setVisible(newVisibility);
         isOnboardingVisible = newVisibility;
+        refreshNavigationMenu();
     }
 
     @Override
@@ -567,19 +531,11 @@ public class MainActivity extends SecureBaseActivity {
                 if (profileName != null) profileName.setText(spannableString);
                 if (profileEmail != null) profileEmail.setText(email);
 
-                // ---- INITIALS-BASED PROFILE IMAGE ----
                 if (!MainActivity.this.isFinishing() && !MainActivity.this.isDestroyed() && profileImage != null) {
                     Drawable initialsDrawable = getInitialsDrawable(firstName, lastName);
 
-                    if (profileImageUrl != null
-                            && !profileImageUrl.trim().isEmpty()
-                            && !"null".equalsIgnoreCase(profileImageUrl.trim())) {
-                        Glide.with(MainActivity.this)
-                                .load(profileImageUrl)
-                                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                                .placeholder(initialsDrawable)
-                                .error(initialsDrawable)
-                                .into(profileImage);
+                    if (profileImageUrl != null && !profileImageUrl.trim().isEmpty() && !"null".equalsIgnoreCase(profileImageUrl.trim())) {
+                        Glide.with(MainActivity.this).load(profileImageUrl).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(initialsDrawable).error(initialsDrawable).into(profileImage);
                     } else {
                         profileImage.setImageDrawable(initialsDrawable);
                     }
@@ -653,8 +609,6 @@ public class MainActivity extends SecureBaseActivity {
         if (isFinishing() || isDestroyed()) return;
 
         dismissProfileLoadingDialog();
-
-        // Set guest fallback behind the dialog so UI is not blank
         handleProfileFetchFailure("Profile fetch failed", profileImage, profileName, profileEmail, clientLogo);
 
         profileFetchAttempt++;
@@ -726,15 +680,6 @@ public class MainActivity extends SecureBaseActivity {
         }
     }
 
-    // =========================================================================
-    //  INITIALS AVATAR HELPERS
-    // =========================================================================
-
-    /**
-     * Builds a self-scaling Drawable that renders a colored circle with the
-     * user's initials in white. Used as the fallback whenever a profile image
-     * is missing OR fails to load.
-     */
     private Drawable getInitialsDrawable(String firstName, String lastName) {
         final String initials = getInitials(firstName, lastName);
         final int bgColor = getInitialsColor(firstName, lastName);
@@ -764,7 +709,6 @@ public class MainActivity extends SecureBaseActivity {
 
                 canvas.drawCircle(cx, cy, radius, bgPaint);
 
-                // Scale text to roughly 40% of the circle diameter.
                 textPaint.setTextSize(radius * 0.8f);
                 textPaint.getTextBounds(initials, 0, initials.length(), textBounds);
                 float textY = cy - textBounds.exactCenterY();
@@ -792,10 +736,6 @@ public class MainActivity extends SecureBaseActivity {
         };
     }
 
-    /**
-     * Extracts up to 2 uppercase initials from the given first/last name.
-     * Falls back to "?" if nothing usable is available.
-     */
     private String getInitials(String firstName, String lastName) {
         String first = firstName != null ? firstName.trim() : "";
         String last = lastName != null ? lastName.trim() : "";
@@ -814,10 +754,6 @@ public class MainActivity extends SecureBaseActivity {
         return sb.toString();
     }
 
-    /**
-     * Deterministically picks a palette color for the given name so the
-     * same user always sees the same background color.
-     */
     private int getInitialsColor(String firstName, String lastName) {
         String key = ((firstName != null ? firstName : "") + "|" + (lastName != null ? lastName : "")).trim();
         if (key.isEmpty() || "|".equals(key)) {

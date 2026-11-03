@@ -134,11 +134,6 @@ public class LoginActivity extends SecureBaseActivity {
         }
 
         if (authToken != null) {
-            // Token exists — proceed directly.
-            // If the JWT is expired, the TokenAuthenticator will transparently
-            // refresh it on the first API call. If the refresh token is also
-            // dead, the Authenticator will broadcast ACTION_SESSION_EXPIRED
-            // and SecureBaseActivity will redirect to login.
             checkPermissionsAndNavigate(authToken);
         } else {
             showLoginScreen();
@@ -180,8 +175,10 @@ public class LoginActivity extends SecureBaseActivity {
                         String userId = loginResponse.getData().getUser().getId();
                         String token = loginResponse.getData().getToken();
                         String emailId = loginResponse.getData().getUser().getEmail();
+                        // ── CRITICAL FIX: Extract refreshToken from response ──
+                        String refreshToken = loginResponse.getData().getRefreshToken();
 
-                        storeInSecurePrefs(userId, emailId, token);
+                        storeInSecurePrefs(userId, emailId, token, refreshToken);
 
                         if (isManualLogin) {
                             fetchAndSaveUserData(userId, token);
@@ -257,11 +254,28 @@ public class LoginActivity extends SecureBaseActivity {
         });
     }
 
-    private void storeInSecurePrefs(String userId, String emailId, String authToken) {
+    /**
+     * CRITICAL FIX: Now also stores the refreshToken from the login response.
+     * Without this, TokenAuthenticator.performRefresh() has no token to send,
+     * causing the 401 refresh failure.
+     */
+    private void storeInSecurePrefs(String userId, String emailId, String authToken, String refreshToken) {
         SecurePrefManager prefManager = SecurePrefManager.getInstance(this);
         prefManager.putString("userId", userId);
         prefManager.putString("emailId", emailId);
         prefManager.putString("authToken", authToken);
+
+        // ── CRITICAL FIX: Store the refresh token ──
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            prefManager.putString("refreshToken", refreshToken);
+            Log.d(TAG, "Refresh token stored.");
+        } else {
+            Log.w(TAG, "WARNING: Server did not return a refreshToken in the login response!");
+        }
+
+        if (!prefManager.isEncrypted()) {
+            Log.w(TAG, "WARNING: Tokens stored in PLAINTEXT. Encryption is not active.");
+        }
     }
 
     private void clearSessionAndShowLogin() {

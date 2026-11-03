@@ -48,6 +48,8 @@ public class AdminLoginActivity extends SecureBaseActivity {
 
     private static final String TAG = "AdminLogin";
     private static final int MAX_VERIFY_RETRIES = 3;
+    // ── FIX #5: 7-day auto-expiry for remember-me credentials ──
+    private static final long SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000;
 
     private TextInputEditText emailEditText, passwordEditText;
     private MaterialButton loginButton;
@@ -84,14 +86,27 @@ public class AdminLoginActivity extends SecureBaseActivity {
         boolean isRemembered = pref.getBoolean("remember_me", false);
 
         if (isRemembered) {
-            String savedEmail = pref.getString("saved_email", "");
-            String savedPass = pref.getString("saved_password", "");
+            // ── FIX #5: Check if remember-me credentials have expired (>7 days) ──
+            long savedAt = pref.getString("remember_me_saved_at", null) != null
+                    ? Long.parseLong(pref.getString("remember_me_saved_at", "0"))
+                    : 0L;
 
-            if (!savedEmail.isEmpty() && !savedPass.isEmpty()) {
-                emailEditText.setText(savedEmail);
-                passwordEditText.setText(savedPass);
-                rememberMeCheckBox.setChecked(true);
-                performLogin();
+            if (savedAt > 0 && (System.currentTimeMillis() - savedAt) > SEVEN_DAYS_MS) {
+                Log.d(TAG, "Remember-me credentials expired (>7 days). Clearing.");
+                pref.remove("saved_email");
+                pref.remove("saved_password");
+                pref.remove("remember_me_saved_at");
+                pref.putBoolean("remember_me", false);
+            } else {
+                String savedEmail = pref.getString("saved_email", "");
+                String savedPass = pref.getString("saved_password", "");
+
+                if (!savedEmail.isEmpty() && !savedPass.isEmpty()) {
+                    emailEditText.setText(savedEmail);
+                    passwordEditText.setText(savedPass);
+                    rememberMeCheckBox.setChecked(true);
+                    performLogin();
+                }
             }
         }
 
@@ -148,6 +163,16 @@ public class AdminLoginActivity extends SecureBaseActivity {
                         String authToken = loginResponse.getData().getToken();
                         String empEmail = loginResponse.getData().getUser().getEmail();
                         String empFirstName = loginResponse.getData().getUser().getFirstname();
+
+                        // ── CRITICAL FIX: Store refreshToken immediately ──
+                        String refreshToken = loginResponse.getData().getRefreshToken();
+                        if (refreshToken != null && !refreshToken.isEmpty()) {
+                            SecurePrefManager.getInstance(AdminLoginActivity.this)
+                                    .putString("refreshToken", refreshToken);
+                            Log.d(TAG, "Admin refresh token stored.");
+                        } else {
+                            Log.w(TAG, "WARNING: No refreshToken in admin login response!");
+                        }
 
                         GetEmployee(authToken, userId, empEmail, empFirstName);
                     } else {
@@ -259,6 +284,10 @@ public class AdminLoginActivity extends SecureBaseActivity {
         });
     }
 
+    /**
+     * FIX #5: Remember-me now saves a timestamp for 7-day auto-expiry.
+     * Previously, saved passwords persisted indefinitely.
+     */
     private void handleRememberMe(String email, String password) {
         SecurePrefManager preferences = SecurePrefManager.getInstance(this);
 
@@ -266,9 +295,12 @@ public class AdminLoginActivity extends SecureBaseActivity {
             preferences.putString("saved_email", email);
             preferences.putString("saved_password", password);
             preferences.putBoolean("remember_me", true);
+            // ── FIX #5: Save timestamp for 7-day expiry ──
+            preferences.putString("remember_me_saved_at", String.valueOf(System.currentTimeMillis()));
         } else {
             preferences.remove("saved_email");
             preferences.remove("saved_password");
+            preferences.remove("remember_me_saved_at");
             preferences.putBoolean("remember_me", false);
         }
     }

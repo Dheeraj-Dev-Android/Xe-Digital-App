@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Data {
 
-    @SerializedName("appVersion")
-    private AppVersion appVersion;
+    @SerializedName("expiresIn")
+    private String expiresIn;
 
     @SerializedName("user")
     private User user;
@@ -13,8 +13,11 @@ public class Data {
     @SerializedName("token")
     private String token;
 
-    public AppVersion getAppVersion() {
-        return appVersion;
+    @SerializedName("refreshToken")
+    private String refreshToken;
+
+    public String getExpiresIn() {
+        return expiresIn;
     }
 
     public User getUser() {
@@ -23,5 +26,9 @@ public class Data {
 
     public String getToken() {
         return token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }

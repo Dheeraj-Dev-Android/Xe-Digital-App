@@ -113,7 +113,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone">
 
-    <include
+        <include
             android:id="@+id/slowInternetLayout"
             layout="@layout/slow_internet_connection"
             android:layout_width="match_parent"

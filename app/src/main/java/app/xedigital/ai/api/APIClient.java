@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.concurrent.TimeUnit;
 
+import app.xedigital.ai.utills.AuthInterceptor;
 import app.xedigital.ai.utills.PersistentCookieJar;
 import app.xedigital.ai.utills.TokenAuthenticator;
 import okhttp3.OkHttpClient;
@@ -32,7 +33,23 @@ public class APIClient {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(loggingInterceptor).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS);
+        // ── FIX #8: Global JWT interceptor ──
+        AuthInterceptor authInterceptor = null;
+        if (appContext != null) {
+            authInterceptor = new AuthInterceptor(appContext);
+        }
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS);
+
+        // ── FIX #8: Add AuthInterceptor BEFORE logging so logs show the final request ──
+        if (authInterceptor != null) {
+            builder.addInterceptor(authInterceptor);
+        }
+        builder.addInterceptor(loggingInterceptor);
 
         // Attach CookieJar + Authenticator if Context is available
         if (appContext != null) {

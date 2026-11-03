@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.Crossmanager;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.CrossmanagerDeserializer;
 import app.xedigital.ai.api.APIClient;
+import app.xedigital.ai.utills.AuthInterceptor;
 import app.xedigital.ai.utills.PersistentCookieJar;
 import app.xedigital.ai.utills.TokenAuthenticator;
 import okhttp3.OkHttpClient;
@@ -40,7 +41,29 @@ public class AdminAPIClient {
 
         Gson gson = new GsonBuilder().registerTypeAdapter(Crossmanager.class, new CrossmanagerDeserializer()).create();
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(loggingInterceptor).retryOnConnectionFailure(true).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS);
+        // ── FIX #8: Global JWT interceptor ──
+        AuthInterceptor authInterceptor = null;
+        if (appContext != null) {
+            authInterceptor = new AuthInterceptor(appContext);
+        }
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS);
+
+        // ── FIX #8: Add AuthInterceptor BEFORE logging ──
+        if (authInterceptor != null) {
+            builder.addInterceptor(authInterceptor);
+        }
+        builder.addInterceptor(loggingInterceptor);
+
+        // ── FIX #3: Ensure APIClient is initialized FIRST so shared instances exist ──
+        if (appContext != null) {
+            APIClient.init(appContext);
+            APIClient.getInstance();
+        }
 
         // Reuse the same CookieJar + Authenticator from APIClient
         PersistentCookieJar cookieJar = APIClient.getSharedCookieJar();

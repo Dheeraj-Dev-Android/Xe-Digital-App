@@ -121,3 +121,42 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+# ── FIX #7: Keep PersistentCookieJar's SerializableCookie and all utills classes ──
+# Without these rules, ProGuard/R8 strips SerializableCookie in release builds
+# and cookie persistence breaks silently.
+-keep class app.xedigital.ai.utills.** { *; }
+-keepclassmembers class app.xedigital.ai.utills.** { *; }
+
+# Keep OkHttp cookie classes
+-keep class okhttp3.Cookie { *; }
+-keepclassmembers class okhttp3.Cookie { *; }
+
+# Keep Retrofit interfaces (all API methods)
+-keep,allowobfuscation,allowshrinking interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# Keep Gson model classes
+-keep class app.xedigital.ai.model.** { *; }
+-keepclassmembers class app.xedigital.ai.model.** { *; }
+-keep class app.xedigital.ai.admin.adminModal.** { *; }
+-keepclassmembers class app.xedigital.ai.admin.adminModal.** { *; }
+
+# OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
+# Retrofit
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+# Gson
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.** { *; }
+
+# AndroidX Security (EncryptedSharedPreferences)
+-keep class androidx.security.crypto.** { *; }

@@ -3,23 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item
-        android:id="@+id/nav_dashboard"
-        android:icon="@drawable/ic_dashboard"
-        android:title="@string/menu_dashboard" />
-
-    <item
-        android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_person"
-        android:title="@string/menu_profile" />
     <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard"
+            android:title="@string/menu_dashboard" />
+
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_person"
+            android:title="@string/menu_profile" />
+
         <item
             android:id="@+id/nav_attendance_menu"
             android:icon="@drawable/ic_collections_bookmark"
             android:title="@string/menu_attendance" />
-    </group>
 
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_attendance"
             android:title="@string/view_attendance"
@@ -37,15 +37,11 @@
             android:title="@string/regularize_pending_approval"
             android:visible="false" />
 
-    </group>
-
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_team_member"
             android:icon="@drawable/ic_visitor"
             android:title="@string/team_member" />
-    </group>
-    <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/navTeam_member"
             android:title="@string/team_member_details"
@@ -62,15 +58,12 @@
             android:id="@+id/nav_team_member_timesheet"
             android:title="@string/team_dcr"
             android:visible="false" />
-    </group>
 
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_onboarding_menu"
             android:icon="@drawable/onboarding"
             android:title="@string/onboarding" />
-    </group>
-    <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/nav_onboarding"
             android:title="@string/onboarding_form"
@@ -79,16 +72,12 @@
             android:id="@+id/nav_onboarding_details"
             android:title="@string/onboarding_detail"
             android:visible="false" />
-    </group>
 
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_leaves_menu"
             android:icon="@drawable/ic_calendar_today"
             android:title="@string/menu_leaves" />
-    </group>
 
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_leaves"
             android:title="@string/add_leaves"
@@ -105,17 +94,12 @@
             android:id="@+id/nav_approve_leaves"
             android:title="@string/approve_leaves"
             android:visible="false" />
-    </group>
 
-    <!--DCR Group-->
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dcr_menu"
             android:icon="@drawable/ic_dcr"
             android:title="@string/menu_dcr" />
-    </group>
 
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dcr"
             android:title="@string/view_dcr"
@@ -124,50 +108,52 @@
             android:id="@+id/nav_dcr_form"
             android:title="@string/fill_dcr"
             android:visible="false" />
+
+        <item
+            android:id="@+id/nav_meeting_room"
+            android:icon="@drawable/ic_calendar"
+            android:title="@string/menu_meeting_room" />
+
+        <item
+            android:id="@+id/nav_claim_management"
+            android:icon="@drawable/ic_payments"
+            android:title="@string/menu_claim_management" />
+
+        <item
+            android:id="@+id/nav_vms"
+            android:icon="@drawable/ic_visitor"
+            android:title="@string/vms" />
+
+        <item
+            android:id="@+id/nav_shifts"
+            android:icon="@drawable/ic_shift"
+            android:title="@string/menu_shifts" />
+
+        <item
+            android:id="@+id/nav_holidays"
+            android:icon="@drawable/ic_holiday"
+            android:title="@string/menu_holidays" />
+
+        <item
+            android:id="@+id/nav_policy"
+            android:icon="@drawable/ic_policy"
+            android:title="@string/menu_policy" />
+
+        <item
+            android:id="@+id/nav_documents"
+            android:icon="@drawable/ic_document"
+            android:title="@string/menu_documents_upload"
+            android:visible="false" />
+
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_settings" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/logout" />
+
     </group>
-
-    <item
-        android:id="@id/nav_meeting_room"
-        android:icon="@drawable/ic_calendar"
-        android:title="@string/menu_meeting_room" />
-    <item
-        android:id="@+id/nav_claim_management"
-        android:icon="@drawable/ic_payments"
-        android:title="@string/menu_claim_management" />
-    <item
-        android:id="@+id/nav_vms"
-        android:icon="@drawable/ic_visitor"
-        android:title="@string/vms" />
-    <item
-        android:id="@+id/nav_shifts"
-        android:icon="@drawable/ic_shift"
-        android:title="@string/menu_shifts" />
-
-    <item
-        android:id="@+id/nav_holidays"
-        android:icon="@drawable/ic_holiday"
-        android:title="@string/menu_holidays" />
-
-    <item
-        android:id="@+id/nav_policy"
-        android:icon="@drawable/ic_policy"
-        android:title="@string/menu_policy" />
-
-
-    <item
-        android:id="@+id/nav_documents"
-        android:icon="@drawable/ic_document"
-        android:title="@string/menu_documents_upload"
-        android:visible="false" />
-
-    <item
-        android:id="@+id/nav_settings"
-        android:icon="@drawable/ic_settings"
-        android:title="@string/menu_settings" />
-
-    <item
-        android:id="@+id/nav_logout"
-        android:icon="@drawable/ic_logout"
-        android:title="@string/logout" />
-
 </menu>

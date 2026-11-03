@@ -2,6 +2,7 @@ package app.xedigital.ai.utills;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
@@ -10,19 +11,35 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public class SecurePrefManager {
+    private static final String TAG = "SecurePrefManager";
     private static final String PREF_FILE_NAME = "secure_prefs";
     private static SecurePrefManager instance;
+    // ── FIX #4: Track whether encryption is actually active ──
+    private final boolean isEncrypted;
     private SharedPreferences sharedPreferences;
 
     private SecurePrefManager(Context context) {
+        boolean encrypted = false;
         try {
             String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
 
-            sharedPreferences = EncryptedSharedPreferences.create(PREF_FILE_NAME, masterKeyAlias, context.getApplicationContext(), EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV, EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+            sharedPreferences = EncryptedSharedPreferences.create(
+                    PREF_FILE_NAME,
+                    masterKeyAlias,
+                    context.getApplicationContext(),
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+            encrypted = true;
+            Log.d(TAG, "EncryptedSharedPreferences initialized successfully.");
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            // ── FIX #4: Explicit error log instead of silent fallback ──
+            Log.e(TAG, "CRITICAL: EncryptedSharedPreferences failed! " +
+                    "Falling back to PLAINTEXT SharedPreferences. " +
+                    "Tokens are NOT secure on this device!", e);
             sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
         }
+        this.isEncrypted = encrypted;
     }
 
     public static synchronized SecurePrefManager getInstance(Context context) {
@@ -30,6 +47,11 @@ public class SecurePrefManager {
             instance = new SecurePrefManager(context);
         }
         return instance;
+    }
+
+    // ── FIX #4: Expose encryption status ──
+    public boolean isEncrypted() {
+        return isEncrypted;
     }
 
     public void putString(String key, String value) {

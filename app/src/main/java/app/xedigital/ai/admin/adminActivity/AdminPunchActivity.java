@@ -946,8 +946,6 @@ public class AdminPunchActivity extends AppCompatActivity {
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     private File getOutputDirectory() {
         File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "AdminPunch");
         if (!dir.exists() && !dir.mkdirs()) {
@@ -955,6 +953,8 @@ public class AdminPunchActivity extends AppCompatActivity {
         }
         return dir;
     }
+
+    private final Runnable captureRunnable = this::captureImage;
 
     interface AddressCallback {
         void onAddressReceived(String address, Location location);

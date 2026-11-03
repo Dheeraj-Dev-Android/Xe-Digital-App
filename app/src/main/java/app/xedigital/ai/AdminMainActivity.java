@@ -52,20 +52,65 @@ public class AdminMainActivity extends SecureBaseActivity {
     private static final String TAG = "AdminMainActivity";
 
     private final NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
-    // Tracks which group menus are currently expanded
+
     private final Map<Integer, Boolean> expandedGroups = new HashMap<>();
-    // Maps each parent menu header ID to its child sub-item IDs
-//    R.id.nav_employee_onboard,
+
     private final Map<Integer, int[]> groupChildMap = new HashMap<Integer, int[]>() {{
-        put(R.id.nav_digital_identity_menu, new int[]{R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers});
-        put(R.id.nav_workforce_menu, new int[]{R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf});
-        put(R.id.nav_talent_menu, new int[]{R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter});
-        put(R.id.nav_bgv_menu, new int[]{R.id.nav_candidates_verification, R.id.nav_employment_verification});
-        put(R.id.nav_payroll_menu, new int[]{R.id.nav_payroll_employees, R.id.nav_salary_component, R.id.nav_upload_payroll, R.id.nav_generate_payroll, R.id.nav_payroll_config});
-        put(R.id.nav_meeting_menu, new int[]{R.id.nav_meeting_rooms, R.id.nav_book_meeting});
-        put(R.id.nav_claim_menu, new int[]{R.id.nav_claim_managements, R.id.nav_travel_expenses, R.id.nav_food_expenses, R.id.nav_accommodation_expenses, R.id.nav_miscellaneous_expenses});
-        put(R.id.nav_config_menu, new int[]{R.id.nav_visitor_categories, R.id.nav_leave_config, R.id.nav_notification});
+        put(R.id.nav_digital_identity_menu, new int[]{
+                R.id.nav_visitorDetailsFragment,
+                R.id.nav_employees,
+                R.id.nav_partners,
+                R.id.nav_allUsers
+        });
+        put(R.id.nav_workforce_menu, new int[]{
+                R.id.nav_wf_attendance,
+                R.id.nav_employee_leaves,
+                R.id.nav_timesheet,
+                R.id.nav_shifts,
+                R.id.nav_departments,
+                R.id.nav_business_unit,
+                R.id.nav_holidays,
+                R.id.nav_leave_types,
+                R.id.nav_policy,
+                R.id.nav_claim_management_wf
+        });
+        put(R.id.nav_talent_menu, new int[]{
+                R.id.nav_job_posting,
+                R.id.nav_sourcing,
+                R.id.nav_assessment,
+                R.id.nav_interviews,
+                R.id.nav_feedback_review,
+                R.id.nav_offer_letter
+        });
+        put(R.id.nav_bgv_menu, new int[]{
+                R.id.nav_candidates_verification,
+                R.id.nav_employment_verification
+        });
+        put(R.id.nav_payroll_menu, new int[]{
+                R.id.nav_payroll_employees,
+                R.id.nav_salary_component,
+                R.id.nav_upload_payroll,
+                R.id.nav_generate_payroll,
+                R.id.nav_payroll_config
+        });
+        put(R.id.nav_meeting_menu, new int[]{
+                R.id.nav_meeting_rooms,
+                R.id.nav_book_meeting
+        });
+        put(R.id.nav_claim_menu, new int[]{
+                R.id.nav_claim_managements,
+                R.id.nav_travel_expenses,
+                R.id.nav_food_expenses,
+                R.id.nav_accommodation_expenses,
+                R.id.nav_miscellaneous_expenses
+        });
+        put(R.id.nav_config_menu, new int[]{
+                R.id.nav_visitor_categories,
+                R.id.nav_leave_config,
+                R.id.nav_notification
+        });
     }};
+
     private ActivityAdminMainBinding binding;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
@@ -98,17 +143,57 @@ public class AdminMainActivity extends SecureBaseActivity {
 
         navController = Navigation.findNavController(this, R.id.admin_nav_host_fragment_content_main);
 
-        // ── FIX: All drawer destinations are now top-level ──────────────
-        // This ensures the hamburger icon stays visible on ALL screens
-        // opened from the drawer, instead of showing a back arrow.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_admin_dashboard, R.id.nav_visitorDetailsFragment, R.id.nav_employees, R.id.nav_partners, R.id.nav_allUsers, R.id.nav_wf_attendance, R.id.nav_employee_leaves, R.id.nav_timesheet, R.id.nav_shifts, R.id.nav_departments, R.id.nav_business_unit, R.id.nav_holidays, R.id.nav_leave_types, R.id.nav_policy, R.id.nav_claim_management_wf, R.id.nav_job_posting, R.id.nav_sourcing, R.id.nav_assessment, R.id.nav_interviews, R.id.nav_feedback_review, R.id.nav_offer_letter, R.id.nav_candidates_verification, R.id.nav_employment_verification, R.id.nav_payroll_employees, R.id.nav_salary_component, R.id.nav_upload_payroll, R.id.nav_generate_payroll, R.id.nav_payroll_config, R.id.nav_meeting_rooms, R.id.nav_book_meeting, R.id.nav_claim_managements, R.id.nav_travel_expenses, R.id.nav_food_expenses, R.id.nav_accommodation_expenses, R.id.nav_miscellaneous_expenses, R.id.nav_productivity, R.id.nav_access_management, R.id.nav_new_features, R.id.nav_visitor_categories, R.id.nav_leave_config, R.id.nav_notification, R.id.nav_visitorCheckInFragment).setOpenableLayout(drawer).build();
-//        R.id.nav_employee_onboard,
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_admin_dashboard,
+                R.id.nav_visitorDetailsFragment,
+                R.id.nav_employees,
+                R.id.nav_partners,
+                R.id.nav_allUsers,
+                R.id.nav_wf_attendance,
+                R.id.nav_employee_leaves,
+                R.id.nav_timesheet,
+                R.id.nav_shifts,
+                R.id.nav_departments,
+                R.id.nav_business_unit,
+                R.id.nav_holidays,
+                R.id.nav_leave_types,
+                R.id.nav_policy,
+                R.id.nav_claim_management_wf,
+                R.id.nav_job_posting,
+                R.id.nav_sourcing,
+                R.id.nav_assessment,
+                R.id.nav_interviews,
+                R.id.nav_feedback_review,
+                R.id.nav_offer_letter,
+                R.id.nav_candidates_verification,
+                R.id.nav_employment_verification,
+                R.id.nav_payroll_employees,
+                R.id.nav_salary_component,
+                R.id.nav_upload_payroll,
+                R.id.nav_generate_payroll,
+                R.id.nav_payroll_config,
+                R.id.nav_meeting_rooms,
+                R.id.nav_book_meeting,
+                R.id.nav_claim_managements,
+                R.id.nav_travel_expenses,
+                R.id.nav_food_expenses,
+                R.id.nav_accommodation_expenses,
+                R.id.nav_miscellaneous_expenses,
+                R.id.nav_productivity,
+                R.id.nav_access_management,
+                R.id.nav_new_features,
+                R.id.nav_visitor_categories,
+                R.id.nav_leave_config,
+                R.id.nav_notification,
+                R.id.nav_visitorCheckInFragment
+        ).setOpenableLayout(drawer).build();
+
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
 
-        // Custom drawer listener for expandable groups
         setupNavigationDrawer(navigationView, drawer);
 
-        slowInternetBinding.btnDismiss.setOnClickListener(v -> slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
+        slowInternetBinding.btnDismiss.setOnClickListener(v ->
+                slowInternetBinding.slowInternetContainer.setVisibility(View.GONE));
 
         if (navigationView != null) {
             fetchUserProfileData();
@@ -117,37 +202,28 @@ public class AdminMainActivity extends SecureBaseActivity {
         }
 
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-// Sync submenu state for the initial destination (handles activity recreation)
+
         if (navController.getCurrentDestination() != null) {
             syncSubmenuVisibilityForDestination(navController.getCurrentDestination().getId());
         }
         setupBackPressedHandling(drawer);
     }
 
-    /**
-     * Sets up the NavigationView with a custom listener that handles:
-     * 1. Group parent items → toggle sub-menu visibility
-     * 2. Leaf navigation items → navigate via NavController
-     * 3. Logout → clear session and redirect
-     */
     private void setupNavigationDrawer(NavigationView navigationView, DrawerLayout drawer) {
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            // ── LOGOUT ──────────────────────────────────────────
             if (itemId == R.id.nav_logout) {
                 drawer.closeDrawer(GravityCompat.START);
                 handleLogout();
                 return true;
             }
 
-            // ── GROUP PARENT TOGGLE ─────────────────────────────
             if (groupChildMap.containsKey(itemId)) {
                 toggleSubMenu(navigationView, itemId);
                 return true;
             }
 
-            // ── STANDALONE / LEAF NAVIGATION ITEMS ──────────────
             boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
             if (handled) {
                 drawer.closeDrawer(GravityCompat.START);
@@ -159,14 +235,9 @@ public class AdminMainActivity extends SecureBaseActivity {
         });
     }
 
-    /**
-     * Toggles the visibility of all child items under a group parent.
-     * Accordion behavior: opening one group auto-collapses others.
-     */
     private void toggleSubMenu(NavigationView navigationView, int parentId) {
         boolean isCurrentlyExpanded = Boolean.TRUE.equals(expandedGroups.get(parentId));
 
-        // Collapse all other groups first
         for (Map.Entry<Integer, int[]> entry : groupChildMap.entrySet()) {
             if (entry.getKey() != parentId) {
                 setChildrenVisibility(navigationView, entry.getValue(), false);
@@ -174,10 +245,23 @@ public class AdminMainActivity extends SecureBaseActivity {
             }
         }
 
-        // Toggle the clicked group
         boolean newState = !isCurrentlyExpanded;
         setChildrenVisibility(navigationView, groupChildMap.get(parentId), newState);
         expandedGroups.put(parentId, newState);
+    }
+
+    private void refreshNavigationMenu() {
+        NavigationView navigationView = binding.adminNavView;
+        if (navigationView == null) return;
+        navigationView.post(() -> {
+            for (int i = 0; i < navigationView.getChildCount(); i++) {
+                View child = navigationView.getChildAt(i);
+                child.requestLayout();
+                child.invalidate();
+            }
+            navigationView.requestLayout();
+            navigationView.invalidate();
+        });
     }
 
     private void setChildrenVisibility(NavigationView navigationView, int[] childIds, boolean visible) {
@@ -188,9 +272,9 @@ public class AdminMainActivity extends SecureBaseActivity {
                 childItem.setVisible(visible);
             }
         }
+        refreshNavigationMenu();
     }
 
-    // ── Back Pressed Logic ──────────────────────────────────────────
     private void setupBackPressedHandling(DrawerLayout drawer) {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -222,8 +306,6 @@ public class AdminMainActivity extends SecureBaseActivity {
             }
         }
     }
-
-    // ── Internet UI Handlers ─────────────────────────────────────────
 
     public void showNoInternetLayout() {
         noInternetBinding.getRoot().setVisibility(View.VISIBLE);
@@ -262,12 +344,18 @@ public class AdminMainActivity extends SecureBaseActivity {
         profileFetchAttempt++;
 
         if (profileFetchAttempt == 1) {
-            CustomDialogHelper.showErrorDialog(this, "Heads Up", "We couldn't load your profile details right now. Please try again.", "Retry", () -> {
-                profileLoadingDialog = CustomDialogHelper.showLoadingDialog(this, "Loading your profile...");
-                fetchUserProfileData();
-            });
+            CustomDialogHelper.showErrorDialog(this, "Heads Up",
+                    "We couldn't load your profile details right now. Please try again.",
+                    "Retry",
+                    () -> {
+                        profileLoadingDialog = CustomDialogHelper.showLoadingDialog(this, "Loading your profile...");
+                        fetchUserProfileData();
+                    });
         } else {
-            CustomDialogHelper.showErrorDialog(this, "Unable to Load Profile", "We're still unable to load your details. Please log in again to continue.", "Go to Login", () -> handleLogout());
+            CustomDialogHelper.showErrorDialog(this, "Unable to Load Profile",
+                    "We're still unable to load your details. Please log in again to continue.",
+                    "Go to Login",
+                    () -> handleLogout());
         }
     }
 
@@ -294,8 +382,12 @@ public class AdminMainActivity extends SecureBaseActivity {
 
         call.enqueue(new Callback<UserDetailsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<UserDetailsResponse> call, @NonNull Response<UserDetailsResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && response.body().getData().getUser() != null) {
+            public void onResponse(@NonNull Call<UserDetailsResponse> call,
+                                   @NonNull Response<UserDetailsResponse> response) {
+                if (response.isSuccessful()
+                        && response.body() != null
+                        && response.body().getData() != null
+                        && response.body().getData().getUser() != null) {
                     UserDetailsResponse userDetails = response.body();
                     userViewModel.setUserDetails(userDetails);
                     bindUserToDrawer(userDetails);
@@ -331,9 +423,11 @@ public class AdminMainActivity extends SecureBaseActivity {
         subtitleText.setText(userDetails.getData().getUser().getEmail());
         preferences.putString("company_logo", userDetails.getData().getCompany().getLogo());
 
-
         if (userDetails.getData() != null) {
-            Glide.with(this).load(userDetails.getData().getCompany().getLogo()).placeholder(R.drawable.ic_profile_placeholder).into(profileImage);
+            Glide.with(this)
+                    .load(userDetails.getData().getCompany().getLogo())
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .into(profileImage);
         }
     }
 
