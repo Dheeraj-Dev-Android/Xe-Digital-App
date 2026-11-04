@@ -257,8 +257,8 @@ public class DashboardFragment extends Fragment {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_dcr_form);
         });
 
-        binding.quickActionsCard.findViewById(R.id.btnQuickProfile).setOnClickListener(v -> {
-            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_profile);
+        binding.quickActionsCard.findViewById(R.id.btnQuickClaim).setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_claim_management);
         });
         return root;
     }

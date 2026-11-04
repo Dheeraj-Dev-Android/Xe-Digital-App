@@ -45,20 +45,66 @@ import retrofit2.http.Path;
 
 public interface AdminAPIInterface {
 
+    /* ========================================================================
+     * 1. AUTHENTICATION & SYSTEM
+     * ======================================================================== */
 
     @FormUrlEncoded
     @POST("authentication/login")
 //    Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password);
     Call<LoginModelResponse> loginApi1(@Field("email") String email, @Field("password") String password, @Field("isEmployee") boolean isEmployee, @Field("versionCode") int versionCode, @Field("versionName") String versionName, @Field("platform") String platform);
 
-    //GET APIs
+    @POST("otp/tinyurl")
+    Call<ResponseBody> getTinyUrl(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
-    @GET("leaves/dashboard/graph/approved/employees")
-    Call<LeaveGraphResponse> getLeavesGraph(@Header("Authorization") String authToken);
+    /* ========================================================================
+     * 2. DASHBOARD & ANALYTICS
+     * ======================================================================== */
+
+    @GET("dashboard")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    Call<AdminDashboardResponse> getDashboard(@Header("Authorization") String authToken);
 
     //    https://app.xedigital.ai/api/v2/dashboard/graph/signin
     @GET("dashboard/graph/signin")
     Call<SignInGraphResponse> getSignInGraphData(@Header("Authorization") String token);
+
+    @GET("leaves/dashboard/graph/approved/employees")
+    Call<LeaveGraphResponse> getLeavesGraph(@Header("Authorization") String authToken);
+
+    /* ========================================================================
+     * 3. USER & ROLE MANAGEMENT
+     * ======================================================================== */
+
+    @GET("users")
+    Call<AdminUserResponse> getAllUsers(@Header("Authorization") String authToken);
+
+    @GET("users/profile/{userId}")
+    Call<UserDetailsResponse> getUser(@Header("Authorization") String authToken, @Path("userId") String userId);
+
+    @PUT("users/profile/{userId}")
+    Call<ResponseBody> updateUser(@Header("Authorization") String authToken, @Path("userId") String userId, @Body RequestBody requestBody);
+
+    @GET("roles")
+    Call<UserRoleResponse> getRoles(@Header("Authorization") String authToken);
+
+    /* ========================================================================
+     * 4. EMPLOYEE MANAGEMENT
+     * ======================================================================== */
+
+    @GET("employees")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
+
+    @PUT("employees/profile/{employeeId}")
+    Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
+
+    @PUT("employees/profile/image/{employeeId}")
+    Call<ResponseBody> addEmployeeProfileImage(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body EmployeeProfileImageRequest requestBody);
+
+    /* ========================================================================
+     * 5. PARTNER MANAGEMENT
+     * ======================================================================== */
 
     @GET("partners")
     Call<PartnersResponse> getPartners(@Header("Authorization") String authToken);
@@ -66,54 +112,38 @@ public interface AdminAPIInterface {
     @GET("partners/profile/{partnerId}")
     Call<UserDetailsResponse> getPartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId);
 
-    //    https://app.xedigital.ai/api/v1/bus/getAll
-    @GET("bus/getAll")
-    Call<AllBuResponse> getBus(@Header("Authorization") String authToken);
-
-    @GET("users")
-    Call<AdminUserResponse> getAllUsers(@Header("Authorization") String authToken);
+    @POST("partners")
+    Call<ResponseBody> addPartner(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
     @PUT("partners/profile/{partnerId}")
     Call<ResponseBody> updatePartner(@Header("Authorization") String authToken, @Path("partnerId") String partnerId, @Body RequestBody requestBody);
 
-    @GET("roles")
-    Call<UserRoleResponse> getRoles(@Header("Authorization") String authToken);
+    /* ========================================================================
+     * 6. COMPANY, BRANCHES, DEPARTMENTS & BUSINESS UNITS
+     * ======================================================================== */
 
-    @GET("employees")
-    @Headers({"Content-Type: application/json", "Accept: application/json"})
-    Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
-
-    @GET("dashboard")
-    @Headers({"Content-Type: application/json", "Accept: application/json"})
-    Call<AdminDashboardResponse> getDashboard(@Header("Authorization") String authToken);
+    //    https://app.xedigital.ai/api/v1/bus/getAll
+    @GET("bus/getAll")
+    Call<AllBuResponse> getBus(@Header("Authorization") String authToken);
 
     @GET("departments")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     Call<DepartmentResponse> getDepartments(@Header("Authorization") String authToken);
 
+    @GET("branches/{companyId}/company")
+    Call<CompanyBranchResponse> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
+
+    /* ========================================================================
+     * 7. SHIFTS MANAGEMENT
+     * ======================================================================== */
+
     @GET("shifts?active=true")
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     Call<ActiveShiftResponse> getShifts(@Header("Authorization") String authToken);
 
-    @GET("users/profile/{userId}")
-    Call<UserDetailsResponse> getUser(@Header("Authorization") String authToken, @Path("userId") String userId);
-
-    @GET("visitorcategories")
-    @Headers({"Content-Type: application/json", "Accept: application/json"})
-    Call<ResponseBody> getVisitorCategories(@Header("Authorization") String authToken);
-
-    @GET("visitors/checkedin/{visitorContact}")
-    Call<VisitorContactResponse> getCheckedIn(@Header("Authorization") String authToken, @Path("visitorContact") String visitorContact);
-
-    @GET("visitors/checkedout/{contact}")
-    Call<VisitorContactResponse> getCheckedOut(@Header("Authorization") String authToken, @Path("contact") String contact);
-
-    @GET("branches/{companyId}/company")
-    Call<CompanyBranchResponse> getBranches(@Header("Authorization") String authToken, @Path("companyId") String companyId);
-
-    //    ?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=
-    @GET("visitors")
-    Call<VisitorsAdminDetailsResponse> getVisitors(@Header("Authorization") String authToken);
+    /* ========================================================================
+     * 8. LEAVES MANAGEMENT
+     * ======================================================================== */
 
     @GET("leavetypes?active=true")
     Call<LeaveTypeResponse> getLeaveTypes(@Header("Authorization") String authToken);
@@ -128,57 +158,29 @@ public interface AdminAPIInterface {
     @GET("leaves/applied/{employeeId}")
     Call<EmployeeAppliedLeaveResponse> getLeavesApplied(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 
-    //    https://app.xedigital.ai/api/v1/employees/dcrData
-//    https://app.xedigital.ai/api/v1/employees/dcrList/685ce653877f7453b52fbc5c
-    @GET("employees/dcrList/{employeeId}")
-    Call<EmployeeTimesheetResponse> getTimesheetData(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
-
-    //    POST APIs
-    @POST("face/recognize")
-    Call<ResponseBody> recognizeFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("partners")
-    Call<ResponseBody> addPartner(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("employees/face")
-    Call<ResponseBody> FaceDetails(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("visitors/face")
-    Call<VisitorFaceResponse> FaceDetailsVisitor(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("images/add/bucket")
-    Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body AddBucketRequest addBucketRequest);
-
-    @POST("otp/tinyurl")
-    Call<ResponseBody> getTinyUrl(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("https://app.xedigital.ai/api/v1/visitors/signout")
-    Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("face/add")
-    Call<AddFaceResponse> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("employees/face/add")
-    Call<EmployeeFaceAddResponse> addEmployeeFace(@Header("Authorization") String authToken, @Body EmpolyeeFaceAddRequest requestBody);
-
-    @PUT("employees/profile/image/{employeeId}")
-    Call<ResponseBody> addEmployeeProfileImage(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body EmployeeProfileImageRequest requestBody);
-
-    @POST("images/add/bucket")
-    Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body RequestBody requestBody);
-
-    @POST("visitors/manual")
-    Call<ResponseBody> ManualVisitor(@Header("Authorization") String authToken, @Body VisitorManualRequest visitorManualRequest);
-
     @POST("leaves/assign/employee")
     Call<ResponseBody> assignLeave(@Header("Authorization") String authToken, @Body AssignLeaveRequest requestBody);
 
-    //    PUT APIs
-    @PUT("users/profile/{userId}")
-    Call<ResponseBody> updateUser(@Header("Authorization") String authToken, @Path("userId") String userId, @Body RequestBody requestBody);
+    /* ========================================================================
+     * 9. VISITOR MANAGEMENT SYSTEM (VMS)
+     * ======================================================================== */
 
-    @PUT("employees/profile/{employeeId}")
-    Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
+    @GET("visitorcategories")
+    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    Call<ResponseBody> getVisitorCategories(@Header("Authorization") String authToken);
+
+    //    ?start=&end=&type=&department=&employee=&page=&limit=&branch=&prefix=
+    @GET("visitors")
+    Call<VisitorsAdminDetailsResponse> getVisitors(@Header("Authorization") String authToken);
+
+    @GET("visitors/checkedin/{visitorContact}")
+    Call<VisitorContactResponse> getCheckedIn(@Header("Authorization") String authToken, @Path("visitorContact") String visitorContact);
+
+    @GET("visitors/checkedout/{contact}")
+    Call<VisitorContactResponse> getCheckedOut(@Header("Authorization") String authToken, @Path("contact") String contact);
+
+    @POST("visitors/manual")
+    Call<ResponseBody> ManualVisitor(@Header("Authorization") String authToken, @Body VisitorManualRequest visitorManualRequest);
 
     //Check IN
     @PUT("visitors/signoutmanual/{visitorId}")
@@ -186,5 +188,46 @@ public interface AdminAPIInterface {
 
     @PUT("visitors/signout/{VisitorId}")
     Call<ResponseBody> checkOut(@Header("Authorization") String authToken, @Path("VisitorId") String VisitorId, @Body VisitorsItem visitorData);
+
+    @POST("https://app.xedigital.ai/api/v1/visitors/signout")
+    Call<ResponseBody> signOut(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("visitors/face")
+    Call<VisitorFaceResponse> FaceDetailsVisitor(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    /* ========================================================================
+     * 10. FACE RECOGNITION & BIOMETRICS
+     * ======================================================================== */
+
+    @POST("face/recognize")
+    Call<ResponseBody> recognizeFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("face/add")
+    Call<AddFaceResponse> addFace(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    @POST("employees/face/add")
+    Call<EmployeeFaceAddResponse> addEmployeeFace(@Header("Authorization") String authToken, @Body EmpolyeeFaceAddRequest requestBody);
+
+    @POST("employees/face")
+    Call<ResponseBody> FaceDetails(@Header("Authorization") String authToken, @Body RequestBody requestBody);
+
+    /* ========================================================================
+     * 11. DAILY CALL REPORT (DCR) / TIMESHEET
+     * ======================================================================== */
+
+    //    https://app.xedigital.ai/api/v1/employees/dcrData
+//    https://app.xedigital.ai/api/v1/employees/dcrList/685ce653877f7453b52fbc5c
+    @GET("employees/dcrList/{employeeId}")
+    Call<EmployeeTimesheetResponse> getTimesheetData(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
+
+    /* ========================================================================
+     * 12. MEDIA & BUCKET UPLOADS
+     * ======================================================================== */
+
+    @POST("images/add/bucket")
+    Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body AddBucketRequest addBucketRequest);
+
+    @POST("images/add/bucket")
+    Call<ResponseBody> addBucket(@Header("Authorization") String authToken, @Body RequestBody requestBody);
 
 }

@@ -473,7 +473,7 @@
 
                         <!-- View profile -->
                         <LinearLayout
-                            android:id="@+id/btnQuickProfile"
+                            android:id="@+id/btnQuickClaim"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -494,8 +494,8 @@
                                     android:layout_width="22dp"
                                     android:layout_height="22dp"
                                     android:layout_gravity="center"
-                                    android:contentDescription="@string/view_profile"
-                                    android:src="@drawable/ic_profile_placeholder"
+                                    android:contentDescription="@string/add_claim"
+                                    android:src="@drawable/ic_document"
                                     app:tint="@color/OccasionalLeave" />
                             </FrameLayout>
 
@@ -504,7 +504,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:gravity="center"
-                                android:text="@string/view_profile"
+                                android:text="@string/add_claim"
                                 android:textColor="@color/avatar_bg"
                                 android:textSize="10.5sp"
                                 android:textStyle="bold"

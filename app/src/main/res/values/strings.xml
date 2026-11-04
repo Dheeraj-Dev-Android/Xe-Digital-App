@@ -210,4 +210,5 @@
     <string name="confirm_check_in">Confirm Check In</string>
     <string name="consultedge_global">ConsultEdge Global</string>
     <string name="punch_in">Check In</string>
+    <string name="add_claim">Add Claim</string>
 </resources>
