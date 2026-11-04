@@ -234,7 +234,7 @@
         <item
             android:id="@+id/nav_visitorCheckInFragment"
             android:icon="@drawable/ic_visitor"
-            android:title="Visitor Check In"
+            android:title="Check In"
             android:visible="false" />
 
         <item

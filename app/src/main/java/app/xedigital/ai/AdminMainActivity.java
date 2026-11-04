@@ -184,8 +184,8 @@ public class AdminMainActivity extends SecureBaseActivity {
                 R.id.nav_new_features,
                 R.id.nav_visitor_categories,
                 R.id.nav_leave_config,
-                R.id.nav_notification,
-                R.id.nav_visitorCheckInFragment
+                R.id.nav_notification
+//                R.id.nav_visitorCheckInFragment
         ).setOpenableLayout(drawer).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);

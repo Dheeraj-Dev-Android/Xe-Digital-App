@@ -138,19 +138,19 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".admin.adminActivity.AdminPunchActivity"
-            android:exported="true"
+            android:exported="false"
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
 
         <activity
             android:name=".admin.adminActivity.AdminCheckOutActivity"
-            android:exported="true"
+            android:exported="false"
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
 
         <activity
             android:name=".admin.adminActivity.AdminManualCheckIn"
-            android:exported="true"
+            android:exported="false"
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.XEDigital.NoActionBar" />
 
@@ -190,7 +190,7 @@
             android:value="face" />
         <meta-data
             android:name="com.google.ar.core"
-            android:value="optional" />
+            android:value="remove" />
 
     </application>
 

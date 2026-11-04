@@ -90,13 +90,13 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="36dp"
         android:contentDescription="@string/get_started"
-        android:src="@drawable/ic_arrow_forward"
+        android:src="@drawable/baseline_arrow_forward_24"
         app:backgroundTint="@color/surface_white"
         app:elevation="8dp"
         app:fabSize="normal"
-        app:tint="@color/colorPrimary" />
+        app:tint="@color/color_primary" />
 
     <!-- ─────────────── OVERLAY INCLUDES ─────────────── -->
 
