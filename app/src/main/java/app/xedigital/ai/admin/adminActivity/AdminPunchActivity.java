@@ -954,11 +954,13 @@ public class AdminPunchActivity extends AppCompatActivity {
         return dir;
     }
 
-    private final Runnable captureRunnable = this::captureImage;
-
     interface AddressCallback {
         void onAddressReceived(String address, Location location);
     }
+
+    private final Runnable captureRunnable = this::captureImage;
+
+
 
 
 }

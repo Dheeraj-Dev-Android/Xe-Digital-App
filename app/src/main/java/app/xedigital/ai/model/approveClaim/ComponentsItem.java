@@ -22,7 +22,7 @@ public class ComponentsItem implements Serializable {
     private String id;
 
     @SerializedName("fixedAmount")
-    private Object fixedAmount;
+    private Double fixedAmount;
 
     @SerializedName("monthlyAmount")
     private double monthlyAmount;
@@ -73,11 +73,11 @@ public class ComponentsItem implements Serializable {
         this.id = id;
     }
 
-    public Object getFixedAmount() {
+    public Double getFixedAmount() {
         return fixedAmount;
     }
 
-    public void setFixedAmount(Object fixedAmount) {
+    public void setFixedAmount(Double fixedAmount) {
         this.fixedAmount = fixedAmount;
     }
 
