@@ -2,7 +2,9 @@ package app.xedigital.ai.admin.adminModal.empTimesheet;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EmployeeDcrItem {
+import java.io.Serializable;
+
+public class EmployeeDcrItem implements Serializable {
 
     @SerializedName("employeeName")
     private String employeeName;

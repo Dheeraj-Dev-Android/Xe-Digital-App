@@ -60,7 +60,8 @@ public class AdminMainActivity extends SecureBaseActivity {
                 R.id.nav_visitorDetailsFragment,
                 R.id.nav_employees,
                 R.id.nav_partners,
-                R.id.nav_allUsers
+                R.id.nav_allUsers,
+                R.id.nav_employee_onboard_details
         });
         put(R.id.nav_workforce_menu, new int[]{
                 R.id.nav_wf_attendance,
@@ -184,7 +185,8 @@ public class AdminMainActivity extends SecureBaseActivity {
                 R.id.nav_new_features,
                 R.id.nav_visitor_categories,
                 R.id.nav_leave_config,
-                R.id.nav_notification
+                R.id.nav_notification,
+                R.id.nav_employee_onboard_details
 //                R.id.nav_visitorCheckInFragment
         ).setOpenableLayout(drawer).build();
 

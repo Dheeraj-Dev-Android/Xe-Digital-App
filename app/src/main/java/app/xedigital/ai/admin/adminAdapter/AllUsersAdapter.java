@@ -79,7 +79,7 @@ public class AllUsersAdapter extends RecyclerView.Adapter<AllUsersAdapter.UserVi
         if (parts.length == 1) {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
         }
-        return String.valueOf((parts[0].charAt(0) + parts[parts.length - 1].charAt(0)));
+        return ("" + parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
     }
 
     // Helper: Returns a consistent color from the palette based on the name's hash

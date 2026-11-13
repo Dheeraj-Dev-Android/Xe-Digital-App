@@ -45,7 +45,7 @@
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:textColor="@color/CasualLeave"
+                    android:textColor="@color/surface_white"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     tools:text="PN" />

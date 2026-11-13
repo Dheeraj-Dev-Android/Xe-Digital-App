@@ -90,6 +90,9 @@
         <action
             android:id="@+id/nav_allUsers_to_nav_editUser"
             app:destination="@id/nav_editUser" />
+        <action
+            android:id="@+id/action_allUsersFragment_to_addUserFragment"
+            app:destination="@id/addUserFragment" />
     </fragment>
 
     <fragment
@@ -103,6 +106,15 @@
     </fragment>
 
     <fragment
+        android:id="@+id/addUserFragment"
+        android:name="app.xedigital.ai.admin.adminUI.allUsers.AddUserFragment"
+        android:label="Add New User"
+        tools:layout="@layout/fragment_add_user">
+        <action
+            android:id="@+id/action_addUserFragment_to_nav_allUsers"
+            app:destination="@id/nav_allUsers" />
+    </fragment>
+    <fragment
         android:id="@+id/nav_editEmployee"
         android:name="app.xedigital.ai.admin.adminUI.employeeDetails.EditEmployeeFragment"
         android:label="Edit Employee"
@@ -110,6 +122,16 @@
         <action
             android:id="@+id/nav_editEmployee_to_nav_employees"
             app:destination="@id/nav_employees" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_employee_onboard_details"
+        android:name="app.xedigital.ai.admin.adminUI.employeeOnboard.EmployeeOnboardDetailsFragment"
+        android:label="Employee Onboard Details"
+        tools:layout="@layout/fragment_employee_onboard_details">
+        <action
+            android:id="@+id/action_nav_employeeOnboardDetails_to_nav_admin_dashboard"
+            app:destination="@id/nav_admin_dashboard" />
     </fragment>
 
 </navigation>

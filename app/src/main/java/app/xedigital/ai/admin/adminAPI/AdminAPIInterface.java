@@ -26,9 +26,11 @@ import app.xedigital.ai.admin.adminModal.employeeProfileImage.EmployeeProfileIma
 import app.xedigital.ai.admin.adminModal.leaveBalance.LeaveBalanceResponse;
 import app.xedigital.ai.admin.adminModal.leaveType.LeaveTypeResponse;
 import app.xedigital.ai.admin.adminModal.partners.PartnersResponse;
+import app.xedigital.ai.admin.adminModal.registerNewUser.RegisterUserRequestBody;
 import app.xedigital.ai.admin.adminModal.updateEmployee.UpdateEmployeeRequest;
 import app.xedigital.ai.admin.adminModal.visitorContact.VisitorContactResponse;
 import app.xedigital.ai.admin.adminModal.visitorFace.VisitorFaceResponse;
+import app.xedigital.ai.model.employeeOnboardDetails.EmployeeOnboardDetailsResponse;
 import app.xedigital.ai.model.login.LoginModelResponse;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -88,6 +90,11 @@ public interface AdminAPIInterface {
     @GET("roles")
     Call<UserRoleResponse> getRoles(@Header("Authorization") String authToken);
 
+
+    //    https://app.xedigital.ai/api/v1/users/register
+    @POST("users/register")
+    Call<ResponseBody> addNewUser(@Header("Authorization") String authToken, @Body RegisterUserRequestBody registerUserRequestBody);
+
     /* ========================================================================
      * 4. EMPLOYEE MANAGEMENT
      * ======================================================================== */
@@ -101,6 +108,10 @@ public interface AdminAPIInterface {
 
     @PUT("employees/profile/image/{employeeId}")
     Call<ResponseBody> addEmployeeProfileImage(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body EmployeeProfileImageRequest requestBody);
+
+    //    https://app.xedigital.ai/api/v1/employees/getEmployeesOnBoarded
+    @GET("employees/getEmployeesOnBoarded")
+    Call<EmployeeOnboardDetailsResponse> getEmployeesOnBoarded(@Header("Authorization") String authToken);
 
     /* ========================================================================
      * 5. PARTNER MANAGEMENT
@@ -217,6 +228,7 @@ public interface AdminAPIInterface {
 
     //    https://app.xedigital.ai/api/v1/employees/dcrData
 //    https://app.xedigital.ai/api/v1/employees/dcrList/685ce653877f7453b52fbc5c
+
     @GET("employees/dcrList/{employeeId}")
     Call<EmployeeTimesheetResponse> getTimesheetData(@Header("Authorization") String authToken, @Path("employeeId") String employeeId);
 

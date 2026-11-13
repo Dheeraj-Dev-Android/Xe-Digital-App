@@ -961,6 +961,4 @@ public class AdminPunchActivity extends AppCompatActivity {
     private final Runnable captureRunnable = this::captureImage;
 
 
-
-
 }
