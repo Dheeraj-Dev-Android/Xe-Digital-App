@@ -14,10 +14,12 @@ import app.xedigital.ai.admin.adminModal.VisitorManual.VisitorManualRequest;
 import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsAdminDetailsResponse;
 import app.xedigital.ai.admin.adminModal.VisitorsAdminDetails.VisitorsItem;
 import app.xedigital.ai.admin.adminModal.addBucket.AddBucketRequest;
+import app.xedigital.ai.admin.adminModal.addEmployee.AddEmployeeRequest;
 import app.xedigital.ai.admin.adminModal.addFace.AddFaceResponse;
 import app.xedigital.ai.admin.adminModal.assignLeave.AssignLeaveRequest;
 import app.xedigital.ai.admin.adminModal.businessUnit.AllBuResponse;
 import app.xedigital.ai.admin.adminModal.department.DepartmentResponse;
+import app.xedigital.ai.admin.adminModal.empAttendance.EmployeeAttendancePunchResponse;
 import app.xedigital.ai.admin.adminModal.empTimesheet.EmployeeTimesheetResponse;
 import app.xedigital.ai.admin.adminModal.employeeAppliedLeave.EmployeeAppliedLeaveResponse;
 import app.xedigital.ai.admin.adminModal.employeeFaceAdd.EmployeeFaceAddResponse;
@@ -44,6 +46,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface AdminAPIInterface {
 
@@ -103,6 +106,9 @@ public interface AdminAPIInterface {
     @Headers({"Content-Type: application/json", "Accept: application/json"})
     Call<EmployeeDetailResponse> getEmployees(@Header("Authorization") String authToken);
 
+    @POST("employees")
+    Call<ResponseBody> addEmployee(@Header("Authorization") String authToken, @Body AddEmployeeRequest requestBody);
+
     @PUT("employees/profile/{employeeId}")
     Call<ResponseBody> updateEmployee(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body UpdateEmployeeRequest requestBody);
 
@@ -113,6 +119,13 @@ public interface AdminAPIInterface {
     @GET("employees/getEmployeesOnBoarded")
     Call<EmployeeOnboardDetailsResponse> getEmployeesOnBoarded(@Header("Authorization") String authToken);
 
+    //    https://app.xedigital.ai/api/v1/employees/updateOnboardStatusRemarks/6a9e5ed3671e7c0571bccb5d
+    @PUT("employees/updateOnboardStatusRemarks/{employeeId}")
+    Call<ResponseBody> updateEmployeeOnboardStatusRemarks(@Header("Authorization") String authToken, @Path("employeeId") String employeeId, @Body RequestBody requestBody);
+
+    //    https://app.xedigital.ai/api/v1/employees/attendance/punch?start=&end=&sorting=&employee=&department=&page=&limit=&branch=&prefix=
+    @GET("employees/attendance/punch")
+    Call<EmployeeAttendancePunchResponse> getEmployeeAttendancePunch(@Header("Authorization") String authToken, @Query("start") String start, @Query("end") String end, @Query("sorting") String sorting, @Query("employee") String employee, @Query("department") String department, @Query("page") int page, @Query("limit") int limit, @Query("branch") String branch, @Query("prefix") String prefix);
     /* ========================================================================
      * 5. PARTNER MANAGEMENT
      * ======================================================================== */

@@ -5,6 +5,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +15,9 @@ import app.xedigital.ai.admin.adminAPI.AdminAPIClient;
 import app.xedigital.ai.admin.adminAPI.AdminAPIInterface;
 import app.xedigital.ai.model.employeeOnboardDetails.EmployeeOnBoardDetailsItem;
 import app.xedigital.ai.model.employeeOnboardDetails.EmployeeOnboardDetailsResponse;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,5 +68,43 @@ public class EmployeeOnboardDetailsViewModel extends ViewModel {
                 errorMessage.setValue("Network error: " + t.getMessage());
             }
         });
+    }
+
+    public void requestEmployeeUpdate(String authToken, String employeeId,
+                                      String remarks, UpdateRequestCallback callback) {
+        RequestBody body;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("remarks", remarks);
+            json.put("status", false);
+            body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json.toString());
+        } catch (JSONException e) {
+            callback.onError("Could not build request");
+            return;
+        }
+        AdminAPIInterface apiService = AdminAPIClient.getInstance().getBase2();
+
+        apiService.updateEmployeeOnboardStatusRemarks(authToken, employeeId, body)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            callback.onSuccess();
+                        } else {
+                            callback.onError("Request failed (" + response.code() + ")");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                        callback.onError("Network error. Please try again.");
+                    }
+                });
+    }
+
+    public interface UpdateRequestCallback {
+        void onSuccess();
+
+        void onError(String message);
     }
 }

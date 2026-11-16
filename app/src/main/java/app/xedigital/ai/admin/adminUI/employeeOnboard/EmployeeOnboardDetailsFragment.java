@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,7 +44,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,6 +79,7 @@ public class EmployeeOnboardDetailsFragment extends Fragment implements Employee
     private EmployeeOnboardDetailsAdapter adapter;
     private String token;
     private Dialog docDialog;
+    private AlertDialog requestDialog;
 
     public static EmployeeOnboardDetailsFragment newInstance() {
         return new EmployeeOnboardDetailsFragment();
@@ -203,8 +209,74 @@ public class EmployeeOnboardDetailsFragment extends Fragment implements Employee
     public void onEditDetails(EmployeeOnBoardDetailsItem item) {
         // Edit flow is not approved yet - keeping the existing stub behaviour.
         if (isAdded() && getContext() != null) {
-            Toast.makeText(getContext(), "Edit coming soon", Toast.LENGTH_SHORT).show();
+            showRequestUpdateDialog(item);
         }
+    }
+
+    private void showRequestUpdateDialog(EmployeeOnBoardDetailsItem item) {
+        if (!isAdded() || getContext() == null || item == null) return;
+
+        View view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_request_employee_update, null);
+
+        TextView tvEmployee = view.findViewById(R.id.tvEmployeeName);
+        ImageView btnClose = view.findViewById(R.id.btnClose);
+        TextInputLayout tilRemarks = view.findViewById(R.id.tilRemarks);
+        TextInputEditText etRemarks = view.findViewById(R.id.etRemarks);
+        MaterialButton btnCancel = view.findViewById(R.id.btnCancel);
+        MaterialButton btnSubmit = view.findViewById(R.id.btnSubmitRequest);
+        ProgressBar progress = view.findViewById(R.id.progressSubmit);
+
+        tvEmployee.setText("Employee: " + safe(item.getFullName()));
+
+        if (requestDialog != null && requestDialog.isShowing()) requestDialog.dismiss();
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext()).setView(view).setCancelable(false).create();
+        requestDialog = dialog;
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        }
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSubmit.setOnClickListener(v -> {
+            String remarks = etRemarks.getText() == null ? "" : etRemarks.getText().toString().trim();
+            if (remarks.isEmpty()) {
+                tilRemarks.setError("Remarks are required");
+                return;
+            }
+            tilRemarks.setError(null);
+
+            // block double taps
+            btnSubmit.setEnabled(false);
+            btnCancel.setEnabled(false);
+            btnClose.setEnabled(false);
+            progress.setVisibility(View.VISIBLE);
+
+            String employeeId = item.getId(); // <-- verify, see below
+
+            mViewModel.requestEmployeeUpdate("jwt " + token, employeeId, remarks, new EmployeeOnboardDetailsViewModel.UpdateRequestCallback() {
+                @Override
+                public void onSuccess() {
+                    if (!isAdded() || getContext() == null) return;
+                    dialog.dismiss();
+                    Toast.makeText(requireContext(), "Update request submitted", Toast.LENGTH_SHORT).show();
+                    showLoading(true);
+                    mViewModel.fetchOnboardedEmployees("jwt " + token);
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (!isAdded() || getContext() == null) return;
+                    progress.setVisibility(View.GONE);
+                    btnSubmit.setEnabled(true);
+                    btnCancel.setEnabled(true);
+                    btnClose.setEnabled(true);
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        dialog.show();
     }
 
     // ---------------- Small helpers ----------------
@@ -659,6 +731,8 @@ public class EmployeeOnboardDetailsFragment extends Fragment implements Employee
         // inside onDestroyView(), next to the shimmer stop:
         if (docDialog != null && docDialog.isShowing()) docDialog.dismiss();
         docDialog = null;
+        if (requestDialog != null && requestDialog.isShowing()) requestDialog.dismiss();
+        requestDialog = null;
         super.onDestroyView();
     }
 

@@ -46,12 +46,11 @@
         <item
             android:id="@+id/nav_workforce_menu"
             android:icon="@drawable/ic_collections_bookmark"
-            android:title="Workforce Management"
-            android:visible="false" />
+            android:title="Workforce Management" />
 
         <item
-            android:id="@+id/nav_wf_attendance"
-            android:title="Attendance"
+            android:id="@+id/nav_employee_attendance"
+            android:title="Employee Attendance"
             android:visible="false" />
         <item
             android:id="@+id/nav_employee_leaves"

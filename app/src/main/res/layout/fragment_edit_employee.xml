@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fragment_dashboard_bg"
-    android:paddingTop="?attr/actionBarSize"
     tools:context=".admin.adminUI.employeeDetails.EditEmployeeFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -20,7 +19,8 @@
             android:id="@+id/linearLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="8dp">
 
             <!-- ========== ASSIGNMENT (first card style) ========== -->
             <com.google.android.material.card.MaterialCardView
@@ -41,71 +41,39 @@
                     android:paddingTop="12dp"
                     android:paddingBottom="4dp">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginEnd="8dp"
-                            android:background="@color/accent_employee" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:letterSpacing="0.12"
-                            android:text="ASSIGNMENT"
-                            android:textAllCaps="true"
-                            android:textColor="@color/accent_employee"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Status | Employee Type -->
-                    <LinearLayout
+                    <!-- Status -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilStatus"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="12dp"
+                        android:hint="Status *">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilStatus"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerStatus"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_weight="1"
-                            android:hint="Status *">
+                            android:inputType="none"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerStatus"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                    <!-- Employee Type -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilEmployeeType"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Employee Type *">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilEmployeeType"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerEmployeeType"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_weight="1"
-                            android:hint="Employee Type *">
-
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerEmployeeType"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
+                            android:inputType="none"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Partner (full width, visible only when Employee Type = Partner) -->
                     <com.google.android.material.textfield.TextInputLayout
@@ -121,97 +89,78 @@
                             android:id="@+id/spinnerPartner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Department | Business Unit (BU) -->
-                    <LinearLayout
+                    <!-- Department -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilDepartment"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="12dp"
+                        android:hint="Department *">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilDepartment"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerDepartment"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_weight="1"
-                            android:hint="Department *">
+                            android:inputType="none"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerDepartment"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none" />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilBusinessUnit"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_weight="1"
-                            android:hint="Business Unit (BU)">
-
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerBusinessUnit"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-
-                    <!-- Shift | Employee Code -->
-                    <LinearLayout
+                    <!-- Business Unit (BU) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilBusinessUnit"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="12dp"
+                        android:hint="Business Unit (BU)">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilShift"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerBusinessUnit"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_weight="1"
-                            android:hint="Shift *"
-                            app:startIconDrawable="@drawable/ic_shift"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:inputType="none"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerShift"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none"
-                                android:paddingStart="40dp" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                    <!-- Shift -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilShift"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Shift *">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilEmployeeCode"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            android:layout_width="0dp"
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerShift"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_weight="1"
-                            android:hint="Employee Code *">
+                            android:inputType="none"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEmployeeCode"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="textCapCharacters"
-                                android:maxLength="20" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
+                    <!-- Employee Code -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilEmployeeCode"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:hint="Employee Code *">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etEmployeeCode"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapCharacters"
+                            android:maxLength="20"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -282,7 +231,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textPersonName|textCapWords"
-                                android:maxLength="50" />
+                                android:maxLength="50"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -300,7 +250,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textPersonName|textCapWords"
-                                android:maxLength="50" />
+                                android:maxLength="50"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -318,7 +269,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName|textCapWords"
-                            android:maxLength="50" />
+                            android:maxLength="50"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Email | Contact -->
@@ -336,10 +288,7 @@
                             android:layout_marginEnd="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="Email *"
-                            app:startIconDrawable="@drawable/ic_email"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="Email *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etEmail"
@@ -347,7 +296,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="textEmailAddress"
                                 android:maxLength="100"
-                                android:paddingStart="40dp" />
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -358,10 +307,7 @@
                             android:layout_marginStart="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="Contact *"
-                            app:startIconDrawable="@drawable/ic_phone"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="Contact *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etContact"
@@ -370,7 +316,7 @@
                                 android:digits="0123456789+-()"
                                 android:inputType="phone"
                                 android:maxLength="15"
-                                android:paddingStart="40dp" />
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -388,7 +334,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textCapWords"
-                            android:maxLength="100" />
+                            android:maxLength="100"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Level | Grade -->
@@ -413,7 +360,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textCapCharacters"
-                                android:maxLength="10" />
+                                android:maxLength="10"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -431,7 +379,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textCapCharacters"
-                                android:maxLength="5" />
+                                android:maxLength="5"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -450,10 +399,7 @@
                             android:layout_marginEnd="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="Date of Birth *"
-                            app:startIconDrawable="@drawable/ic_calendar"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="Date of Birth *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etDOB"
@@ -462,7 +408,7 @@
                                 android:clickable="true"
                                 android:focusable="false"
                                 android:inputType="none"
-                                android:paddingStart="40dp" />
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -473,10 +419,7 @@
                             android:layout_marginStart="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="Joining Date *"
-                            app:startIconDrawable="@drawable/ic_calendar"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="Joining Date *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etJoiningDate"
@@ -485,7 +428,7 @@
                                 android:clickable="true"
                                 android:focusable="false"
                                 android:inputType="none"
-                                android:paddingStart="40dp" />
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -502,7 +445,8 @@
                             android:id="@+id/spinnerJoiningType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
@@ -564,7 +508,8 @@
                             android:id="@+id/spinnerReportingManager"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -579,7 +524,8 @@
                             android:id="@+id/spinnerCrossFunctionalManager"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
@@ -651,7 +597,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textCapCharacters"
-                                android:maxLength="10" />
+                                android:maxLength="10"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -670,7 +617,8 @@
                                 android:layout_height="wrap_content"
                                 android:digits="0123456789"
                                 android:inputType="number"
-                                android:maxLength="12" />
+                                android:maxLength="12"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -687,7 +635,8 @@
                             android:id="@+id/spinnerDifferentlyAbledType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
@@ -753,7 +702,8 @@
                             android:inputType="textMultiLine|textCapSentences"
                             android:maxLength="250"
                             android:maxLines="4"
-                            android:minLines="2" />
+                            android:minLines="2"
+                            android:textSize="13sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- State | Pin Code -->
@@ -771,10 +721,7 @@
                             android:layout_marginEnd="6dp"
                             android:layout_marginBottom="12dp"
                             android:layout_weight="1"
-                            android:hint="State *"
-                            app:startIconDrawable="@drawable/ic_location"
-                            app:startIconMinSize="48dp"
-                            app:startIconTint="@color/accent_employee">
+                            android:hint="State *">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etState"
@@ -782,7 +729,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="textCapWords"
                                 android:maxLength="50"
-                                android:paddingStart="40dp" />
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -801,7 +748,8 @@
                                 android:layout_height="wrap_content"
                                 android:digits="0123456789"
                                 android:inputType="number"
-                                android:maxLength="6" />
+                                android:maxLength="6"
+                                android:textSize="13sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 

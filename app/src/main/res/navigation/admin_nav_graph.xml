@@ -62,6 +62,23 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/nav_employees_to_nav_createNewEmployee"
+            app:destination="@id/nav_createNewEmployee"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_createNewEmployee"
+        android:name="app.xedigital.ai.admin.adminUI.employeeDetails.CreateNewEmployeeFragment"
+        android:label="Create New Employee"
+        tools:layout="@layout/fragment_create_new_employee">
+        <action
+            android:id="@+id/action_nav_createNewEmployee_to_nav_employees"
+            app:destination="@id/nav_employees" />
     </fragment>
 
     <fragment
@@ -131,6 +148,16 @@
         tools:layout="@layout/fragment_employee_onboard_details">
         <action
             android:id="@+id/action_nav_employeeOnboardDetails_to_nav_admin_dashboard"
+            app:destination="@id/nav_admin_dashboard" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_employee_attendance"
+        android:name="app.xedigital.ai.admin.adminUI.EmployeeAttendance.EmployeeAttendanceFragment"
+        android:label="Employee Attendance"
+        tools:layout="@layout/fragment_employee_attendance">
+        <action
+            android:id="@+id/action_nav_employee_attendance_to_nav_admin_dashboard"
             app:destination="@id/nav_admin_dashboard" />
     </fragment>
 

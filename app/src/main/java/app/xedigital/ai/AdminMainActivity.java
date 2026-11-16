@@ -64,7 +64,7 @@ public class AdminMainActivity extends SecureBaseActivity {
                 R.id.nav_employee_onboard_details
         });
         put(R.id.nav_workforce_menu, new int[]{
-                R.id.nav_wf_attendance,
+                R.id.nav_employee_attendance,
                 R.id.nav_employee_leaves,
                 R.id.nav_timesheet,
                 R.id.nav_shifts,
@@ -150,7 +150,7 @@ public class AdminMainActivity extends SecureBaseActivity {
                 R.id.nav_employees,
                 R.id.nav_partners,
                 R.id.nav_allUsers,
-                R.id.nav_wf_attendance,
+                R.id.nav_employee_attendance,
                 R.id.nav_employee_leaves,
                 R.id.nav_timesheet,
                 R.id.nav_shifts,

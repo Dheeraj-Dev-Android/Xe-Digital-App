@@ -375,9 +375,7 @@
                         app:boxStrokeColor="#4F46E5"
                         app:boxStrokeWidth="1dp"
                         app:boxStrokeWidthFocused="2dp"
-                        app:hintTextColor="#4F46E5"
-                        app:startIconDrawable="@drawable/ic_person"
-                        app:startIconTint="#4F46E5">
+                        app:hintTextColor="#4F46E5">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/nameEditText"

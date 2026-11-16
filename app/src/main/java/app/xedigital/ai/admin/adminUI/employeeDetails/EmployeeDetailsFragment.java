@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -124,6 +127,7 @@ public class EmployeeDetailsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         mViewModel = new ViewModelProvider(this).get(EmployeeDetailsViewModel.class);
 
         mViewModel.getEmployeeList().observe(getViewLifecycleOwner(), employees -> {
@@ -170,5 +174,24 @@ public class EmployeeDetailsFragment extends Fragment {
             emptyStateView.setVisibility(View.GONE);
             rvEmployees.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_add_new_employee, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_add_newEmployee) {
+            View view = getView();
+            if (view != null) {
+                Navigation.findNavController(view)
+                        .navigate(R.id.nav_employees_to_nav_createNewEmployee);
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
