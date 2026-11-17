@@ -6,38 +6,38 @@ import java.io.Serializable;
 
 public class Holiday implements Serializable {
 
-	@SerializedName("_id")
-	private String id;
+    @SerializedName("_id")
+    private String id;
 
-	@SerializedName("isOptional")
-	private boolean isOptional;
+    @SerializedName("isOptional")
+    private boolean isOptional;
 
-	@SerializedName("holidayName")
-	private String holidayName;
+    @SerializedName("holidayName")
+    private String holidayName;
 
-	@SerializedName("holidayDateFormat")
-	private String holidayDateFormat;
+    @SerializedName("holidayDateFormat")
+    private String holidayDateFormat;
 
-	@SerializedName("holidayDate")
-	private String holidayDate;
+    @SerializedName("holidayDate")
+    private String holidayDate;
 
-	public String getId(){
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public boolean isIsOptional(){
-		return isOptional;
-	}
+    public boolean isIsOptional() {
+        return isOptional;
+    }
 
-	public String getHolidayName(){
-		return holidayName;
-	}
+    public String getHolidayName() {
+        return holidayName;
+    }
 
-	public String getHolidayDateFormat(){
-		return holidayDateFormat;
-	}
+    public String getHolidayDateFormat() {
+        return holidayDateFormat;
+    }
 
-	public String getHolidayDate(){
-		return holidayDate;
-	}
+    public String getHolidayDate() {
+        return holidayDate;
+    }
 }

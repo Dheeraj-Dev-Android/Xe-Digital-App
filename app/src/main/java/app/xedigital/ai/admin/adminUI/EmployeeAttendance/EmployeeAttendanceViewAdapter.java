@@ -59,10 +59,10 @@ public class EmployeeAttendanceViewAdapter
         // ── Shift times (for late / OT) ──
         String[] shiftTimes = extractShiftTimes(item.getShift());
         String shiftStart = shiftTimes[0]; // e.g. "09:00"
-        String shiftEnd   = shiftTimes[1]; // e.g. "18:00"
+        String shiftEnd = shiftTimes[1]; // e.g. "18:00"
 
         // ── Raw punch values ──
-        String punchInRaw  = objToStr(item.getPunchIn());
+        String punchInRaw = objToStr(item.getPunchIn());
         String punchOutRaw = objToStr(item.getPunchOut());
 
         // ── Punch In / Out (formatted via DateTimeUtils) ──
@@ -149,7 +149,7 @@ public class EmployeeAttendanceViewAdapter
 
     private String[] extractShiftTimes(Object shiftObj) {
         String start = "09:00";
-        String end   = "18:00";
+        String end = "18:00";
 
         if (shiftObj == null) return new String[]{start, end};
 
@@ -222,7 +222,7 @@ public class EmployeeAttendanceViewAdapter
         String name = emp.getFullname();
         if (name == null || name.trim().isEmpty()) {
             String first = emp.getFirstname() != null ? emp.getFirstname() : "";
-            String last  = emp.getLastname() != null ? emp.getLastname() : "";
+            String last = emp.getLastname() != null ? emp.getLastname() : "";
             name = (first + " " + last).trim();
             if (name.isEmpty()) name = "Unknown Employee";
         }
@@ -268,16 +268,16 @@ public class EmployeeAttendanceViewAdapter
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            empNameTextView   = itemView.findViewById(R.id.empNameTextView);
+            empNameTextView = itemView.findViewById(R.id.empNameTextView);
             attendaceDateView = itemView.findViewById(R.id.attendaceDateView);
             leaveNameTextView = itemView.findViewById(R.id.leaveNameTextView);
-            punchInTextView   = itemView.findViewById(R.id.punchInTextView);
-            punchOutTextView  = itemView.findViewById(R.id.punchOutTextView);
+            punchInTextView = itemView.findViewById(R.id.punchInTextView);
+            punchOutTextView = itemView.findViewById(R.id.punchOutTextView);
             totalTimeTextView = itemView.findViewById(R.id.totalTimeTextView);
-            overTimeTextView  = itemView.findViewById(R.id.overTimeTextView);
-            lateTimeTextView  = itemView.findViewById(R.id.lateTimeTextView);
+            overTimeTextView = itemView.findViewById(R.id.overTimeTextView);
+            lateTimeTextView = itemView.findViewById(R.id.lateTimeTextView);
             btnViewAttendance = itemView.findViewById(R.id.btn_viewAttendance);
-            btnRegularize     = itemView.findViewById(R.id.btn_regularize);
+            btnRegularize = itemView.findViewById(R.id.btn_regularize);
         }
     }
 }

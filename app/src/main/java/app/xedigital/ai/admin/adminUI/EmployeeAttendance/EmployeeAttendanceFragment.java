@@ -13,8 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.chip.Chip;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,30 +33,32 @@ import app.xedigital.ai.utills.SecurePrefManager;
 
 public class EmployeeAttendanceFragment extends Fragment implements AttendanceFilterBottomSheet.FilterListener {
 
+    private final List<EmployeePunchDataItem> attendanceList = new ArrayList<>();
+    // ── Date formatters ──
+    private final SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private final SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MMM/yyyy", Locale.getDefault());
     // ── Views ──
     private RecyclerView recyclerViewAttendance;
     private ProgressBar progressBar;
     private TextView tvEmpty, tvFilterSummary;
     private ImageButton btnFilter;
 
+    // ── Chips ──
+    private Chip chipAddAttendancePending;
+    private Chip chipRegularizationPending;
+    private Chip chipViewAttendanceLog;
+
     // ── ViewModel & Adapter ──
     private EmployeeAttendanceViewModel viewModel;
     private EmployeeAttendanceViewAdapter adapter;
-    private final List<EmployeePunchDataItem> attendanceList = new ArrayList<>();
-
     // ── Filter data caches ──
     private List<DepartmentsItem> departmentsList = new ArrayList<>();
     private List<EmployeesItem> employeesList = new ArrayList<>();
-
     // ── Active filter state ──
     private String currentStartDate = "";
     private String currentEndDate = "";
     private String currentDeptId = "";
     private String currentEmpId = "";
-
-    // ── Date formatters ──
-    private final SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-    private final SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     // ══════════════════════════════════════════════
     //  LIFECYCLE
@@ -72,6 +77,7 @@ public class EmployeeAttendanceFragment extends Fragment implements AttendanceFi
         bindViews(view);
         initViewModel();
         setupRecyclerView();
+        setupChips();
         observeLiveData();
         setupFilterButton();
         loadInitialData();
@@ -87,6 +93,10 @@ public class EmployeeAttendanceFragment extends Fragment implements AttendanceFi
         tvEmpty = view.findViewById(R.id.tvEmpty);
         tvFilterSummary = view.findViewById(R.id.tvFilterSummary);
         btnFilter = view.findViewById(R.id.btnFilter);
+
+        chipAddAttendancePending = view.findViewById(R.id.chipAddAttendancePending);
+        chipRegularizationPending = view.findViewById(R.id.chipRegularizationPending);
+        chipViewAttendanceLog = view.findViewById(R.id.chipViewAttendanceLog);
     }
 
     private void initViewModel() {
@@ -97,6 +107,24 @@ public class EmployeeAttendanceFragment extends Fragment implements AttendanceFi
         adapter = new EmployeeAttendanceViewAdapter(attendanceList);
         recyclerViewAttendance.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerViewAttendance.setAdapter(adapter);
+    }
+
+    private void setupChips() {
+        chipAddAttendancePending.setOnClickListener(v -> {
+            // Action when "Add Attendance Pending Approval" chip is clicked
+            Navigation.findNavController(v).navigate(R.id.action_nav_employee_attendance_to_nav_add_attendance_pending_approval);
+        });
+
+        chipRegularizationPending.setOnClickListener(v -> {
+            // Action when "Regularization Pending Approval" chip is clicked
+            Navigation.findNavController(v).navigate(R.id.action_nav_employee_attendance_to_nav_attendance_regularization_approval);
+
+
+        });
+
+        chipViewAttendanceLog.setOnClickListener(v -> {
+            // Action when "View Attendance Log" chip is clicked
+        });
     }
 
     private void setupFilterButton() {

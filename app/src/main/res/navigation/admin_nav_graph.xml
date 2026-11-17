@@ -159,6 +159,36 @@
         <action
             android:id="@+id/action_nav_employee_attendance_to_nav_admin_dashboard"
             app:destination="@id/nav_admin_dashboard" />
+        <action
+            android:id="@+id/action_nav_employee_attendance_to_nav_attendance_regularization_approval"
+            app:destination="@id/nav_attendance_regularization_approval" />
+        <action
+            android:id="@+id/action_nav_employee_attendance_to_nav_add_attendance_pending_approval"
+            app:destination="@id/nav_add_attendance_pending_approval" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_attendance_regularization_approval"
+        android:name="app.xedigital.ai.admin.adminUI.EmployeeAttendance.AttendanceRegularizationApprovalFragment"
+        android:label="Attendance Regularization Approval"
+        tools:layout="@layout/fragment_attendance_regularization_approval">
+        <action
+            android:id="@+id/action_nav_attendance_regularization_approval_to_nav_employee_attendance"
+            app:destination="@id/nav_employee_attendance" />
+        <action
+            android:id="@+id/action_nav_attendance_regularization_approval_to_nav_admin_dashboard"
+            app:destination="@id/nav_admin_dashboard" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_add_attendance_pending_approval"
+        android:name="app.xedigital.ai.admin.adminUI.EmployeeAttendance.AddAttendancePendingApprovalFragment"
+        android:label="Add Attendance Pending Approval"
+        tools:layout="@layout/fragment_add_attendance_pending_approval">
+        <action
+            android:id="@+id/action_nav_add_attendance_pending_approval_to_nav_employee_attendance"
+            app:destination="@id/nav_employee_attendance" />
+        <action
+            android:id="@+id/action_nav_add_attendance_pending_approval_to_nav_admin_dashboard"
+            app:destination="@id/nav_admin_dashboard" />
     </fragment>
 
 </navigation>

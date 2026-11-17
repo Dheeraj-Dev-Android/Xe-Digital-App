@@ -1,8 +1,8 @@
 package app.xedigital.ai.admin.adminModal.empAttendance;
 
-import java.util.List;
-
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class Data {
 

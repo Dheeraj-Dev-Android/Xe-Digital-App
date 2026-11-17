@@ -1,7 +1,9 @@
 package app.xedigital.ai.admin.adminAPI;
 
 import app.xedigital.ai.admin.adminModal.ActiveShift.ActiveShiftResponse;
+import app.xedigital.ai.admin.adminModal.AddAttendanceApproval.AddAttendanceApprovalResponse;
 import app.xedigital.ai.admin.adminModal.AdminUsers.AdminUserResponse;
+import app.xedigital.ai.admin.adminModal.AttendanceRegularizationApproval.AttendanceRegularizationApprovalResponse;
 import app.xedigital.ai.admin.adminModal.Branches.CompanyBranchResponse;
 import app.xedigital.ai.admin.adminModal.Dashboard.AdminDashboardResponse;
 import app.xedigital.ai.admin.adminModal.EmployeeDetails.EmployeeDetailResponse;
@@ -126,6 +128,14 @@ public interface AdminAPIInterface {
     //    https://app.xedigital.ai/api/v1/employees/attendance/punch?start=&end=&sorting=&employee=&department=&page=&limit=&branch=&prefix=
     @GET("employees/attendance/punch")
     Call<EmployeeAttendancePunchResponse> getEmployeeAttendancePunch(@Header("Authorization") String authToken, @Query("start") String start, @Query("end") String end, @Query("sorting") String sorting, @Query("employee") String employee, @Query("department") String department, @Query("page") int page, @Query("limit") int limit, @Query("branch") String branch, @Query("prefix") String prefix);
+
+    //    https://app.xedigital.ai/api/v1/employees/attendance/regularize/applied?start=&end=&employee=&page=&limit=&branch=&prefix=&rm=true
+    @GET("employees/attendance/regularize/applied")
+    Call<AttendanceRegularizationApprovalResponse> getEmployeeAttendanceRegularizeApplied(@Header("Authorization") String authToken, @Query("start") String start, @Query("end") String end, @Query("employee") String employee, @Query("page") int page, @Query("limit") int limit, @Query("branch") String branch, @Query("prefix") String prefix, @Query("rm") boolean rm);
+
+    //    https://app.xedigital.ai/api/v1/employees/attendance/add/regularizeList
+    @GET("employees/attendance/add/regularizeList")
+    Call<AddAttendanceApprovalResponse> getEmployeeAttendanceAddRegularizeList(@Header("Authorization") String authToken);
     /* ========================================================================
      * 5. PARTNER MANAGEMENT
      * ======================================================================== */

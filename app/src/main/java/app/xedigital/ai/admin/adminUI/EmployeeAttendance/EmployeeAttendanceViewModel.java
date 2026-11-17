@@ -24,34 +24,30 @@ public class EmployeeAttendanceViewModel extends ViewModel {
 
     // ── Attendance ──
     private final MutableLiveData<List<EmployeePunchDataItem>> attendanceData = new MutableLiveData<>();
+    // ── Departments (for filter bottom sheet) ──
+    private final MutableLiveData<List<DepartmentsItem>> departments = new MutableLiveData<>();
+    // ── Employees (for filter bottom sheet) ──
+    private final MutableLiveData<List<EmployeesItem>> employees = new MutableLiveData<>();
+    // ── Loading ──
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    // ── Error ──
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public LiveData<List<EmployeePunchDataItem>> getAttendanceData() {
         return attendanceData;
     }
 
-    // ── Departments (for filter bottom sheet) ──
-    private final MutableLiveData<List<DepartmentsItem>> departments = new MutableLiveData<>();
-
     public LiveData<List<DepartmentsItem>> getDepartments() {
         return departments;
     }
-
-    // ── Employees (for filter bottom sheet) ──
-    private final MutableLiveData<List<EmployeesItem>> employees = new MutableLiveData<>();
 
     public LiveData<List<EmployeesItem>> getEmployees() {
         return employees;
     }
 
-    // ── Loading ──
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
-
     public LiveData<Boolean> getIsLoading() {
         return isLoading;
     }
-
-    // ── Error ──
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public LiveData<String> getErrorMessage() {
         return errorMessage;

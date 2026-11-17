@@ -63,6 +63,7 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/attendaceDateView"
                 android:layout_width="match_parent"
